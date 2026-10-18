@@ -410,7 +410,12 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
                       _buildStatus(entry, hasText),
                       const SizedBox(height: 8),
                     ],
+                    // Keyed so the status line and chips appearing above
+                    // it never make Flutter rebuild this row as one of
+                    // them, which would recreate the field and drop the
+                    // keyboard on the first keystroke.
                     Row(
+                      key: const ValueKey('quick-log-field'),
                       children: [
                         Expanded(
                           child: TextField(

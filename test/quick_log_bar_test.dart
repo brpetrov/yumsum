@@ -323,6 +323,47 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500)); // the keyboard retry
   });
 
+  testWidgets('the first keystroke keeps the same field and its focus', (
+    tester,
+  ) async {
+    // No chips: the status line is the first thing to appear above the field.
+    await pumpCard(tester);
+    await tester.tap(find.byType(TextField));
+    await tester.pump();
+    final before = tester.state<EditableTextState>(find.byType(EditableText));
+
+    // The status line appears above the field on the first character; the
+    // field must not be rebuilt as a new widget (which drops the keyboard).
+    await tester.enterText(find.byType(TextField), 'c');
+    await tester.pump();
+
+    final after = tester.state<EditableTextState>(find.byType(EditableText));
+    expect(after, same(before));
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).focusNode!.hasFocus,
+      isTrue,
+    );
+  });
+
+  testWidgets('the first keystroke keeps the field when chips stay', (
+    tester,
+  ) async {
+    await pumpCard(tester, recents: [_recent('Chicken wrap', 450, 30)]);
+    await tester.pump();
+    await tester.tap(find.byType(TextField));
+    await tester.pump();
+    final before = tester.state<EditableTextState>(find.byType(EditableText));
+
+    await tester.enterText(find.byType(TextField), 'c');
+    await tester.pump();
+
+    expect(find.text('Chicken wrap · 450 kcal'), findsOneWidget);
+    expect(
+      tester.state<EditableTextState>(find.byType(EditableText)),
+      same(before),
+    );
+  });
+
   testWidgets('keyboard done saves when calories are present', (tester) async {
     await pumpCard(tester);
     await tester.enterText(find.byType(TextField), '450 kcal porridge');
