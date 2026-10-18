@@ -30,7 +30,7 @@
       "android": {
         "default": {
           "projectId": "lean-streak-project",
-          "appId": "1:296684319013:android:b4da7fa1822509e4db6acc",
+          "appId": "1:296684319013:android:56b8440034eb7b2ddb6acc",
           "fileOutput": "android/app/google-services.json"
         }
       },
@@ -38,7 +38,7 @@
         "lib/firebase_options.dart": {
           "projectId": "lean-streak-project",
           "configurations": {
-            "android": "1:296684319013:android:b4da7fa1822509e4db6acc",
+            "android": "1:296684319013:android:56b8440034eb7b2ddb6acc",
             "ios": "1:296684319013:ios:d7d548a522e7dba6db6acc",
             "web": "1:296684319013:web:dc9c8e0064a127e9db6acc",
             "windows": "1:296684319013:web:cfa432a5adf4792cdb6acc"

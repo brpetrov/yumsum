@@ -1,4 +1,4 @@
-package com.example.lean_streak
+package com.bpetrov.leanstreak
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
