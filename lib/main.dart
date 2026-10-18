@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/app/app.dart';
 import 'package:lean_streak/app/launch_actions.dart';
+import 'package:lean_streak/core/config/app_check.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/firebase_options.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
@@ -38,6 +39,13 @@ void main() async {
       if (error.code != 'duplicate-app') {
         rethrow;
       }
+    }
+    try {
+      await activateAppCheck();
+    } catch (error) {
+      // Without a token the AI call fails with a clear message; the rest of
+      // the app does not depend on App Check.
+      debugPrint('App Check setup failed: $error');
     }
   } catch (error, stackTrace) {
     debugPrint('LeanStreak startup failed: $error');
