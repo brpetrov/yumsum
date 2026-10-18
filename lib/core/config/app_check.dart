@@ -1,10 +1,10 @@
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/foundation.dart';
 
-/// reCAPTCHA v3 site key for the web app (a public value). Empty until the
-/// web app is registered in Firebase App Check; App Check is skipped on the
-/// web until then.
-const recaptchaSiteKey = '6LfON_UtAAAAAACPilACMpqekwXtUm4PKbMLc9qk';
+/// reCAPTCHA Enterprise (Fraud Defense) site key for the web app, a public
+/// value; classic reCAPTCHA v3 no longer accepts new App Check
+/// registrations. App Check is skipped on the web while this is empty.
+const recaptchaSiteKey = '6LffhvUtAAAAANG3hWgQg2FP8EF3vDy0PU1k5XsL';
 
 bool get appCheckAvailable => !kIsWeb || recaptchaSiteKey.isNotEmpty;
 
@@ -18,6 +18,6 @@ Future<void> activateAppCheck() async {
         ? AndroidProvider.debug
         : AndroidProvider.playIntegrity,
     appleProvider: kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
-    webProvider: kIsWeb ? ReCaptchaV3Provider(recaptchaSiteKey) : null,
+    webProvider: kIsWeb ? ReCaptchaEnterpriseProvider(recaptchaSiteKey) : null,
   );
 }
