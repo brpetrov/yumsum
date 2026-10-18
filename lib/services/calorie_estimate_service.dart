@@ -42,6 +42,18 @@ List<EstimateItem> parseEstimateItems(Object? raw) {
   ];
 }
 
+/// The opening of every prompt: where the user lives and what they usually
+/// eat, so dish names and portions are read the way they mean them.
+String nutritionContext({required String country, required String usualFood}) {
+  final food = usualFood.trim();
+  return 'You are a nutrition assistant. The user lives in $country'
+      '${food.isEmpty ? '' : ' and often eats $food'}. Read dish names the '
+      'way they are used there: the same name can mean a different dish in '
+      'different cuisines. The user may write in English or their own '
+      'language; write the meal name and item names in the language they '
+      'used.\n';
+}
+
 class DailyLimitExceededException implements Exception {
   const DailyLimitExceededException();
 }
@@ -56,9 +68,18 @@ class CalorieEstimateException implements Exception {
 }
 
 class CalorieEstimateService {
-  CalorieEstimateService(this._usageRepo);
+  CalorieEstimateService(
+    this._usageRepo, {
+    required String country,
+    required String usualFood,
+  }) : _country = country,
+       _usualFood = usualFood;
 
   final AiUsageRepository _usageRepo;
+
+  /// From the profile: where the user lives and what they usually eat.
+  final String _country;
+  final String _usualFood;
 
   static const String _modelId = 'gemini-3.5-flash-lite';
   static const int _maxServerRetries = 3;
@@ -72,22 +93,18 @@ class CalorieEstimateService {
     generationConfig: _generationConfig,
   );
 
-  static const String _context =
-      'You are a nutrition assistant. The user lives in the UK and often eats '
-      'home-cooked Bulgarian food, so read dish names the Bulgarian way '
-      '(e.g. musaka is the Bulgarian potato and minced meat bake). The user '
-      'may write in English or Bulgarian; write the meal name and item names '
-      'in the language they used.\n';
+  String get _context =>
+      nutritionContext(country: _country, usualFood: _usualFood);
 
   // Listing each component before the total stops the model skipping the
   // oil, butter or gravy.
-  static const String _promptTemplate =
+  String get _promptTemplate =>
       '$_context'
       'The user will describe a meal. List every component with its calories '
       'and protein, including cooking oil, butter, gravy, sauces, bread and '
       'drinks if mentioned. Use any amounts the user gives; otherwise assume a '
       'typical home portion. For home-cooked dishes, include the oil or fat '
-      'they are usually cooked with. For branded or chain products use UK '
+      'they are usually cooked with. For branded or chain products use $_country '
       'nutrition figures. Then add them up.\n'
       'Respond with ONLY a JSON object: {"items": [{"item": "<component>", '
       '"kcal": <integer>, "protein_g": <integer>}], "kcal": <integer total>, '
@@ -96,7 +113,7 @@ class CalorieEstimateService {
       'Do not include any other text.\n\n'
       'Meal: {input}';
 
-  static const String _voicePromptTemplate =
+  String get _voicePromptTemplate =>
       '$_context'
       'The user recorded a voice note about a meal, in English, Bulgarian or '
       'a mix of both. Listen to it and extract a short meal name, the total '
@@ -105,7 +122,7 @@ class CalorieEstimateService {
       'a calorie or protein amount for something, use that exact number for '
       'it. Otherwise estimate it: use any amounts the user gives, assume a '
       'typical home portion if none, include the oil or fat home-cooked dishes '
-      'are usually cooked with, and use UK nutrition figures for branded or '
+      'are usually cooked with, and use $_country nutrition figures for branded or '
       'chain products. Then add them up.\n'
       'If the user gave calories but no protein, still estimate the protein '
       'from the food. Only if nothing in the note says what the food was '
@@ -117,12 +134,12 @@ class CalorieEstimateService {
       '"protein_g": <integer total or null>}\n'
       'Do not include any other text.';
 
-  static const String _photoPromptTemplate =
+  String get _photoPromptTemplate =>
       '$_context'
       'The user sent a photo of a meal. Identify the dishes and estimate the '
       'portions from what is visible. List every component with its calories '
       'and protein, including visible oil, sauces, bread and drinks, then add '
-      'them up. Use UK nutrition figures for branded or chain products. If the '
+      'them up. Use $_country nutrition figures for branded or chain products. If the '
       'photo shows no food, respond with {"error": "no food"}.\n'
       'Respond with ONLY a JSON object: {"name": "<short meal name>", '
       '"items": [{"item": "<component>", "kcal": <integer>, "protein_g": '
@@ -130,7 +147,7 @@ class CalorieEstimateService {
       '"note": "<one short sentence explaining the estimate>"}\n'
       'Do not include any other text.';
 
-  static const String _proteinPromptTemplate =
+  String get _proteinPromptTemplate =>
       '$_context'
       'The user logged a meal by name with its calories. Assuming the '
       'calories are right, estimate how many grams of protein it contains.\n'

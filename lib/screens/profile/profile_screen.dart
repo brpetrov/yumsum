@@ -9,6 +9,7 @@ import 'package:lean_streak/providers/profile_controller.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/widgets/health_plan_preview_card.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
+import 'package:lean_streak/widgets/legal_links.dart';
 import 'package:lean_streak/widgets/clickable.dart';
 
 class PlanSettingsScreen extends ConsumerStatefulWidget {
@@ -24,6 +25,8 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
   final _heightCtrl = TextEditingController();
   final _currentWeightCtrl = TextEditingController();
   final _targetWeightCtrl = TextEditingController();
+  final _countryCtrl = TextEditingController();
+  final _foodCtrl = TextEditingController();
 
   String? _loadedProfileUid;
   Gender? _gender;
@@ -45,6 +48,8 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
     _heightCtrl.dispose();
     _currentWeightCtrl.dispose();
     _targetWeightCtrl.dispose();
+    _countryCtrl.dispose();
+    _foodCtrl.dispose();
     super.dispose();
   }
 
@@ -89,6 +94,8 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
     _heightCtrl.text = _formatDouble(profile.heightCm);
     _currentWeightCtrl.text = _formatDouble(profile.currentWeightKg);
     _targetWeightCtrl.text = _formatDouble(profile.targetWeightKg);
+    _countryCtrl.text = profile.country;
+    _foodCtrl.text = profile.usualFood;
     _gender = profile.gender;
     _activityLevel = profile.activityLevel;
     _trainingFrequency = profile.trainingFrequency;
@@ -117,6 +124,8 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
           activityLevel: _activityLevel,
           trainingFrequency: _trainingFrequency,
           weightLossPace: _weightLossPace,
+          country: _countryCtrl.text,
+          usualFood: _foodCtrl.text,
         );
 
     if (!mounted) return;
@@ -211,6 +220,33 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                           }
                           return null;
                         },
+                      ),
+                      SizedBox(height: 14),
+                      TextFormField(
+                        controller: _countryCtrl,
+                        textCapitalization: TextCapitalization.words,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          labelText: 'Country you live in',
+                          prefixIcon: Icon(Icons.public_rounded),
+                        ),
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? 'Please enter your country.'
+                            : null,
+                      ),
+                      SizedBox(height: 14),
+                      TextFormField(
+                        controller: _foodCtrl,
+                        textCapitalization: TextCapitalization.sentences,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          labelText: 'Food you usually eat (optional)',
+                          hintText: 'e.g. Bulgarian home cooking, vegetarian',
+                          helperText:
+                              'Helps the AI read dish names and portions the way you mean them.',
+                          helperMaxLines: 2,
+                          prefixIcon: Icon(Icons.restaurant_outlined),
+                        ),
                       ),
                       SizedBox(height: 14),
                       Text(
@@ -432,6 +468,8 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                         ),
                         SizedBox(height: 20),
                       ],
+                      const MedicalNote(),
+                      SizedBox(height: 16),
                       SizedBox(
                         height: 52,
                         child: ElevatedButton(

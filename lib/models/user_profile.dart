@@ -103,11 +103,18 @@ enum GoalPaceLevel {
 // Model
 // ---------------------------------------------------------------------------
 
+/// Profiles from before the country/food fields existed get the values the
+/// prompts used to hard-code.
+const defaultCountry = 'United Kingdom';
+const legacyUsualFood = 'Bulgarian home cooking';
+
 class UserProfile {
   const UserProfile({
     required this.uid,
     required this.email,
     required this.name,
+    this.country = defaultCountry,
+    this.usualFood = '',
     required this.age,
     required this.gender,
     required this.heightCm,
@@ -133,6 +140,12 @@ class UserProfile {
   final String uid;
   final String email;
   final String name;
+
+  /// Where the user lives and what they usually eat; both open every AI
+  /// prompt so dish names and portions are read the way they mean them.
+  final String country;
+  final String usualFood;
+
   final int age;
   final Gender gender;
   final double heightCm;
@@ -176,6 +189,8 @@ class UserProfile {
       uid: d['uid'] as String,
       email: d['email'] as String,
       name: d['name'] as String,
+      country: d['country'] as String? ?? defaultCountry,
+      usualFood: d['usualFood'] as String? ?? legacyUsualFood,
       age: d['age'] as int,
       gender: Gender.fromString(d['gender'] as String),
       heightCm: (d['heightCm'] as num).toDouble(),
@@ -206,6 +221,8 @@ class UserProfile {
     'uid': uid,
     'email': email,
     'name': name,
+    'country': country,
+    'usualFood': usualFood,
     'age': age,
     'gender': gender.value,
     'heightCm': heightCm,
@@ -234,6 +251,8 @@ class UserProfile {
     String? uid,
     String? email,
     String? name,
+    String? country,
+    String? usualFood,
     int? age,
     Gender? gender,
     double? heightCm,
@@ -259,6 +278,8 @@ class UserProfile {
       uid: uid ?? this.uid,
       email: email ?? this.email,
       name: name ?? this.name,
+      country: country ?? this.country,
+      usualFood: usualFood ?? this.usualFood,
       age: age ?? this.age,
       gender: gender ?? this.gender,
       heightCm: heightCm ?? this.heightCm,

@@ -2,6 +2,32 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 
 void main() {
+  group('nutritionContext', () {
+    test('names the country and the usual food', () {
+      final context = nutritionContext(
+        country: 'Bulgaria',
+        usualFood: ' vegetarian home cooking ',
+      );
+      expect(
+        context,
+        startsWith(
+          'You are a nutrition assistant. The user lives in Bulgaria and '
+          'often eats vegetarian home cooking.',
+        ),
+      );
+      expect(context, isNot(contains('UK')));
+    });
+
+    test('leaves the food out when none is given', () {
+      expect(
+        nutritionContext(country: 'Germany', usualFood: ''),
+        startsWith(
+          'You are a nutrition assistant. The user lives in Germany. Read',
+        ),
+      );
+    });
+  });
+
   group('parseEstimateItems', () {
     test('reads the model items', () {
       expect(

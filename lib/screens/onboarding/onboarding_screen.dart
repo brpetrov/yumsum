@@ -8,6 +8,7 @@ import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/onboarding_controller.dart';
 import 'package:lean_streak/widgets/health_plan_preview_card.dart';
+import 'package:lean_streak/widgets/legal_links.dart';
 import 'package:lean_streak/widgets/clickable.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -25,6 +26,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _heightCtrl = TextEditingController();
   final _currentWeightCtrl = TextEditingController();
   final _targetWeightCtrl = TextEditingController();
+  final _countryCtrl = TextEditingController();
+  final _foodCtrl = TextEditingController();
 
   Gender? _gender;
   ActivityLevel _activityLevel = ActivityLevel.sedentary;
@@ -38,6 +41,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     _heightCtrl.dispose();
     _currentWeightCtrl.dispose();
     _targetWeightCtrl.dispose();
+    _countryCtrl.dispose();
+    _foodCtrl.dispose();
     super.dispose();
   }
 
@@ -98,6 +103,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           activityLevel: _activityLevel,
           trainingFrequency: _trainingFrequency,
           weightLossPace: _weightLossPace,
+          country: _countryCtrl.text,
+          usualFood: _foodCtrl.text,
         );
   }
 
@@ -128,315 +135,349 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 560),
               child: Form(
-            key: _formKey,
-            onChanged: () => setState(() {}),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // ── Header ─────────────────────────────────────────────
-                SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                    onPressed: isLoading || isSigningOut
-                        ? null
-                        : () => ref
-                              .read(authControllerProvider.notifier)
-                              .signOut(),
-                    icon: const Icon(Icons.arrow_back_rounded),
-                    label: Text(
-                      isSigningOut ? 'Signing out...' : 'Back to sign in',
-                    ),
-                  ),
-                ),
-                SizedBox(height: 12),
-                Text(
-                  'Let\'s get started',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                SizedBox(height: 6),
-                Text(
-                  'Tell us about yourself so we can build your personal plan.',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                SizedBox(height: 32),
-
-                // ── About you ──────────────────────────────────────────
-                const _SectionLabel('ABOUT YOU'),
-                TextFormField(
-                  controller: _nameCtrl,
-                  textCapitalization: TextCapitalization.words,
-                  textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    labelText: 'Name',
-                    prefixIcon: Icon(Icons.person_outline_rounded),
-                  ),
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Please enter your name.'
-                      : null,
-                ),
-                SizedBox(height: 14),
-                TextFormField(
-                  controller: _ageCtrl,
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.next,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: InputDecoration(
-                    labelText: 'Age',
-                    prefixIcon: Icon(Icons.cake_outlined),
-                  ),
-                  validator: (v) {
-                    final n = int.tryParse(v ?? '');
-                    if (n == null) return 'Please enter your age.';
-                    if (n < 13 || n > 120) return 'Valid age: 13–120.';
-                    return null;
-                  },
-                ),
-                SizedBox(height: 14),
-                Text(
-                  'Gender',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Row(
+                key: _formKey,
+                onChanged: () => setState(() {}),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _GenderButton(
-                      label: 'Male',
-                      selected: _gender == Gender.male,
-                      onTap: () => setState(() => _gender = Gender.male),
-                    ),
-                    SizedBox(width: 8),
-                    _GenderButton(
-                      label: 'Female',
-                      selected: _gender == Gender.female,
-                      onTap: () => setState(() => _gender = Gender.female),
-                    ),
-                    SizedBox(width: 8),
-                    _GenderButton(
-                      label: 'Other',
-                      selected: _gender == Gender.other,
-                      onTap: () => setState(() => _gender = Gender.other),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 28),
-
-                // ── Your body ──────────────────────────────────────────
-                const _SectionLabel('YOUR BODY'),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _heightCtrl,
-                        keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true,
+                    // ── Header ─────────────────────────────────────────────
+                    SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: isLoading || isSigningOut
+                            ? null
+                            : () => ref
+                                  .read(authControllerProvider.notifier)
+                                  .signOut(),
+                        icon: const Icon(Icons.arrow_back_rounded),
+                        label: Text(
+                          isSigningOut ? 'Signing out...' : 'Back to sign in',
                         ),
-                        textInputAction: TextInputAction.next,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'^\d{0,3}\.?\d{0,1}'),
-                          ),
-                        ],
-                        decoration: InputDecoration(
-                          labelText: 'Height',
-                          suffixText: 'cm',
-                        ),
-                        validator: (v) {
-                          final n = double.tryParse(v ?? '');
-                          if (n == null) return 'Required';
-                          if (n < 100 || n > 250) return '100–250 cm';
-                          return null;
-                        },
                       ),
                     ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: TextFormField(
-                        controller: _currentWeightCtrl,
+                    SizedBox(height: 12),
+                    Text(
+                      'Let\'s get started',
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      'Tell us about yourself so we can build your personal plan.',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    SizedBox(height: 32),
+
+                    // ── About you ──────────────────────────────────────────
+                    const _SectionLabel('ABOUT YOU'),
+                    TextFormField(
+                      controller: _nameCtrl,
+                      textCapitalization: TextCapitalization.words,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        labelText: 'Name',
+                        prefixIcon: Icon(Icons.person_outline_rounded),
+                      ),
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'Please enter your name.'
+                          : null,
+                    ),
+                    SizedBox(height: 14),
+                    TextFormField(
+                      controller: _ageCtrl,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.next,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      decoration: InputDecoration(
+                        labelText: 'Age',
+                        prefixIcon: Icon(Icons.cake_outlined),
+                      ),
+                      validator: (v) {
+                        final n = int.tryParse(v ?? '');
+                        if (n == null) return 'Please enter your age.';
+                        if (n < 13 || n > 120) return 'Valid age: 13–120.';
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 14),
+                    TextFormField(
+                      controller: _countryCtrl,
+                      textCapitalization: TextCapitalization.words,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        labelText: 'Country you live in',
+                        prefixIcon: Icon(Icons.public_rounded),
+                      ),
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'Please enter your country.'
+                          : null,
+                    ),
+                    SizedBox(height: 14),
+                    TextFormField(
+                      controller: _foodCtrl,
+                      textCapitalization: TextCapitalization.sentences,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        labelText: 'Food you usually eat (optional)',
+                        hintText: 'e.g. Bulgarian home cooking, vegetarian',
+                        helperText:
+                            'Helps the AI read dish names and portions the way you mean them.',
+                        helperMaxLines: 2,
+                        prefixIcon: Icon(Icons.restaurant_outlined),
+                      ),
+                    ),
+                    SizedBox(height: 14),
+                    Text(
+                      'Gender',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        _GenderButton(
+                          label: 'Male',
+                          selected: _gender == Gender.male,
+                          onTap: () => setState(() => _gender = Gender.male),
+                        ),
+                        SizedBox(width: 8),
+                        _GenderButton(
+                          label: 'Female',
+                          selected: _gender == Gender.female,
+                          onTap: () => setState(() => _gender = Gender.female),
+                        ),
+                        SizedBox(width: 8),
+                        _GenderButton(
+                          label: 'Other',
+                          selected: _gender == Gender.other,
+                          onTap: () => setState(() => _gender = Gender.other),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 28),
+
+                    // ── Your body ──────────────────────────────────────────
+                    const _SectionLabel('YOUR BODY'),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _heightCtrl,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            textInputAction: TextInputAction.next,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d{0,3}\.?\d{0,1}'),
+                              ),
+                            ],
+                            decoration: InputDecoration(
+                              labelText: 'Height',
+                              suffixText: 'cm',
+                            ),
+                            validator: (v) {
+                              final n = double.tryParse(v ?? '');
+                              if (n == null) return 'Required';
+                              if (n < 100 || n > 250) return '100–250 cm';
+                              return null;
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: TextFormField(
+                            controller: _currentWeightCtrl,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            textInputAction: TextInputAction.next,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d{0,3}\.?\d{0,1}'),
+                              ),
+                            ],
+                            decoration: InputDecoration(
+                              labelText: 'Current weight',
+                              suffixText: 'kg',
+                            ),
+                            validator: (v) {
+                              final n = double.tryParse(v ?? '');
+                              if (n == null) return 'Required';
+                              if (n < 30 || n > 300) return '30–300 kg';
+                              return null;
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 28),
+
+                    // ── Your goal ──────────────────────────────────────────
+                    const _SectionLabel('YOUR GOAL'),
+                    Text(
+                      'Pace sets the calorie target. Target weight sets how long the plan takes.',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    ...WeightLossPace.values.map(
+                      (pace) => Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: _PaceCard(
+                          pace: pace,
+                          selected: _weightLossPace == pace,
+                          onTap: () => setState(() => _weightLossPace = pace),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    if (_weightLossPace != WeightLossPace.maintain) ...[
+                      TextFormField(
+                        controller: _targetWeightCtrl,
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
-                        textInputAction: TextInputAction.next,
+                        textInputAction: TextInputAction.done,
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                             RegExp(r'^\d{0,3}\.?\d{0,1}'),
                           ),
                         ],
                         decoration: InputDecoration(
-                          labelText: 'Current weight',
+                          labelText: 'Target weight',
                           suffixText: 'kg',
+                          prefixIcon: Icon(Icons.flag_outlined),
                         ),
                         validator: (v) {
+                          if (_weightLossPace == WeightLossPace.maintain) {
+                            return null;
+                          }
                           final n = double.tryParse(v ?? '');
                           if (n == null) return 'Required';
-                          if (n < 30 || n > 300) return '30–300 kg';
+                          if (n < 30 || n > 300) return '30-300 kg';
+                          final current = double.tryParse(
+                            _currentWeightCtrl.text,
+                          );
+                          if (current != null && n >= current) {
+                            return 'Must be less than your current weight';
+                          }
                           return null;
                         },
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 28),
-
-                // ── Your goal ──────────────────────────────────────────
-                const _SectionLabel('YOUR GOAL'),
-                Text(
-                  'Pace sets the calorie target. Target weight sets how long the plan takes.',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                SizedBox(height: 12),
-                ...WeightLossPace.values.map(
-                  (pace) => Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: _PaceCard(
-                      pace: pace,
-                      selected: _weightLossPace == pace,
-                      onTap: () => setState(() => _weightLossPace = pace),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                if (_weightLossPace != WeightLossPace.maintain) ...[
-                  TextFormField(
-                    controller: _targetWeightCtrl,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    textInputAction: TextInputAction.done,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(
-                        RegExp(r'^\d{0,3}\.?\d{0,1}'),
+                    ] else ...[
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.divider),
+                        ),
+                        child: Text(
+                          'We will aim for a daily calorie target close to your maintenance calories.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                            height: 1.4,
+                          ),
+                        ),
                       ),
                     ],
-                    decoration: InputDecoration(
-                      labelText: 'Target weight',
-                      suffixText: 'kg',
-                      prefixIcon: Icon(Icons.flag_outlined),
-                    ),
-                    validator: (v) {
-                      if (_weightLossPace == WeightLossPace.maintain) {
-                        return null;
-                      }
-                      final n = double.tryParse(v ?? '');
-                      if (n == null) return 'Required';
-                      if (n < 30 || n > 300) return '30-300 kg';
-                      final current = double.tryParse(_currentWeightCtrl.text);
-                      if (current != null && n >= current) {
-                        return 'Must be less than your current weight';
-                      }
-                      return null;
-                    },
-                  ),
-                ] else ...[
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.divider),
-                    ),
-                    child: Text(
-                      'We will aim for a daily calorie target close to your maintenance calories.',
+                    SizedBox(height: 28),
+
+                    // ── Activity level ─────────────────────────────────────
+                    const _SectionLabel('YOUR DAILY MOVEMENT'),
+                    Text(
+                      'Your normal day outside workouts.',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         color: AppColors.textSecondary,
-                        height: 1.4,
                       ),
                     ),
-                  ),
-                ],
-                SizedBox(height: 28),
-
-                // ── Activity level ─────────────────────────────────────
-                const _SectionLabel('YOUR DAILY MOVEMENT'),
-                Text(
-                  'Your normal day outside workouts.',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                SizedBox(height: 12),
-                ...ActivityLevel.values.map(
-                  (level) => Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: _ActivityCard(
-                      level: level,
-                      selected: _activityLevel == level,
-                      onTap: () => setState(() => _activityLevel = level),
+                    SizedBox(height: 12),
+                    ...ActivityLevel.values.map(
+                      (level) => Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: _ActivityCard(
+                          level: level,
+                          selected: _activityLevel == level,
+                          onTap: () => setState(() => _activityLevel = level),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                SizedBox(height: 20),
+                    SizedBox(height: 20),
 
-                const _SectionLabel('HOW OFTEN DO YOU TRAIN?'),
-                Text(
-                  'Structured workouts on top of your normal day.',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                SizedBox(height: 12),
-                ...TrainingFrequency.values.map(
-                  (frequency) => Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: _TrainingCard(
-                      frequency: frequency,
-                      selected: _trainingFrequency == frequency,
-                      onTap: () =>
-                          setState(() => _trainingFrequency = frequency),
+                    const _SectionLabel('HOW OFTEN DO YOU TRAIN?'),
+                    Text(
+                      'Structured workouts on top of your normal day.',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
-                  ),
-                ),
-                SizedBox(height: 20),
+                    SizedBox(height: 12),
+                    ...TrainingFrequency.values.map(
+                      (frequency) => Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: _TrainingCard(
+                          frequency: frequency,
+                          selected: _trainingFrequency == frequency,
+                          onTap: () =>
+                              setState(() => _trainingFrequency = frequency),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
 
-                if (preview != null) ...[
-                  HealthPlanPreviewCard(preview: preview, title: 'Your plan'),
-                  SizedBox(height: 20),
-                ],
+                    if (preview != null) ...[
+                      HealthPlanPreviewCard(
+                        preview: preview,
+                        title: 'Your plan',
+                      ),
+                      SizedBox(height: 20),
+                    ],
+                    const MedicalNote(),
+                    SizedBox(height: 16),
 
-                // ── Submit ─────────────────────────────────────────────
-                SizedBox(
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: isLoading ? null : _submit,
-                    child: isLoading
-                        ? SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              color: AppColors.onPrimary,
-                            ),
-                          )
-                        : Text(
-                            'Get My Plan',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                  ),
+                    // ── Submit ─────────────────────────────────────────────
+                    SizedBox(
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: isLoading ? null : _submit,
+                        child: isLoading
+                            ? SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: AppColors.onPrimary,
+                                ),
+                              )
+                            : Text(
+                                'Get My Plan',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                      ),
+                    ),
+                    SizedBox(height: 32),
+                  ],
                 ),
-                SizedBox(height: 32),
-              ],
-            ),
-          ),
+              ),
             ),
           ),
         ),
