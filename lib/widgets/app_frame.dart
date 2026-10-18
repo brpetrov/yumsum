@@ -26,8 +26,6 @@ class AppFrame extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authControllerProvider);
-
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -48,7 +46,7 @@ class AppFrame extends ConsumerWidget {
                 ],
               ),
       ),
-      drawer: _AppDrawer(authState: authState),
+      drawer: const AppDrawer(),
       // The bottom bar lives in the body so it rides above the keyboard;
       // Scaffold.bottomNavigationBar would stay hidden behind it.
       body: bottom == null
@@ -63,14 +61,55 @@ class AppFrame extends ConsumerWidget {
   }
 }
 
-class _AppDrawer extends ConsumerWidget {
-  const _AppDrawer({required this.authState});
+/// The menu, shown on every page: Today first, then the other pages,
+/// appearance and log out.
+class AppDrawer extends ConsumerWidget {
+  const AppDrawer({super.key});
 
-  final AsyncValue<AuthStatus> authState;
+  static const _pages = [
+    (route: AppRoutes.dashboard, icon: Icons.today_outlined, label: 'Today'),
+    (
+      route: AppRoutes.review,
+      icon: Icons.calendar_month_outlined,
+      label: 'History',
+    ),
+    (
+      route: AppRoutes.progress,
+      icon: Icons.monitor_weight_outlined,
+      label: 'Weight & Progress',
+    ),
+    (
+      route: AppRoutes.planSettings,
+      icon: Icons.assignment_outlined,
+      label: 'Plan Settings',
+    ),
+    (
+      route: AppRoutes.profile,
+      icon: Icons.manage_accounts_outlined,
+      label: 'Account Settings',
+    ),
+  ];
+
+  /// Today is the root and every other page sits one level above it, so
+  /// moving between pages swaps the top one and Back always lands on Today.
+  void _open(BuildContext context, String route) {
+    Navigator.of(context).pop();
+    final router = GoRouter.of(context);
+    if (router.state.uri.path == route) return;
+    if (route == AppRoutes.dashboard) {
+      router.go(route);
+    } else if (router.canPop()) {
+      router.pushReplacement(route);
+    } else {
+      router.push(route);
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authControllerProvider);
     final isWorking = authState.isLoading;
+    final current = GoRouter.maybeOf(context)?.state.uri.path;
 
     return Drawer(
       child: SafeArea(
@@ -98,38 +137,13 @@ class _AppDrawer extends ConsumerWidget {
               ),
             ),
             Divider(height: 1),
-            ListTile(
-              leading: Icon(Icons.calendar_month_outlined),
-              title: Text('History'),
-              onTap: () {
-                Navigator.of(context).pop();
-                context.push(AppRoutes.review);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.monitor_weight_outlined),
-              title: Text('Weight & Progress'),
-              onTap: () {
-                Navigator.of(context).pop();
-                context.push(AppRoutes.progress);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.assignment_outlined),
-              title: Text('Plan Settings'),
-              onTap: () {
-                Navigator.of(context).pop();
-                context.push(AppRoutes.planSettings);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.manage_accounts_outlined),
-              title: Text('Account Settings'),
-              onTap: () {
-                Navigator.of(context).pop();
-                context.push(AppRoutes.profile);
-              },
-            ),
+            for (final page in _pages)
+              ListTile(
+                leading: Icon(page.icon),
+                title: Text(page.label),
+                selected: page.route == current,
+                onTap: () => _open(context, page.route),
+              ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 6),
               child: Text(
