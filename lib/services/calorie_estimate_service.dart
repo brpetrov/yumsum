@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_ai/firebase_ai.dart';
 import 'package:flutter/foundation.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:intl/intl.dart';
 
-import 'package:lean_streak/core/config/api_keys.dart';
 import 'package:lean_streak/repositories/ai_usage_repository.dart';
 
 /// One component of a meal as the model broke it down.
@@ -87,9 +86,10 @@ class CalorieEstimateService {
     responseMimeType: 'application/json',
   );
 
-  GenerativeModel get _model => GenerativeModel(
+  // Through Firebase AI Logic (Gemini Developer API backend): no API key in
+  // the app, and the project's quota and billing apply.
+  GenerativeModel get _model => FirebaseAI.googleAI().generativeModel(
     model: _modelId,
-    apiKey: ApiKeys.gemini,
     generationConfig: _generationConfig,
   );
 
@@ -206,7 +206,7 @@ class CalorieEstimateService {
         await _generateWithRetries(_model, [
           Content.multi([
             TextPart(_voicePromptTemplate),
-            DataPart('audio/wav', wav),
+            InlineDataPart('audio/wav', wav),
           ]),
         ]),
       );
@@ -243,7 +243,7 @@ class CalorieEstimateService {
         await _generateWithRetries(_model, [
           Content.multi([
             TextPart(_photoPromptTemplate),
-            DataPart('image/jpeg', jpeg),
+            InlineDataPart('image/jpeg', jpeg),
           ]),
         ]),
       );
@@ -316,6 +316,10 @@ class CalorieEstimateService {
           rethrow;
         }
         await Future<void>.delayed(Duration(milliseconds: 700 * attempt));
+      } on FirebaseAIException catch (error) {
+        // Quota, API not enabled, bad key, unsupported location: none of
+        // these clear up on retry, so say what it is.
+        throw CalorieEstimateException(_firebaseAiMessage(error));
       } on SocketException {
         if (attempt == _maxServerRetries) rethrow;
         await Future<void>.delayed(Duration(milliseconds: 700 * attempt));
@@ -333,6 +337,25 @@ class CalorieEstimateService {
         lower.contains('high demand') ||
         lower.contains('overloaded') ||
         lower.contains('timed out');
+  }
+
+  /// The package doesn't export its quota / not-enabled exception types, so
+  /// they are told apart by name and message.
+  String _firebaseAiMessage(FirebaseAIException error) {
+    final type = error.runtimeType.toString();
+    final lower = error.message.toLowerCase();
+    if (type == 'QuotaExceeded' ||
+        lower.contains('quota') ||
+        lower.contains('429')) {
+      return 'The AI has reached its limit for today. Add the calories '
+          'yourself, e.g. "wrap 450".';
+    }
+    if (type == 'ServiceApiNotEnabled' ||
+        error is InvalidApiKey ||
+        lower.contains('not enabled')) {
+      return 'AI estimates are not switched on for this app yet.';
+    }
+    return 'Could not reach the AI right now.';
   }
 
   String _friendlyServerError(String message) {
