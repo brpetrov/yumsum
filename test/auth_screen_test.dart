@@ -7,6 +7,13 @@ import 'package:lean_streak/screens/auth/auth_screen.dart';
 
 class _FakeAuthController extends AuthController {
   final resets = <String>[];
+  int googleSignIns = 0;
+
+  @override
+  Future<bool> signInWithGoogle() async {
+    googleSignIns++;
+    return true;
+  }
 
   @override
   Future<void> sendPasswordReset(String email) async {
@@ -63,6 +70,23 @@ void main() {
       find.textContaining('Privacy Policy', findRichText: true),
       findsOneWidget,
     );
+  });
+
+  testWidgets('Continue with Google starts the Google flow', (tester) async {
+    final controller = _FakeAuthController();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [authControllerProvider.overrideWith(() => controller)],
+        child: MaterialApp(theme: AppTheme.light, home: const AuthScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Continue with Google'));
+    await tester.tap(find.text('Continue with Google'));
+    await tester.pumpAndSettle();
+
+    expect(controller.googleSignIns, 1);
   });
 
   testWidgets('the link is only offered when signing in', (tester) async {

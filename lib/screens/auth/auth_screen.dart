@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
@@ -50,12 +51,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     }
   }
 
+  Future<void> _signInWithGoogle() =>
+      ref.read(authControllerProvider.notifier).signInWithGoogle();
+
   String _parseError(Object error) {
     if (error is EmailNotVerifiedException) {
       return 'Please verify your email before signing in. Check your inbox.';
     }
+    if (error is GoogleSignInException) {
+      return 'Google sign-in didn\'t work. Please try again.';
+    }
     if (error is FirebaseAuthException) {
       switch (error.code) {
+        case 'account-exists-with-different-credential':
+          return 'This email already has a password login. Sign in with your password.';
         case 'user-not-found':
         case 'wrong-password':
         case 'invalid-credential':
@@ -389,6 +398,29 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               ),
                       ),
                     ),
+                    SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(child: Divider(color: AppColors.divider)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
+                            'or',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ),
+                        Expanded(child: Divider(color: AppColors.divider)),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      onPressed: isLoading ? null : _signInWithGoogle,
+                      icon: const _GoogleMark(),
+                      label: const Text('Continue with Google'),
+                    ),
                     SizedBox(height: 20),
                     const LegalFooter(),
                     SizedBox(height: 32),
@@ -398,6 +430,24 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// A plain "G" in Google blue, so the button needs no image asset.
+class _GoogleMark extends StatelessWidget {
+  const _GoogleMark();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text(
+      'G',
+      style: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w800,
+        color: Color(0xFF4285F4),
+        height: 1,
       ),
     );
   }
