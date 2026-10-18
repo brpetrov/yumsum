@@ -76,6 +76,25 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     return 'Something went wrong. Please try again.';
   }
 
+  static final _emailRe = RegExp(r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,}$');
+
+  bool _isValidEmail(String email) => _emailRe.hasMatch(email);
+
+  Future<void> _forgotPassword() async {
+    final email = _emailController.text.trim();
+    if (!_isValidEmail(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Enter your email above first, then tap Forgot password.',
+          ),
+        ),
+      );
+      return;
+    }
+    await ref.read(authControllerProvider.notifier).sendPasswordReset(email);
+  }
+
   void _switchMode() {
     setState(() {
       _isSignIn = !_isSignIn;
@@ -94,8 +113,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
     final authState = ref.watch(authControllerProvider);
     final isLoading = authState.isLoading;
-    final isVerificationSent =
-        authState.valueOrNull == AuthStatus.verificationSent;
+    final email = _emailController.text.trim();
+    final (bannerTitle, bannerBody) = switch (authState.valueOrNull) {
+      AuthStatus.verificationSent => (
+        'Verification email sent!',
+        'We sent a link to $email. Click it to verify your account, then '
+            'sign in.',
+      ),
+      AuthStatus.resetSent => (
+        'Password reset email sent.',
+        'We sent a link to $email. Open it to choose a new password, then '
+            'sign in.',
+      ),
+      _ => (null, null),
+    };
     final errorMessage = authState.hasError
         ? _parseError(authState.error!)
         : null;
@@ -173,8 +204,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     ),
                     SizedBox(height: 28),
 
-                    // Verification success banner
-                    if (isVerificationSent) ...[
+                    // Verification / reset sent banner
+                    if (bannerTitle != null) ...[
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -201,7 +232,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Verification email sent!',
+                                    bannerTitle,
                                     style: TextStyle(
                                       color: AppColors.primary,
                                       fontSize: 14,
@@ -210,8 +241,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   ),
                                   SizedBox(height: 2),
                                   Text(
-                                    'We sent a link to ${_emailController.text.trim()}. '
-                                    'Click it to verify your account, then sign in.',
+                                    bannerBody!,
                                     style: TextStyle(
                                       color: AppColors.textSecondary,
                                       fontSize: 13,
@@ -282,10 +312,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         if (v == null || v.trim().isEmpty) {
                           return 'Please enter your email.';
                         }
-                        final emailRe = RegExp(
-                          r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,}$',
-                        );
-                        if (!emailRe.hasMatch(v.trim())) {
+                        if (!_isValidEmail(v.trim())) {
                           return 'Please enter a valid email.';
                         }
                         return null;
@@ -328,7 +355,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 28),
+                    if (_isSignIn)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: isLoading ? null : _forgotPassword,
+                          child: const Text('Forgot password?'),
+                        ),
+                      ),
+                    SizedBox(height: _isSignIn ? 12 : 28),
 
                     // Submit
                     SizedBox(

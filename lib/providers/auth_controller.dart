@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum AuthStatus { idle, verificationSent }
+enum AuthStatus { idle, verificationSent, resetSent }
 
 /// Thrown when a user tries to sign in before verifying their email.
 class EmailNotVerifiedException implements Exception {
@@ -40,6 +40,20 @@ class AuthController extends AsyncNotifier<AuthStatus> {
       await credential.user?.sendEmailVerification();
       await FirebaseAuth.instance.signOut();
       return AuthStatus.verificationSent;
+    });
+  }
+
+  /// Emails a link to choose a new password. An unknown address gets the
+  /// same answer as a known one, so the form can't be used to probe emails.
+  Future<void> sendPasswordReset(String email) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      try {
+        await FirebaseAuth.instance.sendPasswordResetEmail(email: email.trim());
+      } on FirebaseAuthException catch (error) {
+        if (error.code != 'user-not-found') rethrow;
+      }
+      return AuthStatus.resetSent;
     });
   }
 
