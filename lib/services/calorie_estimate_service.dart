@@ -53,6 +53,44 @@ String nutritionContext({required String country, required String usualFood}) {
       'used.\n';
 }
 
+const aiNotSwitchedOnMessage =
+    'AI estimates are not switched on for this app yet.';
+const aiQuotaUsedMessage =
+    'The AI has reached its limit for today. Add the calories yourself, '
+    'e.g. "wrap 450".';
+
+/// What to tell the user for a server-side AI error, from its wording.
+/// "Firebase AI Logic API has not been used in project … or it is disabled"
+/// and quota errors arrive as plain server errors.
+String aiErrorMessage(String message) {
+  final lower = message.toLowerCase();
+  if (lower.contains('has not been used') ||
+      lower.contains('is disabled') ||
+      lower.contains('not enabled')) {
+    return aiNotSwitchedOnMessage;
+  }
+  if (lower.contains('quota') ||
+      lower.contains('429') ||
+      lower.contains('resource_exhausted')) {
+    return aiQuotaUsedMessage;
+  }
+  if (isTransientAiError(message)) {
+    return 'The AI estimate service is busy right now. Try again in a few '
+        'seconds.';
+  }
+  return 'Could not estimate calories right now.';
+}
+
+bool isTransientAiError(String message) {
+  final lower = message.toLowerCase();
+  return lower.contains('503') ||
+      lower.contains('500') ||
+      lower.contains('unavailable') ||
+      lower.contains('high demand') ||
+      lower.contains('overloaded') ||
+      lower.contains('timed out');
+}
+
 class DailyLimitExceededException implements Exception {
   const DailyLimitExceededException();
 }
@@ -329,39 +367,18 @@ class CalorieEstimateService {
     throw const CalorieEstimateException('Could not reach the AI service.');
   }
 
-  bool _isTransientServerError(String message) {
-    final lower = message.toLowerCase();
-    return lower.contains('503') ||
-        lower.contains('500') ||
-        lower.contains('unavailable') ||
-        lower.contains('high demand') ||
-        lower.contains('overloaded') ||
-        lower.contains('timed out');
-  }
+  bool _isTransientServerError(String message) => isTransientAiError(message);
 
   /// The package doesn't export its quota / not-enabled exception types, so
-  /// they are told apart by name and message.
+  /// they are told apart by name, or by the server's wording.
   String _firebaseAiMessage(FirebaseAIException error) {
     final type = error.runtimeType.toString();
-    final lower = error.message.toLowerCase();
-    if (type == 'QuotaExceeded' ||
-        lower.contains('quota') ||
-        lower.contains('429')) {
-      return 'The AI has reached its limit for today. Add the calories '
-          'yourself, e.g. "wrap 450".';
+    if (type == 'ServiceApiNotEnabled' || error is InvalidApiKey) {
+      return aiNotSwitchedOnMessage;
     }
-    if (type == 'ServiceApiNotEnabled' ||
-        error is InvalidApiKey ||
-        lower.contains('not enabled')) {
-      return 'AI estimates are not switched on for this app yet.';
-    }
-    return 'Could not reach the AI right now.';
+    if (type == 'QuotaExceeded') return aiQuotaUsedMessage;
+    return aiErrorMessage(error.message);
   }
 
-  String _friendlyServerError(String message) {
-    if (_isTransientServerError(message)) {
-      return 'The AI estimate service is busy right now. Try again in a few seconds.';
-    }
-    return 'Could not estimate calories right now.';
-  }
+  String _friendlyServerError(String message) => aiErrorMessage(message);
 }

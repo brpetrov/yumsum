@@ -28,6 +28,27 @@ void main() {
     });
   });
 
+  group('aiErrorMessage', () {
+    test('tells setup, quota and busy errors apart', () {
+      expect(
+        aiErrorMessage(
+          'Firebase AI Logic API has not been used in project 1 before or '
+          'it is disabled. Enable it by visiting https://…',
+        ),
+        aiNotSwitchedOnMessage,
+      );
+      expect(
+        aiErrorMessage('Quota exceeded for quota metric'),
+        aiQuotaUsedMessage,
+      );
+      expect(aiErrorMessage('503 Service Unavailable'), contains('busy'));
+      expect(
+        aiErrorMessage('Something odd'),
+        'Could not estimate calories right now.',
+      );
+    });
+  });
+
   group('parseEstimateItems', () {
     test('reads the model items', () {
       expect(
