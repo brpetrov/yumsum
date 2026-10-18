@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 /// reCAPTCHA v3 site key for the web app (a public value). Empty until the
 /// web app is registered in Firebase App Check; App Check is skipped on the
 /// web until then.
-const recaptchaSiteKey = '';
+const recaptchaSiteKey = '6LfON_UtAAAAAACPilACMpqekwXtUm4PKbMLc9qk';
 
 bool get appCheckAvailable => !kIsWeb || recaptchaSiteKey.isNotEmpty;
 
