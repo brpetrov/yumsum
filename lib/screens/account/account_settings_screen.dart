@@ -7,6 +7,8 @@ import 'package:lean_streak/providers/account_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/reminder_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
+import 'package:lean_streak/core/constants/legal_links.dart';
+import 'package:lean_streak/widgets/legal_links.dart';
 import 'package:lean_streak/widgets/password_confirm_dialog.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 
@@ -245,6 +247,26 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         onPressed: isWorking ? null : _sendPasswordReset,
                         icon: Icon(Icons.lock_reset_rounded),
                         label: Text('Send password reset email'),
+                      ),
+                      SizedBox(height: 28),
+                      const _AccountSectionLabel('LEGAL'),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Privacy policy'),
+                        trailing: const Icon(
+                          Icons.open_in_new_rounded,
+                          size: 18,
+                        ),
+                        onTap: () => openLegalPage(LegalLinks.privacyPolicy),
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Terms of use'),
+                        trailing: const Icon(
+                          Icons.open_in_new_rounded,
+                          size: 18,
+                        ),
+                        onTap: () => openLegalPage(LegalLinks.terms),
                       ),
                       SizedBox(height: 28),
                       const _AccountSectionLabel('DANGER ZONE'),

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#F6F4EF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#171513" media="(prefers-color-scheme: dark)">
+  <title>LeanStreak Privacy Policy</title>
+  <style>
+    :root { --bg: #F6F4EF; --surface: #FDFCF9; --text: #1F1D1A; --muted: #6E6A63; --accent: #2E7D6E; --line: #E8E4DC; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #171513; --surface: #211E1B; --text: #F2EEE8; --muted: #B3ACA3; --accent: #5FB3A3; --line: #332E2A; }
+    }
+    html, body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    main { max-width: 720px; margin: 0 auto; padding: 32px 20px 64px; }
+    h1 { font-size: 28px; letter-spacing: -0.5px; margin: 0 0 4px; }
+    h2 { font-size: 18px; margin: 28px 0 8px; }
+    p, li { color: var(--text); }
+    .meta { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+    a { color: var(--accent); }
+    .box { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+    nav { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+<main>
+  <nav><a href="/">LeanStreak</a> · <a href="/terms">Terms of Use</a></nav>
+  <h1>Privacy Policy</h1>
+  <p class="meta">Effective 18 October 2026</p>
+
+  <p>LeanStreak is a calorie and weight tracker made by Boyan Petrov, an individual developer based in the United Kingdom ("we", "us"). This policy explains what the app collects, why, and what you can do about it. Questions and requests: <a href="mailto:CONTACT_EMAIL">CONTACT_EMAIL</a>.</p>
+
+  <h2>What we collect</h2>
+  <ul>
+    <li><strong>Account:</strong> your email address and name. Passwords are handled by Google Firebase Authentication; we never see them.</li>
+    <li><strong>Profile:</strong> age, gender, height, current and target weight, activity level, training frequency and goal pace. These are used to calculate your calorie target.</li>
+    <li><strong>What you log:</strong> meals (names, calories, protein and the time you logged them) and weigh-ins.</li>
+    <li><strong>AI usage counts:</strong> how many AI estimates you have used each day, to apply the daily limit.</li>
+    <li><strong>Technical data:</strong> Firebase records basic technical information such as IP address and device type for security and to operate the service.</li>
+  </ul>
+  <p>Reminder settings, theme and other preferences stay on your device and are not sent to us. The app contains no advertising and no analytics or tracking SDKs.</p>
+
+  <h2>How your meal descriptions, photos and voice notes are processed</h2>
+  <div class="box">
+    <p>When you ask for an estimate, the text you typed, the photo you took or the voice note you recorded is sent to Google's Gemini API, which returns the calories, protein and a breakdown. We keep only the resulting meal entry; we do not store your photos or recordings.</p>
+    <p>Google processes this content under its own terms. On the Gemini API tier LeanStreak uses, Google may use the content you send to improve its products. Please don't include personal details in meal descriptions, photos or recordings that you wouldn't want processed in that way.</p>
+  </div>
+
+  <h2>Why we process your data</h2>
+  <p>Only to run the app for you: to calculate and update your plan, show your history, send the reminders you turn on, and estimate meals you ask about. The legal basis is the contract between you and us (providing the app) and, for health-related details such as weight and diet, your consent, which you give by entering them and can withdraw by deleting them or your account.</p>
+
+  <h2>Who else sees it</h2>
+  <p>We don't sell or share your data, and we don't use it for advertising. It is processed by these providers on our behalf:</p>
+  <ul>
+    <li><strong>Google Firebase</strong> (Authentication, Firestore database, Hosting): stores your account and logs on Google Cloud servers, which may be outside the UK. Google provides the standard contractual safeguards for such transfers.</li>
+    <li><strong>Google Gemini API:</strong> estimates meals, as described above.</li>
+  </ul>
+
+  <h2>How long we keep it</h2>
+  <p>Until you remove it. In Account Settings you can <em>Reset all data</em> (deletes every meal, summary, weigh-in and usage record but keeps your account) or <em>Delete account</em> (deletes everything, including your login). Deletion takes effect immediately in our database.</p>
+
+  <h2>Your rights</h2>
+  <p>Under UK data protection law you can ask to access, correct, delete or receive a copy of your data, or object to how it's processed. Most of this you can do yourself in the app; for anything else, email <a href="mailto:CONTACT_EMAIL">CONTACT_EMAIL</a>. You can also complain to the Information Commissioner's Office (<a href="https://ico.org.uk">ico.org.uk</a>).</p>
+
+  <h2>Children</h2>
+  <p>LeanStreak is a dieting tool and is not intended for anyone under 18. We don't knowingly collect data from children.</p>
+
+  <h2>Changes</h2>
+  <p>If this policy changes we'll update it here and change the date at the top. Significant changes will also be mentioned in the app.</p>
+</main>
+</body>
+</html>

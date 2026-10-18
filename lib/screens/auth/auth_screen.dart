@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/widgets/app_logo_mark.dart';
+import 'package:lean_streak/widgets/legal_links.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 import 'package:lean_streak/widgets/clickable.dart';
 
@@ -388,6 +389,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               ),
                       ),
                     ),
+                    SizedBox(height: 20),
+                    const LegalFooter(),
                     SizedBox(height: 32),
                   ],
                 ),

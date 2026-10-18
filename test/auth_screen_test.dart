@@ -42,6 +42,29 @@ void main() {
     expect(find.text('Password reset email sent.'), findsOneWidget);
   });
 
+  testWidgets('the sign-in screen links to the terms and privacy policy', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authControllerProvider.overrideWith(_FakeAuthController.new),
+        ],
+        child: MaterialApp(theme: AppTheme.light, home: const AuthScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.textContaining('Terms of Use', findRichText: true),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('Privacy Policy', findRichText: true),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('the link is only offered when signing in', (tester) async {
     await tester.pumpWidget(
       ProviderScope(

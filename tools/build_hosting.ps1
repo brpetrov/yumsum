@@ -37,6 +37,8 @@ Reset-Directory $hostingBuild
 
 Copy-Item -Path $fastBuild -Destination (Join-Path $hostingBuild 'app') -Recurse
 Copy-Item -Path $webkitBuild -Destination (Join-Path $hostingBuild 'webkit') -Recurse
+# Legal pages, served at /privacy and /terms (firebase.json has cleanUrls on).
+Copy-Item -Path (Join-Path $PSScriptRoot 'hosting\*.html') -Destination $hostingBuild
 
 $detectorHtml = @'
 <!DOCTYPE html>

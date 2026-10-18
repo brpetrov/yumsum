@@ -4,6 +4,7 @@
   },
   "hosting": {
     "public": "build/hosting",
+    "cleanUrls": true,
     "ignore": [
       "firebase.json",
       "**/.*",

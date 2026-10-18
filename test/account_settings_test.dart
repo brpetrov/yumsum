@@ -95,6 +95,13 @@ void main() {
     expect(prefs.getInt('reminders.weekly_weight_hour'), 20);
   });
 
+  testWidgets('Account Settings links to the legal pages', (tester) async {
+    await pumpScreen(tester);
+    await tester.ensureVisible(find.text('Terms of use'));
+    expect(find.text('Privacy policy'), findsOneWidget);
+    expect(find.text('Terms of use'), findsOneWidget);
+  });
+
   testWidgets('Reset all data asks for the password, then resets', (
     tester,
   ) async {
