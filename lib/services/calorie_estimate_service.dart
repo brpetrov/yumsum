@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_ai/firebase_ai.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:lean_streak/core/config/app_check.dart';
@@ -129,7 +130,7 @@ class CalorieEstimateService {
   // the app, and the project's quota and billing apply. The App Check token
   // proves the call comes from this app (enforced in the Firebase console).
   GenerativeModel get _model => FirebaseAI.googleAI(
-    appCheck: appCheckAvailable ? const LimitedUseAppCheck() : null,
+    appCheck: appCheckAvailable ? FirebaseAppCheck.instance : null,
   ).generativeModel(model: _modelId, generationConfig: _generationConfig);
 
   String get _context =>
