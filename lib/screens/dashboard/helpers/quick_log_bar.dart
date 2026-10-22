@@ -14,10 +14,14 @@ import 'package:lean_streak/helpers/wav.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/food_lookup_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
+import 'package:lean_streak/screens/dashboard/helpers/barcode_scan_page.dart';
+import 'package:lean_streak/screens/dashboard/helpers/portion_sheet.dart';
 import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
+import 'package:lean_streak/services/food_lookup_service.dart';
 import 'package:lean_streak/widgets/estimate_breakdown.dart';
 
 /// The microphone behind the bar's mic button; overridable in tests.
@@ -361,6 +365,41 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
     });
   }
 
+  /// Scan a packet's barcode, look it up in Open Food Facts and ask how
+  /// much was eaten; the box is then filled like an AI result, but with
+  /// label figures and no AI usage.
+  Future<void> _scanBarcode() async {
+    final barcode = await ref.read(barcodeScannerProvider)(context);
+    if (barcode == null || !mounted) return;
+    setState(() {
+      _working = true;
+      _error = null;
+    });
+    PackagedFood? food;
+    try {
+      food = await ref.read(foodLookupServiceProvider).byBarcode(barcode);
+    } on FoodLookupException catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _working = false;
+        _error = error.message;
+      });
+      return;
+    }
+    if (!mounted) return;
+    setState(() {
+      _working = false;
+      if (food == null) {
+        _error = 'That barcode isn\'t in the food database. Type the meal instead.';
+      }
+    });
+    if (food == null) return;
+    final portion = await showPortionSheet(context, food);
+    if (portion == null || !mounted) return;
+    _setText('${portion.name} ${_amounts(portion.kcal, portion.protein)}');
+    setState(() => _aiItems = const []);
+  }
+
   Future<void> _openDetails() async {
     final entry = _entry;
     final saved = await showLogMealSheet(
@@ -455,9 +494,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
                                 vertical: 15,
                                 horizontal: 20,
                               ),
-                              // Camera while empty; a clear button once
-                              // there is text, so a wrong voice or AI
-                              // result is one tap from gone.
+                              // Barcode and camera while empty; a clear
+                              // button once there is text, so a wrong
+                              // voice or AI result is one tap from gone.
                               suffixIcon: _working || _listening
                                   ? null
                                   : hasText
@@ -467,13 +506,26 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
                                       color: AppColors.textSecondary,
                                       icon: const Icon(Icons.close_rounded),
                                     )
-                                  : IconButton(
-                                      tooltip: 'Photo',
-                                      onPressed: _pickPhoto,
-                                      color: AppColors.textSecondary,
-                                      icon: const Icon(
-                                        Icons.photo_camera_outlined,
-                                      ),
+                                  : Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          tooltip: 'Scan barcode',
+                                          onPressed: _scanBarcode,
+                                          color: AppColors.textSecondary,
+                                          icon: const Icon(
+                                            Icons.barcode_reader,
+                                          ),
+                                        ),
+                                        IconButton(
+                                          tooltip: 'Photo',
+                                          onPressed: _pickPhoto,
+                                          color: AppColors.textSecondary,
+                                          icon: const Icon(
+                                            Icons.photo_camera_outlined,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                             ),
                           ),

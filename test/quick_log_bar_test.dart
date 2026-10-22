@@ -8,10 +8,13 @@ import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/food_lookup_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
+import 'package:lean_streak/screens/dashboard/helpers/barcode_scan_page.dart';
 import 'package:lean_streak/screens/dashboard/helpers/quick_log_bar.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
+import 'package:lean_streak/services/food_lookup_service.dart';
 import 'package:record/record.dart';
 
 class _FakeLogMealController extends LogMealController {
@@ -68,6 +71,23 @@ class _FakeEstimateService implements CalorieEstimateService {
 }
 
 /// A microphone that plays back whatever the test feeds it.
+class _FakeFoodLookup implements FoodLookupService {
+  PackagedFood? food = (
+    name: 'Chicken Tikka Wrap',
+    brand: 'Tesco',
+    kcalPer100g: 215,
+    proteinPer100g: 9,
+    servingGrams: 220,
+  );
+  String? lastBarcode;
+
+  @override
+  Future<PackagedFood?> byBarcode(String barcode) async {
+    lastBarcode = barcode;
+    return food;
+  }
+}
+
 class _FakeRecorder extends Fake implements AudioRecorder {
   final audio = StreamController<Uint8List>();
   bool stopped = false;
@@ -106,16 +126,19 @@ void main() {
   late _FakeLogMealController controller;
   late _FakeEstimateService estimateService;
   late _FakeRecorder recorder;
+  late _FakeFoodLookup foodLookup;
   late ProviderContainer container;
 
   Future<void> pumpCard(
     WidgetTester tester, {
     List<Meal> recents = const [],
     LaunchAction? launchAction,
+    String? scanned,
   }) async {
     controller = _FakeLogMealController();
     estimateService = _FakeEstimateService();
     recorder = _FakeRecorder();
+    foodLookup = _FakeFoodLookup();
     container = ProviderContainer(
       overrides: [
         logMealControllerProvider.overrideWith(() => controller),
@@ -123,6 +146,8 @@ void main() {
         currentUidProvider.overrideWithValue('user-1'),
         recentMealsProvider.overrideWith((ref) async => recents),
         audioRecorderProvider.overrideWithValue(recorder),
+        barcodeScannerProvider.overrideWithValue((_) async => scanned),
+        foodLookupServiceProvider.overrideWithValue(foodLookup),
       ],
     );
     addTearDown(container.dispose);
@@ -186,10 +211,51 @@ void main() {
     expect(find.text('400 kcal · 30 g'), findsOneWidget);
   });
 
+  testWidgets('a scanned barcode is looked up and the portion fills the box', (
+    tester,
+  ) async {
+    await pumpCard(tester, scanned: '5000112637922');
+    await tester.tap(find.byTooltip('Scan barcode'));
+    await tester.pumpAndSettle();
+
+    expect(foodLookup.lastBarcode, '5000112637922');
+    expect(find.text('Chicken Tikka Wrap'), findsOneWidget);
+    final grams = find.byWidgetPredicate(
+      (widget) => widget is TextField && widget.controller?.text == '220',
+    );
+    expect(grams, findsOneWidget);
+
+    await tester.enterText(grams, '150');
+    await tester.pump();
+    await tester.tap(find.text('Use'));
+    await tester.pumpAndSettle();
+
+    expect(boxText(tester), 'Chicken Tikka Wrap 323 kcal 14g protein');
+    expect(estimateService.estimateCalls, 0);
+  });
+
+  testWidgets('an unknown barcode says so', (tester) async {
+    await pumpCard(tester, scanned: '4000000000000');
+    foodLookup.food = null;
+    await tester.tap(find.byTooltip('Scan barcode'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('isn\'t in the food database'), findsOneWidget);
+    expect(boxText(tester), isEmpty);
+  });
+
+  testWidgets('backing out of the scanner changes nothing', (tester) async {
+    await pumpCard(tester, scanned: null);
+    await tester.tap(find.byTooltip('Scan barcode'));
+    await tester.pumpAndSettle();
+    expect(find.byType(BottomSheet), findsNothing);
+    expect(boxText(tester), isEmpty);
+  });
+
   testWidgets('the box offers the camera when empty and clear when not', (
     tester,
   ) async {
     await pumpCard(tester);
+    expect(find.byTooltip('Scan barcode'), findsOneWidget);
     expect(find.byTooltip('Photo'), findsOneWidget);
     expect(find.byTooltip('Clear'), findsNothing);
 
