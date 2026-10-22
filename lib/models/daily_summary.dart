@@ -24,6 +24,7 @@ class DailySummary {
     required this.mealCount,
     this.proteinGrams,
     required this.status,
+    this.dayOff = false,
     required this.updatedAt,
   });
 
@@ -36,6 +37,9 @@ class DailySummary {
   /// Null when no meal that day had protein data.
   final int? proteinGrams;
   final DailyStatus status;
+
+  /// Taken off (a holiday, a birthday): logged, but not judged.
+  final bool dayOff;
   final DateTime updatedAt;
 
   double get deltaRatio {
@@ -56,6 +60,7 @@ class DailySummary {
       mealCount: data['mealCount'] as int,
       proteinGrams: (data['proteinGrams'] as num?)?.round(),
       status: _statusFromFirestore(data),
+      dayOff: data['dayOff'] == true,
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
     );
   }
@@ -69,6 +74,7 @@ class DailySummary {
       'mealCount': mealCount,
       if (proteinGrams != null) 'proteinGrams': proteinGrams,
       'status': status.value,
+      if (dayOff) 'dayOff': true,
       'updatedAt': Timestamp.fromDate(updatedAt),
     };
   }

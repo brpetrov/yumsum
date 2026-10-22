@@ -15,12 +15,14 @@ class AppFrame extends ConsumerWidget {
     super.key,
     required this.title,
     this.subtitle,
+    this.actions,
     required this.body,
     this.bottom,
   });
 
   final String title;
   final String? subtitle;
+  final List<Widget>? actions;
   final Widget body;
   final Widget? bottom;
 
@@ -45,6 +47,7 @@ class AppFrame extends ConsumerWidget {
                   ),
                 ],
               ),
+        actions: actions,
       ),
       drawer: const AppDrawer(),
       // The bottom bar lives in the body so it rides above the keyboard;

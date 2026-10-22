@@ -13,8 +13,10 @@ Color dayStatusColor(DailyStatus status) {
 }
 
 /// Today isn't over, so being under target isn't a verdict yet: a day only
-/// shows its status once it is finished, on track, or over target.
+/// shows its status once it is finished, on track, or over target. A day
+/// off never shows one.
 bool hasSettledStatus(DailySummary summary) {
+  if (summary.dayOff) return false;
   final now = DateTime.now();
   final isToday = summary.date == DateFormat('yyyy-MM-dd').format(now);
   return !isToday ||

@@ -17,6 +17,7 @@ class AccountRepository {
       'daily_summaries',
       'weight_entries',
       'day_edits',
+      'days_off',
       'ai_usage',
     ]) {
       await _deleteCollection(userDoc.collection(name));

@@ -13,6 +13,7 @@ class PeriodReview {
     required this.greenDays,
     required this.yellowDays,
     required this.redDays,
+    required this.daysOff,
     required this.calorieConsistencyRate,
     required this.bestDay,
     required this.worstDay,
@@ -30,6 +31,9 @@ class PeriodReview {
   final int greenDays;
   final int yellowDays;
   final int redDays;
+
+  /// Logged days taken off, which aren't judged.
+  final int daysOff;
   final double calorieConsistencyRate;
   final DailySummary? bestDay;
   final DailySummary? worstDay;

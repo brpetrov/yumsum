@@ -461,6 +461,13 @@ class _PeriodReviewCard extends ConsumerWidget {
                       label: '${review.redDays} off track',
                       color: AppColors.veryBad,
                     ),
+                    if (review.daysOff > 0)
+                      StatusPill(
+                        label:
+                            '${review.daysOff} '
+                            '${review.daysOff == 1 ? 'day' : 'days'} off',
+                        color: AppColors.primary,
+                      ),
                   ],
                 ),
                 for (final note in review.guidance) ...[

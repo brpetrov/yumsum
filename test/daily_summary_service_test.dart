@@ -1,12 +1,17 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/repositories/daily_summary_repository.dart';
+import 'package:lean_streak/repositories/day_off_repository.dart';
 import 'package:lean_streak/repositories/meal_repository.dart';
 import 'package:lean_streak/repositories/user_profile_repository.dart';
 import 'package:lean_streak/services/daily_summary_service.dart';
 
 class _Unused
-    implements MealRepository, UserProfileRepository, DailySummaryRepository {
+    implements
+        MealRepository,
+        UserProfileRepository,
+        DailySummaryRepository,
+        DayOffRepository {
   @override
   dynamic noSuchMethod(Invocation invocation) =>
       throw UnimplementedError('buildSummary needs no repository');
@@ -28,6 +33,7 @@ void main() {
     mealRepository: _Unused(),
     userProfileRepository: _Unused(),
     dailySummaryRepository: _Unused(),
+    dayOffRepository: _Unused(),
   );
 
   test('adds up protein from the meals that have it', () {

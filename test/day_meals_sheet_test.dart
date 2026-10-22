@@ -51,6 +51,25 @@ void main() {
     test('earlier days always show their status', () {
       expect(hasSettledStatus(summaryOn(yesterday, 900)), isTrue);
     });
+
+    test('a day off never shows one', () {
+      final off = summaryOn(yesterday, 3200);
+      expect(
+        hasSettledStatus(
+          DailySummary(
+            date: off.date,
+            totalCalories: off.totalCalories,
+            targetCalories: off.targetCalories,
+            calorieDelta: off.calorieDelta,
+            mealCount: off.mealCount,
+            status: off.status,
+            dayOff: true,
+            updatedAt: off.updatedAt,
+          ),
+        ),
+        isFalse,
+      );
+    });
   });
 
   group('DayMealsSheet', () {

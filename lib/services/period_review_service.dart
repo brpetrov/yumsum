@@ -25,28 +25,30 @@ class PeriodReviewService {
         ? 0.0
         : totalCalories / loggedDays.toDouble();
 
-    final greenDays = activeSummaries
+    // Days off are logged and counted in the totals, but not judged.
+    final judged = activeSummaries.where((summary) => !summary.dayOff).toList();
+    final greenDays = judged
         .where((summary) => summary.status == DailyStatus.green)
         .length;
-    final yellowDays = activeSummaries
+    final yellowDays = judged
         .where((summary) => summary.status == DailyStatus.yellow)
         .length;
-    final redDays = activeSummaries
+    final redDays = judged
         .where((summary) => summary.status == DailyStatus.red)
         .length;
-    final calorieConsistencyRate = loggedDays == 0
+    final calorieConsistencyRate = judged.isEmpty
         ? 0.0
-        : greenDays / loggedDays.toDouble();
+        : greenDays / judged.length.toDouble();
 
-    final bestDay = activeSummaries.isEmpty
+    final bestDay = judged.isEmpty
         ? null
-        : activeSummaries.reduce((best, current) {
+        : judged.reduce((best, current) {
             if (current.deltaRatio < best.deltaRatio) return current;
             return current.date.compareTo(best.date) > 0 ? current : best;
           });
-    final worstDay = activeSummaries.isEmpty
+    final worstDay = judged.isEmpty
         ? null
-        : activeSummaries.reduce((worst, current) {
+        : judged.reduce((worst, current) {
             if (current.deltaRatio > worst.deltaRatio) return current;
             return current.date.compareTo(worst.date) > 0 ? current : worst;
           });
@@ -63,6 +65,7 @@ class PeriodReviewService {
       greenDays: greenDays,
       yellowDays: yellowDays,
       redDays: redDays,
+      daysOff: activeSummaries.length - judged.length,
       calorieConsistencyRate: calorieConsistencyRate,
       bestDay: bestDay,
       worstDay: worstDay,

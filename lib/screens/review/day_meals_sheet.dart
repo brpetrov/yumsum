@@ -143,8 +143,10 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
                   ),
                   if (summary != null)
                     StatusPill(
-                      label: summary.status.label,
-                      color: dayStatusColor(summary.status),
+                      label: summary.dayOff ? 'Day off' : summary.status.label,
+                      color: summary.dayOff
+                          ? AppColors.primary
+                          : dayStatusColor(summary.status),
                     ),
                 ],
               ),

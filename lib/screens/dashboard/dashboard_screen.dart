@@ -11,12 +11,14 @@ import 'package:lean_streak/helpers/health_calculator.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/user_profile.dart';
+import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
+import 'package:lean_streak/screens/dashboard/helpers/day_off_dialog.dart';
 import 'package:lean_streak/screens/dashboard/helpers/quick_log_bar.dart';
 import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
 import 'package:lean_streak/screens/progress/helpers/log_weight_dialog.dart';
@@ -115,6 +117,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     return AppFrame(
       title: 'Today',
       subtitle: DateFormat('EEEE, d MMMM').format(today),
+      actions: [_DayOffButton(date: dateKey)],
       bottom: const QuickLogBar(),
       body: profileAsync.when(
         data: (profile) {
@@ -131,6 +134,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           final savedSummary = ref
               .watch(dailySummaryForDateProvider(dateKey))
               .valueOrNull;
+          final dayOff =
+              ref.watch(dayOffProvider(dateKey)).valueOrNull ?? false;
 
           return mealsAsync.when(
             data: (meals) {
@@ -142,6 +147,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                         date: dateKey,
                         meals: meals,
                         dailyCalorieTarget: profile.dailyCalorieTarget,
+                        dayOff: dayOff,
                       );
 
               return _DashboardContent(
@@ -280,6 +286,41 @@ class _DashboardContent extends StatelessWidget {
   }
 }
 
+/// Top right on Today: take the day off, or go back on plan.
+class _DayOffButton extends ConsumerWidget {
+  const _DayOffButton({required this.date});
+
+  final String date;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isOff = ref.watch(dayOffProvider(date)).valueOrNull ?? false;
+    return IconButton(
+      tooltip: isOff ? 'Day off' : 'Take the day off',
+      color: isOff ? AppColors.primary : null,
+      icon: Icon(
+        isOff ? Icons.beach_access_rounded : Icons.beach_access_outlined,
+      ),
+      onPressed: () async {
+        final uid = ref.read(currentUidProvider);
+        if (uid == null || !await confirmDayOff(context, isOff: isOff)) {
+          return;
+        }
+        try {
+          await ref
+              .read(dailySummaryServiceProvider)
+              .setDayOff(uid, date, !isOff);
+        } catch (_) {
+          if (!context.mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not change that right now.')),
+          );
+        }
+      },
+    );
+  }
+}
+
 /// Calories left for the day, then daily protein, in one card.
 class _TodayCard extends StatelessWidget {
   const _TodayCard({
@@ -303,6 +344,7 @@ class _TodayCard extends StatelessWidget {
     // The day isn't over, so being under target isn't flagged; only "on
     // track" and "over" are worth saying while it is still today.
     final (String? pillLabel, Color barColor) = switch (summary) {
+      _ when summary.dayOff => ('Day off', AppColors.primary),
       _ when summary.mealCount == 0 => (null, AppColors.primary),
       _ when summary.status == DailyStatus.green => (
         'On track',

@@ -30,7 +30,7 @@ firebase deploy --only firestore:rules  # Deploy Firestore security rules
 
 **Device settings:** Theme and reminder switches live in SharedPreferences through `sharedPreferencesProvider` (`lib/providers/preferences_provider.dart`), overridden in `main()` so readers never wait on it.
 
-**Firestore structure:** All user data lives under `/users/{uid}/` with subcollections for meals, daily summaries, weight entries, AI usage and past-day edits (period reviews are computed, not stored; old `check_ins` documents are only deleted along with the account). Reset progress on Weight & Progress clears `weight_entries` only.. Security rules enforce owner-only access.
+**Firestore structure:** All user data lives under `/users/{uid}/` with subcollections for meals, daily summaries, weight entries, AI usage, past-day edits and days off (period reviews are computed, not stored; old `check_ins` documents are only deleted along with the account). Reset progress on Weight & Progress clears `weight_entries` only.. Security rules enforce owner-only access.
 
 ## Key Domain Logic
 
@@ -40,6 +40,7 @@ firebase deploy --only firestore:rules  # Deploy Firestore security rules
 - **Period reviews** (`lib/services/period_review_service.dart`): Aggregates daily summaries into weekly/monthly review data, shown under the History calendar for finished days.
 - **Past-day changes** (`lib/providers/log_meal_controller.dart`): adding, editing or deleting a meal on an earlier day uses one of 10 changes per calendar month (`DayEditRepository.monthlyLimit`).
 - **Today isn't judged mid-day:** a day only shows its green/yellow/red status once it is finished, on track, or over target (`hasSettledStatus` in `lib/widgets/day_status.dart`).
+- **Day off:** the umbrella at the top right of Today takes today off (`confirmDayOff` explains it first; tap again to go back on plan). It is stored in `users/{uid}/days_off/{date}` (`DayOffRepository`), because the daily summary is rewritten on every meal change and deleted when a day has no meals; `recomputeForDate` copies it into `DailySummary.dayOff`. A day off never shows a status (`hasSettledStatus` is false), and period reviews count its calories but leave it out of the on-track/close/off-track tally, the consistency rate and best/worst day, showing "N days off" instead.
 
 ## Models
 
