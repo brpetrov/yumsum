@@ -35,8 +35,9 @@ final audioRecorderProvider = Provider<AudioRecorder>((ref) {
 /// "chicken wrap 450" saves straight away; a meal without calories can be
 /// estimated by the AI, or a photo taken. With the box empty the main
 /// button is the mic: it records a short note that the AI listens to
-/// itself, in English, Bulgarian or a mix. While the box is focused, recent
-/// meals are offered as chips for one-tap re-logging.
+/// itself, in English, Bulgarian or a mix. While the box is focused, meals
+/// are offered as chips for one-tap re-logging: the usual ones for this
+/// time of day, then recent ones matching what is typed.
 class QuickLogBar extends ConsumerStatefulWidget {
   const QuickLogBar({super.key});
 
@@ -390,7 +391,8 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
     setState(() {
       _working = false;
       if (food == null) {
-        _error = 'That barcode isn\'t in the food database. Type the meal instead.';
+        _error =
+            'That barcode isn\'t in the food database. Type the meal instead.';
       }
     });
     if (food == null) return;
@@ -544,14 +546,13 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
     );
   }
 
-  /// Up to three recent meals: the latest ones while the box is empty,
-  /// otherwise those whose name contains what has been typed.
+  /// While the box is empty, the meals usually had around now; once
+  /// typing, up to three recent meals whose name contains the text.
   List<Meal> _matchingRecents(List<Meal> all, String text) {
     final query = text.trim().toLowerCase();
-    return all
-        .where(
-          (meal) => query.isEmpty || meal.name!.toLowerCase().contains(query),
-        )
+    if (query.isEmpty) return usualMealsAt(all, DateTime.now());
+    return distinctRecentMeals(all)
+        .where((meal) => meal.name!.toLowerCase().contains(query))
         .take(3)
         .toList();
   }

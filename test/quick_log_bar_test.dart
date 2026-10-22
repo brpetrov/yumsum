@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
@@ -111,16 +112,20 @@ class _FakeRecorder extends Fake implements AudioRecorder {
   }
 }
 
-Meal _recent(String name, double kcal, double? protein) => Meal(
-  id: name,
-  date: '2026-10-15',
-  timestamp: DateTime(2026, 10, 15, 12),
-  name: name,
-  calories: kcal,
-  proteinGrams: protein,
-  createdAt: DateTime(2026, 10, 15, 12),
-  updatedAt: DateTime(2026, 10, 15, 12),
-);
+/// A meal logged at this time of day [daysAgo] days ago.
+Meal _recent(String name, double kcal, double? protein, {int daysAgo = 1}) {
+  final at = DateTime.now().subtract(Duration(days: daysAgo));
+  return Meal(
+    id: '$name $daysAgo',
+    date: DateFormat('yyyy-MM-dd').format(at),
+    timestamp: at,
+    name: name,
+    calories: kcal,
+    proteinGrams: protein,
+    createdAt: at,
+    updatedAt: at,
+  );
+}
 
 void main() {
   late _FakeLogMealController controller;
@@ -270,27 +275,25 @@ void main() {
     expect(find.byTooltip('Photo'), findsOneWidget);
   });
 
-  testWidgets('offers recent meals while the box is focused', (tester) async {
+  testWidgets('offers usual meals while the box is focused', (tester) async {
     await pumpCard(
       tester,
       recents: [
-        _recent('Porridge with banana', 355, 13),
+        _recent('Ham sandwich', 500, 20),
         _recent('Musaka', 640, 28),
-        _recent('Apple', 80, 0),
-        _recent('Chicken wrap', 450, 30),
+        _recent('Ham sandwich', 480, 20, daysAgo: 2),
+        _recent('Chicken wrap', 450, 30, daysAgo: 2),
+        _recent('Ham sandwich', 480, 20, daysAgo: 3),
       ],
     );
     await tester.pump();
     expect(find.byType(ActionChip), findsNothing);
 
+    // Empty box: only what has been had at this time more than once.
     await tester.tap(find.byType(TextField));
     await tester.pump();
-    expect(find.byType(ActionChip, skipOffstage: false), findsNWidgets(3));
-    expect(find.text('Musaka · 640 kcal'), findsOneWidget);
-    expect(
-      find.text('Chicken wrap · 450 kcal', skipOffstage: false),
-      findsNothing,
-    );
+    expect(find.byType(ActionChip, skipOffstage: false), findsOneWidget);
+    expect(find.text('Ham sandwich · 500 kcal'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField), 'wrap');
     await tester.pump();
@@ -414,7 +417,13 @@ void main() {
   testWidgets('the first keystroke keeps the field when chips stay', (
     tester,
   ) async {
-    await pumpCard(tester, recents: [_recent('Chicken wrap', 450, 30)]);
+    await pumpCard(
+      tester,
+      recents: [
+        _recent('Chicken wrap', 450, 30),
+        _recent('Chicken wrap', 450, 30, daysAgo: 2),
+      ],
+    );
     await tester.pump();
     await tester.tap(find.byType(TextField));
     await tester.pump();
