@@ -195,17 +195,31 @@ void main() {
 
   const listening = 'Listening... tap stop when you\'re done.';
 
-  String boxText(WidgetTester tester) =>
-      tester.widget<TextField>(find.byType(TextField)).controller!.text;
+  final nameBox = find.byKey(const ValueKey('quick-log-name'));
+  final kcalBox = find.byKey(const ValueKey('quick-log-kcal'));
+  final proteinBox = find.byKey(const ValueKey('quick-log-protein'));
+
+  /// The name, calorie and protein boxes; '' for a box that isn't shown.
+  List<String> boxes(WidgetTester tester) => [
+    for (final box in [nameBox, kcalBox, proteinBox])
+      box.evaluate().isEmpty
+          ? ''
+          : tester.widget<TextField>(box).controller!.text,
+  ];
+
+  EditableTextState nameField(WidgetTester tester) => tester.state(
+    find.descendant(of: nameBox, matching: find.byType(EditableText)),
+  );
 
   testWidgets('saves typed name and calories without calling the AI', (
     tester,
   ) async {
     await pumpCard(tester);
-    await tester.enterText(find.byType(TextField), 'chicken wrap 450');
+    await tester.enterText(nameBox, 'chicken wrap');
+    await tester.pump();
+    await tester.enterText(kcalBox, '450');
     await tester.pump();
 
-    expect(find.text('Chicken wrap · 450 kcal'), findsOneWidget);
     await tester.tap(find.byTooltip('Save'));
     await tester.pump();
 
@@ -214,22 +228,48 @@ void main() {
       (name: 'Chicken wrap', calories: 450.0, protein: null),
     ]);
     expect(estimateService.estimateCalls, 0);
-    expect(boxText(tester), isEmpty);
+    expect(boxes(tester), ['', '', '']);
+  });
+
+  testWidgets('the number boxes appear once the bar is in use; digits only', (
+    tester,
+  ) async {
+    await pumpCard(tester);
+    expect(kcalBox, findsNothing);
+
+    tester.view.viewInsets = const FakeViewPadding(bottom: 800);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.tap(nameBox);
+    await tester.pump();
+    expect(kcalBox, findsOneWidget);
+    expect(proteinBox, findsOneWidget);
+
+    // Back hides the keyboard but keeps focus: an empty bar folds away.
+    tester.view.resetViewInsets();
+    await tester.pump();
+    expect(kcalBox, findsNothing);
+    tester.view.viewInsets = const FakeViewPadding(bottom: 800);
+    await tester.pump();
+
+    await tester.enterText(kcalBox, '45x0 kcal');
+    await tester.enterText(proteinBox, '21g');
+    await tester.pump();
+    expect(boxes(tester), ['', '450', '21']);
+    expect(find.text('g protein'), findsOneWidget);
   });
 
   testWidgets('estimates calories when none are typed, then waits for Save', (
     tester,
   ) async {
     await pumpCard(tester);
-    await tester.enterText(find.byType(TextField), 'chicken wrap');
+    await tester.enterText(nameBox, 'chicken wrap');
     await tester.pump();
 
     await tester.tap(find.byTooltip('Estimate with AI'));
     await tester.pump();
     await tester.pump();
 
-    expect(boxText(tester), 'chicken wrap 520 kcal 32g protein');
-    expect(find.text('Chicken wrap · 520 kcal · 32 g protein'), findsOneWidget);
+    expect(boxes(tester), ['chicken wrap', '520', '32']);
     expect(find.byTooltip('Save'), findsOneWidget);
     expect(controller.saved, isEmpty);
 
@@ -261,7 +301,7 @@ void main() {
     await tester.tap(find.text('Use'));
     await tester.pumpAndSettle();
 
-    expect(boxText(tester), 'Chicken Tikka Wrap 323 kcal 14g protein');
+    expect(boxes(tester), ['Chicken Tikka Wrap', '323', '14']);
     expect(estimateService.photoCalls, 0);
   });
 
@@ -271,7 +311,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(foodLookup.lastBarcode, isNull);
     expect(estimateService.photoCalls, 1);
-    expect(boxText(tester), 'Musaka 640 kcal 28g protein');
+    expect(boxes(tester), ['Musaka', '640', '28']);
   });
 
   testWidgets('a barcode the database lacks goes to the AI too', (
@@ -290,14 +330,14 @@ void main() {
     await tester.tap(find.byTooltip('Photo or barcode'));
     await tester.pumpAndSettle();
     expect(estimateService.photoCalls, 0);
-    expect(boxText(tester), isEmpty);
+    expect(boxes(tester), ['', '', '']);
   });
 
   testWidgets('a typed name can be searched for; the pick fills the box', (
     tester,
   ) async {
     await pumpCard(tester);
-    await tester.enterText(find.byType(TextField), 'tikka wrap');
+    await tester.enterText(nameBox, 'tikka wrap');
     await tester.pump();
     await tester.tap(find.text('Search foods'));
     await tester.pumpAndSettle();
@@ -309,7 +349,7 @@ void main() {
     await tester.tap(find.text('Use'));
     await tester.pumpAndSettle();
 
-    expect(boxText(tester), 'Chicken Tikka Wrap 473 kcal 20g protein');
+    expect(boxes(tester), ['Chicken Tikka Wrap', '473', '20']);
     expect(find.text('Search foods'), findsNothing);
   });
 
@@ -320,14 +360,16 @@ void main() {
     expect(find.byTooltip('Photo or barcode'), findsOneWidget);
     expect(find.byTooltip('Clear'), findsNothing);
 
-    await tester.enterText(find.byType(TextField), 'wrap');
+    await tester.enterText(nameBox, 'wrap');
+    await tester.pump();
+    await tester.enterText(kcalBox, '450');
     await tester.pump();
     expect(find.byTooltip('Photo or barcode'), findsNothing);
     expect(find.byTooltip('Clear'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Clear'));
     await tester.pump();
-    expect(boxText(tester), isEmpty);
+    expect(boxes(tester), ['', '', '']);
     expect(find.byTooltip('Photo or barcode'), findsOneWidget);
   });
 
@@ -346,19 +388,19 @@ void main() {
     expect(find.byType(ActionChip), findsNothing);
 
     // Empty box: only what has been had at this time more than once.
-    await tester.tap(find.byType(TextField));
+    await tester.tap(nameBox);
     await tester.pump();
     expect(find.byType(ActionChip, skipOffstage: false), findsOneWidget);
     expect(find.text('Ham sandwich · 500 kcal'), findsOneWidget);
 
-    await tester.enterText(find.byType(TextField), 'wrap');
+    await tester.enterText(nameBox, 'wrap');
     await tester.pump();
     expect(find.text('Search foods'), findsOneWidget);
     expect(find.text('Ham sandwich · 500 kcal'), findsNothing);
 
     await tester.tap(find.text('Chicken wrap · 450 kcal'));
     await tester.pump();
-    expect(boxText(tester), 'Chicken wrap 450 kcal 30g protein');
+    expect(boxes(tester), ['Chicken wrap', '450', '30']);
     expect(find.byType(ActionChip), findsNothing);
 
     await tester.tap(find.byTooltip('Save'));
@@ -374,10 +416,7 @@ void main() {
     await pumpCard(tester);
     await tester.tap(find.byTooltip('Speak'));
     await tester.pump();
-    expect(
-      find.text('Listening... tap stop when you\'re done.'),
-      findsOneWidget,
-    );
+    expect(find.text(listening), findsOneWidget);
 
     recorder.audio.add(Uint8List(32000)); // one second of 16-bit mono
     await tester.pump();
@@ -386,7 +425,7 @@ void main() {
 
     expect(recorder.stopped, isTrue);
     expect(estimateService.heard!.length, 44 + 32000);
-    expect(boxText(tester), 'Lunch 400 kcal');
+    expect(boxes(tester), ['Lunch', '400', '']);
   });
 
   testWidgets('a mis-tap on the mic is not sent to the AI', (tester) async {
@@ -443,32 +482,26 @@ void main() {
     await pumpCard(tester, launchAction: LaunchAction.typeLog);
     await tester.pump();
 
-    final field = tester.widget<TextField>(find.byType(TextField));
-    expect(field.focusNode!.hasFocus, isTrue);
+    expect(tester.widget<TextField>(nameBox).focusNode!.hasFocus, isTrue);
     expect(container.read(launchActionProvider), isNull);
     await tester.pump(const Duration(milliseconds: 500)); // the keyboard retry
   });
 
-  testWidgets('the first keystroke keeps the same field and its focus', (
+  testWidgets('focusing and typing keep the same name field and its focus', (
     tester,
   ) async {
-    // No chips: the status line is the first thing to appear above the field.
     await pumpCard(tester);
-    await tester.tap(find.byType(TextField));
-    await tester.pump();
-    final before = tester.state<EditableTextState>(find.byType(EditableText));
+    final before = nameField(tester);
 
-    // The status line appears above the field on the first character; the
-    // field must not be rebuilt as a new widget (which drops the keyboard).
-    await tester.enterText(find.byType(TextField), 'c');
+    // The number boxes appear under the name box on focus; it must not be
+    // rebuilt as a new widget (which drops the keyboard).
+    await tester.tap(nameBox);
+    await tester.pump();
+    await tester.enterText(nameBox, 'c');
     await tester.pump();
 
-    final after = tester.state<EditableTextState>(find.byType(EditableText));
-    expect(after, same(before));
-    expect(
-      tester.widget<TextField>(find.byType(TextField)).focusNode!.hasFocus,
-      isTrue,
-    );
+    expect(nameField(tester), same(before));
+    expect(tester.widget<TextField>(nameBox).focusNode!.hasFocus, isTrue);
   });
 
   testWidgets('the first keystroke keeps the field when chips stay', (
@@ -482,23 +515,22 @@ void main() {
       ],
     );
     await tester.pump();
-    await tester.tap(find.byType(TextField));
+    await tester.tap(nameBox);
     await tester.pump();
-    final before = tester.state<EditableTextState>(find.byType(EditableText));
+    final before = nameField(tester);
 
-    await tester.enterText(find.byType(TextField), 'c');
+    await tester.enterText(nameBox, 'c');
     await tester.pump();
 
     expect(find.text('Chicken wrap · 450 kcal'), findsOneWidget);
-    expect(
-      tester.state<EditableTextState>(find.byType(EditableText)),
-      same(before),
-    );
+    expect(nameField(tester), same(before));
   });
 
   testWidgets('keyboard done saves when calories are present', (tester) async {
     await pumpCard(tester);
-    await tester.enterText(find.byType(TextField), '450 kcal porridge');
+    await tester.enterText(nameBox, 'porridge');
+    await tester.pump();
+    await tester.enterText(kcalBox, '450');
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pump();
 
@@ -507,15 +539,14 @@ void main() {
     ]);
   });
 
-  testWidgets('saves protein typed into the box', (tester) async {
+  testWidgets('saves protein typed into its box', (tester) async {
     await pumpCard(tester);
-    await tester.enterText(
-      find.byType(TextField),
-      'chicken wrap 450 35g protein',
-    );
+    await tester.enterText(nameBox, 'chicken wrap');
+    await tester.pump();
+    await tester.enterText(kcalBox, '450');
+    await tester.enterText(proteinBox, '35');
     await tester.pump();
 
-    expect(find.text('Chicken wrap · 450 kcal · 35 g protein'), findsOneWidget);
     await tester.tap(find.byTooltip('Save'));
     await tester.pump();
 

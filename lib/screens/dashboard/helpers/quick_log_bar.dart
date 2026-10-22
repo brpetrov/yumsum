@@ -8,7 +8,6 @@ import 'package:record/record.dart';
 
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
-import 'package:lean_streak/helpers/quick_log_parser.dart';
 import 'package:lean_streak/helpers/wav.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
@@ -19,7 +18,6 @@ import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/screens/dashboard/helpers/food_search_sheet.dart';
 import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 import 'package:lean_streak/screens/dashboard/helpers/portion_sheet.dart';
-import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
 import 'package:lean_streak/widgets/estimate_breakdown.dart';
@@ -31,9 +29,12 @@ final audioRecorderProvider = Provider<AudioRecorder>((ref) {
   return recorder;
 });
 
-/// The log composer pinned to the bottom of Today, under the thumb.
-/// "chicken wrap 450" saves straight away; a meal without calories can be
-/// estimated by the AI, or a photo taken (of the plate, or of a packet's
+typedef _Entry = ({String? name, int? kcal, int? protein});
+
+/// The log composer pinned to the bottom of Today, under the thumb: a name
+/// box, with calorie and protein boxes under it once the bar is in use. A
+/// meal with calories saves straight away; one without can be estimated
+/// by the AI, or a photo taken (of the plate, or of a packet's
 /// barcode). With the box empty the main
 /// button is the mic: it records a short note that the AI listens to
 /// itself, in English, Bulgarian or a mix. While the box is focused, meals
@@ -47,7 +48,8 @@ class QuickLogBar extends ConsumerStatefulWidget {
   ConsumerState<QuickLogBar> createState() => _QuickLogBarState();
 }
 
-class _QuickLogBarState extends ConsumerState<QuickLogBar> {
+class _QuickLogBarState extends ConsumerState<QuickLogBar>
+    with WidgetsBindingObserver {
   static const _sampleRate = 16000;
   static const _maxRecording = Duration(seconds: 30);
   // Auto-stop: once something has been said, this much near-silence ends
@@ -56,8 +58,12 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
   static const _speechDbfs = -30.0;
   static const _silenceDbfs = -45.0;
 
-  final _controller = TextEditingController();
+  final _name = TextEditingController();
+  final _kcal = TextEditingController();
+  final _protein = TextEditingController();
   final _focusNode = FocusNode();
+  final _kcalFocus = FocusNode();
+  final _proteinFocus = FocusNode();
 
   final _chunks = <Uint8List>[];
   StreamSubscription<Uint8List>? _audioSub;
@@ -72,7 +78,15 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
   List<EstimateItem> _aiItems = const [];
   String? _error;
 
-  QuickLogEntry get _entry => parseQuickLog(_controller.text);
+  _Entry get _entry {
+    final name = _name.text.trim();
+    final kcal = int.tryParse(_kcal.text);
+    return (
+      name: name.isEmpty ? null : name[0].toUpperCase() + name.substring(1),
+      kcal: kcal != null && kcal > 0 ? kcal : null,
+      protein: int.tryParse(_protein.text),
+    );
+  }
 
   // Touch devices choose between typing and the mic, so only desktop
   // (including desktop browsers, which have no on-screen keyboard) focuses
@@ -87,7 +101,10 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
   @override
   void initState() {
     super.initState();
-    _focusNode.addListener(() => setState(() {}));
+    WidgetsBinding.instance.addObserver(this);
+    for (final focus in [_focusNode, _kcalFocus, _proteinFocus]) {
+      focus.addListener(() => setState(() {}));
+    }
     ref.listenManual(
       launchActionProvider,
       (_, action) => _onLaunchAction(action),
@@ -147,25 +164,47 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _resumeListener?.dispose();
     _stopTimer?.cancel();
     _levelSub?.cancel();
     _audioSub?.cancel();
     if (_listening) ref.read(audioRecorderProvider).cancel();
-    _focusNode.dispose();
-    _controller.dispose();
+    for (final focus in [_focusNode, _kcalFocus, _proteinFocus]) {
+      focus.dispose();
+    }
+    for (final box in [_name, _kcal, _protein]) {
+      box.dispose();
+    }
     super.dispose();
   }
 
-  void _setText(String text) {
-    _controller.value = TextEditingValue(
-      text: text,
-      selection: TextSelection.collapsed(offset: text.length),
-    );
+  /// The keyboard coming or going decides whether empty number boxes show.
+  @override
+  void didChangeMetrics() {
+    if (_focusNode.hasFocus || _kcalFocus.hasFocus || _proteinFocus.hasFocus) {
+      setState(() {});
+    }
+  }
+
+  /// Puts a meal in the boxes, as an AI result, a chip or a barcode does.
+  void _fill(String name, int? kcal, int? protein) {
+    for (final (box, text) in [
+      (_name, name),
+      (_kcal, kcal?.toString() ?? ''),
+      (_protein, protein?.toString() ?? ''),
+    ]) {
+      box.value = TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(offset: text.length),
+      );
+    }
   }
 
   void _reset() {
-    _controller.clear();
+    for (final box in [_name, _kcal, _protein]) {
+      box.clear();
+    }
     setState(() {
       _aiItems = const [];
       _error = null;
@@ -203,7 +242,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
   }
 
   Future<void> _estimate() async {
-    final text = _controller.text.trim();
+    final text = _name.text.trim();
     final uid = ref.read(currentUidProvider);
     if (text.isEmpty || uid == null) return;
 
@@ -212,13 +251,10 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
           .read(calorieEstimateServiceProvider)
           .estimate(uid, text);
       if (!mounted) return;
-      _setText('$text ${_amounts(result.kcal, result.protein)}');
+      _fill(text, result.kcal, result.protein);
       _aiItems = result.items;
     });
   }
-
-  String _amounts(int kcal, int? protein) =>
-      protein == null ? '$kcal kcal' : '$kcal kcal ${protein}g protein';
 
   /// Shared busy and error handling for the estimate and voice AI calls.
   Future<void> _runAi(Future<void> Function() action) async {
@@ -259,7 +295,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
     _chunks.clear();
     _heardSpeech = false;
     _quietSince = null;
-    _setText('');
+    _fill('', null, null);
     setState(() {
       _listening = true;
       _aiItems = const [];
@@ -333,7 +369,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
           .read(calorieEstimateServiceProvider)
           .parseVoiceAudio(wavFromPcm16(pcm, sampleRate: _sampleRate));
       if (!mounted) return;
-      _setText('${result.name} ${_amounts(result.kcal, result.protein)}');
+      _fill(result.name, result.kcal, result.protein);
       _aiItems = result.items;
     });
   }
@@ -374,7 +410,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
           .read(calorieEstimateServiceProvider)
           .estimateFromPhoto(uid, bytes);
       if (!mounted) return;
-      _setText('${result.name} ${_amounts(result.kcal, result.protein)}');
+      _fill(result.name, result.kcal, result.protein);
       _aiItems = result.items;
     });
   }
@@ -392,41 +428,42 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
   Future<void> _usePackagedFood(PackagedFood food) async {
     final portion = await showPortionSheet(context, food);
     if (portion == null || !mounted) return;
-    _setText('${portion.name} ${_amounts(portion.kcal, portion.protein)}');
+    _fill(portion.name, portion.kcal, portion.protein);
     setState(() => _aiItems = const []);
-  }
-
-  Future<void> _openDetails() async {
-    final entry = _entry;
-    final saved = await showLogMealSheet(
-      context,
-      initialName: entry.name,
-      initialCalories: entry.kcal,
-      initialProtein: entry.protein,
-    );
-    if (saved == true && mounted) _reset();
   }
 
   @override
   Widget build(BuildContext context) {
     final entry = _entry;
-    final hasText = _controller.text.trim().isNotEmpty;
-    final showStatus = hasText || _listening || _working || _error != null;
+    final hasText = [
+      _name,
+      _kcal,
+      _protein,
+    ].any((box) => box.text.trim().isNotEmpty);
+    final focused =
+        _focusNode.hasFocus || _kcalFocus.hasFocus || _proteinFocus.hasFocus;
+    // The number boxes join the name box once the bar is in use, so while
+    // idle it is one box, the camera and the mic. On phones focus outlives
+    // the keyboard (Back only hides it), so an empty bar folds away with
+    // it. The view's insets are read because Scaffold hides them from its
+    // body, where the bar lives.
+    final keyboardUp = View.of(context).viewInsets.bottom > 0;
+    final open = hasText || (focused && (keyboardUp || _isDesktop));
+    final showStatus =
+        _listening || _working || _error != null || _aiItems.isNotEmpty;
     // Watched whether or not the box is focused, so the chips are ready the
-    // moment it is and the list isn't refetched on every focus.
+    // moment it is and the list isn't refetched on every focus. Once there
+    // are calories the meal is complete and suggestions would only repeat it.
     final allRecents =
         ref.watch(recentMealsProvider).valueOrNull ?? const <Meal>[];
-    final offering = _focusNode.hasFocus && !_listening && !_working;
+    final offering = focused && !_listening && !_working && entry.kcal == null;
     final recents = offering
-        ? _matchingRecents(allRecents, _controller.text)
+        ? _matchingRecents(allRecents, _name.text)
         : const <Meal>[];
     // A name without calories can be searched for; the web can't reach
     // the search service.
-    final query = _controller.text.trim();
-    final search =
-        !kIsWeb && offering && query.length >= 3 && entry.kcal == null
-        ? query
-        : null;
+    final query = _name.text.trim();
+    final search = !kIsWeb && offering && query.length >= 3 ? query : null;
 
     return Material(
       color: AppColors.surface,
@@ -450,75 +487,88 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
                       const SizedBox(height: 8),
                     ],
                     if (showStatus) ...[
-                      _buildStatus(entry, hasText),
+                      _buildStatus(),
                       const SizedBox(height: 8),
                     ],
                     // Keyed so the status line and chips appearing above
                     // it never make Flutter rebuild this row as one of
                     // them, which would recreate the field and drop the
-                    // keyboard on the first keystroke.
+                    // keyboard on the first keystroke. The name box stays
+                    // first in its column for the same reason when the
+                    // number boxes appear under it.
                     Row(
                       key: const ValueKey('quick-log-field'),
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Expanded(
-                          child: TextField(
-                            controller: _controller,
-                            focusNode: _focusNode,
-                            autofocus: _isDesktop,
-                            readOnly: _working || _listening,
-                            textCapitalization: TextCapitalization.sentences,
-                            textInputAction: TextInputAction.done,
-                            onChanged: (_) => setState(() {
-                              _aiItems = const [];
-                              _error = null;
-                            }),
-                            onSubmitted: (_) => _submit(),
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: AppColors.textPrimary,
-                            ),
-                            decoration: InputDecoration(
-                              hintText: 'What did you eat? e.g. wrap 450',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(26),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(26),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(26),
-                                borderSide: BorderSide(
-                                  color: AppColors.primary,
-                                  width: 1.5,
+                          child: Column(
+                            children: [
+                              TextField(
+                                key: const ValueKey('quick-log-name'),
+                                controller: _name,
+                                focusNode: _focusNode,
+                                autofocus: _isDesktop,
+                                readOnly: _working || _listening,
+                                textCapitalization:
+                                    TextCapitalization.sentences,
+                                textInputAction: TextInputAction.done,
+                                onChanged: (_) => _edited(),
+                                onSubmitted: (_) => _submit(),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: AppColors.textPrimary,
+                                ),
+                                decoration: _boxDecoration(
+                                  hint: 'What did you eat?',
+                                  // Camera while empty; a clear button once
+                                  // there is text, so a wrong voice or AI
+                                  // result is one tap from gone.
+                                  suffixIcon: _working || _listening
+                                      ? null
+                                      : hasText
+                                      ? IconButton(
+                                          tooltip: 'Clear',
+                                          onPressed: _reset,
+                                          color: AppColors.textSecondary,
+                                          icon: const Icon(Icons.close_rounded),
+                                        )
+                                      : IconButton(
+                                          tooltip: 'Photo or barcode',
+                                          onPressed: _takePhoto,
+                                          color: AppColors.textSecondary,
+                                          icon: const Icon(
+                                            Icons.photo_camera_outlined,
+                                          ),
+                                        ),
                                 ),
                               ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 15,
-                                horizontal: 20,
-                              ),
-                              // Camera while empty; a clear button once
-                              // there is text, so a wrong voice or AI
-                              // result is one tap from gone.
-                              suffixIcon: _working || _listening
-                                  ? null
-                                  : hasText
-                                  ? IconButton(
-                                      tooltip: 'Clear',
-                                      onPressed: _reset,
-                                      color: AppColors.textSecondary,
-                                      icon: const Icon(Icons.close_rounded),
-                                    )
-                                  : IconButton(
-                                      tooltip: 'Photo or barcode',
-                                      onPressed: _takePhoto,
-                                      color: AppColors.textSecondary,
-                                      icon: const Icon(
-                                        Icons.photo_camera_outlined,
+                              if (open) ...[
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _numberBox(
+                                        'quick-log-kcal',
+                                        _kcal,
+                                        _kcalFocus,
+                                        hint: 'kcal',
+                                        unit: 'kcal',
                                       ),
                                     ),
-                            ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: _numberBox(
+                                        'quick-log-protein',
+                                        _protein,
+                                        _proteinFocus,
+                                        hint: 'protein (g)',
+                                        unit: 'g protein',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ],
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -535,6 +585,66 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
     );
   }
 
+  /// Any edit makes an earlier AI breakdown or error stale.
+  void _edited() => setState(() {
+    _aiItems = const [];
+    _error = null;
+  });
+
+  InputDecoration _boxDecoration({
+    required String hint,
+    String? suffixText,
+    Widget? suffixIcon,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+      suffixText: suffixText,
+      suffixIcon: suffixIcon,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(26),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(26),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(26),
+        borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+    );
+  }
+
+  /// Digits only: the box says what the number is, so no unit is typed.
+  Widget _numberBox(
+    String key,
+    TextEditingController box,
+    FocusNode focus, {
+    required String hint,
+    required String unit,
+  }) {
+    return TextField(
+      key: ValueKey(key),
+      controller: box,
+      focusNode: focus,
+      readOnly: _working || _listening,
+      keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        LengthLimitingTextInputFormatter(5),
+      ],
+      textInputAction: TextInputAction.done,
+      onChanged: (_) => _edited(),
+      onSubmitted: (_) => _submit(),
+      style: TextStyle(fontSize: 16, color: AppColors.textPrimary),
+      decoration: _boxDecoration(
+        hint: hint,
+        suffixText: box.text.isEmpty ? null : unit,
+      ),
+    );
+  }
+
   /// While the box is empty, the meals usually had around now; once
   /// typing, up to three recent meals whose name contains the text.
   List<Meal> _matchingRecents(List<Meal> all, String text) {
@@ -547,7 +657,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
   }
 
   /// One scrolling row of chips: a search for [search] when given, then
-  /// meals, which fill the box ready to save when tapped.
+  /// meals, which fill the boxes ready to save when tapped.
   Widget _buildChips(List<Meal> recents, String? search) {
     ActionChip chip(String label, VoidCallback onPressed, {Widget? avatar}) =>
         ActionChip(
@@ -572,10 +682,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
         ),
       for (final meal in recents)
         chip('${meal.name} · ${meal.calories.round()} kcal', () {
-          _setText(
-            '${meal.name} '
-            '${_amounts(meal.calories.round(), meal.proteinGrams?.round())}',
-          );
+          _fill(meal.name!, meal.calories.round(), meal.proteinGrams?.round());
           _focusNode.requestFocus();
           setState(() {
             _aiItems = const [];
@@ -594,9 +701,10 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
     );
   }
 
-  /// One thumb-sized button that changes with the box: mic when empty,
-  /// save or estimate once there is text, stop while listening.
-  Widget _buildAction(QuickLogEntry entry, bool hasText) {
+  /// One thumb-sized button that changes with the boxes: mic when empty,
+  /// save once there are calories, estimate for a name without, stop while
+  /// listening.
+  Widget _buildAction(_Entry entry, bool hasText) {
     final (IconData icon, String tooltip, VoidCallback? onPressed) = _listening
         ? (Icons.stop_rounded, 'Stop', _toggleListening)
         : _working
@@ -605,7 +713,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
         ? (Icons.mic_rounded, 'Speak', _toggleListening)
         : entry.kcal != null
         ? (Icons.check_rounded, 'Save', _submit)
-        : (Icons.auto_awesome_rounded, 'Estimate with AI', _submit);
+        : entry.name != null
+        ? (Icons.auto_awesome_rounded, 'Estimate with AI', _submit)
+        : (Icons.check_rounded, 'Save', null);
 
     return IconButton.filled(
       onPressed: onPressed,
@@ -620,62 +730,25 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
     );
   }
 
-  Widget _buildStatus(QuickLogEntry entry, bool hasText) {
-    final (message, color, emphasise) = switch (entry) {
-      _ when _listening => (
-        'Listening... tap stop when you\'re done.',
-        AppColors.textSecondary,
-        false,
-      ),
-      _ when _working => ('Working...', AppColors.textSecondary, false),
-      _ when _error != null => (_error!, AppColors.error, false),
-      (name: final name, kcal: null, protein: _) => (
-        '${name ?? 'Meal'} · no calories yet. Add a number or estimate with AI.',
-        AppColors.textSecondary,
-        false,
-      ),
-      (name: final name, kcal: final kcal, protein: final protein) => (
-        [
-          ?name,
-          '$kcal kcal',
-          if (protein != null) '$protein g protein',
-        ].join(' · '),
-        AppColors.textPrimary,
-        true,
-      ),
-    };
+  /// Listening, working or what went wrong, and an AI result's breakdown.
+  Widget _buildStatus() {
+    final (String? message, Color color) = _listening
+        ? ('Listening... tap stop when you\'re done.', AppColors.textSecondary)
+        : _working
+        ? ('Working...', AppColors.textSecondary)
+        : (_error, AppColors.error);
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 4, top: 6),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  message,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: color,
-                    fontWeight: emphasise ? FontWeight.w600 : FontWeight.w400,
-                  ),
-                ),
-                if (_aiItems.isNotEmpty && !_working) ...[
-                  const SizedBox(height: 2),
-                  EstimateBreakdown(items: _aiItems),
-                ],
-              ],
-            ),
-          ),
-        ),
-        if (hasText && !_working && !_listening)
-          TextButton(
-            onPressed: _openDetails,
-            child: const Text('More details'),
-          ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, top: 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (message != null)
+            Text(message, style: TextStyle(fontSize: 14, color: color)),
+          if (_aiItems.isNotEmpty && !_working && !_listening)
+            EstimateBreakdown(items: _aiItems),
+        ],
+      ),
     );
   }
 }
