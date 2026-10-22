@@ -217,8 +217,8 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                         validator: (value) {
                           final age = int.tryParse(value ?? '');
                           if (age == null) return 'Please enter your age.';
-                          if (age < 13 || age > 120) {
-                            return 'Valid age: 13-120.';
+                          if (age < 18 || age > 120) {
+                            return 'Valid age: 18–120.';
                           }
                           return null;
                         },

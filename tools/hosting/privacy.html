@@ -26,19 +26,21 @@
 <main>
   <nav><a href="/">LeanStreak</a> · <a href="/terms">Terms of Use</a></nav>
   <h1>Privacy Policy</h1>
-  <p class="meta">Effective 18 October 2026</p>
+  <p class="meta">Effective 22 October 2026</p>
 
   <p>LeanStreak is a calorie and weight tracker made by Boyan Petrov, an individual developer based in the United Kingdom ("we", "us"). This policy explains what the app collects, why, and what you can do about it. Questions and requests: <a href="mailto:broogenn@gmail.com">broogenn@gmail.com</a>.</p>
 
   <h2>What we collect</h2>
   <ul>
-    <li><strong>Account:</strong> your email address and name. Passwords are handled by Google Firebase Authentication; we never see them.</li>
+    <li><strong>Account:</strong> your email address and name. Passwords are handled by Google Firebase Authentication; we never see them. If you sign in with Google, we receive the email address and name of your Google account instead.</li>
     <li><strong>Profile:</strong> age, gender, height, current and target weight, activity level, training frequency and goal pace. These are used to calculate your calorie target.</li>
     <li><strong>What you log:</strong> meals (names, calories, protein and the time you logged them) and weigh-ins.</li>
     <li><strong>AI usage counts:</strong> how many AI estimates you have used each day, to apply the daily limit.</li>
     <li><strong>Technical data:</strong> Firebase records basic technical information such as IP address and device type for security and to operate the service.</li>
+    <li><strong>Genuine-app checks:</strong> to stop others abusing the AI feature, every AI request carries a token from Google's App Check, which confirms it comes from a real copy of the app. On Android this uses Google Play Integrity; on the web it uses reCAPTCHA Enterprise, which looks at device and browser signals and may set cookies. Google runs these checks and tells us only whether the request is genuine. The <a href="https://policies.google.com/privacy">Google Privacy Policy</a> and <a href="https://policies.google.com/terms">Terms of Service</a> apply to them.</li>
+    <li><strong>Crash reports:</strong> if the app on your phone crashes, Firebase Crashlytics sends us a report with the device model, operating system version, app version and the technical trace of the crash, filed under a random installation ID. It contains nothing you logged.</li>
   </ul>
-  <p>Reminder settings, theme and other preferences stay on your device and are not sent to us. The app contains no advertising and no analytics or tracking SDKs.</p>
+  <p>Reminders are scheduled by the app on your device, and reminder settings, theme and other preferences stay there; none of this is sent to us. The app contains no advertising and no advertising or analytics trackers.</p>
 
   <h2>How your meal descriptions, photos and voice notes are processed</h2>
   <div class="box">
@@ -54,6 +56,8 @@
   <ul>
     <li><strong>Google Firebase</strong> (Authentication, Firestore database, Hosting): stores your account and logs on Google Cloud servers, which may be outside the UK. Google provides the standard contractual safeguards for such transfers.</li>
     <li><strong>Google Gemini API:</strong> estimates meals, as described above.</li>
+    <li><strong>Google App Check</strong> (Play Integrity on Android, reCAPTCHA Enterprise on the web): confirms requests come from the genuine app.</li>
+    <li><strong>Firebase Crashlytics:</strong> receives crash reports from the phone apps.</li>
   </ul>
 
   <h2>How long we keep it</h2>

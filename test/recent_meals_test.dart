@@ -26,9 +26,9 @@ void main() {
 
   test('caps the list', () {
     final recents = distinctRecentMeals([
-      for (var i = 0; i < 40; i++) _meal('$i', 'Meal $i', 100),
+      for (var i = 0; i < 60; i++) _meal('$i', 'Meal $i', 100),
     ]);
 
-    expect(recents.length, 30);
+    expect(recents.length, 50);
   });
 }

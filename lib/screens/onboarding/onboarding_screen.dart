@@ -203,7 +203,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       validator: (v) {
                         final n = int.tryParse(v ?? '');
                         if (n == null) return 'Please enter your age.';
-                        if (n < 13 || n > 120) return 'Valid age: 13–120.';
+                        if (n < 18 || n > 120) return 'Valid age: 18–120.';
                         return null;
                       },
                     ),

@@ -1,4 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/app/app.dart';
@@ -46,6 +48,19 @@ void main() async {
       // Without a token the AI call fails with a clear message; the rest of
       // the app does not depend on App Check.
       debugPrint('App Check setup failed: $error');
+    }
+    if (!kIsWeb) {
+      // Crashlytics has no web build; the debugPrint handler above stays
+      // there. Uncaught errors become crash reports (device, OS, app
+      // version and the trace; nothing the user logged).
+      FlutterError.onError = (details) {
+        FlutterError.presentError(details);
+        FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+      };
+      WidgetsBinding.instance.platformDispatcher.onError = (error, stack) {
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+        return true;
+      };
     }
   } catch (error, stackTrace) {
     debugPrint('LeanStreak startup failed: $error');

@@ -1,4 +1,5 @@
 import 'package:flutter/gestures.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -7,6 +8,10 @@ import 'package:lean_streak/core/constants/legal_links.dart';
 
 Future<void> openLegalPage(Uri page) =>
     launchUrl(page, mode: LaunchMode.externalApplication);
+
+/// Opens the user's mail app with a message to the developer.
+Future<void> openFeedbackEmail() =>
+    launchUrl(LegalLinks.feedback, mode: LaunchMode.externalApplication);
 
 /// "By continuing you agree to..." with tappable Terms and Privacy links.
 class LegalFooter extends StatelessWidget {
@@ -20,7 +25,7 @@ class LegalFooter extends StatelessWidget {
       color: AppColors.primary,
       fontWeight: FontWeight.w600,
     );
-    return Text.rich(
+    final agreement = Text.rich(
       TextSpan(
         style: muted,
         children: [
@@ -42,6 +47,42 @@ class LegalFooter extends StatelessWidget {
         ],
       ),
       textAlign: TextAlign.center,
+    );
+    if (!kIsWeb) return agreement;
+    // Google's terms ask for this line wherever the reCAPTCHA badge is hidden.
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        agreement,
+        const SizedBox(height: 6),
+        Text.rich(
+          TextSpan(
+            style: muted,
+            children: [
+              const TextSpan(text: 'Protected by reCAPTCHA Enterprise. Google\'s '),
+              TextSpan(
+                text: 'Privacy Policy',
+                style: link,
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () => openLegalPage(
+                    Uri.parse('https://policies.google.com/privacy'),
+                  ),
+              ),
+              const TextSpan(text: ' and '),
+              TextSpan(
+                text: 'Terms of Service',
+                style: link,
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () => openLegalPage(
+                    Uri.parse('https://policies.google.com/terms'),
+                  ),
+              ),
+              const TextSpan(text: ' apply.'),
+            ],
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }

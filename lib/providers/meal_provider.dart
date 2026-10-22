@@ -11,7 +11,7 @@ final mealRepositoryProvider = Provider<MealRepository>((ref) {
 
 /// The user's recent meals for one-tap re-logging: each name once (case
 /// insensitive, keeping the latest entry), unnamed meals skipped, at most
-/// 30. Refreshed by [LogMealController] after every change.
+/// 50. Refreshed by [LogMealController] after every change.
 final recentMealsProvider = FutureProvider.autoDispose<List<Meal>>((ref) async {
   final uid = ref.watch(currentUidProvider);
   if (uid == null) return const [];
@@ -20,7 +20,7 @@ final recentMealsProvider = FutureProvider.autoDispose<List<Meal>>((ref) async {
 });
 
 /// [meals] newest first, reduced to the latest meal per name.
-List<Meal> distinctRecentMeals(List<Meal> meals, {int max = 30}) {
+List<Meal> distinctRecentMeals(List<Meal> meals, {int max = 50}) {
   final seen = <String>{};
   return [
     for (final meal in meals)

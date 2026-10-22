@@ -39,7 +39,7 @@ class MealRepository {
   }
 
   /// The latest [limit] meals logged, newest first.
-  Future<List<Meal>> fetchRecentMeals(String uid, {int limit = 60}) async {
+  Future<List<Meal>> fetchRecentMeals(String uid, {int limit = 120}) async {
     final snapshot = await _meals(
       uid,
     ).orderBy('createdAt', descending: true).limit(limit).get();

@@ -251,7 +251,14 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         label: Text('Send password reset email'),
                       ),
                       SizedBox(height: 28),
-                      const _AccountSectionLabel('LEGAL'),
+                      const _AccountSectionLabel('HELP & LEGAL'),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Send feedback'),
+                        subtitle: const Text('Opens an email to the developer'),
+                        trailing: const Icon(Icons.mail_outline_rounded, size: 18),
+                        onTap: openFeedbackEmail,
+                      ),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: const Text('Privacy policy'),
