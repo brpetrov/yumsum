@@ -11,6 +11,8 @@ class ReminderSettings {
     required this.weeklyWeight,
     required this.weeklyDay,
     required this.weeklyTime,
+    required this.creatine,
+    required this.creatineTime,
   });
 
   final bool dailyMeal;
@@ -19,30 +21,41 @@ class ReminderSettings {
   /// [DateTime.monday] to [DateTime.sunday].
   final int weeklyDay;
   final TimeOfDay weeklyTime;
+  final bool creatine;
+  final TimeOfDay creatineTime;
 
   ReminderSettings copyWith({
     bool? dailyMeal,
     bool? weeklyWeight,
     int? weeklyDay,
     TimeOfDay? weeklyTime,
+    bool? creatine,
+    TimeOfDay? creatineTime,
   }) {
     return ReminderSettings(
       dailyMeal: dailyMeal ?? this.dailyMeal,
       weeklyWeight: weeklyWeight ?? this.weeklyWeight,
       weeklyDay: weeklyDay ?? this.weeklyDay,
       weeklyTime: weeklyTime ?? this.weeklyTime,
+      creatine: creatine ?? this.creatine,
+      creatineTime: creatineTime ?? this.creatineTime,
     );
   }
 }
 
-/// The two reminder switches and the weigh-in slot (Saturday 20:00 unless
-/// changed), stored on the device since reminders are per device.
+/// The reminder switches, the weigh-in slot (Saturday 20:00 unless changed)
+/// and the creatine time (09:00; that reminder is off unless turned on),
+/// stored on the device since reminders are per device.
 class ReminderSettingsNotifier extends Notifier<ReminderSettings> {
   static const _dailyKey = 'reminders.daily_meal';
   static const _weeklyKey = 'reminders.weekly_weight';
   static const _weeklyDayKey = 'reminders.weekly_weight_day';
   static const _weeklyHourKey = 'reminders.weekly_weight_hour';
   static const _weeklyMinuteKey = 'reminders.weekly_weight_minute';
+  static const _creatineKey = 'reminders.creatine';
+  static const _creatineHourKey = 'reminders.creatine_hour';
+  static const _creatineMinuteKey = 'reminders.creatine_minute';
+  static const _creatineOfferedKey = 'reminders.creatine_offered';
 
   @override
   ReminderSettings build() {
@@ -54,6 +67,11 @@ class ReminderSettingsNotifier extends Notifier<ReminderSettings> {
       weeklyTime: TimeOfDay(
         hour: prefs.getInt(_weeklyHourKey) ?? 20,
         minute: prefs.getInt(_weeklyMinuteKey) ?? 0,
+      ),
+      creatine: prefs.getBool(_creatineKey) ?? false,
+      creatineTime: TimeOfDay(
+        hour: prefs.getInt(_creatineHourKey) ?? 9,
+        minute: prefs.getInt(_creatineMinuteKey) ?? 0,
       ),
     );
   }
@@ -70,6 +88,33 @@ class ReminderSettingsNotifier extends Notifier<ReminderSettings> {
 
   Future<bool> setWeeklyWeight(bool on) =>
       _set(on, (settings) => settings.copyWith(weeklyWeight: on));
+
+  Future<bool> setCreatine(bool on) =>
+      _set(on, (settings) => settings.copyWith(creatine: on));
+
+  Future<void> setCreatineTime(TimeOfDay time) async {
+    state = state.copyWith(creatineTime: time);
+    await _persist(state);
+  }
+
+  /// The creatine reminder is offered once, in the first week after sign-up
+  /// (from the day after, so it doesn't crowd the first session).
+  bool shouldOfferCreatine({
+    required DateTime signedUp,
+    required DateTime now,
+  }) {
+    final offered = ref
+        .read(sharedPreferencesProvider)
+        .getBool(_creatineOfferedKey);
+    if (state.creatine || offered == true) return false;
+    final days = DateTime.utc(now.year, now.month, now.day)
+        .difference(DateTime.utc(signedUp.year, signedUp.month, signedUp.day))
+        .inDays;
+    return days >= 1 && days < 7;
+  }
+
+  Future<void> markCreatineOffered() =>
+      ref.read(sharedPreferencesProvider).setBool(_creatineOfferedKey, true);
 
   Future<void> setWeeklySchedule({
     required int day,
@@ -96,8 +141,16 @@ class ReminderSettingsNotifier extends Notifier<ReminderSettings> {
     await prefs.setInt(_weeklyDayKey, settings.weeklyDay);
     await prefs.setInt(_weeklyHourKey, settings.weeklyTime.hour);
     await prefs.setInt(_weeklyMinuteKey, settings.weeklyTime.minute);
+    await prefs.setBool(_creatineKey, settings.creatine);
+    await prefs.setInt(_creatineHourKey, settings.creatineTime.hour);
+    await prefs.setInt(_creatineMinuteKey, settings.creatineTime.minute);
   }
 }
+
+/// A reminder time as the settings show it, e.g. "09:00".
+String clockLabel(TimeOfDay time) =>
+    '${time.hour.toString().padLeft(2, '0')}:'
+    '${time.minute.toString().padLeft(2, '0')}';
 
 final reminderSettingsProvider =
     NotifierProvider<ReminderSettingsNotifier, ReminderSettings>(
@@ -105,7 +158,7 @@ final reminderSettingsProvider =
     );
 
 /// Keeps the scheduled notifications in step with the settings. Re-runs
-/// whenever a switch flips or the weigh-in slot changes.
+/// whenever a switch flips or a time changes.
 final reminderSyncProvider = FutureProvider.autoDispose<void>((ref) async {
   final settings = ref.watch(reminderSettingsProvider);
 
@@ -120,6 +173,15 @@ final reminderSyncProvider = FutureProvider.autoDispose<void>((ref) async {
     await NotificationService.scheduleDailyMealReminder();
   } else {
     await NotificationService.cancelDailyMealReminder();
+  }
+
+  if (settings.creatine) {
+    await NotificationService.scheduleCreatineReminder(
+      hour: settings.creatineTime.hour,
+      minute: settings.creatineTime.minute,
+    );
+  } else {
+    await NotificationService.cancelCreatineReminder();
   }
 
   if (!settings.weeklyWeight) {

@@ -22,6 +22,7 @@ void main() {
           AppRoutes.review,
           AppRoutes.progress,
           AppRoutes.planSettings,
+          AppRoutes.notifications,
           AppRoutes.profile,
         ])
           GoRoute(

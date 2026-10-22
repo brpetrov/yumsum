@@ -6,7 +6,6 @@ import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/providers/account_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
-import 'package:lean_streak/providers/reminder_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/core/constants/legal_links.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
@@ -241,9 +240,6 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                             : Text('Save Account'),
                       ),
                       SizedBox(height: 28),
-                      const _AccountSectionLabel('REMINDERS'),
-                      const _ReminderSwitches(),
-                      SizedBox(height: 28),
                       const _AccountSectionLabel('PASSWORD'),
                       OutlinedButton.icon(
                         onPressed: isWorking ? null : _sendPasswordReset,
@@ -316,108 +312,6 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-/// The two notification switches, plus the weigh-in day and time. Turning a
-/// switch on asks the system for permission; if that is refused it stays off.
-class _ReminderSwitches extends ConsumerWidget {
-  const _ReminderSwitches();
-
-  static const _dayNames = [
-    '',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
-  ];
-
-  static String _clock(TimeOfDay time) =>
-      '${time.hour.toString().padLeft(2, '0')}:'
-      '${time.minute.toString().padLeft(2, '0')}';
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final settings = ref.watch(reminderSettingsProvider);
-    final notifier = ref.read(reminderSettingsProvider.notifier);
-
-    Future<void> apply(Future<bool> Function() change) async {
-      final ok = await change();
-      if (ok || !context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Allow notifications for LeanStreak in system settings.',
-          ),
-        ),
-      );
-    }
-
-    Future<void> pickTime() async {
-      final picked = await showTimePicker(
-        context: context,
-        initialTime: settings.weeklyTime,
-        builder: (context, child) => MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child!,
-        ),
-      );
-      if (picked != null) {
-        await notifier.setWeeklySchedule(day: settings.weeklyDay, time: picked);
-      }
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SwitchListTile(
-          contentPadding: EdgeInsets.zero,
-          title: const Text('Daily meal reminder'),
-          subtitle: const Text('Every evening at 20:30'),
-          value: settings.dailyMeal,
-          onChanged: (on) => apply(() => notifier.setDailyMeal(on)),
-        ),
-        SwitchListTile(
-          contentPadding: EdgeInsets.zero,
-          title: const Text('Weekly weigh-in reminder'),
-          subtitle: Text(
-            '${_dayNames[settings.weeklyDay]}s at ${_clock(settings.weeklyTime)}',
-          ),
-          value: settings.weeklyWeight,
-          onChanged: (on) => apply(() => notifier.setWeeklyWeight(on)),
-        ),
-        if (settings.weeklyWeight)
-          Row(
-            children: [
-              DropdownButton<int>(
-                value: settings.weeklyDay,
-                underline: const SizedBox.shrink(),
-                items: [
-                  for (var day = DateTime.monday; day <= DateTime.sunday; day++)
-                    DropdownMenuItem(value: day, child: Text(_dayNames[day])),
-                ],
-                onChanged: (day) {
-                  if (day != null) {
-                    notifier.setWeeklySchedule(
-                      day: day,
-                      time: settings.weeklyTime,
-                    );
-                  }
-                },
-              ),
-              const SizedBox(width: 12),
-              TextButton.icon(
-                onPressed: pickTime,
-                icon: const Icon(Icons.schedule_rounded),
-                label: Text(_clock(settings.weeklyTime)),
-              ),
-            ],
-          ),
-      ],
     );
   }
 }

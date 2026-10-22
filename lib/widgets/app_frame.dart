@@ -87,6 +87,11 @@ class AppDrawer extends ConsumerWidget {
       label: 'Plan Settings',
     ),
     (
+      route: AppRoutes.notifications,
+      icon: Icons.notifications_outlined,
+      label: 'Notifications',
+    ),
+    (
       route: AppRoutes.profile,
       icon: Icons.manage_accounts_outlined,
       label: 'Account Settings',

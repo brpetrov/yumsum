@@ -78,23 +78,6 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('the weigh-in reminder defaults to Saturday 20:00; day changes', (
-    tester,
-  ) async {
-    await pumpScreen(tester);
-    expect(find.text('Saturdays at 20:00'), findsOneWidget);
-
-    await tester.ensureVisible(find.text('Saturday'));
-    await tester.tap(find.text('Saturday'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Sunday').last);
-    await tester.pumpAndSettle();
-
-    expect(find.text('Sundays at 20:00'), findsOneWidget);
-    expect(prefs.getInt('reminders.weekly_weight_day'), DateTime.sunday);
-    expect(prefs.getInt('reminders.weekly_weight_hour'), 20);
-  });
-
   testWidgets('Account Settings links to feedback and the legal pages', (
     tester,
   ) async {

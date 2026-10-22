@@ -15,9 +15,11 @@ import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
+import 'package:lean_streak/providers/reminder_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
+import 'package:lean_streak/screens/dashboard/helpers/creatine_offer.dart';
 import 'package:lean_streak/screens/dashboard/helpers/day_off_dialog.dart';
 import 'package:lean_streak/screens/dashboard/helpers/quick_log_bar.dart';
 import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
@@ -54,6 +56,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       (_, action) => _onLaunchAction(action),
       fireImmediately: true,
     );
+    ref.listenManual(userProfileProvider, (_, next) {
+      final profile = next.valueOrNull;
+      if (profile != null) _maybeOfferCreatine(profile.createdAt);
+    }, fireImmediately: true);
+  }
+
+  /// Once, in the first week: offer the daily creatine reminder.
+  void _maybeOfferCreatine(DateTime signedUp) {
+    final reminders = ref.read(reminderSettingsProvider.notifier);
+    if (!reminders.shouldOfferCreatine(
+      signedUp: signedUp,
+      now: DateTime.now(),
+    )) {
+      return;
+    }
+    reminders.markCreatineOffered();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) offerCreatineReminder(context, ref);
+    });
   }
 
   void _onLaunchAction(LaunchAction? action) {

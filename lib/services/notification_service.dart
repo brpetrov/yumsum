@@ -18,6 +18,7 @@ class NotificationService {
 
   static const int _dailyReminderId = 1001;
   static const int _weeklyWeightReminderId = 1002;
+  static const int _creatineReminderId = 1003;
   static bool _initialized = false;
 
   static bool get isSupported {
@@ -171,6 +172,52 @@ class NotificationService {
   static Future<void> cancelWeeklyWeightReminder() async {
     if (!isSupported) return;
     await _notifications.cancel(id: _weeklyWeightReminderId);
+  }
+
+  /// Every day at [hour]:[minute].
+  static Future<void> scheduleCreatineReminder({
+    required int hour,
+    required int minute,
+  }) async {
+    if (!isSupported) return;
+    await _notifications.cancel(id: _creatineReminderId);
+
+    final now = tz.TZDateTime.now(tz.local);
+    var scheduledTime = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    );
+    if (!scheduledTime.isAfter(now)) {
+      scheduledTime = scheduledTime.add(const Duration(days: 1));
+    }
+
+    await _notifications.zonedSchedule(
+      id: _creatineReminderId,
+      title: 'Creatine time',
+      body: 'Take today\'s creatine.',
+      scheduledDate: scheduledTime,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'creatine_reminder',
+          'Creatine Reminder',
+          channelDescription: 'Reminds you once a day to take creatine.',
+          importance: Importance.defaultImportance,
+          priority: Priority.defaultPriority,
+        ),
+        iOS: DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: await _androidScheduleMode(),
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  static Future<void> cancelCreatineReminder() async {
+    if (!isSupported) return;
+    await _notifications.cancel(id: _creatineReminderId);
   }
 
   static AndroidFlutterLocalNotificationsPlugin? get _android => _notifications
