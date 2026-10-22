@@ -10,6 +10,9 @@ typedef PackagedFood = ({
   int kcalPer100g,
   int? proteinPer100g,
   int? servingGrams,
+
+  /// A small photo of the front of the pack, when one has been uploaded.
+  String? imageUrl,
 });
 
 class FoodLookupException implements Exception {
@@ -59,7 +62,7 @@ class FoodLookupService {
       'page_size': '30',
       'fields':
           'product_name,product_name_en,brands,nutriments,serving_size,'
-          'quantity,countries_tags',
+          'quantity,countries_tags,image_front_small_url',
     });
     final response = await _get(uri);
     if (response.statusCode != 200) {
@@ -148,6 +151,7 @@ PackagedFood? parsePackagedFood(Map<String, dynamic> json) {
     servingGrams:
         gramsIn(_text(product['serving_size'])) ??
         gramsIn(_text(product['quantity'])),
+    imageUrl: _text(product['image_front_small_url']),
   );
 }
 

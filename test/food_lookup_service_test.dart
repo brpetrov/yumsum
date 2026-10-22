@@ -17,6 +17,7 @@ void main() {
         {"product_name": "Tikka Wrap", "nutriments": {}},
         {"product_name": "Chicken tikka wrap", "brands": ["Myprotein"],
           "countries_tags": ["en:united-kingdom"], "quantity": "175 g",
+          "image_front_small_url": "https://images.openfoodfacts.org/w.200.jpg",
           "nutriments": {"energy-kcal_100g": 162, "proteins_100g": 12.1}}
       ]}'''),
       country: 'United Kingdom',
@@ -25,6 +26,8 @@ void main() {
     expect(foods.map((food) => food.brand), ['Myprotein', 'Daily Delight']);
     expect(foods.first.servingGrams, 175);
     expect(foods.first.proteinPer100g, 12);
+    expect(foods.first.imageUrl, 'https://images.openfoodfacts.org/w.200.jpg');
+    expect(foods.last.imageUrl, isNull);
   });
 
   group('parsePackagedFood', () {

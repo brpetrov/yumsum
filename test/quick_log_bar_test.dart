@@ -89,6 +89,7 @@ class _FakeFoodLookup implements FoodLookupService {
     kcalPer100g: 215,
     proteinPer100g: 9,
     servingGrams: 220,
+    imageUrl: null,
   );
   String? lastBarcode;
   String? lastQuery;

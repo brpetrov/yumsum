@@ -9,11 +9,16 @@ const _wrap = (
   kcalPer100g: 215,
   proteinPer100g: 9,
   servingGrams: 220,
+  imageUrl: null,
 );
 
 void main() {
   test('portionFor scales per-100 g figures and rounds', () {
-    expect(portionFor(_wrap, 150), (name: 'Chicken Tikka Wrap', kcal: 323, protein: 14));
+    expect(portionFor(_wrap, 150), (
+      name: 'Chicken Tikka Wrap',
+      kcal: 323,
+      protein: 14,
+    ));
     expect(portionFor(_wrap, 100).kcal, 215);
 
     const noProtein = (
@@ -22,8 +27,13 @@ void main() {
       kcalPer100g: 42,
       proteinPer100g: null,
       servingGrams: 330,
+      imageUrl: null,
     );
-    expect(portionFor(noProtein, 330), (name: 'Cola', kcal: 139, protein: null));
+    expect(portionFor(noProtein, 330), (
+      name: 'Cola',
+      kcal: 139,
+      protein: null,
+    ));
   });
 
   testWidgets('the sheet starts at the serving, recalculates and returns', (
@@ -36,7 +46,8 @@ void main() {
         home: Scaffold(
           body: Builder(
             builder: (context) => TextButton(
-              onPressed: () async => result = await showPortionSheet(context, _wrap),
+              onPressed: () async =>
+                  result = await showPortionSheet(context, _wrap),
               child: const Text('open'),
             ),
           ),
@@ -48,7 +59,10 @@ void main() {
 
     expect(find.text('Chicken Tikka Wrap'), findsOneWidget);
     expect(find.text('Tesco'), findsOneWidget);
-    expect(find.text('215 kcal · 9 g protein per 100 g · Open Food Facts'), findsOneWidget);
+    expect(
+      find.text('215 kcal · 9 g protein per 100 g · Open Food Facts'),
+      findsOneWidget,
+    );
     expect(find.text('473 kcal · 20 g protein'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField), '150');

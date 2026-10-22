@@ -91,6 +91,7 @@ class _FoodSearchSheetState extends ConsumerState<_FoodSearchSheet> {
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 24,
                       ),
+                      leading: _PackPhoto(food.imageUrl),
                       title: Text(food.name),
                       subtitle: Text(
                         [
@@ -106,6 +107,34 @@ class _FoodSearchSheetState extends ConsumerState<_FoodSearchSheet> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// The front of the pack, or a plain box when there is no photo.
+class _PackPhoto extends StatelessWidget {
+  const _PackPhoto(this.url);
+
+  final String? url;
+
+  @override
+  Widget build(BuildContext context) {
+    final placeholder = ColoredBox(
+      color: AppColors.surfaceVariant,
+      child: Icon(Icons.inventory_2_outlined, color: AppColors.textSecondary),
+    );
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: SizedBox.square(
+        dimension: 48,
+        child: url == null
+            ? placeholder
+            : Image.network(
+                url!,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => placeholder,
+              ),
       ),
     );
   }
