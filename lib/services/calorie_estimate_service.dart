@@ -182,6 +182,8 @@ class CalorieEstimateService {
       'portions from what is visible. List every component with its calories '
       'and protein, including visible oil, sauces, bread and drinks, then add '
       'them up. Use $_country nutrition figures for branded or chain products. If the '
+      'photo shows a packet rather than a plate, estimate one typical serving of '
+      'that product, using its label figures if they can be read. If the '
       'photo shows no food, respond with {"error": "no food"}.\n'
       'Respond with ONLY a JSON object: {"name": "<short meal name>", '
       '"items": [{"item": "<component>", "kcal": <integer>, "protein_g": '

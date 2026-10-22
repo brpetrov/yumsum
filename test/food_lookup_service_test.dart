@@ -7,6 +7,26 @@ Map<String, dynamic> _reply(String json) =>
     jsonDecode(json) as Map<String, dynamic>;
 
 void main() {
+  test('search hits: local products first, no-calorie ones dropped', () {
+    final foods = parseSearchHits(
+      _reply('''
+      {"hits": [
+        {"product_name": "Chicken Tikka Wrap", "brands": ["Daily Delight"],
+          "countries_tags": ["en:united-states"],
+          "nutriments": {"energy-kcal_100g": 189}},
+        {"product_name": "Tikka Wrap", "nutriments": {}},
+        {"product_name": "Chicken tikka wrap", "brands": ["Myprotein"],
+          "countries_tags": ["en:united-kingdom"], "quantity": "175 g",
+          "nutriments": {"energy-kcal_100g": 162, "proteins_100g": 12.1}}
+      ]}'''),
+      country: 'United Kingdom',
+    );
+
+    expect(foods.map((food) => food.brand), ['Myprotein', 'Daily Delight']);
+    expect(foods.first.servingGrams, 175);
+    expect(foods.first.proteinPer100g, 12);
+  });
+
   group('parsePackagedFood', () {
     test('reads name, brand, calories, protein and the serving', () {
       final food = parsePackagedFood(

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:lean_streak/app/launch_actions.dart';
@@ -12,7 +13,8 @@ import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
-import 'package:lean_streak/screens/dashboard/helpers/barcode_scan_page.dart';
+import 'package:lean_streak/providers/user_profile_provider.dart';
+import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 import 'package:lean_streak/screens/dashboard/helpers/quick_log_bar.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
@@ -66,12 +68,20 @@ class _FakeEstimateService implements CalorieEstimateService {
   @override
   Future<int?> estimateProtein(String name, int kcal) async => 30;
 
+  int photoCalls = 0;
+
   @override
-  Future<VoiceMealParsed> estimateFromPhoto(String uid, Uint8List jpeg) =>
-      throw UnimplementedError();
+  Future<VoiceMealParsed> estimateFromPhoto(String uid, Uint8List jpeg) async {
+    photoCalls++;
+    return (
+      name: 'Musaka',
+      kcal: 640,
+      protein: 28,
+      items: const <EstimateItem>[],
+    );
+  }
 }
 
-/// A microphone that plays back whatever the test feeds it.
 class _FakeFoodLookup implements FoodLookupService {
   PackagedFood? food = (
     name: 'Chicken Tikka Wrap',
@@ -81,14 +91,22 @@ class _FakeFoodLookup implements FoodLookupService {
     servingGrams: 220,
   );
   String? lastBarcode;
+  String? lastQuery;
 
   @override
   Future<PackagedFood?> byBarcode(String barcode) async {
     lastBarcode = barcode;
     return food;
   }
+
+  @override
+  Future<List<PackagedFood>> search(String query, {String? country}) async {
+    lastQuery = query;
+    return [?food];
+  }
 }
 
+/// A microphone that plays back whatever the test feeds it.
 class _FakeRecorder extends Fake implements AudioRecorder {
   final audio = StreamController<Uint8List>();
   bool stopped = false;
@@ -138,7 +156,8 @@ void main() {
     WidgetTester tester, {
     List<Meal> recents = const [],
     LaunchAction? launchAction,
-    String? scanned,
+    bool takesPhoto = true,
+    String? barcode,
   }) async {
     controller = _FakeLogMealController();
     estimateService = _FakeEstimateService();
@@ -151,7 +170,13 @@ void main() {
         currentUidProvider.overrideWithValue('user-1'),
         recentMealsProvider.overrideWith((ref) async => recents),
         audioRecorderProvider.overrideWithValue(recorder),
-        barcodeScannerProvider.overrideWithValue((_) async => scanned),
+        userProfileProvider.overrideWith((ref) => Stream.value(null)),
+        mealPhotoPickerProvider.overrideWithValue(
+          () async => takesPhoto
+              ? XFile.fromData(Uint8List.fromList([1, 2, 3]), path: 'a.jpg')
+              : null,
+        ),
+        photoBarcodeReaderProvider.overrideWithValue((_) async => barcode),
         foodLookupServiceProvider.overrideWithValue(foodLookup),
       ],
     );
@@ -216,11 +241,11 @@ void main() {
     expect(find.text('400 kcal · 30 g'), findsOneWidget);
   });
 
-  testWidgets('a scanned barcode is looked up and the portion fills the box', (
+  testWidgets('a photo of a barcode is looked up; the portion fills the box', (
     tester,
   ) async {
-    await pumpCard(tester, scanned: '5000112637922');
-    await tester.tap(find.byTooltip('Scan barcode'));
+    await pumpCard(tester, barcode: '5000112637922');
+    await tester.tap(find.byTooltip('Photo or barcode'));
     await tester.pumpAndSettle();
 
     expect(foodLookup.lastBarcode, '5000112637922');
@@ -236,43 +261,73 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(boxText(tester), 'Chicken Tikka Wrap 323 kcal 14g protein');
-    expect(estimateService.estimateCalls, 0);
+    expect(estimateService.photoCalls, 0);
   });
 
-  testWidgets('an unknown barcode says so', (tester) async {
-    await pumpCard(tester, scanned: '4000000000000');
+  testWidgets('a meal photo goes to the AI', (tester) async {
+    await pumpCard(tester);
+    await tester.tap(find.byTooltip('Photo or barcode'));
+    await tester.pumpAndSettle();
+    expect(foodLookup.lastBarcode, isNull);
+    expect(estimateService.photoCalls, 1);
+    expect(boxText(tester), 'Musaka 640 kcal 28g protein');
+  });
+
+  testWidgets('a barcode the database lacks goes to the AI too', (
+    tester,
+  ) async {
+    await pumpCard(tester, barcode: '4000000000000');
     foodLookup.food = null;
-    await tester.tap(find.byTooltip('Scan barcode'));
+    await tester.tap(find.byTooltip('Photo or barcode'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('isn\'t in the food database'), findsOneWidget);
+    expect(foodLookup.lastBarcode, '4000000000000');
+    expect(estimateService.photoCalls, 1);
+  });
+
+  testWidgets('backing out of the camera changes nothing', (tester) async {
+    await pumpCard(tester, takesPhoto: false);
+    await tester.tap(find.byTooltip('Photo or barcode'));
+    await tester.pumpAndSettle();
+    expect(estimateService.photoCalls, 0);
     expect(boxText(tester), isEmpty);
   });
 
-  testWidgets('backing out of the scanner changes nothing', (tester) async {
-    await pumpCard(tester, scanned: null);
-    await tester.tap(find.byTooltip('Scan barcode'));
+  testWidgets('a typed name can be searched for; the pick fills the box', (
+    tester,
+  ) async {
+    await pumpCard(tester);
+    await tester.enterText(find.byType(TextField), 'tikka wrap');
+    await tester.pump();
+    await tester.tap(find.text('Search foods'));
     await tester.pumpAndSettle();
-    expect(find.byType(BottomSheet), findsNothing);
-    expect(boxText(tester), isEmpty);
+
+    expect(foodLookup.lastQuery, 'tikka wrap');
+    expect(find.text('Tesco · 215 kcal per 100 g'), findsOneWidget);
+    await tester.tap(find.text('Chicken Tikka Wrap'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Use'));
+    await tester.pumpAndSettle();
+
+    expect(boxText(tester), 'Chicken Tikka Wrap 473 kcal 20g protein');
+    expect(find.text('Search foods'), findsNothing);
   });
 
   testWidgets('the box offers the camera when empty and clear when not', (
     tester,
   ) async {
     await pumpCard(tester);
-    expect(find.byTooltip('Scan barcode'), findsOneWidget);
-    expect(find.byTooltip('Photo'), findsOneWidget);
+    expect(find.byTooltip('Photo or barcode'), findsOneWidget);
     expect(find.byTooltip('Clear'), findsNothing);
 
     await tester.enterText(find.byType(TextField), 'wrap');
     await tester.pump();
-    expect(find.byTooltip('Photo'), findsNothing);
+    expect(find.byTooltip('Photo or barcode'), findsNothing);
     expect(find.byTooltip('Clear'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Clear'));
     await tester.pump();
     expect(boxText(tester), isEmpty);
-    expect(find.byTooltip('Photo'), findsOneWidget);
+    expect(find.byTooltip('Photo or barcode'), findsOneWidget);
   });
 
   testWidgets('offers usual meals while the box is focused', (tester) async {
@@ -297,7 +352,8 @@ void main() {
 
     await tester.enterText(find.byType(TextField), 'wrap');
     await tester.pump();
-    expect(find.byType(ActionChip), findsOneWidget);
+    expect(find.text('Search foods'), findsOneWidget);
+    expect(find.text('Ham sandwich · 500 kcal'), findsNothing);
 
     await tester.tap(find.text('Chicken wrap · 450 kcal'));
     await tester.pump();

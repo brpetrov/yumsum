@@ -122,7 +122,9 @@ class _PortionSheetState extends State<_PortionSheet> {
           const SizedBox(height: 20),
           FilledButton(
             onPressed: _amount > 0 ? _use : null,
-            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(52),
+            ),
             child: const Text('Use'),
           ),
         ],

@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:record/record.dart';
 
 import 'package:lean_streak/app/launch_actions.dart';
@@ -17,7 +16,8 @@ import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
-import 'package:lean_streak/screens/dashboard/helpers/barcode_scan_page.dart';
+import 'package:lean_streak/screens/dashboard/helpers/food_search_sheet.dart';
+import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 import 'package:lean_streak/screens/dashboard/helpers/portion_sheet.dart';
 import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
@@ -33,11 +33,13 @@ final audioRecorderProvider = Provider<AudioRecorder>((ref) {
 
 /// The log composer pinned to the bottom of Today, under the thumb.
 /// "chicken wrap 450" saves straight away; a meal without calories can be
-/// estimated by the AI, or a photo taken. With the box empty the main
+/// estimated by the AI, or a photo taken (of the plate, or of a packet's
+/// barcode). With the box empty the main
 /// button is the mic: it records a short note that the AI listens to
 /// itself, in English, Bulgarian or a mix. While the box is focused, meals
 /// are offered as chips for one-tap re-logging: the usual ones for this
-/// time of day, then recent ones matching what is typed.
+/// time of day, then recent ones matching what is typed, along with a
+/// search of packaged foods.
 class QuickLogBar extends ConsumerStatefulWidget {
   const QuickLogBar({super.key});
 
@@ -336,24 +338,35 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
     });
   }
 
-  bool get _isMobile =>
-      !kIsWeb &&
-      (defaultTargetPlatform == TargetPlatform.android ||
-          defaultTargetPlatform == TargetPlatform.iOS);
-
-  /// Camera on phones, a file picker elsewhere. The picker resizes the photo
-  /// so the upload stays small (and the AI bill tiny).
-  Future<void> _pickPhoto() async {
+  /// One camera for everything: a photo with a packet's barcode in it is
+  /// looked up in Open Food Facts (label figures, no AI use); any other
+  /// photo, or a barcode the database can't answer for, goes to the AI,
+  /// which can read the packet itself.
+  Future<void> _takePhoto() async {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
-    final file = await ImagePicker().pickImage(
-      source: _isMobile ? ImageSource.camera : ImageSource.gallery,
-      maxWidth: 1024,
-      maxHeight: 1024,
-      imageQuality: 80,
-    );
-    if (file == null || !mounted) return;
-    final bytes = await file.readAsBytes();
+    final photo = await ref.read(mealPhotoPickerProvider)();
+    if (photo == null || !mounted) return;
+    setState(() {
+      _working = true;
+      _error = null;
+    });
+    final barcode = await ref.read(photoBarcodeReaderProvider)(photo);
+    PackagedFood? food;
+    if (barcode != null) {
+      try {
+        food = await ref.read(foodLookupServiceProvider).byBarcode(barcode);
+      } on FoodLookupException {
+        // Left to the AI below.
+      }
+    }
+    if (!mounted) return;
+    if (food != null) {
+      setState(() => _working = false);
+      await _usePackagedFood(food);
+      return;
+    }
+    final bytes = await photo.readAsBytes();
     if (!mounted) return;
 
     await _runAi(() async {
@@ -366,36 +379,17 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
     });
   }
 
-  /// Scan a packet's barcode, look it up in Open Food Facts and ask how
-  /// much was eaten; the box is then filled like an AI result, but with
-  /// label figures and no AI usage.
-  Future<void> _scanBarcode() async {
-    final barcode = await ref.read(barcodeScannerProvider)(context);
-    if (barcode == null || !mounted) return;
-    setState(() {
-      _working = true;
-      _error = null;
-    });
-    PackagedFood? food;
-    try {
-      food = await ref.read(foodLookupServiceProvider).byBarcode(barcode);
-    } on FoodLookupException catch (error) {
-      if (!mounted) return;
-      setState(() {
-        _working = false;
-        _error = error.message;
-      });
-      return;
-    }
-    if (!mounted) return;
-    setState(() {
-      _working = false;
-      if (food == null) {
-        _error =
-            'That barcode isn\'t in the food database. Type the meal instead.';
-      }
-    });
-    if (food == null) return;
+  /// Packaged foods matching what is typed, then the portion as for a
+  /// barcode.
+  Future<void> _search(String query) async {
+    final food = await showFoodSearchSheet(context, query);
+    if (food == null || !mounted) return;
+    await _usePackagedFood(food);
+  }
+
+  /// Asks how much of [food] was eaten; the box is then filled like an AI
+  /// result, but with label figures and no AI usage.
+  Future<void> _usePackagedFood(PackagedFood food) async {
     final portion = await showPortionSheet(context, food);
     if (portion == null || !mounted) return;
     _setText('${portion.name} ${_amounts(portion.kcal, portion.protein)}');
@@ -422,9 +416,17 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
     // moment it is and the list isn't refetched on every focus.
     final allRecents =
         ref.watch(recentMealsProvider).valueOrNull ?? const <Meal>[];
-    final recents = _focusNode.hasFocus && !_listening && !_working
+    final offering = _focusNode.hasFocus && !_listening && !_working;
+    final recents = offering
         ? _matchingRecents(allRecents, _controller.text)
         : const <Meal>[];
+    // A name without calories can be searched for; the web can't reach
+    // the search service.
+    final query = _controller.text.trim();
+    final search =
+        !kIsWeb && offering && query.length >= 3 && entry.kcal == null
+        ? query
+        : null;
 
     return Material(
       color: AppColors.surface,
@@ -443,8 +445,8 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (recents.isNotEmpty) ...[
-                      _buildRecents(recents),
+                    if (recents.isNotEmpty || search != null) ...[
+                      _buildChips(recents, search),
                       const SizedBox(height: 8),
                     ],
                     if (showStatus) ...[
@@ -496,9 +498,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
                                 vertical: 15,
                                 horizontal: 20,
                               ),
-                              // Barcode and camera while empty; a clear
-                              // button once there is text, so a wrong
-                              // voice or AI result is one tap from gone.
+                              // Camera while empty; a clear button once
+                              // there is text, so a wrong voice or AI
+                              // result is one tap from gone.
                               suffixIcon: _working || _listening
                                   ? null
                                   : hasText
@@ -508,26 +510,13 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
                                       color: AppColors.textSecondary,
                                       icon: const Icon(Icons.close_rounded),
                                     )
-                                  : Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          tooltip: 'Scan barcode',
-                                          onPressed: _scanBarcode,
-                                          color: AppColors.textSecondary,
-                                          icon: const Icon(
-                                            Icons.barcode_reader,
-                                          ),
-                                        ),
-                                        IconButton(
-                                          tooltip: 'Photo',
-                                          onPressed: _pickPhoto,
-                                          color: AppColors.textSecondary,
-                                          icon: const Icon(
-                                            Icons.photo_camera_outlined,
-                                          ),
-                                        ),
-                                      ],
+                                  : IconButton(
+                                      tooltip: 'Photo or barcode',
+                                      onPressed: _takePhoto,
+                                      color: AppColors.textSecondary,
+                                      icon: const Icon(
+                                        Icons.photo_camera_outlined,
+                                      ),
                                     ),
                             ),
                           ),
@@ -557,38 +546,50 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar> {
         .toList();
   }
 
-  /// One scrolling row of chips; tapping one fills the box ready to save.
-  Widget _buildRecents(List<Meal> recents) {
+  /// One scrolling row of chips: a search for [search] when given, then
+  /// meals, which fill the box ready to save when tapped.
+  Widget _buildChips(List<Meal> recents, String? search) {
+    ActionChip chip(String label, VoidCallback onPressed, {Widget? avatar}) =>
+        ActionChip(
+          avatar: avatar,
+          label: Text(label),
+          labelStyle: TextStyle(fontSize: 13, color: AppColors.textPrimary),
+          backgroundColor: AppColors.surfaceVariant,
+          side: BorderSide.none,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          onPressed: onPressed,
+        );
+    final chips = [
+      if (search != null)
+        chip(
+          'Search foods',
+          () => _search(search),
+          avatar: Icon(
+            Icons.search_rounded,
+            size: 18,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      for (final meal in recents)
+        chip('${meal.name} · ${meal.calories.round()} kcal', () {
+          _setText(
+            '${meal.name} '
+            '${_amounts(meal.calories.round(), meal.proteinGrams?.round())}',
+          );
+          _focusNode.requestFocus();
+          setState(() {
+            _aiItems = const [];
+            _error = null;
+          });
+        }),
+    ];
     return SizedBox(
       height: 36,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: recents.length,
+        itemCount: chips.length,
         separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (_, index) {
-          final meal = recents[index];
-          final kcal = meal.calories.round();
-          return Center(
-            child: ActionChip(
-              label: Text('${meal.name} · $kcal kcal'),
-              labelStyle: TextStyle(fontSize: 13, color: AppColors.textPrimary),
-              backgroundColor: AppColors.surfaceVariant,
-              side: BorderSide.none,
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              onPressed: () {
-                _setText(
-                  '${meal.name} '
-                  '${_amounts(kcal, meal.proteinGrams?.round())}',
-                );
-                _focusNode.requestFocus();
-                setState(() {
-                  _aiItems = const [];
-                  _error = null;
-                });
-              },
-            ),
-          );
-        },
+        itemBuilder: (_, index) => Center(child: chips[index]),
       ),
     );
   }
