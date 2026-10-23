@@ -10,7 +10,9 @@ import 'package:lean_streak/core/config/app_check.dart';
 import 'package:lean_streak/repositories/ai_usage_repository.dart';
 
 /// One component of a meal as the model broke it down.
-typedef EstimateItem = ({String name, int kcal, int? protein});
+/// One component of an AI estimate; [grams] is the weight the AI assumed
+/// (ml for drinks), null when it gave none.
+typedef EstimateItem = ({String name, int? grams, int kcal, int? protein});
 typedef CalorieEstimate = ({
   int kcal,
   int? protein,
@@ -37,10 +39,37 @@ List<EstimateItem> parseEstimateItems(Object? raw) {
           entry['kcal'] is num)
         (
           name: (entry['item'] as String).trim(),
+          grams: switch (entry['grams']) {
+            final num grams when grams > 0 => grams.round(),
+            _ => null,
+          },
           kcal: (entry['kcal'] as num).round(),
           protein: (entry['protein_g'] as num?)?.round(),
         ),
   ];
+}
+
+/// [item] at [grams] instead of the AI's weight, its calories and protein
+/// scaled to match. Unchanged when the AI gave no weight to scale from.
+EstimateItem resized(EstimateItem item, int grams) {
+  final from = item.grams;
+  if (from == null) return item;
+  int scale(int value) => (value * grams / from).round();
+  return (
+    name: item.name,
+    grams: grams,
+    kcal: scale(item.kcal),
+    protein: item.protein == null ? null : scale(item.protein!),
+  );
+}
+
+/// The meal's figures from its items, for after a weight was changed.
+({int kcal, int? protein}) totalOf(List<EstimateItem> items) {
+  final proteins = items.map((item) => item.protein).nonNulls;
+  return (
+    kcal: items.fold(0, (sum, item) => sum + item.kcal),
+    protein: proteins.isEmpty ? null : proteins.reduce((a, b) => a + b),
+  );
 }
 
 /// The opening of every prompt: where the user lives and what they usually
@@ -136,6 +165,13 @@ class CalorieEstimateService {
   String get _context =>
       nutritionContext(country: _country, usualFood: _usualFood);
 
+  // The weights let the user correct a portion in the app without asking
+  // the AI again.
+  static const _weights =
+      'Give each component\'s weight in grams (ml for drinks), and for '
+      'meat, fish, rice and pasta say in the item whether that weight is '
+      'cooked or raw.\n';
+
   // Listing each component before the total stops the model skipping the
   // oil, butter or gravy.
   String get _promptTemplate =>
@@ -146,7 +182,8 @@ class CalorieEstimateService {
       'typical home portion. For home-cooked dishes, include the oil or fat '
       'they are usually cooked with. For branded or chain products use $_country '
       'nutrition figures. Then add them up.\n'
-      'Respond with ONLY a JSON object: {"items": [{"item": "<component>", '
+      '$_weights'
+      'Respond with ONLY a JSON object: {"items": [{"item": "<component>", "grams": <integer>, '
       '"kcal": <integer>, "protein_g": <integer>}], "kcal": <integer total>, '
       '"protein_g": <integer total>, "note": "<one short sentence explaining '
       'the estimate>"}\n'
@@ -169,9 +206,10 @@ class CalorieEstimateService {
       'If the user gave calories but no protein, still estimate the protein '
       'from the food. Only if nothing in the note says what the food was '
       '(e.g. "400 calories for lunch"), set protein_g to null.\n'
+      '$_weights'
       'If the recording contains no meal, respond with {"error": "no meal"}.\n'
       'Respond with ONLY a JSON object: {"transcript": "<what the user said>", '
-      '"name": "<short meal name>", "items": [{"item": "<component>", "kcal": '
+      '"name": "<short meal name>", "items": [{"item": "<component>", "grams": <integer>, "kcal": '
       '<integer>, "protein_g": <integer or null>}], "kcal": <integer total>, '
       '"protein_g": <integer total or null>}\n'
       'Do not include any other text.';
@@ -185,8 +223,9 @@ class CalorieEstimateService {
       'photo shows a packet rather than a plate, estimate one typical serving of '
       'that product, using its label figures if they can be read. If the '
       'photo shows no food, respond with {"error": "no food"}.\n'
+      '$_weights'
       'Respond with ONLY a JSON object: {"name": "<short meal name>", '
-      '"items": [{"item": "<component>", "kcal": <integer>, "protein_g": '
+      '"items": [{"item": "<component>", "grams": <integer>, "kcal": <integer>, "protein_g": '
       '<integer>}], "kcal": <integer total>, "protein_g": <integer total>, '
       '"note": "<one short sentence explaining the estimate>"}\n'
       'Do not include any other text.';

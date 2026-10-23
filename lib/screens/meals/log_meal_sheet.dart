@@ -258,7 +258,17 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
               ),
             ),
             if (_estimateItems.isNotEmpty)
-              EstimateBreakdown(items: _estimateItems),
+              EstimateBreakdown(
+                items: _estimateItems,
+                onChanged: (items) {
+                  final total = totalOf(items);
+                  _caloriesController.text = '${total.kcal}';
+                  if (total.protein != null) {
+                    _proteinController.text = '${total.protein}';
+                  }
+                  setState(() => _estimateItems = items);
+                },
+              ),
             if (_error != null) ...[
               const SizedBox(height: 8),
               Text(

@@ -53,12 +53,12 @@ void main() {
     test('reads the model items', () {
       expect(
         parseEstimateItems([
-          {'item': 'Musaka', 'kcal': 520, 'protein_g': 28},
-          {'item': ' Bread ', 'kcal': 80.4, 'protein_g': null},
+          {'item': 'Musaka', 'grams': 350, 'kcal': 520, 'protein_g': 28},
+          {'item': ' Bread ', 'grams': 0, 'kcal': 80.4, 'protein_g': null},
         ]),
         [
-          (name: 'Musaka', kcal: 520, protein: 28),
-          (name: 'Bread', kcal: 80, protein: null),
+          (name: 'Musaka', grams: 350, kcal: 520, protein: 28),
+          (name: 'Bread', grams: null, kcal: 80, protein: null),
         ],
       );
     });
@@ -72,10 +72,32 @@ void main() {
           {'item': 'Mystery', 'kcal': 'lots'},
           'not a map',
         ]),
-        [(name: 'Oil', kcal: 120, protein: null)],
+        [(name: 'Oil', grams: null, kcal: 120, protein: null)],
       );
       expect(parseEstimateItems(null), isEmpty);
       expect(parseEstimateItems('items'), isEmpty);
+    });
+
+    test('a corrected weight rescales the item, and the totals follow', () {
+      const chicken = (
+        name: 'Chicken breast, cooked',
+        grams: 150,
+        kcal: 248,
+        protein: 46,
+      );
+      const rice = (name: 'Rice, cooked', grams: 200, kcal: 260, protein: 5);
+      final bigger = resized(chicken, 220);
+      expect(bigger, (
+        name: 'Chicken breast, cooked',
+        grams: 220,
+        kcal: 364,
+        protein: 67,
+      ));
+      expect(totalOf([bigger, rice]), (kcal: 624, protein: 72));
+
+      const oil = (name: 'Oil', grams: null, kcal: 120, protein: null);
+      expect(resized(oil, 30), oil);
+      expect(totalOf([oil]), (kcal: 120, protein: null));
     });
   });
 }

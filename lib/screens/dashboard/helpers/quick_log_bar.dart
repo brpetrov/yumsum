@@ -191,6 +191,13 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     }
   }
 
+  /// A weight corrected in the breakdown: the boxes follow the items.
+  void _itemsChanged(List<EstimateItem> items) {
+    final total = totalOf(items);
+    _fill(_name.text, total.kcal, total.protein);
+    setState(() => _aiItems = items);
+  }
+
   /// Puts a meal in the boxes, as an AI result, a chip or a barcode does.
   void _fill(String name, int? kcal, int? protein) {
     for (final (box, text) in [
@@ -759,7 +766,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
           if (message != null)
             Text(message, style: TextStyle(fontSize: 14, color: color)),
           if (_aiItems.isNotEmpty && !_working && !_listening)
-            EstimateBreakdown(items: _aiItems),
+            EstimateBreakdown(items: _aiItems, onChanged: _itemsChanged),
         ],
       ),
     );

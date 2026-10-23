@@ -46,8 +46,8 @@ class _FakeEstimateService implements CalorieEstimateService {
       protein: 32,
       note: 'Typical wrap.',
       items: const [
-        (name: 'Chicken wrap', kcal: 400, protein: 30),
-        (name: 'Mayo', kcal: 120, protein: 2),
+        (name: 'Chicken wrap', grams: 200, kcal: 400, protein: 30),
+        (name: 'Mayo', grams: 15, kcal: 120, protein: 2),
       ],
     );
   }
@@ -290,6 +290,22 @@ void main() {
     await tester.pump();
     expect(find.text('120 kcal · 2 g'), findsOneWidget);
     expect(find.text('400 kcal · 30 g'), findsOneWidget);
+
+    // A corrected weight rescales the item and the boxes, with no AI call.
+    await tester.tap(find.text('200 g'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      ),
+      '300',
+    );
+    await tester.tap(find.text('Use'));
+    await tester.pumpAndSettle();
+    expect(find.text('600 kcal · 45 g'), findsOneWidget);
+    expect(boxes(tester), ['chicken wrap', '720', '47']);
+    expect(estimateService.estimateCalls, 1);
   });
 
   testWidgets('a scanned barcode is looked up; the portion fills the box', (
