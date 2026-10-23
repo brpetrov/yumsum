@@ -15,6 +15,7 @@ import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
+import 'package:lean_streak/screens/dashboard/helpers/contribute_sheet.dart';
 import 'package:lean_streak/screens/dashboard/helpers/food_search_sheet.dart';
 import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 import 'package:lean_streak/screens/dashboard/helpers/portion_sheet.dart';
@@ -41,6 +42,8 @@ typedef _Entry = ({String? name, int? kcal, int? protein});
 /// are offered as chips for one-tap re-logging: the usual ones for this
 /// time of day, then recent ones matching what is typed, along with a
 /// search of packaged foods.
+enum _Offer { declined, abandoned, contributed }
+
 class QuickLogBar extends ConsumerStatefulWidget {
   const QuickLogBar({super.key});
 
@@ -396,7 +399,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       await _lookUpBarcode(barcode);
       return;
     }
-    final bytes = await capture.photo!.readAsBytes();
+    final bytes = await capture.photos.first.readAsBytes();
     if (!mounted) return;
 
     await _runAi(() async {
@@ -414,25 +417,64 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       _working = true;
       _error = null;
     });
-    PackagedFood? food;
+    BarcodeLookup? found;
     String? problem;
     try {
-      food = await ref.read(foodLookupServiceProvider).byBarcode(barcode);
+      found = await ref.read(foodLookupServiceProvider).byBarcode(barcode);
     } on FoodLookupException catch (error) {
       problem = error.message;
     }
     if (!mounted) return;
+    setState(() => _working = false);
+    if (found?.food case final food?) {
+      await _usePackagedFood(food);
+      return;
+    }
+    // Only a product Open Food Facts has never heard of is offered: one
+    // it has without figures belongs to someone else's entry.
+    if (found != null &&
+        !found.listed &&
+        await _offerContribution(barcode) != _Offer.declined) {
+      return;
+    }
+    if (!mounted) return;
     setState(() {
-      _working = false;
-      if (food == null && problem == null) _missedBarcode = barcode;
-      if (food == null) {
-        _error =
-            problem ??
-            'That barcode isn\'t in the food database. Open the camera '
-                'again and take a photo of the packet instead.';
-      }
+      if (problem == null) _missedBarcode = barcode;
+      _error =
+          problem ??
+          (found!.listed
+              ? 'Open Food Facts has this product but no calories for it '
+                    'yet. Open the camera again and take a photo of the '
+                    'packet instead.'
+              : 'That barcode isn\'t in the food database. Open the '
+                    'camera again and take a photo of the packet instead.');
     });
-    if (food != null) await _usePackagedFood(food);
+  }
+
+  /// A barcode Open Food Facts doesn't know: invite the user to add it
+  /// and, once they have, log it straight away. Declined when they said
+  /// Not now (or can't: contributing needs the app's account and a phone
+  /// camera); abandoned when they started and then backed out, which
+  /// needs no message.
+  Future<_Offer> _offerContribution(String barcode) async {
+    if (kIsWeb || !ref.read(foodContributionServiceProvider).isConfigured) {
+      return _Offer.declined;
+    }
+    if (!await inviteToContribute(context) || !mounted) {
+      return _Offer.declined;
+    }
+    final photos = await ref.read(productPhotosProvider)(context);
+    if (photos == null || photos.length < 2 || !mounted) {
+      return _Offer.abandoned;
+    }
+    final result = await showContributeSheet(
+      context,
+      barcode: barcode,
+      photos: photos,
+    );
+    if (!result.contributed || !mounted) return _Offer.abandoned;
+    if (result.food case final food?) await _usePackagedFood(food);
+    return _Offer.contributed;
   }
 
   /// Packaged foods matching what is typed, then the portion as for a

@@ -15,6 +15,11 @@ typedef PackagedFood = ({
   String? imageUrl,
 });
 
+/// A barcode lookup: [listed] is false when Open Food Facts has never
+/// heard of the product; [food] is null too when it has the product but
+/// no name or calorie figure for it.
+typedef BarcodeLookup = ({bool listed, PackagedFood? food});
+
 class FoodLookupException implements Exception {
   const FoodLookupException(this.message);
   final String message;
@@ -31,9 +36,8 @@ class FoodLookupService {
 
   final http.Client _client;
 
-  /// The product behind [barcode], or null when the database doesn't know
-  /// it (or has no calorie figure for it).
-  Future<PackagedFood?> byBarcode(String barcode) async {
+  /// The product behind [barcode].
+  Future<BarcodeLookup> byBarcode(String barcode) async {
     final uri = Uri.https(
       'world.openfoodfacts.org',
       '/api/v2/product/$barcode.json',
@@ -44,13 +48,14 @@ class FoodLookupService {
       },
     );
     final response = await _get(uri);
-    if (response.statusCode == 404) return null;
+    if (response.statusCode == 404) return (listed: false, food: null);
     if (response.statusCode != 200) {
       throw const FoodLookupException(
         'The food database is not answering right now.',
       );
     }
-    return parsePackagedFood(jsonDecode(response.body) as Map<String, dynamic>);
+    final json = jsonDecode(response.body) as Map<String, dynamic>;
+    return (listed: json['product'] is Map, food: parsePackagedFood(json));
   }
 
   /// Up to 20 products matching [query], those sold in [country] first,

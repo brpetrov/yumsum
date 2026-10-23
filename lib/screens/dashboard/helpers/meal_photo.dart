@@ -5,8 +5,9 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:lean_streak/screens/dashboard/helpers/meal_camera_page.dart';
 
-/// What the bar's camera brought back: a packet's barcode or a photo.
-typedef MealCapture = ({String? barcode, XFile? photo});
+/// What the camera brought back: a packet's barcode, or the photos taken
+/// (one for a meal, one per step for a product).
+typedef MealCapture = ({String? barcode, List<XFile> photos});
 
 /// Opens the bar's camera, passing over a barcode the food database just
 /// didn't know; overridable in tests.
@@ -41,5 +42,23 @@ Future<MealCapture?> openMealCamera(
     maxHeight: 1024,
     imageQuality: 80,
   );
-  return photo == null ? null : (barcode: null, photo: photo);
+  return photo == null ? null : (barcode: null, photos: [photo]);
+}
+
+/// Takes the two photos a new product needs; overridable in tests.
+final productPhotosProvider =
+    Provider<Future<List<XFile>?> Function(BuildContext context)>(
+      (ref) => takeProductPhotos,
+    );
+
+Future<List<XFile>?> takeProductPhotos(BuildContext context) async {
+  final capture = await Navigator.of(context).push<MealCapture>(
+    MaterialPageRoute(
+      fullscreenDialog: true,
+      builder: (_) => const MealCameraPage(
+        photoSteps: ['The front of the pack', 'The nutrition table'],
+      ),
+    ),
+  );
+  return capture?.photos;
 }

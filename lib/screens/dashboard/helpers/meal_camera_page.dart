@@ -11,10 +11,14 @@ import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 /// barcode by itself, and a shutter for a photo of the plate. Resolves to
 /// whichever came first, or null when closed. [skipBarcode] is one the
 /// food database just didn't know, so the packet can be photographed.
+///
+/// With [photoSteps] it reads no barcodes: it asks for one photo per
+/// step ("The front of the pack", ...) and resolves to all of them.
 class MealCameraPage extends StatefulWidget {
-  const MealCameraPage({super.key, this.skipBarcode});
+  const MealCameraPage({super.key, this.skipBarcode, this.photoSteps});
 
   final String? skipBarcode;
+  final List<String>? photoSteps;
 
   @override
   State<MealCameraPage> createState() => _MealCameraPageState();
@@ -41,6 +45,9 @@ class _MealCameraPageState extends State<MealCameraPage>
   bool _reading = false;
   bool _done = false;
   String? _problem;
+  final _photos = <XFile>[];
+
+  bool get _scanning => widget.photoSteps == null;
 
   @override
   void initState() {
@@ -133,7 +140,7 @@ class _MealCameraPageState extends State<MealCameraPage>
         _letGo(camera);
         return;
       }
-      await camera.startImageStream(_onFrame);
+      if (_scanning) await camera.startImageStream(_onFrame);
       setState(() {});
     } on CameraException catch (error) {
       final failed = _camera;
@@ -166,7 +173,7 @@ class _MealCameraPageState extends State<MealCameraPage>
       if (code.isNotEmpty && !_done) {
         _done = true;
         HapticFeedback.mediumImpact();
-        _leave((barcode: code.first, photo: null));
+        _leave((barcode: code.first, photos: const []));
       }
     } catch (_) {
       // An unreadable frame; the next one will do.
@@ -214,7 +221,14 @@ class _MealCameraPageState extends State<MealCameraPage>
     try {
       if (camera.value.isStreamingImages) await camera.stopImageStream();
       final photo = await camera.takePicture();
-      _leave((barcode: null, photo: photo));
+      _photos.add(photo);
+      if (_photos.length < (widget.photoSteps?.length ?? 1)) {
+        // On to the next step.
+        HapticFeedback.lightImpact();
+        if (mounted) setState(() => _done = false);
+        return;
+      }
+      _leave((barcode: null, photos: List.of(_photos)));
     } on CameraException {
       // Closed meanwhile: nothing to go back to.
       if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) return;
@@ -223,7 +237,7 @@ class _MealCameraPageState extends State<MealCameraPage>
         const SnackBar(content: Text('Could not take the photo. Try again.')),
       );
       if (identical(_camera, camera)) {
-        if (!camera.value.isStreamingImages) {
+        if (_scanning && !camera.value.isStreamingImages) {
           await camera.startImageStream(_onFrame);
         }
       } else if (_camera == null &&
@@ -239,6 +253,11 @@ class _MealCameraPageState extends State<MealCameraPage>
     const white = Colors.white;
     final camera = _camera;
     final ready = camera != null && camera.value.isInitialized;
+    final steps = widget.photoSteps;
+    final hint = steps == null
+        ? 'Point at a barcode, or photograph your meal'
+        : '${_photos.length + 1} of ${steps.length} · '
+              '${steps[_photos.length.clamp(0, steps.length - 1)]}';
 
     return PopScope(
       onPopInvokedWithResult: (didPop, _) {
@@ -289,7 +308,7 @@ class _MealCameraPageState extends State<MealCameraPage>
                         ),
                       ),
               ),
-            if (ready)
+            if (ready && _scanning)
               Center(
                 child: Container(
                   width: 260,
@@ -327,7 +346,7 @@ class _MealCameraPageState extends State<MealCameraPage>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Point at a barcode, or photograph your meal',
+                          hint,
                           style: TextStyle(
                             color: white.withValues(alpha: 0.9),
                             fontSize: 15,

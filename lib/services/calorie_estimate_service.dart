@@ -9,7 +9,6 @@ import 'package:lean_streak/core/config/app_check.dart';
 
 import 'package:lean_streak/repositories/ai_usage_repository.dart';
 
-/// One component of a meal as the model broke it down.
 /// One component of an AI estimate; [grams] is the weight the AI assumed
 /// (ml for drinks), null when it gave none.
 typedef EstimateItem = ({String name, int? grams, int kcal, int? protein});
@@ -27,6 +26,60 @@ typedef VoiceMealParsed = ({
   int? protein,
   List<EstimateItem> items,
 });
+
+/// What the AI read off a packet for a contribution. Anything the photos
+/// don't show is null, or missing from [per100g], which is keyed by Open
+/// Food Facts nutrient ids ([labelNutrientIds]).
+typedef LabelReading = ({
+  String? name,
+
+  /// Two-letter code of the language the name is printed in.
+  String? lang,
+  String? brand,
+  String? quantity,
+  String? servingSize,
+  Map<String, double> per100g,
+});
+
+/// The per-100 g figures a contribution carries, as Open Food Facts names
+/// them: energy in kcal, the rest in grams.
+const labelNutrientIds = [
+  'energy-kcal',
+  'proteins',
+  'fat',
+  'saturated-fat',
+  'carbohydrates',
+  'sugars',
+  'fiber',
+  'salt',
+];
+
+/// Reads the model's label reply, dropping blanks and odd values.
+LabelReading parseLabelReading(Map<String, dynamic> map) {
+  String? text(Object? value) =>
+      value is String &&
+          value.trim().isNotEmpty &&
+          value.trim().toLowerCase() != 'null'
+      ? value.trim()
+      : null;
+  final figures = map['per_100g'];
+  return (
+    name: text(map['name']),
+    lang: switch (text(map['lang'])?.toLowerCase()) {
+      final code? when RegExp(r'^[a-z]{2}$').hasMatch(code) => code,
+      _ => null,
+    },
+    brand: text(map['brand']),
+    quantity: text(map['quantity']),
+    servingSize: text(map['serving_size']),
+    per100g: {
+      if (figures is Map)
+        for (final id in labelNutrientIds)
+          if (figures[id] case final num value when value >= 0)
+            id: value.toDouble(),
+    },
+  );
+}
 
 /// Reads the model's `items` list, skipping anything malformed.
 List<EstimateItem> parseEstimateItems(Object? raw) {
@@ -230,6 +283,28 @@ class CalorieEstimateService {
       '"note": "<one short sentence explaining the estimate>"}\n'
       'Do not include any other text.';
 
+  // Contributed data is public, so the model must copy, not estimate.
+  String get _labelPromptTemplate =>
+      'The user photographed a food packet to add it to Open Food Facts: the '
+      'first image is the front of the pack, the second the nutrition table. '
+      'Copy what is printed; never guess or estimate. Use the per 100 g (or '
+      'per 100 ml) column. If the table only gives figures per serving and '
+      'states the serving size, convert them to per 100 g. If energy is only '
+      'given in kJ, convert it to kcal by dividing by 4.184. Use null for '
+      'anything the photos do not show. If the images do not show a food '
+      'packet, respond with {"error": "no packet"}.\n'
+      'Respond with ONLY a JSON object: {"name": "<product name as printed '
+      'on the front, in the language printed, without the brand>", "lang": '
+      '"<two-letter ISO 639-1 code of the language that name is in, e.g. en '
+      'or bg>", "brand": '
+      '"<brand or null>", "quantity": "<net quantity as printed, e.g. 400 g, '
+      'or null>", "serving_size": "<serving size as printed, e.g. 30 g, or '
+      'null>", "per_100g": {"energy-kcal": <number or null>, "proteins": '
+      '<number or null>, "fat": <number or null>, "saturated-fat": <number '
+      'or null>, "carbohydrates": <number or null>, "sugars": <number or '
+      'null>, "fiber": <number or null>, "salt": <number or null>}}\n'
+      'Do not include any other text.';
+
   String get _proteinPromptTemplate =>
       '$_context'
       'The user logged a meal by name with its calories. Assuming the '
@@ -349,6 +424,51 @@ class CalorieEstimateService {
       debugPrint('CalorieEstimateService photo error: $error\n$st');
       throw const CalorieEstimateException(
         'Could not read that photo right now.',
+      );
+    }
+  }
+
+  /// Reads a packet's front and nutrition table for a contribution. Counts
+  /// towards the daily AI limit like [estimate].
+  Future<LabelReading> readLabel(
+    String uid,
+    Uint8List front,
+    Uint8List label,
+  ) async {
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final count = await _usageRepo.watchCount(uid, today).first;
+    if (count >= AiUsageRepository.dailyLimit) {
+      throw const DailyLimitExceededException();
+    }
+
+    try {
+      final map = _decode(
+        await _generateWithRetries(_model, [
+          Content.multi([
+            TextPart(_labelPromptTemplate),
+            InlineDataPart('image/jpeg', front),
+            InlineDataPart('image/jpeg', label),
+          ]),
+        ]),
+      );
+      if (map['error'] != null) {
+        throw const CalorieEstimateException(
+          'Those photos don\'t show a packet\'s label. Fill in the details '
+          'from the packet yourself.',
+        );
+      }
+      final reading = parseLabelReading(map);
+      await _usageRepo.increment(uid, today);
+      return reading;
+    } on CalorieEstimateException {
+      rethrow;
+    } on ServerException catch (error, st) {
+      debugPrint('CalorieEstimateService label error: $error\n$st');
+      throw CalorieEstimateException(_friendlyServerError(error.message));
+    } catch (error, st) {
+      debugPrint('CalorieEstimateService label error: $error\n$st');
+      throw const CalorieEstimateException(
+        'Could not read the label right now. Fill in the details yourself.',
       );
     }
   }

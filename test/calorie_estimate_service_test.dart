@@ -49,6 +49,33 @@ void main() {
     });
   });
 
+  test('a label reading keeps printed figures and drops blanks', () {
+    final reading = parseLabelReading({
+      'name': 'Кисело мляко',
+      'lang': 'BG',
+      'brand': 'Верея',
+      'quantity': '400 g',
+      'serving_size': null,
+      'per_100g': {
+        'energy-kcal': 63,
+        'proteins': 3.3,
+        'fat': 3.6,
+        'sugars': null,
+        'salt': 'a little',
+        'fiber': -1,
+      },
+    });
+
+    expect(reading.name, 'Кисело мляко');
+    expect(reading.lang, 'bg');
+    expect(parseLabelReading({'lang': 'Bulgarian'}).lang, isNull);
+    expect(reading.brand, 'Верея');
+    expect(reading.quantity, '400 g');
+    expect(reading.servingSize, isNull);
+    expect(reading.per100g, {'energy-kcal': 63, 'proteins': 3.3, 'fat': 3.6});
+    expect(parseLabelReading({}).per100g, isEmpty);
+  });
+
   group('parseEstimateItems', () {
     test('reads the model items', () {
       expect(

@@ -46,3 +46,6 @@ app.*.map.json
 
 # API keys — never commit
 lib/core/config/api_keys.dart
+
+# Open Food Facts app account (copy config/off_account.example.json)
+config/off_account.json

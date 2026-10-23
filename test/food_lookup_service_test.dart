@@ -1,12 +1,29 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
 
 Map<String, dynamic> _reply(String json) =>
     jsonDecode(json) as Map<String, dynamic>;
 
 void main() {
+  test('never heard of, or listed without calories, are told apart', () async {
+    FoodLookupService replying(int status, String body) =>
+        FoodLookupService(MockClient((_) async => http.Response(body, status)));
+
+    final unknown = await replying(404, '').byBarcode('1');
+    expect(unknown.listed, isFalse);
+    final noCode = await replying(200, '{"status": 0}').byBarcode('1');
+    expect(noCode.listed, isFalse);
+    final bare = await replying(
+      200,
+      '{"status": 1, "product": {"product_name": "Joghurt"}}',
+    ).byBarcode('1');
+    expect((bare.listed, bare.food), (true, null));
+  });
+
   test('search hits: local products first, no-calorie ones dropped', () {
     final foods = parseSearchHits(
       _reply('''

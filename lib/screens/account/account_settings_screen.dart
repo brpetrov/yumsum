@@ -273,6 +273,19 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         ),
                         onTap: () => openLegalPage(LegalLinks.terms),
                       ),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Food data from Open Food Facts'),
+                        subtitle: const Text(
+                          'A free database built by volunteers, under the '
+                          'Open Database License',
+                        ),
+                        trailing: const Icon(
+                          Icons.open_in_new_rounded,
+                          size: 18,
+                        ),
+                        onTap: () => openLegalPage(LegalLinks.openFoodFacts),
+                      ),
                       SizedBox(height: 28),
                       const _AccountSectionLabel('DANGER ZONE'),
                       OutlinedButton.icon(

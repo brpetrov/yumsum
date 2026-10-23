@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -13,12 +14,15 @@ import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
+import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 import 'package:lean_streak/screens/dashboard/helpers/quick_log_bar.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
+import 'package:lean_streak/services/food_contribution_service.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
 import 'package:record/record.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakeLogMealController extends LogMealController {
   final saved = <({String? name, double calories, double? protein})>[];
@@ -80,7 +84,38 @@ class _FakeEstimateService implements CalorieEstimateService {
       items: const <EstimateItem>[],
     );
   }
+
+  @override
+  Future<LabelReading> readLabel(
+    String uid,
+    Uint8List front,
+    Uint8List label,
+  ) async => (
+    name: 'Лютеница',
+    lang: 'bg',
+    brand: 'Първа преса',
+    quantity: '260 g',
+    servingSize: null,
+    per100g: const {'energy-kcal': 95.0, 'proteins': 2.0},
+  );
 }
+
+class _FakeContributor extends Fake implements FoodContributionService {
+  final sent = <ProductContribution>[];
+
+  @override
+  bool get isConfigured => true;
+
+  @override
+  Future<void> contribute(ProductContribution product) async {
+    sent.add(product);
+  }
+}
+
+// A 1x1 PNG, so the photos the contribute sheet shows decode.
+final _pixel = base64Decode(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+);
 
 class _FakeFoodLookup implements FoodLookupService {
   PackagedFood? food = (
@@ -93,11 +128,13 @@ class _FakeFoodLookup implements FoodLookupService {
   );
   String? lastBarcode;
   String? lastQuery;
+  // Whether Open Food Facts knows the product when [food] is null.
+  bool listed = false;
 
   @override
-  Future<PackagedFood?> byBarcode(String barcode) async {
+  Future<BarcodeLookup> byBarcode(String barcode) async {
     lastBarcode = barcode;
-    return food;
+    return (listed: food != null || listed, food: food);
   }
 
   @override
@@ -153,6 +190,7 @@ void main() {
   late _FakeFoodLookup foodLookup;
   late ProviderContainer container;
   late List<String?> cameraSkips;
+  late _FakeContributor contributor;
 
   Future<void> pumpCard(
     WidgetTester tester, {
@@ -161,6 +199,9 @@ void main() {
     bool takesPhoto = true,
     String? barcode,
   }) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    contributor = _FakeContributor();
     controller = _FakeLogMealController();
     estimateService = _FakeEstimateService();
     recorder = _FakeRecorder();
@@ -177,18 +218,28 @@ void main() {
         mealCameraProvider.overrideWithValue((_, skip) async {
           cameraSkips.add(skip);
           return barcode != null
-              ? (barcode: barcode, photo: null)
+              ? (barcode: barcode, photos: const <XFile>[])
               : takesPhoto
               ? (
                   barcode: null,
-                  photo: XFile.fromData(
-                    Uint8List.fromList([1, 2, 3]),
-                    path: 'a.jpg',
-                  ),
+                  photos: [
+                    XFile.fromData(
+                      Uint8List.fromList([1, 2, 3]),
+                      path: 'a.jpg',
+                    ),
+                  ],
                 )
               : null;
         }),
         foodLookupServiceProvider.overrideWithValue(foodLookup),
+        foodContributionServiceProvider.overrideWithValue(contributor),
+        productPhotosProvider.overrideWithValue(
+          (_) async => [
+            XFile.fromData(_pixel, path: 'front.png'),
+            XFile.fromData(_pixel, path: 'label.png'),
+          ],
+        ),
+        sharedPreferencesProvider.overrideWithValue(prefs),
       ],
     );
     addTearDown(container.dispose);
@@ -340,11 +391,92 @@ void main() {
     expect(boxes(tester), ['Musaka', '640', '28']);
   });
 
+  testWidgets('a missing product can be contributed, then logged', (
+    tester,
+  ) async {
+    await pumpCard(tester, barcode: '3800000000017');
+    foodLookup.food = null;
+    await tester.tap(find.byTooltip('Photo or barcode'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Be the first to add this'), findsOneWidget);
+    await tester.tap(find.text('Contribute'));
+    await tester.pumpAndSettle();
+
+    // The AI's reading is in the form, for the user to check.
+    String field(String key) =>
+        tester.widget<TextField>(find.byKey(ValueKey(key))).controller!.text;
+    expect(field('contribute-name'), 'Лютеница');
+    expect(field('contribute-energy-kcal'), '95');
+    await tester.enterText(
+      find.byKey(const ValueKey('contribute-proteins')),
+      '2,4',
+    );
+    await tester.ensureVisible(find.widgetWithText(FilledButton, 'Contribute'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Contribute'));
+    await tester.pumpAndSettle();
+
+    final sent = contributor.sent.single;
+    expect(sent.lang, 'bg');
+    expect(sent.barcode, '3800000000017');
+    expect(sent.brand, 'Първа преса');
+    expect(sent.per100g, {'energy-kcal': 95.0, 'proteins': 2.4});
+    expect(find.text('Thank you!'), findsOneWidget);
+
+    await tester.tap(find.text('Log it'));
+    await tester.pumpAndSettle();
+    // The pack size (260 g) is the starting amount.
+    await tester.tap(find.text('Use'));
+    await tester.pumpAndSettle();
+    expect(boxes(tester), ['Лютеница', '247', '5']);
+    expect(find.textContaining('isn\'t in the food database'), findsNothing);
+  });
+
+  testWidgets('a listed product without calories is not offered', (
+    tester,
+  ) async {
+    await pumpCard(tester, barcode: '4000000000001');
+    foodLookup.food = null;
+    foodLookup.listed = true;
+    await tester.tap(find.byTooltip('Photo or barcode'));
+    await tester.pumpAndSettle();
+    expect(find.text('Be the first to add this'), findsNothing);
+    expect(find.textContaining('no calories for it yet'), findsOneWidget);
+  });
+
+  testWidgets('closing the thank-you still counts as contributed', (
+    tester,
+  ) async {
+    await pumpCard(tester, barcode: '3800000000017');
+    foodLookup.food = null;
+    await tester.tap(find.byTooltip('Photo or barcode'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Contribute'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.widgetWithText(FilledButton, 'Contribute'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Contribute'));
+    await tester.pumpAndSettle();
+    expect(find.text('Thank you!'), findsOneWidget);
+
+    await tester.tapAt(const Offset(20, 20)); // outside the sheet
+    await tester.pumpAndSettle();
+    expect(find.text('Thank you!'), findsNothing);
+    expect(find.textContaining('isn\'t in the food database'), findsNothing);
+    // The new product's barcode is not passed over next time.
+    await tester.tap(find.byTooltip('Photo or barcode'));
+    await tester.pumpAndSettle();
+    expect(cameraSkips.last, isNull);
+  });
+
   testWidgets('a barcode the database lacks says so', (tester) async {
     await pumpCard(tester, barcode: '4000000000000');
     foodLookup.food = null;
     await tester.tap(find.byTooltip('Photo or barcode'));
     await tester.pumpAndSettle();
+    // Not now: the plain message, and no contribution.
+    await tester.tap(find.text('Not now'));
+    await tester.pumpAndSettle();
+    expect(contributor.sent, isEmpty);
     expect(foodLookup.lastBarcode, '4000000000000');
     expect(find.textContaining('isn\'t in the food database'), findsOneWidget);
     expect(estimateService.photoCalls, 0);
@@ -353,6 +485,8 @@ void main() {
     // Opened again, the camera passes over that barcode so the packet can
     // be photographed instead.
     await tester.tap(find.byTooltip('Photo or barcode'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Not now'));
     await tester.pumpAndSettle();
     expect(cameraSkips, [null, '4000000000000']);
   });
