@@ -34,8 +34,8 @@ typedef _Entry = ({String? name, int? kcal, int? protein});
 /// The log composer pinned to the bottom of Today, under the thumb: a name
 /// box, with calorie and protein boxes under it once the bar is in use. A
 /// meal with calories saves straight away; one without can be estimated
-/// by the AI, or a photo taken (of the plate, or of a packet's
-/// barcode). With the box empty the main
+/// by the AI, or the camera used (it reads a packet's barcode by itself,
+/// or takes a photo of the plate). With the box empty the main
 /// button is the mic: it records a short note that the AI listens to
 /// itself, in English, Bulgarian or a mix. While the box is focused, meals
 /// are offered as chips for one-tap re-logging: the usual ones for this
@@ -76,6 +76,10 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   bool _listening = false;
   bool _working = false;
   List<EstimateItem> _aiItems = const [];
+
+  /// The last barcode the food database didn't know; the camera passes
+  /// over it next time so the packet itself can be photographed.
+  String? _missedBarcode;
   String? _error;
 
   _Entry get _entry {
@@ -374,35 +378,18 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     });
   }
 
-  /// One camera for everything: a photo with a packet's barcode in it is
-  /// looked up in Open Food Facts (label figures, no AI use); any other
-  /// photo, or a barcode the database can't answer for, goes to the AI,
-  /// which can read the packet itself.
+  /// One camera for everything: a barcode it reads is looked up in Open
+  /// Food Facts (label figures, no AI use); a photo goes to the AI.
   Future<void> _takePhoto() async {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
-    final photo = await ref.read(mealPhotoPickerProvider)();
-    if (photo == null || !mounted) return;
-    setState(() {
-      _working = true;
-      _error = null;
-    });
-    final barcode = await ref.read(photoBarcodeReaderProvider)(photo);
-    PackagedFood? food;
-    if (barcode != null) {
-      try {
-        food = await ref.read(foodLookupServiceProvider).byBarcode(barcode);
-      } on FoodLookupException {
-        // Left to the AI below.
-      }
-    }
-    if (!mounted) return;
-    if (food != null) {
-      setState(() => _working = false);
-      await _usePackagedFood(food);
+    final capture = await ref.read(mealCameraProvider)(context, _missedBarcode);
+    if (capture == null || !mounted) return;
+    if (capture.barcode case final barcode?) {
+      await _lookUpBarcode(barcode);
       return;
     }
-    final bytes = await photo.readAsBytes();
+    final bytes = await capture.photo!.readAsBytes();
     if (!mounted) return;
 
     await _runAi(() async {
@@ -413,6 +400,32 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       _fill(result.name, result.kcal, result.protein);
       _aiItems = result.items;
     });
+  }
+
+  Future<void> _lookUpBarcode(String barcode) async {
+    setState(() {
+      _working = true;
+      _error = null;
+    });
+    PackagedFood? food;
+    String? problem;
+    try {
+      food = await ref.read(foodLookupServiceProvider).byBarcode(barcode);
+    } on FoodLookupException catch (error) {
+      problem = error.message;
+    }
+    if (!mounted) return;
+    setState(() {
+      _working = false;
+      if (food == null && problem == null) _missedBarcode = barcode;
+      if (food == null) {
+        _error =
+            problem ??
+            'That barcode isn\'t in the food database. Open the camera '
+                'again and take a photo of the packet instead.';
+      }
+    });
+    if (food != null) await _usePackagedFood(food);
   }
 
   /// Packaged foods matching what is typed, then the portion as for a

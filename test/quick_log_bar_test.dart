@@ -152,6 +152,7 @@ void main() {
   late _FakeRecorder recorder;
   late _FakeFoodLookup foodLookup;
   late ProviderContainer container;
+  late List<String?> cameraSkips;
 
   Future<void> pumpCard(
     WidgetTester tester, {
@@ -164,6 +165,7 @@ void main() {
     estimateService = _FakeEstimateService();
     recorder = _FakeRecorder();
     foodLookup = _FakeFoodLookup();
+    cameraSkips = [];
     container = ProviderContainer(
       overrides: [
         logMealControllerProvider.overrideWith(() => controller),
@@ -172,12 +174,20 @@ void main() {
         recentMealsProvider.overrideWith((ref) async => recents),
         audioRecorderProvider.overrideWithValue(recorder),
         userProfileProvider.overrideWith((ref) => Stream.value(null)),
-        mealPhotoPickerProvider.overrideWithValue(
-          () async => takesPhoto
-              ? XFile.fromData(Uint8List.fromList([1, 2, 3]), path: 'a.jpg')
-              : null,
-        ),
-        photoBarcodeReaderProvider.overrideWithValue((_) async => barcode),
+        mealCameraProvider.overrideWithValue((_, skip) async {
+          cameraSkips.add(skip);
+          return barcode != null
+              ? (barcode: barcode, photo: null)
+              : takesPhoto
+              ? (
+                  barcode: null,
+                  photo: XFile.fromData(
+                    Uint8List.fromList([1, 2, 3]),
+                    path: 'a.jpg',
+                  ),
+                )
+              : null;
+        }),
         foodLookupServiceProvider.overrideWithValue(foodLookup),
       ],
     );
@@ -282,7 +292,7 @@ void main() {
     expect(find.text('400 kcal · 30 g'), findsOneWidget);
   });
 
-  testWidgets('a photo of a barcode is looked up; the portion fills the box', (
+  testWidgets('a scanned barcode is looked up; the portion fills the box', (
     tester,
   ) async {
     await pumpCard(tester, barcode: '5000112637922');
@@ -314,15 +324,21 @@ void main() {
     expect(boxes(tester), ['Musaka', '640', '28']);
   });
 
-  testWidgets('a barcode the database lacks goes to the AI too', (
-    tester,
-  ) async {
+  testWidgets('a barcode the database lacks says so', (tester) async {
     await pumpCard(tester, barcode: '4000000000000');
     foodLookup.food = null;
     await tester.tap(find.byTooltip('Photo or barcode'));
     await tester.pumpAndSettle();
     expect(foodLookup.lastBarcode, '4000000000000');
-    expect(estimateService.photoCalls, 1);
+    expect(find.textContaining('isn\'t in the food database'), findsOneWidget);
+    expect(estimateService.photoCalls, 0);
+    expect(boxes(tester), ['', '', '']);
+
+    // Opened again, the camera passes over that barcode so the packet can
+    // be photographed instead.
+    await tester.tap(find.byTooltip('Photo or barcode'));
+    await tester.pumpAndSettle();
+    expect(cameraSkips, [null, '4000000000000']);
   });
 
   testWidgets('backing out of the camera changes nothing', (tester) async {
