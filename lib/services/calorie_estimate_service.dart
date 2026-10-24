@@ -12,12 +12,7 @@ import 'package:lean_streak/repositories/ai_usage_repository.dart';
 /// One component of an AI estimate; [grams] is the weight the AI assumed
 /// (ml for drinks), null when it gave none.
 typedef EstimateItem = ({String name, int? grams, int kcal, int? protein});
-typedef CalorieEstimate = ({
-  int kcal,
-  int? protein,
-  String note,
-  List<EstimateItem> items,
-});
+typedef CalorieEstimate = ({int kcal, int? protein, List<EstimateItem> items});
 
 /// A meal recognised from a voice note or a photo.
 typedef VoiceMealParsed = ({
@@ -139,13 +134,16 @@ String nutritionContext({required String country, required String usualFood}) {
 
 const aiNotSwitchedOnMessage =
     'AI estimates are not switched on for this app yet.';
-const aiQuotaUsedMessage =
-    'The AI has reached its limit for today. Add the calories yourself, '
-    'e.g. "wrap 450".';
+const aiBusyMessage = 'The AI is busy right now. Try again in a minute.';
+const aiPausedMessage =
+    'AI estimates are paused for now. You can still type the calories '
+    'yourself.';
 
 /// What to tell the user for a server-side AI error, from its wording.
 /// "Firebase AI Logic API has not been used in project … or it is disabled"
-/// and quota errors arrive as plain server errors.
+/// and quota errors arrive as plain server errors. On the paid tier a
+/// quota error is a per-minute limit, and an empty prepaid balance (402)
+/// stops every call until it is topped up.
 String aiErrorMessage(String message) {
   final lower = message.toLowerCase();
   if (lower.contains('has not been used') ||
@@ -153,10 +151,17 @@ String aiErrorMessage(String message) {
       lower.contains('not enabled')) {
     return aiNotSwitchedOnMessage;
   }
+  if (lower.contains('402') ||
+      lower.contains('payment') ||
+      lower.contains('prepay') ||
+      lower.contains('credit') ||
+      lower.contains('billing')) {
+    return aiPausedMessage;
+  }
   if (lower.contains('quota') ||
       lower.contains('429') ||
       lower.contains('resource_exhausted')) {
-    return aiQuotaUsedMessage;
+    return aiBusyMessage;
   }
   if (isTransientAiError(message)) {
     return 'The AI estimate service is busy right now. Try again in a few '
@@ -238,8 +243,7 @@ class CalorieEstimateService {
       '$_weights'
       'Respond with ONLY a JSON object: {"items": [{"item": "<component>", "grams": <integer>, '
       '"kcal": <integer>, "protein_g": <integer>}], "kcal": <integer total>, '
-      '"protein_g": <integer total>, "note": "<one short sentence explaining '
-      'the estimate>"}\n'
+      '"protein_g": <integer total>}\n'
       'Do not include any other text.\n\n'
       'Meal: {input}';
 
@@ -279,8 +283,7 @@ class CalorieEstimateService {
       '$_weights'
       'Respond with ONLY a JSON object: {"name": "<short meal name>", '
       '"items": [{"item": "<component>", "grams": <integer>, "kcal": <integer>, "protein_g": '
-      '<integer>}], "kcal": <integer total>, "protein_g": <integer total>, '
-      '"note": "<one short sentence explaining the estimate>"}\n'
+      '<integer>}], "kcal": <integer total>, "protein_g": <integer total>}\n'
       'Do not include any other text.';
 
   // Contributed data is public, so the model must copy, not estimate.
@@ -332,13 +335,11 @@ class CalorieEstimateService {
       );
       final kcal = (map['kcal'] as num).toInt();
       final protein = (map['protein_g'] as num?)?.round();
-      final note = map['note'] as String;
 
       await _usageRepo.increment(uid, today);
       return (
         kcal: kcal,
         protein: protein,
-        note: note,
         items: parseEstimateItems(map['items']),
       );
     } on DailyLimitExceededException {
@@ -356,9 +357,14 @@ class CalorieEstimateService {
 
   /// Recognises the meal in a short WAV voice note, in English, Bulgarian
   /// or a mix; the model does the listening, so no language setting is
-  /// needed. Doesn't count towards the daily AI limit (one call per note,
-  /// as before).
-  Future<VoiceMealParsed> parseVoiceAudio(Uint8List wav) async {
+  /// needed. Counts towards the daily AI limit like [estimate].
+  Future<VoiceMealParsed> parseVoiceAudio(String uid, Uint8List wav) async {
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final count = await _usageRepo.watchCount(uid, today).first;
+    if (count >= AiUsageRepository.dailyLimit) {
+      throw const DailyLimitExceededException();
+    }
+
     try {
       final map = _decode(
         await _generateWithRetries(_model, [
@@ -373,7 +379,11 @@ class CalorieEstimateService {
           'Couldn\'t hear a meal in that. Tap the mic and try again.',
         );
       }
-      return _mealFrom(map);
+      final meal = _mealFrom(map);
+      await _usageRepo.increment(uid, today);
+      return meal;
+    } on DailyLimitExceededException {
+      rethrow;
     } on CalorieEstimateException {
       rethrow;
     } on ServerException catch (error, st) {
@@ -474,8 +484,9 @@ class CalorieEstimateService {
   }
 
   /// Protein for a meal logged by name and calories, or null when the name
-  /// says nothing about the food (e.g. "Lunch"). Like [parseVoice], this
-  /// doesn't count towards the daily AI limit.
+  /// says nothing about the food (e.g. "Lunch"). This doesn't count towards
+  /// the daily AI limit: it costs a fraction of an estimate, comes with
+  /// saving a meal, and counting it would use up the allowance unasked.
   Future<int?> estimateProtein(String name, int kcal) async {
     final prompt = _proteinPromptTemplate
         .replaceFirst('{name}', name.trim())
@@ -512,7 +523,15 @@ class CalorieEstimateService {
   ) async {
     for (var attempt = 1; attempt <= _maxServerRetries; attempt++) {
       try {
-        return await model.generateContent(content);
+        final response = await model.generateContent(content);
+        // Token use is what the AI costs; logged to check the estimates.
+        final usage = response.usageMetadata;
+        debugPrint(
+          'AI tokens: in ${usage?.promptTokenCount}, '
+          'out ${usage?.candidatesTokenCount}, '
+          'thinking ${usage?.thoughtsTokenCount}',
+        );
+        return response;
       } on ServerException catch (error) {
         if (!_isTransientServerError(error.message) ||
             attempt == _maxServerRetries) {
@@ -541,7 +560,8 @@ class CalorieEstimateService {
     if (type == 'ServiceApiNotEnabled' || error is InvalidApiKey) {
       return aiNotSwitchedOnMessage;
     }
-    if (type == 'QuotaExceeded') return aiQuotaUsedMessage;
+    // Quota errors (QuotaExceeded) are told apart by their wording, which
+    // also separates an empty prepaid balance from a busy minute.
     return aiErrorMessage(error.message);
   }
 

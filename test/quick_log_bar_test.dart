@@ -48,7 +48,6 @@ class _FakeEstimateService implements CalorieEstimateService {
     return (
       kcal: 520,
       protein: 32,
-      note: 'Typical wrap.',
       items: const [
         (name: 'Chicken wrap', grams: 200, kcal: 400, protein: 30),
         (name: 'Mayo', grams: 15, kcal: 120, protein: 2),
@@ -59,7 +58,7 @@ class _FakeEstimateService implements CalorieEstimateService {
   Uint8List? heard;
 
   @override
-  Future<VoiceMealParsed> parseVoiceAudio(Uint8List wav) async {
+  Future<VoiceMealParsed> parseVoiceAudio(String uid, Uint8List wav) async {
     heard = wav;
     return (
       name: 'Lunch',
@@ -198,6 +197,7 @@ void main() {
     LaunchAction? launchAction,
     bool takesPhoto = true,
     String? barcode,
+    int aiUsed = 0,
   }) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
@@ -212,6 +212,7 @@ void main() {
         logMealControllerProvider.overrideWith(() => controller),
         calorieEstimateServiceProvider.overrideWithValue(estimateService),
         currentUidProvider.overrideWithValue('user-1'),
+        aiUsageTodayProvider.overrideWith((ref) => Stream.value(aiUsed)),
         recentMealsProvider.overrideWith((ref) async => recents),
         audioRecorderProvider.overrideWithValue(recorder),
         userProfileProvider.overrideWith((ref) => Stream.value(null)),
@@ -592,6 +593,47 @@ void main() {
     expect(recorder.stopped, isTrue);
     expect(estimateService.heard!.length, 44 + 32000);
     expect(boxes(tester), ['Lunch', '400', '']);
+  });
+
+  testWidgets('the mic says so before recording once the AI is used up', (
+    tester,
+  ) async {
+    await pumpCard(tester, aiUsed: 10);
+    await tester.pump();
+    await tester.tap(find.byTooltip('Speak'));
+    await tester.pump();
+
+    expect(find.text(listening), findsNothing);
+    expect(
+      find.text(
+        'Today\'s 10 AI estimates are used up. Type the calories yourself.',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('what is left of the AI shows once half is used', (tester) async {
+    await pumpCard(tester, aiUsed: 7);
+    await tester.pump();
+    expect(find.text('3 AI estimates left today'), findsNothing);
+
+    await tester.enterText(nameBox, 'Wrap');
+    await tester.pump();
+    expect(find.text('3 AI estimates left today'), findsOneWidget);
+
+    await tester.enterText(kcalBox, '450');
+    await tester.pump();
+    expect(find.text('3 AI estimates left today'), findsNothing);
+  });
+
+  testWidgets('nothing about the AI allowance while under half is used', (
+    tester,
+  ) async {
+    await pumpCard(tester, aiUsed: 4);
+    await tester.pump();
+    await tester.enterText(nameBox, 'Wrap');
+    await tester.pump();
+    expect(find.textContaining('left today'), findsNothing);
   });
 
   testWidgets('a mis-tap on the mic is not sent to the AI', (tester) async {

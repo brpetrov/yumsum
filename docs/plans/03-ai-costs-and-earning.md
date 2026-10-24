@@ -8,7 +8,14 @@
 2. **The paid tier is cheap per person.** It's about **£0.07 a month for someone who uses AI three times a day, every day**, and most entries (typed numbers, barcodes, chips) use no AI at all.
 3. **Costs grow with users, so the app has to earn something once it's popular.** The fair way: **logging stays free forever, and only the AI, which costs real money each time, gets a free daily allowance with a cheap "Plus" for more.** No banner ads.
 
-## Where things stand today
+## Decided (24 October 2026)
+
+- **No ads**, not even in the free version.
+- **10 free AI estimates a day** (typed, voice and photo together), down from 20.
+- **Paying for more comes later, not at launch.** The options to choose from then: Plus (a subscription), a "protein bar" one-off top-up of AI estimates, or a protein-bar tip. Inside the Play app any of these must go through Google Play's billing. A Buy Me a Coffee link is fine on the website, but Play's payments policy doesn't allow one in the app.
+- Contributing to Open Food Facts can wait until after launch. It stays hidden until the app has an account.
+
+## Where things stood on 23 October
 
 - The Firebase project is on the free **Spark** plan, and AI goes through Firebase AI Logic on Gemini's free tier.
 - Google no longer publishes free-tier limits. One measurement in September 2026 found **15 requests a minute and 500 a day for the whole app**, shared by every user, resetting at about 08:00 UK time. That's roughly 80–170 AI users a day, and a busy lunchtime could hit the per-minute cap.
@@ -50,16 +57,18 @@ Google adds **20% UK VAT**, and you pay in pounds. These figures assume about 40
 1. **Move the project to Blaze**, link a billing account, and **prepay $10–$20**. The rest of Firebase still includes the same free allowances as Spark: Firestore reads and writes, Auth, Hosting.
 2. **Set a spend-cap budget** on Firebase AI Logic, for example **£20 a month**, with email alerts at 50% and 90%. Firebase console → Usage and billing → Budgets.
 3. **Lower the per-user rate limit** from 100 to about **10 requests a minute**. Google Cloud console → Quotas & System Limits → "Generate content requests per user".
-4. **Count every AI call**, including voice and protein, and make it hard to cheat. I'll change the code so voice notes count. I'll also tighten the Firestore rules so the daily counter can only go up by one and can't be deleted or reset.
-5. **Clearer messages:**
-   - "busy, trying again" for per-minute 429s, which should be retried automatically
-   - "limit for today" only for the daily limit
-   - "AI is paused" for a 402
-6. **Measure real usage.** I'll log the token counts Gemini reports for a few days of your own use, so the figures above become real numbers.
-7. **Cut the cost per call.** I'll update the AI library (2.3 → current) so photos can be sent at **low resolution**, which uses about 75% fewer image tokens and is plenty for food. I'll also drop the unused "note" text from the AI's answers (output is the expensive part).
+4. **Count every AI call.** *Done 24 October:* voice notes now count, and the mic says so before recording once the allowance is used up. The automatic protein estimate on saving a meal still doesn't count: it costs about a fifth of an estimate and comes with saving, so counting it would use up the allowance without the user asking for AI.
+
+   *Not done: tightening the Firestore rules on the counter.* A rule can't make it tamper-proof. Deleting the day's document resets it, and deleting an account needs that delete to work. Changing the phone's date also starts a fresh day. The counter is a fair limit for ordinary use. The real protection is App Check (only the genuine app can call the AI), the per-user rate limit and the spend cap. A tamper-proof allowance needs a small server function, which comes with Plus.
+5. **Clearer messages.** *Done 24 October:*
+   - "The AI is busy right now. Try again in a minute." for quota and 429 errors, which on the paid tier are per-minute limits. They aren't retried automatically, because a per-user minute limit doesn't clear in a few seconds.
+   - "Today's 10 AI estimates are used up…" only for the daily allowance
+   - "AI estimates are paused for now…" for an empty prepaid balance (402) or a billing problem
+6. **Measure real usage.** *Started 24 October:* the app now prints Gemini's token counts for every call in the debug log ("AI tokens: in …, out …, thinking …"). I'll read them off during the next phone test and update the figures above.
+7. **Cut the cost per call.** *Done 24 October:* the unused "note" is gone from the typed and photo answers. *Waiting for the measurements:* updating the AI library (2.3 → current) so photos can be sent at **low resolution**, which uses about 75% fewer image tokens. Worth doing only if photos turn out to be a real share of the cost.
 
    There's an alternative model: Gemini 3.1 Flash-Lite is about a third cheaper, but it's retired in May 2027. I'd stay on 3.5 unless costs bite.
-8. **Show people their allowance:** a quiet "7 AI estimates left today" under the bar once they're past half.
+8. **Show people their allowance.** *Done 24 October:* "3 AI estimates left today" appears above the bar, in muted text, once half is used and the meal has no calories yet.
 
 With all of that, **100 daily users cost about £5–£7 a month**, and nothing can run away from you.
 
@@ -111,11 +120,12 @@ To cover everyone's AI, roughly **1 in 30 daily users (about 3%)** needs to be o
 - [ ] Blaze plan + billing account + prepay $10–$20
 - [ ] Spend-cap budget on AI Logic (about £20 a month) with alerts
 - [ ] Per-user AI rate limit down to about 10 a minute
-- [ ] (me) Count voice and protein calls; tighten the Firestore rules on the AI counter
-- [ ] (me) Correct 429 and 402 handling and messages
-- [ ] (me) Log real token use for a few days, then update the figures here
-- [ ] (me) Update `firebase_ai`; low-resolution photos; drop the unused "note"
-- [ ] (me) "AI estimates left today" hint
+- [x] (me) Free allowance down to 10 a day; voice notes count (protein on save doesn't; Firestore rules can't make the counter tamper-proof, see step 4)
+- [x] (me) Correct 429 and 402 handling and messages
+- [ ] (me) Read the logged token use during the next phone test, then update the figures here
+- [x] (me) Drop the unused "note"
+- [ ] (me) Update `firebase_ai` for low-resolution photos, if the measurements say photos matter
+- [x] (me) "AI estimates left today" hint
 
 **When costs pass about £20 a month**
 - [ ] Decide the free allowance and Plus contents

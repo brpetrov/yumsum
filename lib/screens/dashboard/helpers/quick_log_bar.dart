@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
+import 'package:lean_streak/repositories/ai_usage_repository.dart';
 import 'package:lean_streak/screens/dashboard/helpers/contribute_sheet.dart';
 import 'package:lean_streak/screens/dashboard/helpers/food_search_sheet.dart';
 import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
@@ -60,6 +62,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   static const _silenceAfterSpeech = Duration(milliseconds: 2500);
   static const _speechDbfs = -30.0;
   static const _silenceDbfs = -45.0;
+  static const _limitMessage =
+      'Today\'s ${AiUsageRepository.dailyLimit} AI estimates are used up. '
+      'Type the calories yourself.';
 
   final _name = TextEditingController();
   final _kcal = TextEditingController();
@@ -94,6 +99,12 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       protein: int.tryParse(_protein.text),
     );
   }
+
+  /// AI estimates left today, or null until the count has loaded.
+  int? get _aiLeft => switch (ref.read(aiUsageTodayProvider).valueOrNull) {
+    final used? => max(0, AiUsageRepository.dailyLimit - used),
+    null => null,
+  };
 
   // Touch devices choose between typing and the mic, so only desktop
   // (including desktop browsers, which have no on-screen keyboard) focuses
@@ -280,8 +291,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     try {
       await action();
     } on DailyLimitExceededException {
-      _error =
-          'Daily AI limit reached. Add the calories yourself, e.g. "wrap 450".';
+      _error = _limitMessage;
     } on CalorieEstimateException catch (error) {
       _error = error.message;
     } catch (_) {
@@ -294,6 +304,11 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   Future<void> _toggleListening() async {
     if (_listening) {
       await _finishListening();
+      return;
+    }
+    // Said before recording, not after the user has spoken the whole meal.
+    if (_aiLeft == 0) {
+      setState(() => _error = _limitMessage);
       return;
     }
 
@@ -356,7 +371,8 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   /// Stops the recording (whichever of the stop button, a pause or the time
   /// cap comes first) and has the AI listen to it.
   Future<void> _finishListening() async {
-    if (!mounted || !_listening) return;
+    final uid = ref.read(currentUidProvider);
+    if (!mounted || !_listening || uid == null) return;
     setState(() => _listening = false);
     _stopTimer?.cancel();
     _levelSub?.cancel();
@@ -381,7 +397,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     await _runAi(() async {
       final result = await ref
           .read(calorieEstimateServiceProvider)
-          .parseVoiceAudio(wavFromPcm16(pcm, sampleRate: _sampleRate));
+          .parseVoiceAudio(uid, wavFromPcm16(pcm, sampleRate: _sampleRate));
       if (!mounted) return;
       _fill(result.name, result.kcal, result.protein);
       _aiItems = result.items;
@@ -526,6 +542,22 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     // the search service.
     final query = _name.text.trim();
     final search = !kIsWeb && offering && query.length >= 3 ? query : null;
+    // Once half of today's AI estimates are used, a quiet count of what's
+    // left, while the bar could still use one.
+    ref.watch(aiUsageTodayProvider);
+    final left = _aiLeft;
+    final aiHint =
+        open &&
+            !showStatus &&
+            entry.kcal == null &&
+            left != null &&
+            left <= AiUsageRepository.dailyLimit ~/ 2
+        ? switch (left) {
+            0 => 'No AI estimates left today',
+            1 => '1 AI estimate left today',
+            _ => '$left AI estimates left today',
+          }
+        : null;
 
     return Material(
       color: AppColors.surface,
@@ -550,6 +582,18 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                     ],
                     if (showStatus) ...[
                       _buildStatus(),
+                      const SizedBox(height: 8),
+                    ] else if (aiHint != null) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4),
+                        child: Text(
+                          aiHint,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 8),
                     ],
                     // Keyed so the status line and chips appearing above

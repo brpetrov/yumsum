@@ -29,7 +29,7 @@ void main() {
   });
 
   group('aiErrorMessage', () {
-    test('tells setup, quota and busy errors apart', () {
+    test('tells setup, paused, quota and busy errors apart', () {
       expect(
         aiErrorMessage(
           'Firebase AI Logic API has not been used in project 1 before or '
@@ -37,9 +37,10 @@ void main() {
         ),
         aiNotSwitchedOnMessage,
       );
+      expect(aiErrorMessage('Quota exceeded for quota metric'), aiBusyMessage);
       expect(
-        aiErrorMessage('Quota exceeded for quota metric'),
-        aiQuotaUsedMessage,
+        aiErrorMessage('Your prepayment credits are depleted.'),
+        aiPausedMessage,
       );
       expect(aiErrorMessage('503 Service Unavailable'), contains('busy'));
       expect(
