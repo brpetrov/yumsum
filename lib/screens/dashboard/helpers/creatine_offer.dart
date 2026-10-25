@@ -12,8 +12,7 @@ Future<void> offerCreatineReminder(BuildContext context, WidgetRef ref) async {
     builder: (context) => AlertDialog(
       title: const Text('Take creatine?'),
       content: Text(
-        'LeanStreak can remind you once a day to take it, at $time unless '
-        'you change it.',
+        'Get a daily reminder at $time. You can change the time later.',
       ),
       actions: [
         TextButton(
@@ -36,11 +35,11 @@ Future<void> offerCreatineReminder(BuildContext context, WidgetRef ref) async {
     SnackBar(
       content: Text(switch ((wanted == true, on)) {
         (_, true) =>
-          'Creatine reminder on, daily at $time. Change it under '
-              'Notifications in the menu.',
+          'Creatine reminder on for $time. Change it under Notifications in '
+              'the menu.',
         (true, false) =>
-          'Allow notifications for LeanStreak in system settings, then turn '
-              'it on under Notifications in the menu.',
+          'Allow notifications in your phone\'s Settings, then turn it on '
+              'under Notifications in the menu.',
         _ => 'You can turn it on any time under Notifications in the menu.',
       }),
     ),

@@ -117,8 +117,8 @@ class NotificationService {
 
     await _notifications.zonedSchedule(
       id: _dailyReminderId,
-      title: 'Log today before the day ends',
-      body: 'Open LeanStreak and log your meals for today.',
+      title: 'Log today\'s meals',
+      body: 'Add what you ate before the day ends.',
       scheduledDate: scheduledTime,
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(

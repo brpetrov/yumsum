@@ -295,7 +295,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     } on CalorieEstimateException catch (error) {
       _error = error.message;
     } catch (_) {
-      _error = 'Could not reach the AI right now.';
+      _error = 'Could not reach the AI. Try again.';
     }
 
     if (mounted) setState(() => _working = false);
@@ -459,11 +459,10 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       _error =
           problem ??
           (found!.listed
-              ? 'Open Food Facts has this product but no calories for it '
-                    'yet. Open the camera again and take a photo of the '
-                    'packet instead.'
-              : 'That barcode isn\'t in the food database. Open the '
-                    'camera again and take a photo of the packet instead.');
+              ? 'Open Food Facts has no calories for this product yet. '
+                    'Take a photo of the packet instead.'
+              : 'This product isn\'t on Open Food Facts. Take a photo of '
+                    'the packet instead.');
     });
   }
 

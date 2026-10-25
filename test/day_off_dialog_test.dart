@@ -29,9 +29,10 @@ void main() {
   testWidgets('explains a day off and confirms it', (tester) async {
     await open(tester, isOff: false);
     expect(find.text('Take today off?'), findsOneWidget);
-    expect(find.textContaining('today just isn\'t judged'), findsOneWidget);
+    expect(find.text('No green, yellow or red today.'), findsOneWidget);
+    expect(find.text('Tap the umbrella to undo.'), findsOneWidget);
 
-    await tester.tap(find.text('Take the day off'));
+    await tester.tap(find.text('Take day off'));
     await tester.pumpAndSettle();
     expect(result, isTrue);
   });

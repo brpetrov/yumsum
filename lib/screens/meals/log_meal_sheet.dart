@@ -117,7 +117,7 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
     } on CalorieEstimateException catch (error) {
       _error = error.message;
     } catch (_) {
-      _error = 'Could not reach the AI right now.';
+      _error = 'Could not reach the AI. Try again.';
     }
 
     if (mounted) setState(() => _estimating = false);
@@ -237,7 +237,7 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Leave protein blank and it is estimated from the meal name.',
+              'Leave protein blank to estimate it from the name.',
               style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 4),

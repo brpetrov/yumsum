@@ -89,7 +89,7 @@ class ProgressScreen extends ConsumerWidget {
             Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (_, _) => Center(
           child: Text(
-            'Could not load your weight history right now.',
+            'Could not load your weight history.',
             style: TextStyle(color: AppColors.textSecondary),
           ),
         ),
@@ -117,8 +117,8 @@ class ProgressScreen extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('Reset progress?'),
         content: const Text(
-          'This deletes your weight history, so the chart starts again from '
-          'your next weigh-in. Your plan, meals and profile stay.',
+          'This clears your weight history and chart. Your plan, meals and '
+          'profile stay.',
         ),
         actions: [
           TextButton(
@@ -144,7 +144,7 @@ class ProgressScreen extends ConsumerWidget {
         content: Text(
           ok
               ? 'Weight history cleared.'
-              : 'Could not reset progress right now.',
+              : 'Could not reset progress. Try again.',
         ),
       ),
     );
@@ -470,8 +470,8 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Log your weight to track your progress over time. Your plan '
-              'updates automatically each time you do.',
+              'Log your weight to see your progress. Your plan adjusts each '
+              'time.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,

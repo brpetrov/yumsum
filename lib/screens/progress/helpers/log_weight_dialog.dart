@@ -42,7 +42,9 @@ class _LogWeightDialogState extends ConsumerState<_LogWeightDialog> {
   }
 
   Future<void> _save() async {
-    final weight = double.tryParse(_weightCtrl.text.trim().replaceAll(',', '.'));
+    final weight = double.tryParse(
+      _weightCtrl.text.trim().replaceAll(',', '.'),
+    );
     if (weight == null || weight < 25 || weight > 400) {
       setState(() => _error = 'Enter a weight between 25 and 400 kg.');
       return;
@@ -55,7 +57,7 @@ class _LogWeightDialogState extends ConsumerState<_LogWeightDialog> {
 
     if (!mounted) return;
     if (result == null) {
-      setState(() => _error = 'Could not save your weight right now.');
+      setState(() => _error = 'Could not save your weight. Try again.');
       return;
     }
     Navigator.of(context).pop(result);
@@ -72,7 +74,7 @@ class _LogWeightDialogState extends ConsumerState<_LogWeightDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Your plan recalculates automatically from your latest weight.',
+            'Your plan adjusts to match.',
             style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 16),

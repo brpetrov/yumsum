@@ -118,7 +118,7 @@ class _StartupErrorApp extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Please refresh the page. If it keeps happening, send this message back to the developer.',
+                      'Refresh the page. If it keeps happening, send the message below to the developer.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: AppColors.textSecondary,

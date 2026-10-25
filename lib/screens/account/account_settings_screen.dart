@@ -47,10 +47,13 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Account updated.')));
+      ).showSnackBar(SnackBar(content: Text('Name saved.')));
     } catch (error) {
       if (!mounted) return;
-      _showAccountError(error, fallback: 'Could not update your account.');
+      _showAccountError(
+        error,
+        fallback: 'Could not save your name. Try again.',
+      );
     }
   }
 
@@ -86,7 +89,10 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       );
     } catch (error) {
       if (!mounted) return;
-      _showAccountError(error, fallback: 'Could not start email change.');
+      _showAccountError(
+        error,
+        fallback: 'Could not change your email. Try again.',
+      );
     }
   }
 
@@ -95,8 +101,8 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       context,
       title: 'Reset all data?',
       description:
-          'This deletes every meal, daily summary, weigh-in and AI usage '
-          'record. Your account, profile and plan stay.',
+          'This deletes all your meals, weigh-ins and days off. Your '
+          'account, profile and plan stay.',
       confirmLabel: 'Reset all data',
       destructive: true,
     );
@@ -122,7 +128,8 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       context,
       title: 'Delete account?',
       description:
-          'This deletes your profile, all logged data, and your login. This cannot be undone.',
+          'This deletes your account and everything in it. It can\'t be '
+          'undone.',
       confirmLabel: 'Delete account',
       destructive: true,
     );
@@ -162,7 +169,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
           if (profile == null) {
             return Center(
               child: Text(
-                'Could not load your account right now.',
+                'Could not load your account.',
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             );
@@ -192,7 +199,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                       ),
                       SizedBox(height: 6),
                       Text(
-                        'Update your name, change your email, or manage account security.',
+                        'Change your name, email or password.',
                         style: TextStyle(
                           fontSize: 15,
                           color: AppColors.textSecondary,
@@ -212,7 +219,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Please enter your name.';
+                            return 'Enter your name.';
                           }
                           return null;
                         },
@@ -237,7 +244,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         onPressed: isWorking ? null : _saveName,
                         child: isWorking
                             ? const _SmallButtonSpinner()
-                            : Text('Save Account'),
+                            : Text('Save name'),
                       ),
                       SizedBox(height: 28),
                       const _AccountSectionLabel('PASSWORD'),
@@ -252,7 +259,10 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         contentPadding: EdgeInsets.zero,
                         title: const Text('Send feedback'),
                         subtitle: const Text('Opens an email to the developer'),
-                        trailing: const Icon(Icons.mail_outline_rounded, size: 18),
+                        trailing: const Icon(
+                          Icons.mail_outline_rounded,
+                          size: 18,
+                        ),
                         onTap: openFeedbackEmail,
                       ),
                       ListTile(
@@ -307,7 +317,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                           foregroundColor: AppColors.error,
                         ),
                         icon: Icon(Icons.delete_outline_rounded),
-                        label: Text('Delete Account'),
+                        label: Text('Delete account'),
                       ),
                     ],
                   ),
@@ -320,7 +330,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
             Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (_, _) => Center(
           child: Text(
-            'Could not load your account right now.',
+            'Could not load your account.',
             style: TextStyle(color: AppColors.textSecondary),
           ),
         ),
@@ -421,7 +431,7 @@ class _ChangeEmailDialogState extends State<_ChangeEmailDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Enter your new email and current password. We will send a verification link before changing your login email.',
+              'We\'ll email a link to your new address. Your email changes once you open it.',
               style: TextStyle(color: AppColors.textSecondary),
             ),
             SizedBox(height: 16),
@@ -435,12 +445,12 @@ class _ChangeEmailDialogState extends State<_ChangeEmailDialog> {
               ),
               validator: (value) {
                 final email = value?.trim() ?? '';
-                if (email.isEmpty) return 'Please enter your new email.';
+                if (email.isEmpty) return 'Enter your new email.';
                 final emailRe = RegExp(
                   r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$',
                 );
                 if (!emailRe.hasMatch(email)) {
-                  return 'Please enter a valid email.';
+                  return 'Enter a valid email.';
                 }
                 return null;
               },
@@ -468,7 +478,7 @@ class _ChangeEmailDialogState extends State<_ChangeEmailDialog> {
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Please enter your current password.';
+                  return 'Enter your current password.';
                 }
                 return null;
               },
@@ -481,7 +491,7 @@ class _ChangeEmailDialogState extends State<_ChangeEmailDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: Text('Cancel'),
         ),
-        FilledButton(onPressed: _submit, child: Text('Send verification')),
+        FilledButton(onPressed: _submit, child: Text('Send link')),
       ],
     );
   }

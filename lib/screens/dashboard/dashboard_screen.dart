@@ -145,7 +145,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           if (profile == null) {
             return Center(
               child: Text(
-                'Could not load your profile right now.',
+                'Could not load your profile.',
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             );
@@ -213,7 +213,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Could not delete meal right now.'),
+                        content: Text('Could not delete the meal. Try again.'),
                       ),
                     );
                   }
@@ -225,7 +225,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             ),
             error: (_, _) => Center(
               child: Text(
-                'Could not load meals right now.',
+                'Could not load your meals.',
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             ),
@@ -235,7 +235,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (_, _) => Center(
           child: Text(
-            'Could not load your profile right now.',
+            'Could not load your profile.',
             style: TextStyle(color: AppColors.textSecondary),
           ),
         ),
@@ -334,7 +334,9 @@ class _DayOffButton extends ConsumerWidget {
         } catch (_) {
           if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not change that right now.')),
+            const SnackBar(
+              content: Text('Could not change your day off. Try again.'),
+            ),
           );
         }
       },

@@ -430,7 +430,7 @@ void main() {
     await tester.tap(find.text('Use'));
     await tester.pumpAndSettle();
     expect(boxes(tester), ['Лютеница', '247', '5']);
-    expect(find.textContaining('isn\'t in the food database'), findsNothing);
+    expect(find.textContaining('isn\'t on Open Food Facts'), findsNothing);
   });
 
   testWidgets('a listed product without calories is not offered', (
@@ -442,7 +442,10 @@ void main() {
     await tester.tap(find.byTooltip('Photo or barcode'));
     await tester.pumpAndSettle();
     expect(find.text('Be the first to add this'), findsNothing);
-    expect(find.textContaining('no calories for it yet'), findsOneWidget);
+    expect(
+      find.textContaining('no calories for this product yet'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('closing the thank-you still counts as contributed', (
@@ -462,7 +465,7 @@ void main() {
     await tester.tapAt(const Offset(20, 20)); // outside the sheet
     await tester.pumpAndSettle();
     expect(find.text('Thank you!'), findsNothing);
-    expect(find.textContaining('isn\'t in the food database'), findsNothing);
+    expect(find.textContaining('isn\'t on Open Food Facts'), findsNothing);
     // The new product's barcode is not passed over next time.
     await tester.tap(find.byTooltip('Photo or barcode'));
     await tester.pumpAndSettle();
@@ -479,7 +482,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(contributor.sent, isEmpty);
     expect(foodLookup.lastBarcode, '4000000000000');
-    expect(find.textContaining('isn\'t in the food database'), findsOneWidget);
+    expect(find.textContaining('isn\'t on Open Food Facts'), findsOneWidget);
     expect(estimateService.photoCalls, 0);
     expect(boxes(tester), ['', '', '']);
 
