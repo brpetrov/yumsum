@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
+import 'package:lean_streak/widgets/pack_photo.dart';
 
 typedef Portion = ({String name, int kcal, int? protein});
 
@@ -73,20 +74,35 @@ class _PortionSheetState extends State<_PortionSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            food.name,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          if (food.brand != null) Text(food.brand!, style: muted),
-          const SizedBox(height: 4),
-          Text(
-            '${_amounts(food.kcalPer100g, food.proteinPer100g)} per 100 g'
-            ' · Open Food Facts',
-            style: muted.copyWith(fontSize: 13),
+          Row(
+            children: [
+              if (food.imageUrl != null) ...[
+                PackPhoto(food.imageUrl, size: 72),
+                const SizedBox(width: 16),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      food.name,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    if (food.brand != null) Text(food.brand!, style: muted),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${_amounts(food.kcalPer100g, food.proteinPer100g)}'
+                      ' per 100 g · Open Food Facts',
+                      style: muted.copyWith(fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
           Row(
@@ -125,7 +141,7 @@ class _PortionSheetState extends State<_PortionSheet> {
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(52),
             ),
-            child: const Text('Use'),
+            child: const Text('Done'),
           ),
         ],
       ),

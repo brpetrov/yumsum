@@ -43,7 +43,7 @@ class FoodLookupService {
       '/api/v2/product/$barcode.json',
       {
         'fields':
-            'product_name,product_name_en,brands,nutriments,serving_size,quantity',
+            'product_name,product_name_en,brands,nutriments,serving_size,quantity,image_front_small_url',
         'app_name': 'LeanStreak',
       },
     );

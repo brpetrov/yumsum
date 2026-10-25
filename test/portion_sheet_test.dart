@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/screens/dashboard/helpers/portion_sheet.dart';
+import 'package:lean_streak/widgets/pack_photo.dart';
 
 const _wrap = (
   name: 'Chicken Tikka Wrap',
@@ -59,6 +60,7 @@ void main() {
 
     expect(find.text('Chicken Tikka Wrap'), findsOneWidget);
     expect(find.text('Tesco'), findsOneWidget);
+    expect(find.byType(PackPhoto), findsNothing);
     expect(
       find.text('215 kcal · 9 g protein per 100 g · Open Food Facts'),
       findsOneWidget,
@@ -69,8 +71,41 @@ void main() {
     await tester.pump();
     expect(find.text('323 kcal · 14 g protein'), findsOneWidget);
 
-    await tester.tap(find.text('Use'));
+    await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
     expect(result, (name: 'Chicken Tikka Wrap', kcal: 323, protein: 14));
+  });
+
+  testWidgets('the sheet shows the pack photo when there is one', (
+    tester,
+  ) async {
+    const withPhoto = (
+      name: 'Chicken Tikka Wrap',
+      brand: 'Tesco',
+      kcalPer100g: 215,
+      proteinPer100g: 9,
+      servingGrams: 220,
+      imageUrl: 'https://images.openfoodfacts.org/w.200.jpg',
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => TextButton(
+              onPressed: () => showPortionSheet(context, withPhoto),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<PackPhoto>(find.byType(PackPhoto)).url,
+      'https://images.openfoodfacts.org/w.200.jpg',
+    );
   });
 }

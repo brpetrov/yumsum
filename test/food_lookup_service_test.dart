@@ -24,6 +24,25 @@ void main() {
     expect((bare.listed, bare.food), (true, null));
   });
 
+  test('a barcode lookup asks for the pack photo and reads it', () async {
+    late Uri asked;
+    final found = await FoodLookupService(
+      MockClient((request) async {
+        asked = request.url;
+        return http.Response('''
+          {"status": 1, "product": {"product_name": "Chicken Tikka Wrap",
+            "image_front_small_url": "https://images.openfoodfacts.org/w.200.jpg",
+            "nutriments": {"energy-kcal_100g": 215}}}''', 200);
+      }),
+    ).byBarcode('5000112637922');
+
+    expect(
+      asked.queryParameters['fields']!.split(','),
+      contains('image_front_small_url'),
+    );
+    expect(found.food!.imageUrl, 'https://images.openfoodfacts.org/w.200.jpg');
+  });
+
   test('search hits: local products first, no-calorie ones dropped', () {
     final foods = parseSearchHits(
       _reply('''

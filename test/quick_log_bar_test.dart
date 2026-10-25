@@ -376,7 +376,7 @@ void main() {
 
     await tester.enterText(grams, '150');
     await tester.pump();
-    await tester.tap(find.text('Use'));
+    await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
 
     expect(boxes(tester), ['Chicken Tikka Wrap', '323', '14']);
@@ -427,7 +427,7 @@ void main() {
     await tester.tap(find.text('Log it'));
     await tester.pumpAndSettle();
     // The pack size (260 g) is the starting amount.
-    await tester.tap(find.text('Use'));
+    await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
     expect(boxes(tester), ['Лютеница', '247', '5']);
     expect(find.textContaining('isn\'t in the food database'), findsNothing);
@@ -513,7 +513,7 @@ void main() {
     expect(find.text('Tesco · 215 kcal per 100 g'), findsOneWidget);
     await tester.tap(find.text('Chicken Tikka Wrap'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Use'));
+    await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
 
     expect(boxes(tester), ['Chicken Tikka Wrap', '473', '20']);
