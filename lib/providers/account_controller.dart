@@ -1,11 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/providers/account_provider.dart';
+import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
+
+/// Whether [user] can sign in with a password; an account made with Google
+/// only can't, so it has no password to change or confirm with.
+bool hasPasswordLogin(User user) =>
+    user.providerData.any((info) => info.providerId == 'password');
 
 class AccountActionException implements Exception {
   const AccountActionException(this.message);
@@ -151,6 +158,32 @@ class AccountController extends AsyncNotifier<void> {
 
     if (user == null || uid == null) {
       throw const AccountActionException('You are not signed in.');
+    }
+
+    // A Google account has no password, so it confirms with Google and
+    // [password] is ignored. Closing the picker is rethrown as it is
+    // ([backedOutOfGoogle]), for the screen to treat as a cancel.
+    if (!hasPasswordLogin(user)) {
+      try {
+        if (kIsWeb) {
+          await user.reauthenticateWithPopup(GoogleAuthProvider());
+        } else {
+          final account = await (await googleSignIn()).authenticate();
+          await user.reauthenticateWithCredential(
+            GoogleAuthProvider.credential(
+              idToken: account.authentication.idToken,
+            ),
+          );
+        }
+        return user;
+      } on FirebaseAuthException catch (error) {
+        if (backedOutOfGoogle(error)) rethrow;
+        throw AccountActionException(
+          error.code == 'user-mismatch'
+              ? 'Choose the Google account you signed in with.'
+              : _mapAuthError(error),
+        );
+      }
     }
 
     final email = user.email;

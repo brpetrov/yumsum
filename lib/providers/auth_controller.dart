@@ -10,6 +10,27 @@ class EmailNotVerifiedException implements Exception {
   const EmailNotVerifiedException();
 }
 
+Future<void>? _googleReady;
+
+/// The phone's Google sign-in, set up on first use: the plugin may only be
+/// initialised once, and signing in again or confirming a deletion uses it
+/// too.
+Future<GoogleSignIn> googleSignIn() async {
+  await (_googleReady ??= GoogleSignIn.instance.initialize());
+  return GoogleSignIn.instance;
+}
+
+/// Whether [error] is the user closing Google's account picker or popup,
+/// which isn't shown as an error.
+bool backedOutOfGoogle(Object? error) => switch (error) {
+  GoogleSignInException(code: GoogleSignInExceptionCode.canceled) => true,
+  FirebaseAuthException(
+    code: 'popup-closed-by-user' || 'cancelled-popup-request',
+  ) =>
+    true,
+  _ => false,
+};
+
 class AuthController extends AsyncNotifier<AuthStatus> {
   @override
   Future<AuthStatus> build() async => AuthStatus.idle;
@@ -40,9 +61,7 @@ class AuthController extends AsyncNotifier<AuthStatus> {
       if (kIsWeb) {
         await FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
       } else {
-        final google = GoogleSignIn.instance;
-        await google.initialize();
-        final account = await google.authenticate();
+        final account = await (await googleSignIn()).authenticate();
         await FirebaseAuth.instance.signInWithCredential(
           GoogleAuthProvider.credential(
             idToken: account.authentication.idToken,
@@ -51,22 +70,13 @@ class AuthController extends AsyncNotifier<AuthStatus> {
       }
       return AuthStatus.idle;
     });
-    if (_backedOut(next.error)) {
+    if (backedOutOfGoogle(next.error)) {
       state = const AsyncData(AuthStatus.idle);
       return false;
     }
     state = next;
     return !next.hasError;
   }
-
-  bool _backedOut(Object? error) => switch (error) {
-    GoogleSignInException(code: GoogleSignInExceptionCode.canceled) => true,
-    FirebaseAuthException(
-      code: 'popup-closed-by-user' || 'cancelled-popup-request',
-    ) =>
-      true,
-    _ => false,
-  };
 
   Future<void> signUp(String email, String password) async {
     state = const AsyncLoading();

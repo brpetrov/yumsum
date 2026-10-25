@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 
+/// Asks for the password before [confirmLabel]. Without [askPassword]
+/// (a Google account, which confirms with Google next) it's a plain
+/// confirmation that resolves to an empty string.
 Future<String?> showPasswordConfirmDialog(
   BuildContext context, {
   required String title,
   required String description,
   required String confirmLabel,
   bool destructive = false,
+  bool askPassword = true,
 }) {
   return showDialog<String>(
     context: context,
@@ -17,6 +21,7 @@ Future<String?> showPasswordConfirmDialog(
         description: description,
         confirmLabel: confirmLabel,
         destructive: destructive,
+        askPassword: askPassword,
       );
     },
   );
@@ -28,12 +33,14 @@ class _PasswordConfirmDialog extends StatefulWidget {
     required this.description,
     required this.confirmLabel,
     required this.destructive,
+    required this.askPassword,
   });
 
   final String title;
   final String description;
   final String confirmLabel;
   final bool destructive;
+  final bool askPassword;
 
   @override
   State<_PasswordConfirmDialog> createState() => _PasswordConfirmDialogState();
@@ -51,7 +58,8 @@ class _PasswordConfirmDialogState extends State<_PasswordConfirmDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final canConfirm = _passwordCtrl.text.trim().isNotEmpty;
+    final canConfirm =
+        !widget.askPassword || _passwordCtrl.text.trim().isNotEmpty;
 
     return AlertDialog(
       title: Text(widget.title),
@@ -63,25 +71,27 @@ class _PasswordConfirmDialogState extends State<_PasswordConfirmDialog> {
             widget.description,
             style: TextStyle(color: AppColors.textSecondary, height: 1.4),
           ),
-          SizedBox(height: 16),
-          TextField(
-            controller: _passwordCtrl,
-            autofocus: true,
-            obscureText: _obscure,
-            onChanged: (_) => setState(() {}),
-            decoration: InputDecoration(
-              labelText: 'Password',
-              prefixIcon: Icon(Icons.lock_outline_rounded),
-              suffixIcon: IconButton(
-                onPressed: () => setState(() => _obscure = !_obscure),
-                icon: Icon(
-                  _obscure
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined,
+          if (widget.askPassword) ...[
+            SizedBox(height: 16),
+            TextField(
+              controller: _passwordCtrl,
+              autofocus: true,
+              obscureText: _obscure,
+              onChanged: (_) => setState(() {}),
+              decoration: InputDecoration(
+                labelText: 'Password',
+                prefixIcon: Icon(Icons.lock_outline_rounded),
+                suffixIcon: IconButton(
+                  onPressed: () => setState(() => _obscure = !_obscure),
+                  icon: Icon(
+                    _obscure
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ],
       ),
       actions: [

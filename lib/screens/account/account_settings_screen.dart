@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/providers/account_controller.dart';
+import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/core/constants/legal_links.dart';
@@ -30,6 +31,18 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     _nameCtrl.dispose();
     super.dispose();
   }
+
+  /// False for an account made with Google: it has no password to change
+  /// or confirm with, and Google looks after its email.
+  bool get _usesPassword {
+    final user = ref.read(authStateProvider).valueOrNull;
+    return user == null || hasPasswordLogin(user);
+  }
+
+  /// A Google user is asked to confirm with Google next.
+  String _confirmNote(String description) => _usesPassword
+      ? description
+      : '$description You\'ll confirm with Google next.';
 
   void _seedName(String uid, String name) {
     if (_loadedProfileUid == uid) return;
@@ -100,11 +113,13 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     final password = await showPasswordConfirmDialog(
       context,
       title: 'Reset all data?',
-      description:
-          'This deletes all your meals, weigh-ins and days off. Your '
-          'account, profile and plan stay.',
+      description: _confirmNote(
+        'This deletes all your meals, weigh-ins and days off. Your '
+        'account, profile and plan stay.',
+      ),
       confirmLabel: 'Reset all data',
       destructive: true,
+      askPassword: _usesPassword,
     );
 
     if (password == null || !mounted) return;
@@ -118,7 +133,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text('All logged data deleted.')));
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted || backedOutOfGoogle(error)) return;
       _showAccountError(error, fallback: 'Could not reset your data.');
     }
   }
@@ -127,11 +142,13 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     final password = await showPasswordConfirmDialog(
       context,
       title: 'Delete account?',
-      description:
-          'This deletes your account and everything in it. It can\'t be '
-          'undone.',
+      description: _confirmNote(
+        'This deletes your account and everything in it. It can\'t be '
+        'undone.',
+      ),
       confirmLabel: 'Delete account',
       destructive: true,
+      askPassword: _usesPassword,
     );
 
     if (password == null || !mounted) return;
@@ -141,7 +158,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
           .read(accountControllerProvider.notifier)
           .deleteAccount(password: password);
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted || backedOutOfGoogle(error)) return;
       _showAccountError(error, fallback: 'Could not delete your account.');
     }
   }
@@ -159,6 +176,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     final authUser = ref.watch(authStateProvider).valueOrNull;
     final accountState = ref.watch(accountControllerProvider);
     final isWorking = accountState.isLoading;
+    final usesPassword = _usesPassword;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -199,7 +217,10 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                       ),
                       SizedBox(height: 6),
                       Text(
-                        'Change your name, email or password.',
+                        usesPassword
+                            ? 'Change your name, email or password.'
+                            : 'Change your name. Google looks after your '
+                                  'email and password.',
                         style: TextStyle(
                           fontSize: 15,
                           color: AppColors.textSecondary,
@@ -233,12 +254,14 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                           prefixIcon: Icon(Icons.email_outlined),
                         ),
                       ),
-                      SizedBox(height: 12),
-                      OutlinedButton.icon(
-                        onPressed: isWorking ? null : _changeEmail,
-                        icon: Icon(Icons.mark_email_read_outlined),
-                        label: Text('Change email'),
-                      ),
+                      if (usesPassword) ...[
+                        SizedBox(height: 12),
+                        OutlinedButton.icon(
+                          onPressed: isWorking ? null : _changeEmail,
+                          icon: Icon(Icons.mark_email_read_outlined),
+                          label: Text('Change email'),
+                        ),
+                      ],
                       SizedBox(height: 18),
                       ElevatedButton(
                         onPressed: isWorking ? null : _saveName,
@@ -246,13 +269,15 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                             ? const _SmallButtonSpinner()
                             : Text('Save name'),
                       ),
-                      SizedBox(height: 28),
-                      const _AccountSectionLabel('PASSWORD'),
-                      OutlinedButton.icon(
-                        onPressed: isWorking ? null : _sendPasswordReset,
-                        icon: Icon(Icons.lock_reset_rounded),
-                        label: Text('Send password reset email'),
-                      ),
+                      if (usesPassword) ...[
+                        SizedBox(height: 28),
+                        const _AccountSectionLabel('PASSWORD'),
+                        OutlinedButton.icon(
+                          onPressed: isWorking ? null : _sendPasswordReset,
+                          icon: Icon(Icons.lock_reset_rounded),
+                          label: Text('Send password reset email'),
+                        ),
+                      ],
                       SizedBox(height: 28),
                       const _AccountSectionLabel('HELP & LEGAL'),
                       ListTile(

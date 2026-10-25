@@ -13,6 +13,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakeAccountController extends AccountController {
   final resetPasswords = <String>[];
+  final deletePasswords = <String>[];
+
+  @override
+  Future<void> deleteAccount({required String password}) async {
+    deletePasswords.add(password);
+  }
 
   @override
   Future<void> syncAuthEmailToProfile() async {}
@@ -21,6 +27,20 @@ class _FakeAccountController extends AccountController {
   Future<void> resetAllData({required String password}) async {
     resetPasswords.add(password);
   }
+}
+
+class _GoogleLogin extends Fake implements UserInfo {
+  @override
+  String get providerId => 'google.com';
+}
+
+/// Signed up with Google, so there's no password.
+class _GoogleUser extends Fake implements User {
+  @override
+  String? get email => 'a@b.com';
+
+  @override
+  List<UserInfo> get providerData => [_GoogleLogin()];
 }
 
 final _now = DateTime(2026, 10, 16);
@@ -54,7 +74,7 @@ void main() {
   late SharedPreferences prefs;
   late _FakeAccountController controller;
 
-  Future<void> pumpScreen(WidgetTester tester) async {
+  Future<void> pumpScreen(WidgetTester tester, {User? user}) async {
     SharedPreferences.setMockInitialValues({});
     prefs = await SharedPreferences.getInstance();
     controller = _FakeAccountController();
@@ -66,7 +86,7 @@ void main() {
           userProfileProvider.overrideWith(
             (ref) => Stream<UserProfile?>.value(_profile),
           ),
-          authStateProvider.overrideWith((ref) => Stream<User?>.value(null)),
+          authStateProvider.overrideWith((ref) => Stream<User?>.value(user)),
           accountControllerProvider.overrideWith(() => controller),
         ],
         child: MaterialApp(
@@ -105,5 +125,23 @@ void main() {
 
     expect(controller.resetPasswords, ['hunter2']);
     expect(find.text('All logged data deleted.'), findsOneWidget);
+  });
+
+  testWidgets('A Google account confirms with Google, not a password', (
+    tester,
+  ) async {
+    await pumpScreen(tester, user: _GoogleUser());
+    expect(find.text('Change email'), findsNothing);
+    expect(find.text('Send password reset email'), findsNothing);
+
+    await tester.ensureVisible(find.text('Delete account'));
+    await tester.tap(find.text('Delete account'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('confirm with Google next'), findsOneWidget);
+    expect(find.widgetWithText(TextField, 'Password'), findsNothing);
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Delete account'));
+    await tester.pumpAndSettle();
+    expect(controller.deletePasswords, ['']);
   });
 }
