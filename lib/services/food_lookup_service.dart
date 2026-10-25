@@ -89,7 +89,7 @@ class FoodLookupService {
             // Open Food Facts asks apps to identify themselves; browsers
             // don't allow setting this header, so the web relies on app_name.
             headers: {
-              if (!kIsWeb) 'User-Agent': 'LeanStreak/0.1 (broogenn@gmail.com)',
+              if (!kIsWeb) 'User-Agent': 'LeanStreak/0.1 (broovenn@gmail.com)',
             },
           )
           .timeout(const Duration(seconds: 12));

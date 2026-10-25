@@ -74,7 +74,7 @@ class FoodContributionService {
   };
 
   Map<String, String> get _headers => {
-    if (!kIsWeb) 'User-Agent': 'LeanStreak/$_appVersion (broogenn@gmail.com)',
+    if (!kIsWeb) 'User-Agent': 'LeanStreak/$_appVersion (broovenn@gmail.com)',
     // The test server sits behind a shared password of its own.
     if (host.endsWith('.net'))
       'Authorization': 'Basic ${base64Encode(utf8.encode('off:off'))}',
