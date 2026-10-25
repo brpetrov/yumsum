@@ -51,10 +51,10 @@ Future<bool> inviteToContribute(BuildContext context) async {
             ),
             const SizedBox(height: 8),
             Text(
-              'This product isn\'t on Open Food Facts yet, the free food '
-              'database built by volunteers that LeanStreak scans from. Add it '
-              'with two photos and it will be there next time, for you and '
-              'for everyone who scans it after you.',
+              'This product isn\'t on Open Food Facts yet, the free, '
+              'volunteer-run food list LeanStreak scans from. Add it with two '
+              'photos and it\'ll be there for you and everyone who scans it '
+              'next.',
               textAlign: TextAlign.center,
               style: muted,
             ),
@@ -208,14 +208,12 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
           'packet: they will be public.';
     } on DailyLimitExceededException {
       _note =
-          'Daily AI limit reached, so please copy the details from the '
-          'packet yourself.';
+          'Daily AI limit reached. Copy the details from the packet '
+          'yourself.';
     } on CalorieEstimateException catch (error) {
       _note = error.message;
     } catch (_) {
-      _note =
-          'Could not read the label right now. Fill in the details '
-          'yourself.';
+      _note = 'Could not read the label. Fill in the details yourself.';
     }
     if (mounted) setState(() => _reading = false);
   }
@@ -235,7 +233,7 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
     final name = _text(_name);
     final kcal = _figure('energy-kcal');
     if (name == null || kcal == null) {
-      setState(() => _error = 'The product name and energy are needed.');
+      setState(() => _error = 'Add the product name and energy (kcal).');
       return;
     }
     final prefs = ref.read(sharedPreferencesProvider);
@@ -325,8 +323,8 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
           ),
           const SizedBox(height: 8),
           Text(
-            '${_text(_name)} is now on Open Food Facts, for you and for '
-            'everyone who scans it after you.'
+            '${_text(_name)} is now on Open Food Facts for everyone who scans '
+            'it next.'
             '${count > 1 ? ' That\'s $count products you\'ve added.' : ''}',
             textAlign: TextAlign.center,
             style: TextStyle(

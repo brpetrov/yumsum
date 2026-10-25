@@ -67,7 +67,7 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
           ? null
           : result.error is EditLimitExceededException
           ? 'No past-day changes left this month.'
-          : 'Could not delete the meal right now.',
+          : 'Could not delete the meal. Try again.',
     );
   }
 
@@ -156,10 +156,7 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
               Text(
                 '${changesLeft.clamp(0, DayEditRepository.monthlyLimit)} of '
                 '${DayEditRepository.monthlyLimit} past-day changes left this month',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
-                ),
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             ],
             const SizedBox(height: 12),

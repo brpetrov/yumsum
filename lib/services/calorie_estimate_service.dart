@@ -132,8 +132,7 @@ String nutritionContext({required String country, required String usualFood}) {
       'used.\n';
 }
 
-const aiNotSwitchedOnMessage =
-    'AI estimates are not switched on for this app yet.';
+const aiNotSwitchedOnMessage = 'AI estimates aren\'t switched on yet.';
 const aiBusyMessage = 'The AI is busy right now. Try again in a minute.';
 const aiPausedMessage =
     'AI estimates are paused for now. You can still type the calories '
@@ -164,10 +163,9 @@ String aiErrorMessage(String message) {
     return aiBusyMessage;
   }
   if (isTransientAiError(message)) {
-    return 'The AI estimate service is busy right now. Try again in a few '
-        'seconds.';
+    return 'The AI is busy. Try again in a few seconds.';
   }
-  return 'Could not estimate calories right now.';
+  return 'Could not estimate calories. Try again.';
 }
 
 bool isTransientAiError(String message) {
@@ -351,7 +349,7 @@ class CalorieEstimateService {
       throw CalorieEstimateException(_friendlyServerError(error.message));
     } catch (error, st) {
       debugPrint('CalorieEstimateService error: $error\n$st');
-      throw CalorieEstimateException('Could not estimate calories right now.');
+      throw CalorieEstimateException('Could not estimate calories. Try again.');
     }
   }
 
@@ -392,7 +390,7 @@ class CalorieEstimateService {
     } catch (error, st) {
       debugPrint('CalorieEstimateService voice error: $error\n$st');
       throw const CalorieEstimateException(
-        'Could not process voice input right now.',
+        'Could not understand the recording. Try again.',
       );
     }
   }
@@ -433,7 +431,7 @@ class CalorieEstimateService {
     } catch (error, st) {
       debugPrint('CalorieEstimateService photo error: $error\n$st');
       throw const CalorieEstimateException(
-        'Could not read that photo right now.',
+        'Could not read that photo. Try again.',
       );
     }
   }
@@ -463,8 +461,7 @@ class CalorieEstimateService {
       );
       if (map['error'] != null) {
         throw const CalorieEstimateException(
-          'Those photos don\'t show a packet\'s label. Fill in the details '
-          'from the packet yourself.',
+          'Those photos don\'t show a label. Fill in the details yourself.',
         );
       }
       final reading = parseLabelReading(map);
@@ -478,7 +475,7 @@ class CalorieEstimateService {
     } catch (error, st) {
       debugPrint('CalorieEstimateService label error: $error\n$st');
       throw const CalorieEstimateException(
-        'Could not read the label right now. Fill in the details yourself.',
+        'Could not read the label. Fill in the details yourself.',
       );
     }
   }
@@ -508,7 +505,7 @@ class CalorieEstimateService {
   Map<String, dynamic> _decode(GenerateContentResponse response) {
     final raw = response.text?.trim() ?? '';
     if (raw.isEmpty) {
-      throw const CalorieEstimateException('Empty response from model.');
+      throw const CalorieEstimateException('No answer from the AI. Try again.');
     }
     final jsonStr = raw
         .replaceAll(RegExp(r'```(?:json)?\s*'), '')
@@ -548,7 +545,7 @@ class CalorieEstimateService {
       }
     }
 
-    throw const CalorieEstimateException('Could not reach the AI service.');
+    throw const CalorieEstimateException('Could not reach the AI. Try again.');
   }
 
   bool _isTransientServerError(String message) => isTransientAiError(message);

@@ -41,7 +41,7 @@ class ProfileLoadErrorScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Your account is signed in, but your health plan could not be loaded. Check your connection and try again.',
+                  'Check your connection and try again.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: AppColors.textSecondary,

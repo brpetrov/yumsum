@@ -147,7 +147,7 @@ class FoodContributionService {
         'Open Food Facts said ${response.statusCode}: ${response.body}',
       );
       throw const FoodContributionException(
-        'Open Food Facts didn\'t take it this time. Try again in a moment.',
+        'Open Food Facts didn\'t accept it. Try again in a moment.',
       );
     }
   }

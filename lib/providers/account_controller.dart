@@ -48,7 +48,7 @@ class AccountController extends AsyncNotifier<void> {
         throw const AccountActionException('You are not signed in.');
       }
       if (trimmedName.isEmpty) {
-        throw const AccountActionException('Please enter your name.');
+        throw const AccountActionException('Enter your name.');
       }
 
       await ref.read(userProfileRepositoryProvider).updateProfile(uid, {
@@ -94,16 +94,14 @@ class AccountController extends AsyncNotifier<void> {
     try {
       final trimmedEmail = newEmail.trim();
       if (trimmedEmail.isEmpty) {
-        throw const AccountActionException('Please enter a new email address.');
+        throw const AccountActionException('Enter a new email address.');
       }
 
       final user = await _reauthenticate(password);
       final currentEmail = user.email;
       if (currentEmail != null &&
           currentEmail.toLowerCase() == trimmedEmail.toLowerCase()) {
-        throw const AccountActionException(
-          'This is already your account email.',
-        );
+        throw const AccountActionException('That\'s already your email.');
       }
 
       await user.verifyBeforeUpdateEmail(trimmedEmail);
@@ -164,7 +162,7 @@ class AccountController extends AsyncNotifier<void> {
 
     final trimmedPassword = password.trim();
     if (trimmedPassword.isEmpty) {
-      throw const AccountActionException('Please enter your password.');
+      throw const AccountActionException('Enter your password.');
     }
 
     try {
@@ -188,13 +186,13 @@ class AccountController extends AsyncNotifier<void> {
       case 'too-many-requests':
         return 'Too many attempts. Try again later.';
       case 'network-request-failed':
-        return 'Network error. Check your connection and try again.';
+        return 'Could not connect. Check your internet and try again.';
       case 'invalid-email':
-        return 'Please enter a valid email address.';
+        return 'Enter a valid email address.';
       case 'email-already-in-use':
         return 'An account already uses that email address.';
       case 'requires-recent-login':
-        return 'Please confirm your password and try again.';
+        return 'Confirm your password and try again.';
       default:
         return 'Could not verify your password.';
     }

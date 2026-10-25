@@ -56,34 +56,34 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   String _parseError(Object error) {
     if (error is EmailNotVerifiedException) {
-      return 'Please verify your email before signing in. Check your inbox.';
+      return 'Verify your email first. Check your inbox for the link.';
     }
     if (error is GoogleSignInException) {
-      return 'Google sign-in didn\'t work. Please try again.';
+      return 'Google sign-in didn\'t work. Try again.';
     }
     if (error is FirebaseAuthException) {
       switch (error.code) {
         case 'account-exists-with-different-credential':
-          return 'This email already has a password login. Sign in with your password.';
+          return 'This email already has a password. Sign in with it instead.';
         case 'user-not-found':
         case 'wrong-password':
         case 'invalid-credential':
           return 'Incorrect email or password.';
         case 'email-already-in-use':
-          return 'An account with this email already exists.';
+          return 'An account with this email already exists. Sign in instead.';
         case 'weak-password':
           return 'Password must be at least 6 characters.';
         case 'invalid-email':
-          return 'Please enter a valid email address.';
+          return 'Enter a valid email address.';
         case 'too-many-requests':
-          return 'Too many attempts. Please try again later.';
+          return 'Too many attempts. Try again later.';
         case 'network-request-failed':
-          return 'No internet connection. Please try again.';
+          return 'No internet connection. Try again.';
         default:
-          return 'Something went wrong. Please try again.';
+          return 'Something went wrong. Try again.';
       }
     }
-    return 'Something went wrong. Please try again.';
+    return 'Something went wrong. Try again.';
   }
 
   static final _emailRe = RegExp(r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,}$');
@@ -126,8 +126,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final email = _emailController.text.trim();
     final (bannerTitle, bannerBody) = switch (authState.valueOrNull) {
       AuthStatus.verificationSent => (
-        'Verification email sent!',
-        'We sent a link to $email. Click it to verify your account, then '
+        'Verification email sent',
+        'We sent a link to $email. Open it to verify your account, then '
             'sign in.',
       ),
       AuthStatus.resetSent => (
@@ -200,12 +200,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       child: Row(
                         children: [
                           _TabButton(
-                            label: 'Sign In',
+                            label: 'Sign in',
                             selected: _isSignIn,
                             onTap: _isSignIn ? null : _switchMode,
                           ),
                           _TabButton(
-                            label: 'Sign Up',
+                            label: 'Sign up',
                             selected: !_isSignIn,
                             onTap: !_isSignIn ? null : _switchMode,
                           ),
@@ -320,10 +320,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       ),
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) {
-                          return 'Please enter your email.';
+                          return 'Enter your email.';
                         }
                         if (!_isValidEmail(v.trim())) {
-                          return 'Please enter a valid email.';
+                          return 'Enter a valid email.';
                         }
                         return null;
                       },
@@ -357,7 +357,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       ),
                       validator: (v) {
                         if (v == null || v.isEmpty) {
-                          return 'Please enter your password.';
+                          return 'Enter your password.';
                         }
                         if (!_isSignIn && v.length < 6) {
                           return 'Password must be at least 6 characters.';
@@ -390,7 +390,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 ),
                               )
                             : Text(
-                                _isSignIn ? 'Sign In' : 'Create Account',
+                                _isSignIn ? 'Sign in' : 'Create account',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,

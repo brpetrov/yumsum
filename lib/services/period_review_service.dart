@@ -89,7 +89,7 @@ class PeriodReviewService {
     final guidance = <String>[];
 
     if (loggedDays == 0) {
-      guidance.add('No logged meals were found for this period.');
+      guidance.add('No meals logged in this period.');
       return guidance;
     }
 
@@ -97,7 +97,7 @@ class PeriodReviewService {
       guidance.add('Most logged days stayed close to target.');
     } else if (calorieConsistencyRate >= 0.40) {
       guidance.add(
-        'Some logged days stayed close to target. Tightening a few outliers will help.',
+        'Some logged days stayed close to target; a few were well off.',
       );
     } else {
       guidance.add('Most logged days were well above or below target.');
@@ -110,7 +110,7 @@ class PeriodReviewService {
         : (daysInPeriod * 0.5).ceil();
     if (loggedDays < minimumLoggedDays) {
       guidance.add(
-        'Logging was inconsistent. More complete logging will make the review more useful.',
+        'Some days weren\'t logged. Log more days for a clearer review.',
       );
     }
 

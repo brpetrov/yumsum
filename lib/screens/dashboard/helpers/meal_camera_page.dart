@@ -13,7 +13,7 @@ import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 /// food database just didn't know, so the packet can be photographed.
 ///
 /// With [photoSteps] it reads no barcodes: it asks for one photo per
-/// step ("The front of the pack", ...) and resolves to all of them.
+/// step ("Front of the pack", ...) and resolves to all of them.
 class MealCameraPage extends StatefulWidget {
   const MealCameraPage({super.key, this.skipBarcode, this.photoSteps});
 
@@ -119,7 +119,7 @@ class _MealCameraPageState extends State<MealCameraPage>
       final cameras = await availableCameras();
       if (!mounted || _done) return;
       if (cameras.isEmpty) {
-        if (mounted) setState(() => _problem = 'No camera here.');
+        if (mounted) setState(() => _problem = 'No camera found.');
         return;
       }
       final camera = CameraController(
@@ -149,9 +149,8 @@ class _MealCameraPageState extends State<MealCameraPage>
       if (!mounted) return;
       setState(
         () => _problem = error.code.startsWith('CameraAccess')
-            ? 'Allow camera access to take photos and scan barcodes. If '
-                  'you said no before, allow it in the phone\'s Settings, '
-                  'then try again.'
+            ? 'Allow camera access to scan barcodes and take photos. If '
+                  'you said no before, turn it on in your phone\'s Settings.'
             : 'The camera could not start.',
       );
     }
@@ -255,7 +254,7 @@ class _MealCameraPageState extends State<MealCameraPage>
     final ready = camera != null && camera.value.isInitialized;
     final steps = widget.photoSteps;
     final hint = steps == null
-        ? 'Point at a barcode, or photograph your meal'
+        ? 'Scan a barcode\nor just take a photo of your meal'
         : '${_photos.length + 1} of ${steps.length} · '
               '${steps[_photos.length.clamp(0, steps.length - 1)]}';
 
@@ -347,6 +346,7 @@ class _MealCameraPageState extends State<MealCameraPage>
                       children: [
                         Text(
                           hint,
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             color: white.withValues(alpha: 0.9),
                             fontSize: 15,

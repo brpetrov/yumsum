@@ -106,7 +106,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
   Future<void> _submit(UserProfile profile) async {
     if (!_formKey.currentState!.validate()) return;
     if (_gender == null) {
-      _showSnack('Please select your gender.');
+      _showSnack('Select your gender.');
       return;
     }
 
@@ -135,11 +135,11 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Plan settings updated.')));
+      ).showSnackBar(SnackBar(content: Text('Plan saved.')));
       return;
     }
 
-    _showSnack('Could not update your plan settings right now.');
+    _showSnack('Could not save your plan. Try again.');
   }
 
   void _showSnack(String message) {
@@ -162,7 +162,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
           if (profile == null) {
             return Center(
               child: Text(
-                'Could not load your profile right now.',
+                'Could not load your profile.',
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             );
@@ -194,7 +194,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                       ),
                       SizedBox(height: 6),
                       Text(
-                        'We will recalculate from your body, activity, target weight, and pace.',
+                        'Change anything below and your plan adjusts to match.',
                         style: TextStyle(
                           fontSize: 15,
                           color: AppColors.textSecondary,
@@ -216,7 +216,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                         ),
                         validator: (value) {
                           final age = int.tryParse(value ?? '');
-                          if (age == null) return 'Please enter your age.';
+                          if (age == null) return 'Enter your age.';
                           if (age < 18 || age > 120) {
                             return 'Valid age: 18–120.';
                           }
@@ -233,7 +233,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                           prefixIcon: Icon(Icons.public_rounded),
                         ),
                         validator: (v) => (v == null || v.trim().isEmpty)
-                            ? 'Please enter your country.'
+                            ? 'Enter your country.'
                             : null,
                       ),
                       SizedBox(height: 14),
@@ -390,7 +390,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                             border: Border.all(color: AppColors.divider),
                           ),
                           child: Text(
-                            'Your target weight will stay equal to your current weight while maintaining.',
+                            'Your target weight stays at your current weight.',
                             style: TextStyle(
                               fontSize: 14,
                               color: AppColors.textSecondary,
@@ -486,7 +486,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                                   ),
                                 )
                               : Text(
-                                  'Save Plan Settings',
+                                  'Save plan',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -505,7 +505,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
             Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (_, _) => Center(
           child: Text(
-            'Could not load your profile right now.',
+            'Could not load your profile.',
             style: TextStyle(color: AppColors.textSecondary),
           ),
         ),
@@ -736,7 +736,7 @@ class _BmiBadge extends StatelessWidget {
         border: Border.all(color: category.color.withValues(alpha: 0.28)),
       ),
       child: Text(
-        'Your weight is: ${category.label}',
+        category.label,
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w700,

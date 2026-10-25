@@ -43,7 +43,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
             Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (_, _) => Center(
           child: Text(
-            'Could not load your review right now.',
+            'Could not load your history.',
             style: TextStyle(color: AppColors.textSecondary),
           ),
         ),
@@ -128,7 +128,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
               if (reviewEnd.isBefore(start))
                 AppCard(
                   child: Text(
-                    'The review fills in once a day in this period is over.',
+                    'Your review starts tomorrow, once today is over.',
                     style: TextStyle(
                       fontSize: 15,
                       color: AppColors.textSecondary,

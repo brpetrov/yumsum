@@ -36,7 +36,7 @@ class HealthPlanPreviewCard extends StatelessWidget {
       return 'No calorie deficit is applied.';
     }
     if (preview.calorieTargetClamped) {
-      return 'The selected pace would fall below the minimum, so the date is based on the achievable weekly loss.';
+      return 'This pace would go below the minimum, so the goal date moves later.';
     }
     return switch (preview.goalPaceLevel) {
       GoalPaceLevel.safe => 'A moderate deficit from estimated maintenance.',
@@ -225,7 +225,7 @@ class _CalculationInfoDialog extends StatelessWidget {
             if (preview.calorieTargetClamped) ...[
               const SizedBox(height: 10),
               Text(
-                'The selected pace would go below the minimum calorie floor, so the app uses the floor and stretches the date.',
+                'This pace would go below the minimum, so your target stays at the minimum and the goal date moves later.',
                 style: TextStyle(
                   fontSize: 13,
                   color: AppColors.textSecondary,

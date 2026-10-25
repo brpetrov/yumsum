@@ -85,7 +85,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_gender == null) {
-      _showSnack('Please select your gender.');
+      _showSnack('Select your gender.');
       return;
     }
 
@@ -118,7 +118,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget build(BuildContext context) {
     ref.listen<AsyncValue<void>>(onboardingControllerProvider, (_, next) {
       if (next.hasError) {
-        _showSnack('Something went wrong. Please try again.');
+        _showSnack('Something went wrong. Try again.');
       }
     });
 
@@ -168,7 +168,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     ),
                     SizedBox(height: 6),
                     Text(
-                      'Tell us about yourself so we can build your personal plan.',
+                      'Tell us about yourself to get your plan.',
                       style: TextStyle(
                         fontSize: 15,
                         color: AppColors.textSecondary,
@@ -187,7 +187,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         prefixIcon: Icon(Icons.person_outline_rounded),
                       ),
                       validator: (v) => (v == null || v.trim().isEmpty)
-                          ? 'Please enter your name.'
+                          ? 'Enter your name.'
                           : null,
                     ),
                     SizedBox(height: 14),
@@ -202,7 +202,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       ),
                       validator: (v) {
                         final n = int.tryParse(v ?? '');
-                        if (n == null) return 'Please enter your age.';
+                        if (n == null) return 'Enter your age.';
                         if (n < 18 || n > 120) return 'Valid age: 18–120.';
                         return null;
                       },
@@ -217,7 +217,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         prefixIcon: Icon(Icons.public_rounded),
                       ),
                       validator: (v) => (v == null || v.trim().isEmpty)
-                          ? 'Please enter your country.'
+                          ? 'Enter your country.'
                           : null,
                     ),
                     SizedBox(height: 14),
@@ -386,7 +386,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           border: Border.all(color: AppColors.divider),
                         ),
                         child: Text(
-                          'We will aim for a daily calorie target close to your maintenance calories.',
+                          'Your daily target will be close to your maintenance calories.',
                           style: TextStyle(
                             fontSize: 14,
                             color: AppColors.textSecondary,
@@ -466,7 +466,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                 ),
                               )
                             : Text(
-                                'Get My Plan',
+                                'Get my plan',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,

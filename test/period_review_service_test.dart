@@ -73,7 +73,7 @@ void main() {
 
     group('inconsistent-logging note', () {
       const note =
-          'Logging was inconsistent. More complete logging will make the review more useful.';
+          'Some days weren\'t logged. Log more days for a clearer review.';
 
       test('is fair to a week that is only part way through', () {
         final review = PeriodReviewService().buildReview(

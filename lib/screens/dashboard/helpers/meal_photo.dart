@@ -56,7 +56,7 @@ Future<List<XFile>?> takeProductPhotos(BuildContext context) async {
     MaterialPageRoute(
       fullscreenDialog: true,
       builder: (_) => const MealCameraPage(
-        photoSteps: ['The front of the pack', 'The nutrition table'],
+        photoSteps: ['Front of the pack', 'Nutrition table'],
       ),
     ),
   );

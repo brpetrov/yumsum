@@ -45,7 +45,7 @@ void main() {
       expect(aiErrorMessage('503 Service Unavailable'), contains('busy'));
       expect(
         aiErrorMessage('Something odd'),
-        'Could not estimate calories right now.',
+        'Could not estimate calories. Try again.',
       );
     });
   });
