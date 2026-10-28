@@ -46,8 +46,8 @@ $detectorHtml = @'
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="LeanStreak - A low-friction habit and calorie consistency tracker">
-  <title>LeanStreak</title>
+  <meta name="description" content="YumSum - A low-friction habit and calorie consistency tracker">
+  <title>YumSum</title>
   <style>
     html,
     body {
@@ -75,7 +75,7 @@ $detectorHtml = @'
   </style>
 </head>
 <body>
-  <div>Loading LeanStreak...</div>
+  <div>Loading YumSum...</div>
   <script>
     function isWebKitBrowser() {
       const ua = navigator.userAgent || '';

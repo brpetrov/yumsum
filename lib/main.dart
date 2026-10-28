@@ -108,7 +108,7 @@ class _StartupErrorApp extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'LeanStreak could not start',
+                      'YumSum could not start',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: AppColors.textPrimary,

@@ -33,9 +33,7 @@ class NotificationsScreen extends ConsumerWidget {
       if (ok || !context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Allow notifications for LeanStreak in system settings.',
-          ),
+          content: Text('Allow notifications for YumSum in system settings.'),
         ),
       );
     }

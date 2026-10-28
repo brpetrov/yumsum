@@ -66,7 +66,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '296684319013',
     projectId: 'lean-streak-project',
     storageBucket: 'lean-streak-project.firebasestorage.app',
-    iosBundleId: 'com.bpetrov.leanstreak',
+    iosBundleId: 'com.bpetrov.yumsum',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

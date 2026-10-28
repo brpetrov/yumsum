@@ -52,7 +52,7 @@ Future<bool> inviteToContribute(BuildContext context) async {
             const SizedBox(height: 8),
             Text(
               'This product isn\'t on Open Food Facts yet, the free, '
-              'volunteer-run food list LeanStreak scans from. Add it with two '
+              'volunteer-run food list YumSum scans from. Add it with two '
               'photos and it\'ll be there for you and everyone who scans it '
               'next.',
               textAlign: TextAlign.center,

@@ -32,7 +32,7 @@ class LeanStreakApp extends ConsumerWidget {
       );
     });
     return MaterialApp.router(
-      title: 'LeanStreak',
+      title: 'YumSum',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: mode,

@@ -94,7 +94,7 @@ class MedicalNote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      'LeanStreak gives general estimates, not medical advice. Talk to a '
+      'YumSum gives general estimates, not medical advice. Talk to a '
       'doctor or dietitian before changing your diet, especially if you have '
       'a health condition.',
       style: TextStyle(

@@ -132,7 +132,7 @@ class AppDrawer extends ConsumerWidget {
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'LeanStreak',
+                      'YumSum',
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 24,

@@ -1,4 +1,4 @@
-package com.bpetrov.leanstreak
+package com.bpetrov.yumsum
 
 import android.content.Intent
 import android.os.Bundle

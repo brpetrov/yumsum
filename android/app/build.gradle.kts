@@ -10,7 +10,7 @@ plugins {
 }
 
 android {
-    namespace = "com.bpetrov.leanstreak"
+    namespace = "com.bpetrov.yumsum"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -25,7 +25,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.bpetrov.leanstreak"
+        applicationId = "com.bpetrov.yumsum"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

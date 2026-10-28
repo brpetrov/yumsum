@@ -68,13 +68,13 @@ class FoodContributionService {
   Map<String, String> get _account => {
     'user_id': userId,
     'password': password,
-    'app_name': 'LeanStreak',
+    'app_name': 'YumSum',
     'app_version': _appVersion,
     'app_uuid': appUuid,
   };
 
   Map<String, String> get _headers => {
-    if (!kIsWeb) 'User-Agent': 'LeanStreak/$_appVersion (broovenn@gmail.com)',
+    if (!kIsWeb) 'User-Agent': 'YumSum/$_appVersion (broovenn@gmail.com)',
     // The test server sits behind a shared password of its own.
     if (host.endsWith('.net'))
       'Authorization': 'Basic ${base64Encode(utf8.encode('off:off'))}',
@@ -90,7 +90,7 @@ class FoodContributionService {
           ..._account,
           ...productFields(product, lc),
           // Open Food Facts asks for "user agent + user id", nothing personal.
-          'comment': 'LeanStreak $_appVersion user $appUuid',
+          'comment': 'YumSum $_appVersion user $appUuid',
         },
       saved: (reply) => reply?['status'] == 1,
     );

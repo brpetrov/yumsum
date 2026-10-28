@@ -56,7 +56,7 @@ class _Logo extends StatelessWidget {
         ),
         SizedBox(height: 16),
         Text(
-          'LeanStreak',
+          'YumSum',
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 28,

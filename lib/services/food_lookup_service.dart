@@ -44,7 +44,7 @@ class FoodLookupService {
       {
         'fields':
             'product_name,product_name_en,brands,nutriments,serving_size,quantity,image_front_small_url',
-        'app_name': 'LeanStreak',
+        'app_name': 'YumSum',
       },
     );
     final response = await _get(uri);
@@ -89,7 +89,7 @@ class FoodLookupService {
             // Open Food Facts asks apps to identify themselves; browsers
             // don't allow setting this header, so the web relies on app_name.
             headers: {
-              if (!kIsWeb) 'User-Agent': 'LeanStreak/0.1 (broovenn@gmail.com)',
+              if (!kIsWeb) 'User-Agent': 'YumSum/0.1 (broovenn@gmail.com)',
             },
           )
           .timeout(const Duration(seconds: 12));

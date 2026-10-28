@@ -1,4 +1,4 @@
-package com.bpetrov.leanstreak
+package com.bpetrov.yumsum
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager

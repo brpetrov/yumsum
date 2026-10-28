@@ -1,11 +1,11 @@
 {
-    "name": "LeanStreak",
-    "short_name": "LeanStreak",
+    "name": "YumSum",
+    "short_name": "YumSum",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#F6F4EF",
     "theme_color": "#F6F4EF",
-    "description": "LeanStreak - A low-friction habit and calorie consistency tracker",
+    "description": "YumSum - A low-friction habit and calorie consistency tracker",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

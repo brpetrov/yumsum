@@ -179,7 +179,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     SizedBox(height: 16),
                     Center(
                       child: Text(
-                        'LeanStreak',
+                        'YumSum',
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
