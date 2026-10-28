@@ -73,7 +73,7 @@ class HealthPlanPreviewCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: _color.withValues(alpha: 0.07),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: _color.withValues(alpha: 0.3)),
       ),
       child: Column(

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Matches AppPalette.dark.background. -->
-    <color name="launch_background">#171513</color>
+    <color name="launch_background">#1A1512</color>
 
     <!-- The home-screen widget, from AppPalette.dark. -->
-    <color name="widget_surface">#211E1B</color>
-    <color name="widget_outline">#332E2A</color>
-    <color name="widget_primary">#5FB3A3</color>
-    <color name="widget_on_primary">#0F1F1B</color>
+    <color name="widget_surface">#241D19</color>
+    <color name="widget_outline">#382E28</color>
+    <color name="widget_primary">#F58A5A</color>
+    <color name="widget_on_primary">#2B1206</color>
 </resources>

@@ -337,7 +337,7 @@ class _DayCell extends StatelessWidget {
     return Material(
       color: color?.withValues(alpha: 0.16) ?? AppColors.surfaceVariant,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         side: isToday
             ? BorderSide(color: AppColors.primary, width: 1.5)
             : BorderSide.none,

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 
-/// The app's card: a cream surface with a thin warm edge instead of a shadow.
-/// Tappable cards get an ink ripple, plus a pointer cursor and hover on web.
+/// The app's card: a cream surface with a thin warm edge and a soft warm
+/// shadow. Tappable cards get an ink ripple, plus a pointer cursor and hover
+/// on web.
 class AppCard extends StatelessWidget {
   const AppCard({
     super.key,
@@ -16,18 +18,32 @@ class AppCard extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final VoidCallback? onTap;
 
+  static const _radius = BorderRadius.all(Radius.circular(AppTheme.cardRadius));
+
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-        side: BorderSide(color: AppColors.divider),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: _radius,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(padding: padding, child: child),
+      child: Material(
+        color: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: _radius,
+          side: BorderSide(color: AppColors.divider),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(padding: padding, child: child),
+        ),
       ),
     );
   }

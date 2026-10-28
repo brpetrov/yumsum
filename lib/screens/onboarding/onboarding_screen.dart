@@ -382,7 +382,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(18),
                           border: Border.all(color: AppColors.divider),
                         ),
                         child: Text(
@@ -531,7 +531,7 @@ class _GenderButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
             color: selected ? AppColors.primary : AppColors.surfaceVariant,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(14),
           ),
           child: Text(
             label,
@@ -715,7 +715,7 @@ class _SelectionCard extends StatelessWidget {
           color: selected
               ? AppColors.primary.withValues(alpha: 0.07)
               : AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: selected ? AppColors.primary : AppColors.divider,
             width: selected ? 1.5 : 1,

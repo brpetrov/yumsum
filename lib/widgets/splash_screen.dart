@@ -38,11 +38,7 @@ class _Logo extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: 72,
-          height: 72,
-          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: AppColors.surface,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
@@ -52,7 +48,7 @@ class _Logo extends StatelessWidget {
               ),
             ],
           ),
-          child: const AppLogoMark(),
+          child: const AppLogoMark(size: 72),
         ),
         SizedBox(height: 16),
         Text(

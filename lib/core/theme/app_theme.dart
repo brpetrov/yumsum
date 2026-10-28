@@ -2,8 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../constants/app_colors.dart';
 
+/// Bundled in assets/fonts. Component styles that replace the text style
+/// rather than merge into it (app bar, buttons, snack bar) name it too.
+const _font = 'Nunito';
+
+/// Rounded and soft to match the smiling-bowl icon: pill buttons and chips,
+/// big card and sheet corners, and Nunito's rounded letters.
 class AppTheme {
   AppTheme._();
+
+  static const cardRadius = 22.0;
+  static const inputRadius = 18.0;
 
   static final ThemeData light = _build(AppPalette.light, Brightness.light);
   static final ThemeData dark = _build(AppPalette.dark, Brightness.dark);
@@ -37,7 +46,7 @@ class AppTheme {
         error: p.error,
       ),
       scaffoldBackgroundColor: p.background,
-      fontFamily: 'Roboto',
+      fontFamily: _font,
     );
 
     return base.copyWith(
@@ -48,9 +57,10 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         titleTextStyle: TextStyle(
+          fontFamily: _font,
           color: p.textPrimary,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
+          fontSize: 19,
+          fontWeight: FontWeight.w700,
           letterSpacing: -0.2,
         ),
       ),
@@ -58,7 +68,7 @@ class AppTheme {
         color: p.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(16)),
+          borderRadius: const BorderRadius.all(Radius.circular(cardRadius)),
           side: BorderSide(color: p.divider),
         ),
         margin: EdgeInsets.zero,
@@ -67,7 +77,7 @@ class AppTheme {
         backgroundColor: p.surface,
         surfaceTintColor: Colors.transparent,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20)),
+          borderRadius: BorderRadius.all(Radius.circular(28)),
         ),
         // Dialogs otherwise grow to their longest line on wide browsers.
         constraints: const BoxConstraints(minWidth: 280, maxWidth: 480),
@@ -75,6 +85,9 @@ class AppTheme {
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: p.surface,
         surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+        ),
         constraints: const BoxConstraints(maxWidth: 640),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -84,12 +97,11 @@ class AppTheme {
           disabledBackgroundColor: p.surfaceVariant,
           disabledForegroundColor: p.textDisabled,
           minimumSize: const Size.fromHeight(52),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
+          shape: const StadiumBorder(),
           textStyle: const TextStyle(
+            fontFamily: _font,
             fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             letterSpacing: 0.2,
           ),
           elevation: 0,
@@ -101,23 +113,24 @@ class AppTheme {
           foregroundColor: p.onPrimary,
           disabledBackgroundColor: p.surfaceVariant,
           disabledForegroundColor: p.textDisabled,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+          shape: const StadiumBorder(),
+          textStyle: const TextStyle(
+            fontFamily: _font,
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
           ),
-          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: p.primary,
           minimumSize: const Size.fromHeight(52),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
+          shape: const StadiumBorder(),
           side: BorderSide(color: p.primary, width: 1.5),
           textStyle: const TextStyle(
+            fontFamily: _font,
             fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             letterSpacing: 0.2,
           ),
         ),
@@ -125,7 +138,11 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: p.primary,
-          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(
+            fontFamily: _font,
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -136,23 +153,23 @@ class AppTheme {
           vertical: 14,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(inputRadius),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(inputRadius),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(inputRadius),
           borderSide: BorderSide(color: p.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(inputRadius),
           borderSide: BorderSide(color: p.error, width: 1.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(inputRadius),
           borderSide: BorderSide(color: p.error, width: 1.5),
         ),
         labelStyle: TextStyle(color: p.textSecondary),
@@ -166,59 +183,66 @@ class AppTheme {
         color: p.primary,
         linearTrackColor: p.surfaceVariant,
       ),
-      textTheme: TextTheme(
-        displayLarge: TextStyle(
-          color: p.textPrimary,
-          fontWeight: FontWeight.w700,
-          letterSpacing: -1.0,
+      // Merged so every style, listed or not, keeps the font.
+      textTheme: base.textTheme.merge(
+        TextTheme(
+          displayLarge: TextStyle(
+            color: p.textPrimary,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -1.0,
+          ),
+          displayMedium: TextStyle(
+            color: p.textPrimary,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
+          ),
+          headlineLarge: TextStyle(
+            color: p.textPrimary,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
+          ),
+          headlineMedium: TextStyle(
+            color: p.textPrimary,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.3,
+          ),
+          headlineSmall: TextStyle(
+            color: p.textPrimary,
+            fontWeight: FontWeight.w700,
+          ),
+          titleLarge: TextStyle(
+            color: p.textPrimary,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.2,
+          ),
+          titleMedium: TextStyle(
+            color: p.textPrimary,
+            fontWeight: FontWeight.w500,
+          ),
+          titleSmall: TextStyle(
+            color: p.textSecondary,
+            fontWeight: FontWeight.w500,
+          ),
+          bodyLarge: TextStyle(color: p.textPrimary),
+          bodyMedium: TextStyle(color: p.textPrimary),
+          bodySmall: TextStyle(color: p.textSecondary),
+          labelLarge: TextStyle(
+            color: p.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+          labelSmall: TextStyle(color: p.textSecondary, letterSpacing: 0.5),
         ),
-        displayMedium: TextStyle(
-          color: p.textPrimary,
-          fontWeight: FontWeight.w700,
-          letterSpacing: -0.5,
-        ),
-        headlineLarge: TextStyle(
-          color: p.textPrimary,
-          fontWeight: FontWeight.w700,
-          letterSpacing: -0.5,
-        ),
-        headlineMedium: TextStyle(
-          color: p.textPrimary,
-          fontWeight: FontWeight.w600,
-          letterSpacing: -0.3,
-        ),
-        headlineSmall: TextStyle(
-          color: p.textPrimary,
-          fontWeight: FontWeight.w600,
-        ),
-        titleLarge: TextStyle(
-          color: p.textPrimary,
-          fontWeight: FontWeight.w600,
-          letterSpacing: -0.2,
-        ),
-        titleMedium: TextStyle(
-          color: p.textPrimary,
-          fontWeight: FontWeight.w500,
-        ),
-        titleSmall: TextStyle(
-          color: p.textSecondary,
-          fontWeight: FontWeight.w500,
-        ),
-        bodyLarge: TextStyle(color: p.textPrimary),
-        bodyMedium: TextStyle(color: p.textPrimary),
-        bodySmall: TextStyle(color: p.textSecondary),
-        labelLarge: TextStyle(
-          color: p.textPrimary,
-          fontWeight: FontWeight.w600,
-        ),
-        labelSmall: TextStyle(color: p.textSecondary, letterSpacing: 0.5),
+      ),
+      chipTheme: const ChipThemeData(
+        side: BorderSide.none,
+        shape: StadiumBorder(),
       ),
       dividerTheme: DividerThemeData(color: p.divider, thickness: 1, space: 1),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         backgroundColor: p.textPrimary,
-        contentTextStyle: TextStyle(color: p.background),
+        contentTextStyle: TextStyle(fontFamily: _font, color: p.background),
       ),
     );
   }

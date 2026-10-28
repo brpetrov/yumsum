@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-/// One set of colours for a theme. Light is "warm paper"; dark is the same
-/// idea in warm charcoal, never pure black, with the teal lifted so it stays
-/// readable on dark surfaces.
+/// One set of colours for a theme, taken from the app icon. Light is cream
+/// from the bowl with the tile's orange as the accent; dark is the same idea
+/// in warm charcoal, never pure black, with the hues lifted so they stay
+/// readable on dark surfaces. Green (the icon's arc) means on track, the yolk
+/// amber close, and a crimson, kept well apart from the orange, off track.
 class AppPalette {
   const AppPalette({
     required this.primary,
@@ -45,43 +47,43 @@ class AppPalette {
   final Color info;
 
   static const light = AppPalette(
-    primary: Color(0xFF2E7D6E),
+    primary: Color(0xFFC94D1A),
     onPrimary: Color(0xFFFFFFFF),
-    primaryContainer: Color(0xFFE1EFEC),
-    onPrimaryContainer: Color(0xFF2E7D6E),
-    background: Color(0xFFF6F4EF),
-    surface: Color(0xFFFDFCF9),
-    surfaceVariant: Color(0xFFF0EDE6),
-    outline: Color(0xFFCFC9BE),
-    textPrimary: Color(0xFF1F1D1A),
-    textSecondary: Color(0xFF6E6A63),
-    textDisabled: Color(0xFFA8A39A),
-    veryGood: Color(0xFF2E7D6E),
-    bad: Color(0xFFE8A75B),
-    veryBad: Color(0xFFD64045),
-    divider: Color(0xFFE8E4DC),
-    error: Color(0xFFD64045),
-    shadow: Color(0x0A1F1D1A),
+    primaryContainer: Color(0xFFFCE5D3),
+    onPrimaryContainer: Color(0xFF9A3B12),
+    background: Color(0xFFFAF2E7),
+    surface: Color(0xFFFFFBF5),
+    surfaceVariant: Color(0xFFF5EADB),
+    outline: Color(0xFFDDCBB5),
+    textPrimary: Color(0xFF2B1F18),
+    textSecondary: Color(0xFF76665A),
+    textDisabled: Color(0xFFB4A595),
+    veryGood: Color(0xFF1E9C74),
+    bad: Color(0xFFE8A10F),
+    veryBad: Color(0xFFC8284A),
+    divider: Color(0xFFEFE3D2),
+    error: Color(0xFFC8284A),
+    shadow: Color(0x148C5A3C),
     info: Color(0xFF3B82F6),
   );
 
   static const dark = AppPalette(
-    primary: Color(0xFF5FB3A3),
-    onPrimary: Color(0xFF0F1F1B),
-    primaryContainer: Color(0xFF1E3B35),
-    onPrimaryContainer: Color(0xFF9FDCCF),
-    background: Color(0xFF171513),
-    surface: Color(0xFF211E1B),
-    surfaceVariant: Color(0xFF2A2623),
-    outline: Color(0xFF4A443E),
-    textPrimary: Color(0xFFF2EEE8),
-    textSecondary: Color(0xFFB3ACA3),
-    textDisabled: Color(0xFF7A736A),
-    veryGood: Color(0xFF5FB3A3),
-    bad: Color(0xFFF0B96A),
-    veryBad: Color(0xFFE8666A),
-    divider: Color(0xFF332E2A),
-    error: Color(0xFFE8666A),
+    primary: Color(0xFFF58A5A),
+    onPrimary: Color(0xFF2B1206),
+    primaryContainer: Color(0xFF4A2616),
+    onPrimaryContainer: Color(0xFFFFC7A8),
+    background: Color(0xFF1A1512),
+    surface: Color(0xFF241D19),
+    surfaceVariant: Color(0xFF2F2621),
+    outline: Color(0xFF4F433A),
+    textPrimary: Color(0xFFF6EDE3),
+    textSecondary: Color(0xFFBCAD9F),
+    textDisabled: Color(0xFF7D7065),
+    veryGood: Color(0xFF4FD1A5),
+    bad: Color(0xFFF6C04A),
+    veryBad: Color(0xFFF2647E),
+    divider: Color(0xFF382E28),
+    error: Color(0xFFF2647E),
     shadow: Color(0x66000000),
     info: Color(0xFF6FA6F8),
   );
