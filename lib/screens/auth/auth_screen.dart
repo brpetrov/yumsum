@@ -159,11 +159,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     // Logo
                     Center(
                       child: Container(
-                        width: 72,
-                        height: 72,
-                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: AppColors.surface,
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
@@ -173,7 +169,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             ),
                           ],
                         ),
-                        child: const AppLogoMark(),
+                        child: const AppLogoMark(size: 72),
                       ),
                     ),
                     SizedBox(height: 16),
@@ -194,7 +190,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     Container(
                       decoration: BoxDecoration(
                         color: AppColors.surfaceVariant,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(999),
                       ),
                       padding: const EdgeInsets.all(4),
                       child: Row(
@@ -223,7 +219,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(14),
                           border: Border.all(
                             color: AppColors.primary.withValues(alpha: 0.25),
                           ),
@@ -275,7 +271,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.error.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(14),
                           border: Border.all(
                             color: AppColors.error.withValues(alpha: 0.25),
                           ),
@@ -476,7 +472,7 @@ class _TabButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
             color: selected ? AppColors.surface : Colors.transparent,
-            borderRadius: BorderRadius.circular(9),
+            borderRadius: BorderRadius.circular(999),
             boxShadow: selected
                 ? [
                     BoxShadow(

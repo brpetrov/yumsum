@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/app/app.dart';
 import 'package:lean_streak/app/launch_actions.dart';
@@ -23,6 +24,12 @@ void main() async {
   ErrorWidget.builder = (details) {
     return _StartupErrorApp(message: details.exceptionAsString());
   };
+
+  // Nunito is bundled under the SIL Open Font License, which travels with it.
+  LicenseRegistry.addLicense(() async* {
+    final license = await rootBundle.loadString('assets/fonts/OFL.txt');
+    yield LicenseEntryWithLineBreaks(['Nunito'], license);
+  });
 
   final prefs = await SharedPreferences.getInstance();
   final container = ProviderContainer(
