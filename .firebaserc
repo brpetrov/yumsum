@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "lean-streak-project"
-  }
+  },
+  "targets": {
+    "lean-streak-project": {
+      "hosting": {
+        "app": [
+          "yumsum"
+        ],
+        "old": [
+          "lean-streak-project"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

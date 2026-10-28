@@ -2,29 +2,48 @@
   "firestore": {
     "rules": "firestore.rules"
   },
-  "hosting": {
-    "public": "build/hosting",
-    "cleanUrls": true,
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "/app/**",
-        "destination": "/app/index.html"
-      },
-      {
-        "source": "/webkit/**",
-        "destination": "/webkit/index.html"
-      },
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
-  },
+  "hosting": [
+    {
+      "target": "app",
+      "public": "build/hosting",
+      "cleanUrls": true,
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "/app/**",
+          "destination": "/app/index.html"
+        },
+        {
+          "source": "/webkit/**",
+          "destination": "/webkit/index.html"
+        },
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    },
+    {
+      "target": "old",
+      "public": "tools/hosting-redirect",
+      "redirects": [
+        {
+          "regex": "^/$",
+          "destination": "https://yumsum.web.app/",
+          "type": 301
+        },
+        {
+          "regex": "^/(.*)$",
+          "destination": "https://yumsum.web.app/:1",
+          "type": 301
+        }
+      ]
+    }
+  ],
   "flutter": {
     "platforms": {
       "android": {
