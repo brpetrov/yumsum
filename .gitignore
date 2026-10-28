@@ -49,3 +49,6 @@ lib/core/config/api_keys.dart
 
 # Open Food Facts app account (copy config/off_account.example.json)
 config/off_account.json
+
+# Firebase CLI deploy cache
+.firebase/
