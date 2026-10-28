@@ -54,7 +54,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyD6kEkNTzty4LCtUh3jneHCVxzoUwc8ymM',
-    appId: '1:296684319013:android:56b8440034eb7b2ddb6acc',
+    appId: '1:296684319013:android:7722c1ccb05bc21cdb6acc',
     messagingSenderId: '296684319013',
     projectId: 'lean-streak-project',
     storageBucket: 'lean-streak-project.firebasestorage.app',
@@ -62,7 +62,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBd9ws7Q6E7YoXiV2Y2Jc3YUWZ0-xFRX34',
-    appId: '1:296684319013:ios:d7d548a522e7dba6db6acc',
+    appId: '1:296684319013:ios:34bb8e74ea1e98dddb6acc',
     messagingSenderId: '296684319013',
     projectId: 'lean-streak-project',
     storageBucket: 'lean-streak-project.firebasestorage.app',
