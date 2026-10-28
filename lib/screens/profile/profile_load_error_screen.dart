@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
@@ -33,10 +34,9 @@ class ProfileLoadErrorScreen extends ConsumerWidget {
                 Text(
                   'Could not load your profile',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: AppTheme.display.copyWith(
                     color: AppColors.textPrimary,
                     fontSize: 24,
-                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 8),

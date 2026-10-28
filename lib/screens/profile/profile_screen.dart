@@ -4,11 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/profile_controller.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
+import 'package:lean_streak/widgets/app_card.dart';
+import 'package:lean_streak/widgets/day_status.dart';
 import 'package:lean_streak/widgets/health_plan_preview_card.dart';
+import 'package:lean_streak/widgets/icon_bubble.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
 import 'package:lean_streak/widgets/clickable.dart';
@@ -185,14 +189,12 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                     children: [
                       Text(
                         'Update your health plan',
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w700,
+                        style: AppTheme.display.copyWith(
+                          fontSize: 28,
                           color: AppColors.textPrimary,
-                          letterSpacing: -0.5,
                         ),
                       ),
-                      SizedBox(height: 6),
+                      SizedBox(height: 8),
                       Text(
                         'Change anything below and your plan adjusts to match.',
                         style: TextStyle(
@@ -223,7 +225,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 14),
+                      SizedBox(height: 16),
                       TextFormField(
                         controller: _countryCtrl,
                         textCapitalization: TextCapitalization.words,
@@ -236,7 +238,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                             ? 'Enter your country.'
                             : null,
                       ),
-                      SizedBox(height: 14),
+                      SizedBox(height: 16),
                       TextFormField(
                         controller: _foodCtrl,
                         textCapitalization: TextCapitalization.sentences,
@@ -250,15 +252,16 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                           prefixIcon: Icon(Icons.restaurant_outlined),
                         ),
                       ),
-                      SizedBox(height: 14),
+                      SizedBox(height: 18),
                       Text(
                         'Gender',
                         style: TextStyle(
                           fontSize: 13,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textSecondary,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      SizedBox(height: 10),
                       Row(
                         children: [
                           _GenderButton(
@@ -383,11 +386,12 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                         ),
                       ] else ...[
                         Container(
-                          padding: const EdgeInsets.all(14),
+                          padding: const EdgeInsets.all(18),
                           decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(color: AppColors.divider),
+                            color: AppColors.surfaceVariant,
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.inputRadius,
+                            ),
                           ),
                           child: Text(
                             'Your target weight stays at your current weight.',
@@ -473,7 +477,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                       const MedicalNote(),
                       SizedBox(height: 16),
                       SizedBox(
-                        height: 52,
+                        height: 54,
                         child: ElevatedButton(
                           onPressed: isSaving ? null : () => _submit(profile),
                           child: isSaving
@@ -522,14 +526,13 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(left: 4, bottom: 14),
       child: Text(
         text,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
+        style: AppTheme.display.copyWith(
+          fontSize: 13,
           color: AppColors.textSecondary,
-          letterSpacing: 1.0,
+          letterSpacing: 1.2,
         ),
       ),
     );
@@ -554,17 +557,25 @@ class _GenderButton extends StatelessWidget {
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
             color: selected ? AppColors.primary : AppColors.surfaceVariant,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.35),
+                      blurRadius: 14,
+                      offset: const Offset(0, 5),
+                    ),
+                  ]
+                : null,
           ),
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
+            style: AppTheme.display.copyWith(
+              fontSize: 15.5,
               color: selected
                   ? Theme.of(context).colorScheme.onPrimary
                   : AppColors.textSecondary,
@@ -606,13 +617,7 @@ class _BmiCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final category = _category;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.divider),
-      ),
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -634,11 +639,9 @@ class _BmiCard extends StatelessWidget {
                     SizedBox(height: 4),
                     Text(
                       bmi.toStringAsFixed(1),
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w800,
+                      style: AppTheme.display.copyWith(
+                        fontSize: 36,
                         color: AppColors.textPrimary,
-                        letterSpacing: -0.5,
                       ),
                     ),
                   ],
@@ -678,7 +681,7 @@ class _BmiGradientLine extends StatelessWidget {
                 right: 0,
                 top: 11,
                 child: Container(
-                  height: 8,
+                  height: 10,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(999),
                     gradient: LinearGradient(
@@ -729,18 +732,16 @@ class _BmiBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: category.color.withValues(alpha: 0.10),
+        color: category.color.withValues(alpha: AppColors.isDark ? 0.2 : 0.17),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: category.color.withValues(alpha: 0.28)),
       ),
       child: Text(
         category.label,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-          color: category.color,
+        style: AppTheme.display.copyWith(
+          fontSize: 14,
+          color: tintedTextColor(category.color),
         ),
       ),
     );
@@ -979,25 +980,35 @@ class _SelectionCard extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: selected
               ? AppColors.primary.withValues(alpha: 0.07)
               : AppColors.surface,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.divider,
-            width: selected ? 1.5 : 1,
+            color: selected ? AppColors.primary : Colors.transparent,
+            width: 2,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            Icon(
+            IconBubble(
               icon,
+              size: 40,
+              background: selected
+                  ? AppColors.primaryContainer
+                  : AppColors.surfaceVariant,
               color: selected ? AppColors.primary : AppColors.textSecondary,
-              size: 22,
             ),
-            SizedBox(width: 12),
+            SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1005,8 +1016,8 @@ class _SelectionCard extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w700,
                       color: selected
                           ? AppColors.primary
                           : AppColors.textPrimary,

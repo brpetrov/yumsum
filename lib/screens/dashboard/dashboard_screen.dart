@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/meal.dart';
@@ -26,8 +27,10 @@ import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
 import 'package:lean_streak/screens/progress/helpers/log_weight_dialog.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
+import 'package:lean_streak/widgets/bowl_note.dart';
 import 'package:lean_streak/widgets/calorie_bars.dart';
 import 'package:lean_streak/widgets/day_status.dart';
+import 'package:lean_streak/widgets/icon_bubble.dart';
 import 'package:lean_streak/widgets/meal_row.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 
@@ -274,7 +277,7 @@ class _DashboardContent extends StatelessWidget {
       children: [
         ResponsivePage(
           maxWidth: 720,
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -289,15 +292,15 @@ class _DashboardContent extends StatelessWidget {
                     .where((meal) => meal.proteinGrams == null)
                     .length,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 18),
               _MealsCard(
                 meals: meals,
                 onEditMeal: onEditMeal,
                 onDeleteMeal: onDeleteMeal,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 18),
               _MonthPreviewCard(date: date, onOpenReview: onOpenReview),
-              const SizedBox(height: 12),
+              const SizedBox(height: 18),
               const _WeightCard(),
             ],
           ),
@@ -318,9 +321,10 @@ class _DayOffButton extends ConsumerWidget {
     final isOff = ref.watch(dayOffProvider(date)).valueOrNull ?? false;
     return IconButton(
       tooltip: isOff ? 'Day off' : 'Take the day off',
-      color: isOff ? AppColors.primary : null,
-      icon: Icon(
+      icon: IconBubble(
         isOff ? Icons.beach_access_rounded : Icons.beach_access_outlined,
+        raised: true,
+        color: isOff ? AppColors.primary : null,
       ),
       onPressed: () async {
         final uid = ref.read(currentUidProvider);
@@ -380,7 +384,22 @@ class _TodayCard extends StatelessWidget {
       _ => (null, AppColors.veryGood),
     };
 
+    // The number big and its unit smaller, like a scoreboard.
+    final number = AppTheme.display.copyWith(
+      fontSize: 42,
+      height: 1.1,
+      letterSpacing: -0.5,
+      color: AppColors.textPrimary,
+    );
+
+    // Warm like the icon's tile, fading into the bowl's cream.
     return AppCard(
+      padding: const EdgeInsets.fromLTRB(24, 22, 24, 22),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [AppColors.heroStart, AppColors.heroEnd],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -391,22 +410,27 @@ class _TodayCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      remaining >= 0
-                          ? '$remaining kcal left'
-                          : '${remaining.abs()} kcal over',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
-                        color: AppColors.textPrimary,
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(text: '${remaining.abs()}'),
+                          TextSpan(
+                            text: remaining >= 0 ? ' kcal left' : ' kcal over',
+                            style: number.copyWith(
+                              fontSize: 22,
+                              letterSpacing: 0,
+                            ),
+                          ),
+                        ],
                       ),
+                      style: number,
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
                       '${summary.totalCalories} of ${summary.targetCalories} kcal eaten',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.textSecondary,
                       ),
                     ),
@@ -417,37 +441,36 @@ class _TodayCard extends StatelessWidget {
                 StatusPill(label: pillLabel, color: barColor),
             ],
           ),
-          const SizedBox(height: 14),
-          _ProgressBar(value: calorieProgress, color: barColor),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
+          _ProgressBar(value: calorieProgress, color: barColor, height: 14),
+          const SizedBox(height: 22),
           Row(
             children: [
               Text(
                 'Daily protein',
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                 ),
               ),
               const Spacer(),
               Text(
                 '$proteinLogged / $proteinTarget g',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
+                style: AppTheme.display.copyWith(
+                  fontSize: 17,
                   color: AppColors.textPrimary,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           _ProgressBar(
             value: proteinTarget <= 0 ? 0 : proteinLogged / proteinTarget,
             color: AppColors.veryGood,
           ),
           if (mealsWithoutProtein > 0) ...[
-            const SizedBox(height: 6),
+            const SizedBox(height: 10),
             Text(
               '$mealsWithoutProtein ${mealsWithoutProtein == 1 ? 'meal' : 'meals'} '
               'not counted (no protein info)',
@@ -460,21 +483,41 @@ class _TodayCard extends StatelessWidget {
   }
 }
 
+/// A thick, fully rounded bar on a cream track, its fill a little lighter
+/// at the start, like the icon's arc.
 class _ProgressBar extends StatelessWidget {
-  const _ProgressBar({required this.value, required this.color});
+  const _ProgressBar({
+    required this.value,
+    required this.color,
+    this.height = 12,
+  });
 
   final double value;
   final Color color;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(4),
-      child: LinearProgressIndicator(
-        value: value.clamp(0.0, 1.0),
-        minHeight: 8,
-        color: color,
-        backgroundColor: AppColors.surfaceVariant,
+    return Container(
+      height: height,
+      alignment: Alignment.centerLeft,
+      decoration: BoxDecoration(
+        color: AppColors.isDark
+            ? Colors.white.withValues(alpha: 0.08)
+            : Colors.white.withValues(alpha: 0.85),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: FractionallySizedBox(
+        widthFactor: value.clamp(0.0, 1.0),
+        heightFactor: 1,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color.lerp(color, Colors.white, 0.3)!, color],
+            ),
+            borderRadius: BorderRadius.circular(999),
+          ),
+        ),
       ),
     );
   }
@@ -495,46 +538,39 @@ class _MealsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppCard(
-      padding: const EdgeInsets.fromLTRB(18, 16, 6, 8),
+      padding: const EdgeInsets.fromLTRB(22, 20, 8, 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.only(right: 12, bottom: 4),
+            padding: const EdgeInsets.only(right: 14, bottom: 4),
             child: Row(
               children: [
                 Expanded(
                   child: Text(
                     'Today\'s meals',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
+                    style: AppTheme.display.copyWith(
+                      fontSize: 19,
                       color: AppColors.textPrimary,
                     ),
                   ),
                 ),
                 if (meals.isNotEmpty)
-                  Text(
-                    '${meals.length} logged',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                    ),
+                  StatusPill(
+                    label: '${meals.length} logged',
+                    color: AppColors.primary,
                   ),
               ],
             ),
           ),
           if (meals.isEmpty)
-            Padding(
-              padding: EdgeInsets.only(top: 4, bottom: 10, right: 12),
-              child: Text(
-                'Nothing logged yet. Type or tap the mic below.',
-                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
-              ),
+            const Padding(
+              padding: EdgeInsets.only(top: 12, bottom: 12, right: 14),
+              child: BowlNote('Nothing logged yet. Type or tap the mic below.'),
             )
           else
             for (var index = 0; index < meals.length; index++) ...[
-              if (index > 0) const Divider(height: 1),
+              if (index > 0) const Divider(height: 1, endIndent: 14),
               MealRow(
                 meal: meals[index],
                 onEdit: () => onEditMeal(meals[index]),
@@ -570,29 +606,39 @@ class _MonthPreviewCard extends ConsumerWidget {
               Expanded(
                 child: Text(
                   DateFormat('MMMM').format(date),
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
+                  style: AppTheme.display.copyWith(
+                    fontSize: 19,
                     color: AppColors.textPrimary,
                   ),
                 ),
               ),
-              Text(
-                'History',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
+              Container(
+                padding: const EdgeInsets.fromLTRB(14, 6, 8, 6),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryContainer,
+                  borderRadius: BorderRadius.circular(999),
                 ),
-              ),
-              Icon(
-                Icons.chevron_right_rounded,
-                size: 20,
-                color: AppColors.primary,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'History',
+                      style: AppTheme.display.copyWith(
+                        fontSize: 14,
+                        color: AppColors.onPrimaryContainer,
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      size: 20,
+                      color: AppColors.onPrimaryContainer,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 18),
           summariesAsync.when(
             data: (summariesByDate) {
               final days = List.generate(
@@ -617,13 +663,13 @@ class _MonthPreviewCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    height: 80,
+                    height: 88,
                     child: CalorieBars(
                       days: days,
                       summariesByDate: summariesByDate,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
@@ -632,7 +678,8 @@ class _MonthPreviewCard extends ConsumerWidget {
                               ? 'No logged days yet this month.'
                               : '${summaries.length} days logged',
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textSecondary,
                           ),
                         ),
@@ -641,12 +688,12 @@ class _MonthPreviewCard extends ConsumerWidget {
                         label: '${count(DailyStatus.green)}',
                         color: AppColors.veryGood,
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
                       StatusPill(
                         label: '${count(DailyStatus.yellow)}',
                         color: AppColors.bad,
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
                       StatusPill(
                         label: '${count(DailyStatus.red)}',
                         color: AppColors.veryBad,
@@ -700,10 +747,10 @@ class _WeightCard extends ConsumerWidget {
 
     return AppCard(
       onTap: () => context.push(AppRoutes.progress),
-      padding: const EdgeInsets.fromLTRB(18, 10, 10, 10),
+      padding: const EdgeInsets.fromLTRB(18, 16, 16, 16),
       child: Row(
         children: [
-          Icon(Icons.monitor_weight_outlined, color: AppColors.primary),
+          const IconBubble(Icons.monitor_weight_outlined, size: 46),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -711,9 +758,8 @@ class _WeightCard extends ConsumerWidget {
               children: [
                 Text(
                   'Weight',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
+                  style: AppTheme.display.copyWith(
+                    fontSize: 19,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -735,6 +781,11 @@ class _WeightCard extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () => _showLogWeightWithFeedback(context),
+            style: TextButton.styleFrom(
+              backgroundColor: AppColors.primaryContainer,
+              foregroundColor: AppColors.onPrimaryContainer,
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+            ),
             child: const Text('Log'),
           ),
         ],

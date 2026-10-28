@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/widgets/icon_bubble.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
@@ -159,11 +161,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     SizedBox(height: 12),
                     Text(
                       'Let\'s get started',
-                      style: TextStyle(
+                      style: AppTheme.display.copyWith(
                         fontSize: 26,
-                        fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
-                        letterSpacing: -0.5,
                       ),
                     ),
                     SizedBox(height: 6),
@@ -379,11 +379,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       ),
                     ] else ...[
                       Container(
-                        padding: const EdgeInsets.all(14),
+                        padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: AppColors.divider),
+                          color: AppColors.surfaceVariant,
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.inputRadius,
+                          ),
                         ),
                         child: Text(
                           'Your daily target will be close to your maintenance calories.',
@@ -453,7 +454,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
                     // ── Submit ─────────────────────────────────────────────
                     SizedBox(
-                      height: 52,
+                      height: 54,
                       child: ElevatedButton(
                         onPressed: isLoading ? null : _submit,
                         child: isLoading
@@ -497,14 +498,13 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(left: 4, bottom: 14),
       child: Text(
         text,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
+        style: AppTheme.display.copyWith(
+          fontSize: 13,
           color: AppColors.textSecondary,
-          letterSpacing: 1.0,
+          letterSpacing: 1.2,
         ),
       ),
     );
@@ -528,17 +528,25 @@ class _GenderButton extends StatelessWidget {
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
             color: selected ? AppColors.primary : AppColors.surfaceVariant,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.35),
+                      blurRadius: 14,
+                      offset: const Offset(0, 5),
+                    ),
+                  ]
+                : null,
           ),
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
+            style: AppTheme.display.copyWith(
+              fontSize: 15.5,
               color: selected
                   ? Theme.of(context).colorScheme.onPrimary
                   : AppColors.textSecondary,
@@ -710,25 +718,35 @@ class _SelectionCard extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: selected
               ? AppColors.primary.withValues(alpha: 0.07)
               : AppColors.surface,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.divider,
-            width: selected ? 1.5 : 1,
+            color: selected ? AppColors.primary : Colors.transparent,
+            width: 2,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            Icon(
+            IconBubble(
               icon,
+              size: 40,
+              background: selected
+                  ? AppColors.primaryContainer
+                  : AppColors.surfaceVariant,
               color: selected ? AppColors.primary : AppColors.textSecondary,
-              size: 22,
             ),
-            SizedBox(width: 12),
+            SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -736,8 +754,8 @@ class _SelectionCard extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w700,
                       color: selected
                           ? AppColors.primary
                           : AppColors.textPrimary,

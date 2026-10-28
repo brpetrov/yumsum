@@ -4,14 +4,17 @@ import 'package:intl/intl.dart';
 
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/period_review.dart';
 import 'package:lean_streak/providers/period_review_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/screens/review/day_meals_sheet.dart';
 import 'package:lean_streak/widgets/app_card.dart';
+import 'package:lean_streak/widgets/bowl_note.dart';
 import 'package:lean_streak/widgets/calorie_bars.dart';
 import 'package:lean_streak/widgets/day_status.dart';
+import 'package:lean_streak/widgets/pill_toggle.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 
 /// Calendar on top, the period's review underneath. Week and month share one
@@ -82,25 +85,23 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
         ResponsivePage(
           maxWidth: 720,
           padding: EdgeInsets.fromLTRB(
-            16,
+            20,
             8,
-            16,
-            24 + MediaQuery.paddingOf(context).bottom,
+            20,
+            28 + MediaQuery.paddingOf(context).bottom,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SegmentedButton<_ReviewMode>(
-                showSelectedIcon: false,
-                segments: const [
-                  ButtonSegment(value: _ReviewMode.week, label: Text('Week')),
-                  ButtonSegment(value: _ReviewMode.month, label: Text('Month')),
+              PillToggle<_ReviewMode>(
+                options: const [
+                  (_ReviewMode.week, 'Week'),
+                  (_ReviewMode.month, 'Month'),
                 ],
-                selected: {_mode},
-                onSelectionChanged: (selection) =>
-                    setState(() => _mode = selection.first),
+                selected: _mode,
+                onChanged: (mode) => setState(() => _mode = mode),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 18),
               _PeriodBar(
                 label: _periodLabel(start, _mode),
                 onPrevious: start.isAfter(firstStart)
@@ -113,9 +114,9 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                     ? null
                     : () => setState(() => _anchor = today),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 18),
               AppCard(
-                padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
+                padding: const EdgeInsets.fromLTRB(14, 20, 14, 18),
                 child: _Calendar(
                   start: start,
                   end: end,
@@ -124,15 +125,11 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   onOpenDay: (day) => showDayMealsSheet(context, day),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 18),
               if (reviewEnd.isBefore(start))
-                AppCard(
-                  child: Text(
+                const AppCard(
+                  child: BowlNote(
                     'Your review starts tomorrow, once today is over.',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.textSecondary,
-                    ),
                   ),
                 )
               else
@@ -176,7 +173,7 @@ class _PeriodBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppCard(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       child: Row(
         children: [
           IconButton(
@@ -188,9 +185,8 @@ class _PeriodBar extends StatelessWidget {
             child: Text(
               label,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
+              style: AppTheme.display.copyWith(
+                fontSize: 18,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -261,14 +257,14 @@ class _Calendar extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.textSecondary,
                   ),
                 ),
               ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         LayoutBuilder(
           // Square cells on phones; flatter ones on wide screens so the
           // review below stays in view.
@@ -276,7 +272,7 @@ class _Calendar extends StatelessWidget {
             crossAxisCount: 7,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 6,
+            mainAxisSpacing: 8,
             crossAxisSpacing: 6,
             childAspectRatio: switch ((isMonth, constraints.maxWidth > 520)) {
               (true, true) => 1.6,
@@ -296,11 +292,11 @@ class _Calendar extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         Wrap(
           alignment: WrapAlignment.center,
           spacing: 14,
-          runSpacing: 6,
+          runSpacing: 8,
           children: [
             _LegendDot(label: 'On track', color: AppColors.veryGood),
             _LegendDot(label: 'Close', color: AppColors.bad),
@@ -334,12 +330,16 @@ class _DayCell extends StatelessWidget {
         ? null
         : dayStatusColor(summary.status);
 
+    // Round bubbles: tinted by the day's status, plain cream when nothing
+    // settled, and no bubble at all for days still to come.
     return Material(
-      color: color?.withValues(alpha: 0.16) ?? AppColors.surfaceVariant,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
+      color: isFuture
+          ? Colors.transparent
+          : color?.withValues(alpha: AppColors.isDark ? 0.24 : 0.2) ??
+                AppColors.surfaceVariant,
+      shape: StadiumBorder(
         side: isToday
-            ? BorderSide(color: AppColors.primary, width: 1.5)
+            ? BorderSide(color: AppColors.primary, width: 2)
             : BorderSide.none,
       ),
       clipBehavior: Clip.antiAlias,
@@ -348,12 +348,13 @@ class _DayCell extends StatelessWidget {
         child: Center(
           child: Text(
             '${day.day}',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
+            style: AppTheme.display.copyWith(
+              fontSize: 16,
               color: isFuture
                   ? AppColors.textDisabled
-                  : color ?? AppColors.textSecondary,
+                  : color == null
+                  ? AppColors.textSecondary
+                  : tintedTextColor(color),
             ),
           ),
         ),
@@ -374,14 +375,18 @@ class _LegendDot extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 8,
-          height: 8,
+          width: 10,
+          height: 10,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 6),
         Text(
           label,
-          style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+          style: TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textSecondary,
+          ),
         ),
       ],
     );
@@ -425,18 +430,12 @@ class _PeriodReviewCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (review.loggedDays == 0)
-                Text(
-                  'Nothing logged in this period yet.',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: AppColors.textSecondary,
-                  ),
-                )
+                const BowlNote('Nothing logged in this period yet.')
               else
                 _ReviewHeadline(review: review),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               SizedBox(
-                height: 80,
+                height: 88,
                 child: CalorieBars(
                   days: days,
                   summariesByDate: summariesByDate,
@@ -444,7 +443,7 @@ class _PeriodReviewCard extends ConsumerWidget {
                 ),
               ),
               if (review.loggedDays > 0) ...[
-                const SizedBox(height: 14),
+                const SizedBox(height: 18),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -471,7 +470,7 @@ class _PeriodReviewCard extends ConsumerWidget {
                   ],
                 ),
                 for (final note in review.guidance) ...[
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 14),
                   Text(
                     note,
                     style: TextStyle(
@@ -508,16 +507,21 @@ class _ReviewHeadline extends StatelessWidget {
             children: [
               Text(
                 '$onTrack%',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w800,
+                style: AppTheme.display.copyWith(
+                  fontSize: 44,
+                  height: 1.1,
                   letterSpacing: -0.5,
                   color: AppColors.textPrimary,
                 ),
               ),
+              const SizedBox(height: 2),
               Text(
                 'of logged days on track',
-                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
               ),
             ],
           ),
@@ -527,13 +531,13 @@ class _ReviewHeadline extends StatelessWidget {
           children: [
             Text(
               '${review.loggedDays} of ${review.daysInPeriod} days logged',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
+              style: AppTheme.display.copyWith(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
                 color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             Text(
               'Average ${review.averageCaloriesPerDay.round()} kcal a day',
               style: TextStyle(fontSize: 13, color: AppColors.textSecondary),

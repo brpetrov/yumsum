@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
@@ -43,9 +44,8 @@ Future<bool> inviteToContribute(BuildContext context) async {
             Text(
               'Be the first to add this',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: AppTheme.display.copyWith(
                 fontSize: 20,
-                fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -315,9 +315,8 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
           Text(
             'Thank you!',
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: AppTheme.display.copyWith(
               fontSize: 22,
-              fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
             ),
           ),
@@ -377,9 +376,8 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
         children: [
           Text(
             'Check the details',
-            style: TextStyle(
+            style: AppTheme.display.copyWith(
               fontSize: 20,
-              fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
             ),
           ),
@@ -391,7 +389,7 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
               children: [
                 for (final image in images) ...[
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(14),
                     child: Image.memory(
                       image,
                       width: 72,

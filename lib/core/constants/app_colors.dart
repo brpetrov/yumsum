@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 /// in warm charcoal, never pure black, with the hues lifted so they stay
 /// readable on dark surfaces. Green (the icon's arc) means on track, the yolk
 /// amber close, and a crimson, kept well apart from the orange, off track.
+/// The hero colours are the warm sweep behind Today's main card, from the
+/// tile's peach into the bowl's cream.
 class AppPalette {
   const AppPalette({
     required this.primary,
@@ -25,6 +27,8 @@ class AppPalette {
     required this.error,
     required this.shadow,
     required this.info,
+    required this.heroStart,
+    required this.heroEnd,
   });
 
   final Color primary;
@@ -45,26 +49,30 @@ class AppPalette {
   final Color error;
   final Color shadow;
   final Color info;
+  final Color heroStart;
+  final Color heroEnd;
 
   static const light = AppPalette(
     primary: Color(0xFFC94D1A),
     onPrimary: Color(0xFFFFFFFF),
     primaryContainer: Color(0xFFFCE5D3),
     onPrimaryContainer: Color(0xFF9A3B12),
-    background: Color(0xFFFAF2E7),
+    background: Color(0xFFFBF0E4),
     surface: Color(0xFFFFFBF5),
-    surfaceVariant: Color(0xFFF5EADB),
-    outline: Color(0xFFDDCBB5),
+    surfaceVariant: Color(0xFFF7E7D7),
+    outline: Color(0xFFE2CDB6),
     textPrimary: Color(0xFF2B1F18),
-    textSecondary: Color(0xFF76665A),
+    textSecondary: Color(0xFF6F5F53),
     textDisabled: Color(0xFFB4A595),
     veryGood: Color(0xFF1E9C74),
     bad: Color(0xFFE8A10F),
     veryBad: Color(0xFFC8284A),
-    divider: Color(0xFFEFE3D2),
+    divider: Color(0xFFF1E1CF),
     error: Color(0xFFC8284A),
-    shadow: Color(0x148C5A3C),
+    shadow: Color(0x1FA65A32),
     info: Color(0xFF3B82F6),
+    heroStart: Color(0xFFFFDCC2),
+    heroEnd: Color(0xFFFFF3E6),
   );
 
   static const dark = AppPalette(
@@ -84,8 +92,10 @@ class AppPalette {
     veryBad: Color(0xFFF2647E),
     divider: Color(0xFF382E28),
     error: Color(0xFFF2647E),
-    shadow: Color(0x66000000),
+    shadow: Color(0x73000000),
     info: Color(0xFF6FA6F8),
+    heroStart: Color(0xFF4A2818),
+    heroEnd: Color(0xFF2B221D),
   );
 }
 
@@ -120,4 +130,17 @@ class AppColors {
   static Color get error => palette.error;
   static Color get shadow => palette.shadow;
   static Color get info => palette.info;
+  static Color get heroStart => palette.heroStart;
+  static Color get heroEnd => palette.heroEnd;
+
+  /// The icon tile's orange-to-red sweep around [primary], for the mic and
+  /// other glossy bubbles.
+  static LinearGradient get primaryGradient => LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color.lerp(primary, const Color(0xFFE08A45), 0.5)!,
+      Color.lerp(primary, const Color(0xFFD2402C), 0.35)!,
+    ],
+  );
 }

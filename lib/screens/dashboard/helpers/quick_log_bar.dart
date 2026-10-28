@@ -558,128 +558,133 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
           }
         : null;
 
-    return Material(
-      color: AppColors.surface,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: AppColors.divider)),
-        ),
+    // A soft panel with a rounded top, floating on a warm shadow.
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 28,
+            offset: const Offset(0, -8),
+          ),
+        ],
+      ),
+      child: Material(
+        type: MaterialType.transparency,
         child: SafeArea(
           top: false,
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 720),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 10, 12, 10),
+                padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     if (recents.isNotEmpty || search != null) ...[
                       _buildChips(recents, search),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                     ],
                     if (showStatus) ...[
                       _buildStatus(),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                     ] else if (aiHint != null) ...[
                       Padding(
-                        padding: const EdgeInsets.only(left: 4),
+                        padding: const EdgeInsets.only(left: 6),
                         child: Text(
                           aiHint,
                           style: TextStyle(
                             fontSize: 13,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textSecondary,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                     ],
                     // Keyed so the status line and chips appearing above
                     // it never make Flutter rebuild this row as one of
                     // them, which would recreate the field and drop the
-                    // keyboard on the first keystroke. The name box stays
-                    // first in its column for the same reason when the
-                    // number boxes appear under it.
+                    // keyboard on the first keystroke. The number boxes
+                    // come after it, so they never shift it either.
                     Row(
                       key: const ValueKey('quick-log-field'),
-                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Expanded(
-                          child: Column(
-                            children: [
-                              TextField(
-                                key: const ValueKey('quick-log-name'),
-                                controller: _name,
-                                focusNode: _focusNode,
-                                autofocus: _isDesktop,
-                                readOnly: _working || _listening,
-                                textCapitalization:
-                                    TextCapitalization.sentences,
-                                textInputAction: TextInputAction.done,
-                                onChanged: (_) => _edited(),
-                                onSubmitted: (_) => _submit(),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: AppColors.textPrimary,
-                                ),
-                                decoration: _boxDecoration(
-                                  hint: 'What did you eat?',
-                                  // Camera while empty; a clear button once
-                                  // there is text, so a wrong voice or AI
-                                  // result is one tap from gone.
-                                  suffixIcon: _working || _listening
-                                      ? null
-                                      : hasText
-                                      ? IconButton(
-                                          tooltip: 'Clear',
-                                          onPressed: _reset,
-                                          color: AppColors.textSecondary,
-                                          icon: const Icon(Icons.close_rounded),
-                                        )
-                                      : IconButton(
-                                          tooltip: 'Photo or barcode',
-                                          onPressed: _takePhoto,
-                                          color: AppColors.textSecondary,
-                                          icon: const Icon(
-                                            Icons.photo_camera_outlined,
-                                          ),
-                                        ),
-                                ),
-                              ),
-                              if (open) ...[
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _numberBox(
-                                        'quick-log-kcal',
-                                        _kcal,
-                                        _kcalFocus,
-                                        hint: 'kcal',
-                                        unit: 'kcal',
+                          child: TextField(
+                            key: const ValueKey('quick-log-name'),
+                            controller: _name,
+                            focusNode: _focusNode,
+                            autofocus: _isDesktop,
+                            readOnly: _working || _listening,
+                            textCapitalization: TextCapitalization.sentences,
+                            textInputAction: TextInputAction.done,
+                            onChanged: (_) => _edited(),
+                            onSubmitted: (_) => _submit(),
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: AppColors.textPrimary,
+                            ),
+                            decoration: _boxDecoration(
+                              hint: 'What did you eat?',
+                              // Camera while empty; a clear button once
+                              // there is text, so a wrong voice or AI
+                              // result is one tap from gone.
+                              suffixIcon: _working || _listening
+                                  ? null
+                                  : hasText
+                                  ? IconButton(
+                                      tooltip: 'Clear',
+                                      onPressed: _reset,
+                                      color: AppColors.textSecondary,
+                                      icon: const Icon(Icons.close_rounded),
+                                    )
+                                  : IconButton(
+                                      tooltip: 'Photo or barcode',
+                                      onPressed: _takePhoto,
+                                      color: AppColors.textSecondary,
+                                      icon: const Icon(
+                                        Icons.photo_camera_outlined,
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: _numberBox(
-                                        'quick-log-protein',
-                                        _protein,
-                                        _proteinFocus,
-                                        hint: 'protein (g)',
-                                        unit: 'g protein',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ],
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 12),
                         _buildAction(entry, hasText),
                       ],
                     ),
+                    // The number boxes span the whole bar, under the name
+                    // and the button.
+                    if (open) ...[
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _numberBox(
+                              'quick-log-kcal',
+                              _kcal,
+                              _kcalFocus,
+                              hint: 'kcal',
+                              unit: 'kcal',
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _numberBox(
+                              'quick-log-protein',
+                              _protein,
+                              _proteinFocus,
+                              hint: 'protein (g)',
+                              unit: 'g protein',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -706,18 +711,18 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       suffixText: suffixText,
       suffixIcon: suffixIcon,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(28),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(28),
         borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(26),
-        borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+        borderRadius: BorderRadius.circular(28),
+        borderSide: BorderSide(color: AppColors.primary, width: 2),
       ),
-      contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+      contentPadding: const EdgeInsets.symmetric(vertical: 17, horizontal: 18),
     );
   }
 
@@ -768,8 +773,12 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
         ActionChip(
           avatar: avatar,
           label: Text(label),
-          labelStyle: TextStyle(fontSize: 13, color: AppColors.textPrimary),
-          backgroundColor: AppColors.surfaceVariant,
+          labelStyle: TextStyle(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w700,
+            color: AppColors.onPrimaryContainer,
+          ),
+          backgroundColor: AppColors.primaryContainer,
           side: BorderSide.none,
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           onPressed: onPressed,
@@ -782,7 +791,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
           avatar: Icon(
             Icons.search_rounded,
             size: 18,
-            color: AppColors.textSecondary,
+            color: AppColors.onPrimaryContainer,
           ),
         ),
       for (final meal in recents)
@@ -796,7 +805,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
         }),
     ];
     return SizedBox(
-      height: 36,
+      height: 40,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: chips.length,
@@ -822,16 +831,42 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
         ? (Icons.auto_awesome_rounded, 'Estimate with AI', _submit)
         : (Icons.check_rounded, 'Save', null);
 
-    return IconButton.filled(
-      onPressed: onPressed,
-      tooltip: tooltip,
-      iconSize: 26,
-      style: IconButton.styleFrom(
-        minimumSize: const Size(52, 52),
-        backgroundColor: _listening ? AppColors.veryBad : AppColors.primary,
-        foregroundColor: AppColors.onPrimary,
+    // A big glossy bubble in the icon tile's colours, with a soft glow.
+    final glow = _listening ? AppColors.veryBad : AppColors.primary;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: onPressed == null ? AppColors.surfaceVariant : null,
+        gradient: onPressed == null
+            ? null
+            : _listening
+            ? LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color.lerp(glow, Colors.white, 0.15)!, glow],
+              )
+            : AppColors.primaryGradient,
+        boxShadow: onPressed == null
+            ? null
+            : [
+                BoxShadow(
+                  color: glow.withValues(alpha: AppColors.isDark ? 0.3 : 0.4),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6),
+                ),
+              ],
       ),
-      icon: Icon(icon),
+      child: IconButton(
+        onPressed: onPressed,
+        tooltip: tooltip,
+        iconSize: 28,
+        style: IconButton.styleFrom(
+          minimumSize: const Size(58, 58),
+          foregroundColor: AppColors.onPrimary,
+          disabledForegroundColor: AppColors.textDisabled,
+        ),
+        icon: Icon(icon),
+      ),
     );
   }
 
@@ -844,7 +879,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
         : (_error, AppColors.error);
 
     return Padding(
-      padding: const EdgeInsets.only(left: 4, top: 6),
+      padding: const EdgeInsets.only(left: 6, top: 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

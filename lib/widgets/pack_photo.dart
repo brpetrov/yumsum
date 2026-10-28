@@ -16,7 +16,7 @@ class PackPhoto extends StatelessWidget {
       child: Icon(Icons.inventory_2_outlined, color: AppColors.textSecondary),
     );
     return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(14),
       child: SizedBox.square(
         dimension: size,
         child: url == null

@@ -4,9 +4,12 @@ import 'package:go_router/go_router.dart';
 
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/theme_controller.dart';
 import 'package:lean_streak/widgets/app_logo_mark.dart';
+import 'package:lean_streak/widgets/icon_bubble.dart';
+import 'package:lean_streak/widgets/pill_toggle.dart';
 
 /// The home shell: app bar with the menu, the page body, and an optional bar
 /// pinned to the bottom (kept above the keyboard).
@@ -41,7 +44,7 @@ class AppFrame extends ConsumerWidget {
                     subtitle!,
                     style: TextStyle(
                       fontSize: 13,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.textSecondary,
                     ),
                   ),
@@ -124,71 +127,70 @@ class AppDrawer extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 12),
-              child: Row(
+            // Scrolls on a short screen or with large text, so Log out
+            // always keeps its place at the bottom.
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
                 children: [
-                  const AppLogoMark(size: 28),
-                  SizedBox(width: 10),
-                  Expanded(
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(24, 20, 20, 14),
+                    child: Row(
+                      children: [
+                        const AppLogoMark(size: 38),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'YumSum',
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTheme.display.copyWith(
+                              fontSize: 27,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  for (final page in _pages)
+                    _MenuItem(
+                      icon: page.icon,
+                      label: page.label,
+                      selected: page.route == current,
+                      onTap: () => _open(context, page.route),
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 18, 20, 8),
                     child: Text(
-                      'YumSum',
-                      overflow: TextOverflow.ellipsis,
+                      'Appearance',
                       style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                        color: AppColors.textSecondary,
                       ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                    child: PillToggle<ThemeMode>(
+                      options: const [
+                        (ThemeMode.system, 'System'),
+                        (ThemeMode.light, 'Light'),
+                        (ThemeMode.dark, 'Dark'),
+                      ],
+                      selected: ref.watch(themeControllerProvider),
+                      onChanged: (mode) => ref
+                          .read(themeControllerProvider.notifier)
+                          .setMode(mode),
                     ),
                   ),
                 ],
               ),
             ),
-            Divider(height: 1),
-            for (final page in _pages)
-              ListTile(
-                leading: Icon(page.icon),
-                title: Text(page.label),
-                selected: page.route == current,
-                onTap: () => _open(context, page.route),
-              ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 18, 20, 6),
-              child: Text(
-                'Appearance',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-              child: SegmentedButton<ThemeMode>(
-                showSelectedIcon: false,
-                style: SegmentedButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                ),
-                segments: const [
-                  ButtonSegment(value: ThemeMode.system, label: Text('System')),
-                  ButtonSegment(value: ThemeMode.light, label: Text('Light')),
-                  ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
-                ],
-                selected: {ref.watch(themeControllerProvider)},
-                onSelectionChanged: (selection) => ref
-                    .read(themeControllerProvider.notifier)
-                    .setMode(selection.first),
-              ),
-            ),
-            const Spacer(),
-            Divider(height: 1),
-            ListTile(
-              leading: Icon(Icons.logout_rounded),
-              title: Text(authState.isLoading ? 'Signing out...' : 'Log out'),
-              enabled: !isWorking,
+            _MenuItem(
+              icon: Icons.logout_rounded,
+              label: authState.isLoading ? 'Signing out...' : 'Log out',
               onTap: isWorking
                   ? null
                   : () async {
@@ -196,8 +198,58 @@ class AppDrawer extends ConsumerWidget {
                       await ref.read(authControllerProvider.notifier).signOut();
                     },
             ),
+            const SizedBox(height: 8),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// One menu entry: a soft pill, tinted when it is the open page, with its
+/// icon in a bubble.
+class _MenuItem extends StatelessWidget {
+  const _MenuItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.selected = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback? onTap;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+      // The same height on phones as in browsers, so the menu fits short
+      // screens.
+      child: ListTile(
+        shape: const StadiumBorder(),
+        visualDensity: const VisualDensity(vertical: -2),
+        contentPadding: const EdgeInsets.only(left: 6, right: 12),
+        horizontalTitleGap: 14,
+        selected: selected,
+        selectedTileColor: AppColors.primaryContainer,
+        selectedColor: AppColors.onPrimaryContainer,
+        enabled: onTap != null,
+        leading: IconBubble(
+          icon,
+          size: 36,
+          background: selected ? AppColors.surface : AppColors.surfaceVariant,
+          color: selected ? AppColors.primary : AppColors.textSecondary,
+        ),
+        title: Text(
+          label,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+          ),
+        ),
+        onTap: onTap,
       ),
     );
   }

@@ -8,6 +8,7 @@ import 'package:lean_streak/app/app.dart';
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/core/config/app_check.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/firebase_options.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,10 +26,13 @@ void main() async {
     return _StartupErrorApp(message: details.exceptionAsString());
   };
 
-  // Nunito is bundled under the SIL Open Font License, which travels with it.
+  // Nunito and Fredoka are bundled under the SIL Open Font License, which
+  // travels with them.
   LicenseRegistry.addLicense(() async* {
     final license = await rootBundle.loadString('assets/fonts/OFL.txt');
     yield LicenseEntryWithLineBreaks(['Nunito'], license);
+    final fredoka = await rootBundle.loadString('assets/fonts/OFL-Fredoka.txt');
+    yield LicenseEntryWithLineBreaks(['Fredoka'], fredoka);
   });
 
   final prefs = await SharedPreferences.getInstance();
@@ -117,10 +121,9 @@ class _StartupErrorApp extends StatelessWidget {
                     Text(
                       'YumSum could not start',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: AppTheme.display.copyWith(
                         color: AppColors.textPrimary,
                         fontSize: 22,
-                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 12),

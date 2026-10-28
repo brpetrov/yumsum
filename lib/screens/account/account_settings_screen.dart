@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/providers/account_controller.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
@@ -208,11 +209,9 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                     children: [
                       Text(
                         'Manage your account',
-                        style: TextStyle(
+                        style: AppTheme.display.copyWith(
                           fontSize: 26,
-                          fontWeight: FontWeight.w700,
                           color: AppColors.textPrimary,
-                          letterSpacing: -0.5,
                         ),
                       ),
                       SizedBox(height: 6),

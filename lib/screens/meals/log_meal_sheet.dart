@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
@@ -180,9 +181,8 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
           children: [
             Text(
               _isEditing ? 'Edit meal' : 'Add meal',
-              style: TextStyle(
+              style: AppTheme.display.copyWith(
                 fontSize: 22,
-                fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/meal.dart';
 
 /// One meal as a plain row: name and time, calories and protein, and a menu
@@ -25,7 +26,7 @@ class MealRow extends StatelessWidget {
         : 'Unnamed meal';
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 11),
       child: Row(
         children: [
           Expanded(
@@ -35,12 +36,12 @@ class MealRow extends StatelessWidget {
                 Text(
                   name,
                   style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 3),
                 Text(
                   DateFormat('HH:mm').format(meal.timestamp),
                   style: TextStyle(
@@ -56,14 +57,13 @@ class MealRow extends StatelessWidget {
             children: [
               Text(
                 '${meal.calories.round()} kcal',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
+                style: AppTheme.display.copyWith(
+                  fontSize: 16.5,
                   color: AppColors.textPrimary,
                 ),
               ),
               if (meal.proteinGrams != null) ...[
-                const SizedBox(height: 2),
+                const SizedBox(height: 3),
                 Text(
                   '${meal.proteinGrams!.round()} g protein',
                   style: TextStyle(

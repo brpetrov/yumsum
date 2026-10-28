@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
@@ -10,6 +11,7 @@ import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/past_day_edit_provider.dart';
 import 'package:lean_streak/repositories/day_edit_repository.dart';
 import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
+import 'package:lean_streak/widgets/bowl_note.dart';
 import 'package:lean_streak/widgets/day_status.dart';
 import 'package:lean_streak/widgets/meal_row.dart';
 
@@ -120,9 +122,8 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
                       children: [
                         Text(
                           DateFormat('EEEE, d MMMM').format(widget.date),
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
+                          style: AppTheme.display.copyWith(
+                            fontSize: 22,
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -168,15 +169,9 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
                 ),
               )
             else if (meals.isEmpty)
-              Padding(
+              const Padding(
                 padding: EdgeInsets.symmetric(vertical: 12),
-                child: Text(
-                  'No meals logged on this day.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
+                child: BowlNote('No meals logged on this day.'),
               )
             else
               Flexible(

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/widgets/app_logo_mark.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
@@ -156,35 +157,33 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   children: [
                     SizedBox(height: 32),
 
-                    // Logo
+                    // Logo, glowing like the tile it sits on
                     Center(
                       child: Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(27),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.shadow,
-                              blurRadius: 18,
-                              offset: Offset(0, 8),
+                              color: AppColors.primary.withValues(alpha: 0.3),
+                              blurRadius: 30,
+                              offset: Offset(0, 12),
                             ),
                           ],
                         ),
-                        child: const AppLogoMark(size: 72),
+                        child: const AppLogoMark(size: 96),
                       ),
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 20),
                     Center(
                       child: Text(
                         'YumSum',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w700,
+                        style: AppTheme.display.copyWith(
+                          fontSize: 38,
                           color: AppColors.textPrimary,
-                          letterSpacing: -0.5,
                         ),
                       ),
                     ),
-                    SizedBox(height: 40),
+                    SizedBox(height: 36),
 
                     // Sign In / Sign Up toggle
                     Container(
@@ -208,7 +207,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 28),
+                    SizedBox(height: 32),
 
                     // Verification / reset sent banner
                     if (bannerTitle != null) ...[
@@ -219,7 +218,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: AppColors.primary.withValues(alpha: 0.25),
                           ),
@@ -271,7 +270,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.error.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: AppColors.error.withValues(alpha: 0.25),
                           ),
@@ -373,7 +372,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
                     // Submit
                     SizedBox(
-                      height: 52,
+                      height: 54,
                       child: ElevatedButton(
                         onPressed: isLoading ? null : _submit,
                         child: isLoading
@@ -394,7 +393,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               ),
                       ),
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 20),
                     Row(
                       children: [
                         Expanded(child: Divider(color: AppColors.divider)),
@@ -411,13 +410,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         Expanded(child: Divider(color: AppColors.divider)),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 20),
                     OutlinedButton.icon(
                       onPressed: isLoading ? null : _signInWithGoogle,
                       icon: const _GoogleMark(),
                       label: const Text('Continue with Google'),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 28),
                     const LegalFooter(),
                     SizedBox(height: 32),
                   ],
@@ -469,16 +468,22 @@ class _TabButton extends StatelessWidget {
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: selected ? AppColors.surface : Colors.transparent,
+            // In dark mode the card colour is darker than the track, so the
+            // chosen side is lifted with the outline colour instead.
+            color: !selected
+                ? Colors.transparent
+                : AppColors.isDark
+                ? AppColors.outline
+                : AppColors.surface,
             borderRadius: BorderRadius.circular(999),
             boxShadow: selected
                 ? [
                     BoxShadow(
                       color: AppColors.shadow,
-                      blurRadius: 8,
-                      offset: Offset(0, 2),
+                      blurRadius: 12,
+                      offset: Offset(0, 3),
                     ),
                   ]
                 : null,
@@ -486,9 +491,9 @@ class _TabButton extends StatelessWidget {
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+            style: AppTheme.display.copyWith(
+              fontSize: 16,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
               color: selected ? AppColors.textPrimary : AppColors.textSecondary,
             ),
           ),

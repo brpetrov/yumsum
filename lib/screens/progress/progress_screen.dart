@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/models/weight_entry.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
@@ -14,6 +15,7 @@ import 'package:lean_streak/providers/weight_entry_provider.dart';
 import 'package:lean_streak/providers/weight_log_controller.dart';
 import 'package:lean_streak/screens/progress/helpers/log_weight_dialog.dart';
 import 'package:lean_streak/widgets/app_card.dart';
+import 'package:lean_streak/widgets/app_logo_mark.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 
 class ProgressScreen extends ConsumerWidget {
@@ -28,7 +30,11 @@ class ProgressScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(),
       appBar: AppBar(
-        title: const Text('Weight & Progress'),
+        // Shrinks rather than cuts off beside Log weight on narrow phones.
+        title: const FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text('Weight & Progress'),
+        ),
         actions: [
           // The empty state has its own button, so only show this one once
           // there is history.
@@ -55,7 +61,7 @@ class ProgressScreen extends ConsumerWidget {
                 maxWidth: 760,
                 padding: EdgeInsets.fromLTRB(
                   20,
-                  20,
+                  12,
                   20,
                   MediaQuery.of(context).padding.bottom + 32,
                 ),
@@ -63,9 +69,9 @@ class ProgressScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _StatsHeader(entries: entries, profile: profile),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 18),
                     _WeightChartCard(entries: entries, profile: profile),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 22),
                     _HistorySection(entries: entries),
                     const SizedBox(height: 8),
                     Align(
@@ -208,14 +214,17 @@ class _StatBlock extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
+            ),
           ),
           const SizedBox(height: 6),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
+            style: AppTheme.display.copyWith(
+              fontSize: 23,
               color: highlight ?? AppColors.textPrimary,
             ),
           ),
@@ -259,7 +268,7 @@ class _WeightChartCard extends StatelessWidget {
     final labelInterval = math.max(1.0, (maxX / 4).floorToDouble());
 
     return AppCard(
-      padding: const EdgeInsets.fromLTRB(8, 20, 16, 12),
+      padding: const EdgeInsets.fromLTRB(10, 24, 20, 16),
       child: SizedBox(
         height: 240,
         child: LineChart(
@@ -353,18 +362,28 @@ class _WeightChartCard extends StatelessWidget {
                 spots: spots,
                 isCurved: true,
                 color: AppColors.veryGood,
-                barWidth: 3,
+                barWidth: 4,
+                isStrokeCapRound: true,
+                // Round beads with a cream rim, over a soft green wash.
                 dotData: FlDotData(
                   show: true,
                   getDotPainter: (spot, _, _, _) => FlDotCirclePainter(
-                    radius: 3.5,
+                    radius: 5.5,
                     color: AppColors.veryGood,
-                    strokeWidth: 0,
+                    strokeWidth: 3,
+                    strokeColor: AppColors.surface,
                   ),
                 ),
                 belowBarData: BarAreaData(
                   show: true,
-                  color: AppColors.veryGood.withValues(alpha: 0.08),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      AppColors.veryGood.withValues(alpha: 0.22),
+                      AppColors.veryGood.withValues(alpha: 0.02),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -389,28 +408,28 @@ class _HistorySection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
           child: Text(
             'History',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
+            style: AppTheme.display.copyWith(
+              fontSize: 21,
               color: AppColors.textPrimary,
             ),
           ),
         ),
         ...reversed.map(
           (entry) => Padding(
-            padding: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.only(bottom: 12),
             child: AppCard(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
                       DateFormat('EEE, d MMM yyyy').format(entry.date),
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.textSecondary,
                       ),
                     ),
@@ -425,9 +444,8 @@ class _HistorySection extends StatelessWidget {
                   ],
                   Text(
                     '${entry.weightKg.toStringAsFixed(1)} kg',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
+                    style: AppTheme.display.copyWith(
+                      fontSize: 18,
                       color: AppColors.textPrimary,
                     ),
                   ),
@@ -454,17 +472,12 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.monitor_weight_outlined,
-              size: 56,
-              color: AppColors.textSecondary,
-            ),
-            const SizedBox(height: 16),
+            const AppLogoMark(size: 96),
+            const SizedBox(height: 20),
             Text(
               'No weight logged yet',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
+              style: AppTheme.display.copyWith(
+                fontSize: 24,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -479,7 +492,7 @@ class _EmptyState extends StatelessWidget {
                 height: 1.4,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: onLogWeight,
               icon: const Icon(Icons.add_rounded),

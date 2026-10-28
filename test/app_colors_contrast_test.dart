@@ -18,7 +18,13 @@ void main() {
   ]) {
     group('$name palette', () {
       test('text is readable on every surface', () {
-        for (final surface in [p.background, p.surface, p.surfaceVariant]) {
+        for (final surface in [
+          p.background,
+          p.surface,
+          p.surfaceVariant,
+          p.heroStart,
+          p.heroEnd,
+        ]) {
           expect(_contrast(p.textPrimary, surface), greaterThan(7));
           expect(_contrast(p.textSecondary, surface), greaterThan(4.5));
         }

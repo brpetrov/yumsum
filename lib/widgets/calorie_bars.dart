@@ -98,9 +98,14 @@ class _CalorieBar extends StatelessWidget {
         alignment: Alignment.bottomCenter,
         child: FractionallySizedBox(
           heightFactor: heightFactor,
+          // Fully round ends, a little lighter at the top: candy sticks.
           child: Container(
             decoration: BoxDecoration(
-              color: color,
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color.lerp(color, Colors.white, 0.22)!, color],
+              ),
               borderRadius: BorderRadius.circular(999),
             ),
           ),

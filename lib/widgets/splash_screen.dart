@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import 'app_logo_mark.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -39,31 +40,33 @@ class _Logo extends StatelessWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(27),
             boxShadow: [
               BoxShadow(
-                color: AppColors.shadow,
-                blurRadius: 18,
-                offset: Offset(0, 8),
+                color: AppColors.primary.withValues(alpha: 0.3),
+                blurRadius: 30,
+                offset: Offset(0, 12),
               ),
             ],
           ),
-          child: const AppLogoMark(size: 72),
+          child: const AppLogoMark(size: 96),
         ),
-        SizedBox(height: 16),
+        SizedBox(height: 20),
         Text(
           'YumSum',
-          style: TextStyle(
+          style: AppTheme.display.copyWith(
             color: AppColors.textPrimary,
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.5,
+            fontSize: 38,
           ),
         ),
-        SizedBox(height: 4),
+        SizedBox(height: 6),
         Text(
           'Stay consistent. Stay lean.',
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     );

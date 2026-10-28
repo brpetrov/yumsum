@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
 import 'package:lean_streak/models/user_profile.dart';
 
@@ -70,11 +71,10 @@ class HealthPlanPreviewCard extends StatelessWidget {
     ];
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: _color.withValues(alpha: 0.07),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: _color.withValues(alpha: 0.3)),
+        color: _color.withValues(alpha: 0.09),
+        borderRadius: BorderRadius.circular(AppTheme.cardRadius),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,11 +86,7 @@ class HealthPlanPreviewCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: _color,
-                  ),
+                  style: AppTheme.display.copyWith(fontSize: 16, color: _color),
                 ),
               ),
               IconButton(
@@ -331,9 +327,8 @@ class _Metric extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
+          style: AppTheme.display.copyWith(
+            fontSize: 17,
             color: AppColors.textPrimary,
           ),
         ),
