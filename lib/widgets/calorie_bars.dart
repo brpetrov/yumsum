@@ -79,7 +79,7 @@ class _CalorieBar extends StatelessWidget {
         ? AppColors.divider
         : hasSettledStatus(summary)
         ? dayStatusColor(summary.status)
-        : AppColors.primary;
+        : AppColors.veryGood;
     final heightFactor = summary == null
         ? 0.08
         : ((summary.totalCalories / summary.targetCalories.clamp(1, 100000))

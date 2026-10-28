@@ -352,19 +352,19 @@ class _WeightChartCard extends StatelessWidget {
               LineChartBarData(
                 spots: spots,
                 isCurved: true,
-                color: AppColors.primary,
+                color: AppColors.veryGood,
                 barWidth: 3,
                 dotData: FlDotData(
                   show: true,
                   getDotPainter: (spot, _, _, _) => FlDotCirclePainter(
                     radius: 3.5,
-                    color: AppColors.primary,
+                    color: AppColors.veryGood,
                     strokeWidth: 0,
                   ),
                 ),
                 belowBarData: BarAreaData(
                   show: true,
-                  color: AppColors.primary.withValues(alpha: 0.08),
+                  color: AppColors.veryGood.withValues(alpha: 0.08),
                 ),
               ),
             ],

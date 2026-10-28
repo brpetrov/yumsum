@@ -196,8 +196,6 @@ def web(art):
 
 
 def assets(art):
-    # Only icon-192.png is used (AppLogoMark); the rest of assets/web is not.
-    save(tile(art, 192), ROOT / 'assets/web/icon-192.png')
     save(square(art, 512, TILE_R), ROOT / 'assets/android/play_store_512.png')
 
 

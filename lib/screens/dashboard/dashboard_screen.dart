@@ -367,8 +367,8 @@ class _TodayCard extends StatelessWidget {
     // The day isn't over, so being under target isn't flagged; only "on
     // track" and "over" are worth saying while it is still today.
     final (String? pillLabel, Color barColor) = switch (summary) {
-      _ when summary.dayOff => ('Day off', AppColors.primary),
-      _ when summary.mealCount == 0 => (null, AppColors.primary),
+      _ when summary.dayOff => ('Day off', AppColors.veryGood),
+      _ when summary.mealCount == 0 => (null, AppColors.veryGood),
       _ when summary.status == DailyStatus.green => (
         'On track',
         AppColors.veryGood,
@@ -377,7 +377,7 @@ class _TodayCard extends StatelessWidget {
         'Over target',
         dayStatusColor(summary.status),
       ),
-      _ => (null, AppColors.primary),
+      _ => (null, AppColors.veryGood),
     };
 
     return AppCard(
@@ -444,7 +444,7 @@ class _TodayCard extends StatelessWidget {
           const SizedBox(height: 8),
           _ProgressBar(
             value: proteinTarget <= 0 ? 0 : proteinLogged / proteinTarget,
-            color: AppColors.primary,
+            color: AppColors.veryGood,
           ),
           if (mealsWithoutProtein > 0) ...[
             const SizedBox(height: 6),
