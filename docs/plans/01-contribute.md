@@ -75,7 +75,7 @@ The feature stays hidden until the app has an Open Food Facts account. Test on t
    }
    ```
    Don't paste the password into chat. Put it straight into the file.
-3. **Run the app** with the VS Code "LeanStreak (Android)" configuration, which passes that file. From a terminal: `flutter run --dart-define-from-file=config/off_account.json`.
+3. **Run the app** with the VS Code "YumSum (Android)" configuration, which passes that file. From a terminal: `flutter run --dart-define-from-file=config/off_account.json`.
 4. **Try it with a real packet.** Barcode lookups still come from the real database, so pick something it doesn't know: a local Bulgarian product or a supermarket own brand. Contribute it, then open `https://world.openfoodfacts.net/product/<barcode>` (login `off` / `off`). Check the name, figures, language and both photos.
 5. **When you're happy, create the real account** at <https://world.openfoodfacts.org> with the project email from Plan 2, not your personal Gmail.
 6. **Fill in Open Food Facts' API usage form:** <https://docs.google.com/forms/d/e/1FAIpQLSdIE3D8qvjC_zRJw1W8OmuHhsWJ_NSckiiniAHlfaVwUZCziQ/viewform>. Their docs ask apps to do this "so that we can identify your usage and prevent potential bans."

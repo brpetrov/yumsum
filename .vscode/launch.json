@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "LeanStreak (Edge)",
+      "name": "YumSum (Edge)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
@@ -14,14 +14,14 @@
       ]
     },
     {
-      "name": "LeanStreak (Windows)",
+      "name": "YumSum (Windows)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
       "args": ["-d", "windows"]
     },
     {
-      "name": "LeanStreak (Android)",
+      "name": "YumSum (Android)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
