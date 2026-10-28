@@ -6,6 +6,8 @@ The app currently uses your personal Gmail in five places and Firebase's default
 
 ## Step 0: decide the name (do this first)
 
+**Decided 28 October 2026: YumSum.** The app was renamed that day (app ID `com.bpetrov.yumsum`). In the UK, EU, Bulgaria and Madrid registers, the only YUMSUM trade marks are in class 21 (toiletries and cleaning goods, owner Shenzhenshi Yuanshang Technology). Nothing turned up in classes 9, 42 or 44. yumsum.app, getyumsum.app, getyumsum.com and yumsumapp.com were free. yumsum.com is held by a domain investor; yumsum.co.uk is registered but unused. Not checked: social handles, Companies House, and the goods covered by the "YumSur" class 9 mark and Yum Health's WIPO 1751782 mark.
+
 On 23 October 2026 the research found **two other products called LeanStreak, both in the same niche:**
 
 | Who | What | Since |
