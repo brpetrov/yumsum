@@ -68,82 +68,88 @@ class _PortionSheetState extends State<_PortionSheet> {
         24,
         20,
         24,
-        24 + MediaQuery.viewInsetsOf(context).bottom,
+        // padding.bottom is the navigation bar and drops to 0 while the
+        // keyboard covers it.
+        24 +
+            MediaQuery.viewInsetsOf(context).bottom +
+            MediaQuery.paddingOf(context).bottom,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              if (food.imageUrl != null) ...[
-                PackPhoto(food.imageUrl, size: 72),
-                const SizedBox(width: 16),
-              ],
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      food.name,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                if (food.imageUrl != null) ...[
+                  PackPhoto(food.imageUrl, size: 72),
+                  const SizedBox(width: 16),
+                ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        food.name,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
-                    ),
-                    if (food.brand != null) Text(food.brand!, style: muted),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${_amounts(food.kcalPer100g, food.proteinPer100g)}'
-                      ' per 100 g · Open Food Facts',
-                      style: muted.copyWith(fontSize: 13),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              SizedBox(
-                width: 120,
-                child: TextField(
-                  controller: _grams,
-                  autofocus: true,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: const InputDecoration(
-                    labelText: 'Amount',
-                    suffixText: 'g',
-                  ),
-                  onChanged: (_) => setState(() {}),
-                  onSubmitted: (_) => _use(),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  _amount > 0 ? _amounts(portion.kcal, portion.protein) : '',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                      if (food.brand != null) Text(food.brand!, style: muted),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${_amounts(food.kcalPer100g, food.proteinPer100g)}'
+                        ' per 100 g · Open Food Facts',
+                        style: muted.copyWith(fontSize: 13),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          FilledButton(
-            onPressed: _amount > 0 ? _use : null,
-            style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(52),
+              ],
             ),
-            child: const Text('Done'),
-          ),
-        ],
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                SizedBox(
+                  width: 120,
+                  child: TextField(
+                    controller: _grams,
+                    autofocus: true,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: const InputDecoration(
+                      labelText: 'Amount',
+                      suffixText: 'g',
+                    ),
+                    onChanged: (_) => setState(() {}),
+                    onSubmitted: (_) => _use(),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    _amount > 0 ? _amounts(portion.kcal, portion.protein) : '',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            FilledButton(
+              onPressed: _amount > 0 ? _use : null,
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(52),
+              ),
+              child: const Text('Done'),
+            ),
+          ],
+        ),
       ),
     );
   }

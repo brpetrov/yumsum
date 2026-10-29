@@ -108,4 +108,66 @@ void main() {
       'https://images.openfoodfacts.org/w.200.jpg',
     );
   });
+
+  // Android draws edge to edge, so the navigation bar overlaps the app.
+  Future<void> openOverNavigationBar(
+    WidgetTester tester, {
+    double keyboard = 0,
+  }) async {
+    final ratio = tester.view.devicePixelRatio;
+    tester.view.viewPadding = FakeViewPadding(bottom: 48 * ratio);
+    // The engine takes the keyboard off padding, as on a phone.
+    tester.view.padding = FakeViewPadding(
+      bottom: (48 - keyboard).clamp(0, 48) * ratio,
+    );
+    tester.view.viewInsets = FakeViewPadding(bottom: keyboard * ratio);
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => TextButton(
+              onPressed: () => showPortionSheet(context, _wrap),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('Done sits above the navigation bar', (tester) async {
+    await openOverNavigationBar(tester);
+
+    final height =
+        tester.view.physicalSize.height / tester.view.devicePixelRatio;
+    expect(
+      tester.getRect(find.widgetWithText(FilledButton, 'Done')).bottom,
+      lessThanOrEqualTo(height - 48),
+    );
+  });
+
+  testWidgets('Done sits above the keyboard and still scrolls', (tester) async {
+    await openOverNavigationBar(tester, keyboard: 400);
+
+    final done = find.widgetWithText(FilledButton, 'Done');
+    await tester.scrollUntilVisible(
+      done,
+      100,
+      // The sheet's own, not the text field's.
+      scrollable: find
+          .descendant(
+            of: find.byType(BottomSheet),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    final height =
+        tester.view.physicalSize.height / tester.view.devicePixelRatio;
+    expect(tester.getRect(done).bottom, lessThanOrEqualTo(height - 400));
+  });
 }

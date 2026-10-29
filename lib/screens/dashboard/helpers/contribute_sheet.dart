@@ -294,8 +294,12 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
     return PopScope(
       canPop: !_sending,
       child: Padding(
+        // useSafeArea only guards the top of a sheet. padding.bottom is the
+        // navigation bar and drops to 0 while the keyboard covers it.
         padding: EdgeInsets.only(
-          bottom: MediaQuery.viewInsetsOf(context).bottom,
+          bottom:
+              MediaQuery.viewInsetsOf(context).bottom +
+              MediaQuery.paddingOf(context).bottom,
         ),
         child: _thanksCount == null ? _buildForm() : _buildThanks(),
       ),
