@@ -10,9 +10,10 @@
   Then run the app on the phone again so it has the new code too.
 
 - [ ] **Get the AI working on the phone**
-  - [ ] Run YumSum from VS Code and copy the App Check debug token from the debug console.
-  - [ ] Firebase → App Check → Apps → **YumSum Android** → ⋮ → Manage debug tokens → add it.
-  - [ ] Try an AI estimate. If it still fails, note the exact message here:
+  Typed: "Could not estimate calories. Try again." Voice: "Could not understand the recording." Both are Firebase rejecting the phone, because it has no debug token yet.
+  - [ ] Run YumSum from VS Code. In the **Debug Console**, filter for `debug secret` and copy the code after the colon (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`).
+  - [ ] Firebase → App Check → Apps → **YumSum Android** row → **⋮** at the far right (shows on hover) → Manage debug tokens → Add debug token → name it "Boyan's phone", paste the code, Save.
+  - [ ] Wait a minute and try an AI estimate. If it still fails, note the exact message here, and whether AI works on the website:
 
 - [ ] **Check the website** at https://yumsum.web.app/app/
   - [ ] Sign in with Google
@@ -50,7 +51,7 @@
 
 - [ ] **Release signing**: create an upload key and wire it into the release build (release builds still use the debug key, which Play rejects). You keep the key file safe, outside Git.
 - [ ] Add the Play signing SHA-1 and SHA-256 to **YumSum Android** in Firebase once Play App Signing is set up (Google sign-in and App Check need them)
-- [ ] App Check → register **Play Integrity** for YumSum Android
+- [ ] App Check → change **YumSum Android**'s provider from Fraud Defense (the website's reCAPTCHA key, registered by mistake) to **Play Integrity**. It only matters for release builds, which use Play Integrity.
 - [ ] Once App Check metrics show nearly all requests verified: enforce App Check for **Cloud Firestore** and **Authentication**, not just AI Logic
 - [ ] Authentication → Settings: check email enumeration protection is on, and set a minimum password length
 - [ ] Open Food Facts: use a dedicated account with a password used nowhere else (it's built into the Android app)
