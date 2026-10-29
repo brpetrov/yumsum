@@ -33,7 +33,7 @@
   - [x] Browser key (auto created by Firebase), ends `u9to` (checked 29 October 2026)
   - [x] Android key (auto created by Firebase), ends `8ymM`
   - [x] iOS key (auto created by Firebase), ends `RX34`
-  - [ ] Delete the old AI Studio Gemini key, ends `sZZA`: the app no longer uses it, but older website builds contained it, and it showed Gemini and Maps calls the app never made
+  - [x] Delete the old AI Studio Gemini key, ends `sZZA` (deleted 29 October 2026 in aistudio.google.com/apikey): the app no longer uses it, but older website builds contained it, and it showed Gemini and Maps calls the app never made
   - [ ] Wait 5 minutes, then on the phone and on the website: sign in, and log a meal with an AI estimate. If anything fails, note the message here; choosing Don't restrict key again undoes it.
 
   Don't change **Gemini Developer API key (auto created by Firebase)** if it's listed: that's Firebase's own server-side key, never in the app, and it needs the Generative Language API.
