@@ -28,3 +28,12 @@ final weightEntriesProvider = StreamProvider.autoDispose<List<WeightEntry>>((
   if (uid == null) return Stream.value(const <WeightEntry>[]);
   return ref.watch(weightEntryRepositoryProvider).watchEntries(uid);
 });
+
+/// The newest weigh-in, for Today, without reading the whole history.
+final latestWeightEntryProvider = StreamProvider.autoDispose<WeightEntry?>((
+  ref,
+) {
+  final uid = ref.watch(currentUidProvider);
+  if (uid == null) return Stream.value(null);
+  return ref.watch(weightEntryRepositoryProvider).watchLatestEntry(uid);
+});

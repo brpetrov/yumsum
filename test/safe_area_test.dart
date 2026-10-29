@@ -38,9 +38,7 @@ Widget _app(Widget home) {
         (ref, date) => Stream.value(null),
       ),
       dayEditsThisMonthProvider.overrideWith((ref) => Stream.value(0)),
-      reviewPeriodsProvider.overrideWith(
-        (ref) async => const ReviewPeriods(weekStarts: [], monthStarts: []),
-      ),
+      firstLoggedDayProvider.overrideWith((ref) async => null),
       reviewSummariesProvider.overrideWith((ref, range) async => {}),
       periodReviewProvider.overrideWith(
         (ref, range) async => PeriodReviewService().buildReview(

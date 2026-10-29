@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
+import 'package:lean_streak/providers/period_review_provider.dart';
 
 class ReviewRange {
   const ReviewRange({required this.startDate, required this.endDate});
@@ -22,48 +23,14 @@ class ReviewRange {
   int get hashCode => Object.hash(startDate, endDate);
 }
 
-class ReviewPeriods {
-  const ReviewPeriods({required this.weekStarts, required this.monthStarts});
-
-  final List<DateTime> weekStarts;
-  final List<DateTime> monthStarts;
-
-  bool get isEmpty => weekStarts.isEmpty && monthStarts.isEmpty;
-}
-
-final reviewPeriodsProvider = FutureProvider.autoDispose<ReviewPeriods>((
+/// The first day anything was logged, or null before that: History doesn't
+/// page back past its week or month.
+final firstLoggedDayProvider = FutureProvider.autoDispose<DateTime?>((
   ref,
 ) async {
   final uid = ref.watch(currentUidProvider);
-  if (uid == null) {
-    return const ReviewPeriods(weekStarts: [], monthStarts: []);
-  }
-
-  final dates = await ref
-      .watch(dailySummaryRepositoryProvider)
-      .fetchSummaryDates(uid);
-
-  final weekStarts = <DateTime>[];
-  final monthStarts = <DateTime>[];
-  final seenWeeks = <String>{};
-  final seenMonths = <String>{};
-
-  for (final date in dates) {
-    final weekStart = date.subtract(Duration(days: date.weekday - 1));
-    final monthStart = DateTime(date.year, date.month, 1);
-    final weekKey = DateFormat('yyyy-MM-dd').format(weekStart);
-    final monthKey = DateFormat('yyyy-MM').format(monthStart);
-
-    if (seenWeeks.add(weekKey)) {
-      weekStarts.add(weekStart);
-    }
-
-    if (seenMonths.add(monthKey)) {
-      monthStarts.add(monthStart);
-    }
-  }
-
-  return ReviewPeriods(weekStarts: weekStarts, monthStarts: monthStarts);
+  if (uid == null) return null;
+  return ref.watch(dailySummaryRepositoryProvider).fetchFirstSummaryDate(uid);
 });
 
 final reviewSummariesProvider = FutureProvider.autoDispose
@@ -82,3 +49,11 @@ final reviewSummariesProvider = FutureProvider.autoDispose
 
       return {for (final summary in summaries) summary.date: summary};
     });
+
+/// Refetches History's one-off reads after a day's meals changed; the
+/// day summary streams follow by themselves.
+void refreshHistory(Ref ref) {
+  ref.invalidate(firstLoggedDayProvider);
+  ref.invalidate(reviewSummariesProvider);
+  ref.invalidate(periodReviewProvider);
+}

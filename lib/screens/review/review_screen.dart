@@ -34,13 +34,13 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final periodsAsync = ref.watch(reviewPeriodsProvider);
+    final firstDayAsync = ref.watch(firstLoggedDayProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(),
       appBar: AppBar(title: const Text('History')),
-      body: periodsAsync.when(
+      body: firstDayAsync.when(
         data: _buildContent,
         loading: () =>
             Center(child: CircularProgressIndicator(color: AppColors.primary)),
@@ -54,18 +54,15 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     );
   }
 
-  Widget _buildContent(ReviewPeriods periods) {
+  Widget _buildContent(DateTime? firstDay) {
     final today = _dateOnly(DateTime.now());
     final start = _periodStart(_anchor, _mode);
     final end = _periodEnd(_anchor, _mode);
     final currentStart = _periodStart(today, _mode);
-    final logged = _mode == _ReviewMode.month
-        ? periods.monthStarts
-        : periods.weekStarts;
-    final firstStart = logged.fold<DateTime>(
-      currentStart,
-      (earliest, period) => period.isBefore(earliest) ? period : earliest,
-    );
+    final firstLogged = firstDay == null ? null : _periodStart(firstDay, _mode);
+    final firstStart = firstLogged != null && firstLogged.isBefore(currentStart)
+        ? firstLogged
+        : currentStart;
     // Only finished days are reviewed; today is still going.
     final yesterday = today.subtract(const Duration(days: 1));
     final reviewEnd = end.isAfter(yesterday) ? yesterday : end;
