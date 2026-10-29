@@ -21,13 +21,10 @@ class WeightLogResult {
   final int newCalorieTarget;
 
   bool get targetChanged => previousCalorieTarget != newCalorieTarget;
-  int get targetDelta => newCalorieTarget - previousCalorieTarget;
 }
 
 /// Records a weight reading and automatically recomputes the user's plan
-/// (calorie target, BMR/TDEE, target date) from the new weight. Used by both
-/// the ad-hoc weight log and the 2-week check-in so all readings land in one
-/// history.
+/// (calorie target, BMR/TDEE, target date) from the new weight.
 class WeightLogService {
   WeightLogService({
     required WeightEntryRepository weightEntryRepository,
