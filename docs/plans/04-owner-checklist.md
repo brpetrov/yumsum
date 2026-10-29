@@ -4,7 +4,7 @@
 
 ## Now
 
-- [ ] **Deploy the database rules and the website together**
+- [x] **Deploy the database rules and the website together** (done 29 October 2026)
   Run `firebase deploy --only firestore:rules,hosting` (the website is already built in `build/hosting`).
   Deploy both at once: the new rules need the new app code, or Reset all data and Delete account fail.
   Then run the app on the phone again so it has the new code too.
