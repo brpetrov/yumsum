@@ -10,6 +10,7 @@ import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/core/constants/legal_links.dart';
+import 'package:lean_streak/widgets/feedback_dialog.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
 import 'package:lean_streak/widgets/password_confirm_dialog.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
@@ -282,12 +283,12 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                       ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: const Text('Send feedback'),
-                        subtitle: const Text('Opens an email to the developer'),
+                        subtitle: const Text('Write to the developer'),
                         trailing: const Icon(
                           Icons.mail_outline_rounded,
                           size: 18,
                         ),
-                        onTap: openFeedbackEmail,
+                        onTap: () => showFeedbackDialog(context),
                       ),
                       ListTile(
                         contentPadding: EdgeInsets.zero,

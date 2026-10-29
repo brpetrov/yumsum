@@ -106,6 +106,10 @@ void main() {
     expect(find.text('Send feedback'), findsOneWidget);
     expect(find.text('Privacy policy'), findsOneWidget);
     expect(find.text('Terms of use'), findsOneWidget);
+
+    await tester.tap(find.text('Send feedback'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('feedback-text')), findsOneWidget);
   });
 
   testWidgets('Reset all data asks for the password, then resets', (

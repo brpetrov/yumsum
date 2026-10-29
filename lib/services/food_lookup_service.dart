@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:lean_streak/core/constants/app_info.dart';
+
 /// A packaged food as Open Food Facts describes it, per 100 g.
 typedef PackagedFood = ({
   String name,
@@ -88,9 +90,7 @@ class FoodLookupService {
             uri,
             // Open Food Facts asks apps to identify themselves; browsers
             // don't allow setting this header, so the web relies on app_name.
-            headers: {
-              if (!kIsWeb) 'User-Agent': 'YumSum/0.1 (broovenn@gmail.com)',
-            },
+            headers: {if (!kIsWeb) 'User-Agent': 'YumSum/0.1 ($supportEmail)'},
           )
           .timeout(const Duration(seconds: 12));
     } on Exception {

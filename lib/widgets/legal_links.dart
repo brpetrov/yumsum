@@ -9,10 +9,6 @@ import 'package:lean_streak/core/constants/legal_links.dart';
 Future<void> openLegalPage(Uri page) =>
     launchUrl(page, mode: LaunchMode.externalApplication);
 
-/// Opens the user's mail app with a message to the developer.
-Future<void> openFeedbackEmail() =>
-    launchUrl(LegalLinks.feedback, mode: LaunchMode.externalApplication);
-
 /// "By continuing you agree to..." with tappable Terms and Privacy links.
 class LegalFooter extends StatelessWidget {
   const LegalFooter({super.key});
