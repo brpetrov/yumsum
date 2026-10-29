@@ -53,6 +53,7 @@
   - Leave Users collection, Templates collection and Default REPLY-TO blank
 - [ ] Optional: Firestore → TTL → add a policy on collection group `mail`, field `delivery.expireAt`, so sent feedback is cleared from the database
 - [ ] Send a test from Account Settings → Send feedback and check it arrives
+- [ ] Before 31 March 2027: Firebase Extensions shut down then (no installing or editing). Ask Claude to replace the extension with a small Cloud Function of our own, as Firebase's migration guide suggests.
 
 ## Tidy up
 
