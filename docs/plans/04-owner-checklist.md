@@ -56,11 +56,12 @@ The app sends feedback to a Formspree form (formspree.io, signed up with help.yu
 
 ## Before Play closed testing (Claude can do these, just ask)
 
-- [ ] **Release signing**: Play only accepts builds signed with your own upload key. Claude wired it in (the build reads `android/key.properties`, which Git ignores) and fixed release builds, which had been failing since Crashlytics was added.
-  - [ ] Create the key: in the VS Code terminal run `mkdir $HOME\keys`, then `keytool -genkeypair -v -keystore $HOME\keys\yumsum-upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload`. Choose a new password (6+ characters) and answer the questions (your name is enough; Enter skips the rest), then `yes`.
-  - [ ] In `android/key.properties`, replace both `CHANGE_ME` with that password, and save.
+- [x] **Release signing**: Play only accepts builds signed with your own upload key. Claude wired it in (the build reads `android/key.properties`, which Git ignores) and fixed release builds, which had been failing since Crashlytics was added. (Done 29 October 2026.)
+  - [x] Create the key: in the VS Code terminal run `mkdir $HOME\keys`, then `keytool -genkeypair -v -keystore $HOME\keys\yumsum-upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload`. Choose a new password (6+ characters) and answer the questions (your name is enough; Enter skips the rest), then `yes`.
+  - [x] In `android/key.properties`, replace both `CHANGE_ME` with that password, and save.
   - [ ] Back up `C:\Users\brpet\keys\yumsum-upload.jks` and the password together somewhere safe (a password manager, or the file in Google Drive and the password in your head). If it's lost, Play support can swap in a new one, but it takes days.
-  - [ ] Tell Claude, who builds the app bundle and checks it's signed with the new key.
+  - [x] Claude built the app bundle: signed by `CN=Boyan Petrov`, upload key SHA-1 `A9:1D:7C:AF:C3:2E:51:1B:E8:31:5D:44:03:0F:76:B9:96:95:6D:4F`, SHA-256 `CA:F6:11:56:58:AD:A4:AA:D8:28:7C:16:6A:73:95:85:82:11:75:CC:76:F5:C6:8E:90:A9:D2:15:E6:EC:54:1F` (Play shows the same under App integrity → Upload key).
+  - The bundle to upload: `flutter build appbundle --dart-define-from-file=config/off_account.json` (the Open Food Facts account goes in, so contributing works), file `build\app\outputs\bundle\release\app-release.aab`. Raise the `+1` in `version: 0.1.0+1` (pubspec.yaml) for every upload after the first.
 - [ ] Add the Play signing SHA-1 and SHA-256 to **YumSum Android** in Firebase once Play App Signing is set up (Google sign-in and App Check need them)
 - [ ] App Check → change **YumSum Android**'s provider from Fraud Defense (the website's reCAPTCHA key, registered by mistake) to **Play Integrity**. It only matters for release builds, which use Play Integrity.
 - [ ] Once App Check metrics show nearly all requests verified: enforce App Check for **Cloud Firestore** and **Authentication**, not just AI Logic
