@@ -19,7 +19,7 @@ class _User extends Fake implements User {
 }
 
 class _FakeFeedbackRepository extends Fake implements FeedbackRepository {
-  final sent = <({String uid, String email, String text})>[];
+  final sent = <({String uid, String email, String kind, String text})>[];
   bool fail = false;
   Completer<void>? gate;
 
@@ -27,11 +27,12 @@ class _FakeFeedbackRepository extends Fake implements FeedbackRepository {
   Future<void> send({
     required String uid,
     required String email,
+    required String kind,
     required String text,
   }) async {
     await gate?.future;
     if (fail) throw Exception('offline');
-    sent.add((uid: uid, email: email, text: text));
+    sent.add((uid: uid, email: email, kind: kind, text: text));
   }
 }
 
@@ -102,9 +103,29 @@ void main() {
     repo.gate!.complete();
     await tester.pumpAndSettle();
 
-    expect(repo.sent, [(uid: 'u1', email: 'a@b.com', text: 'Love it')]);
+    expect(repo.sent, [
+      (uid: 'u1', email: 'a@b.com', kind: 'Problem', text: 'Love it'),
+    ]);
     expect(find.byType(AlertDialog), findsNothing);
     expect(find.text('Feedback sent. Thank you.'), findsOneWidget);
+  });
+
+  testWidgets('The chosen kind changes the prompt and is sent', (tester) async {
+    await openDialog(tester);
+    expect(
+      find.text('What happened, and what did you expect?'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('Idea'));
+    await tester.pump();
+    expect(find.text('What would make YumSum better for you?'), findsOneWidget);
+
+    await tester.enterText(find.byKey(const Key('feedback-text')), 'Dark mode');
+    await tester.pump();
+    await tester.tap(find.widgetWithText(FilledButton, 'Send'));
+    await tester.pumpAndSettle();
+    expect(repo.sent.single.kind, 'Idea');
   });
 
   testWidgets('A failed send keeps the text and says so', (tester) async {

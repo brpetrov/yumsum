@@ -16,13 +16,13 @@ void main() {
       }),
     );
 
-    await repo.send(uid: 'u1', email: 'a@b.com', text: 'Love it');
+    await repo.send(uid: 'u1', email: 'a@b.com', kind: 'Idea', text: 'Love it');
 
     expect(sent.method, 'POST');
     expect(sent.url, FeedbackRepository.endpoint);
     expect(sent.headers['Accept'], 'application/json');
     final body = jsonDecode(sent.body) as Map<String, dynamic>;
-    expect(body['_subject'], 'YumSum feedback');
+    expect(body['_subject'], 'YumSum feedback: Idea');
     expect(body['email'], 'a@b.com');
     expect(body['message'], 'Love it');
     expect(body['user'], 'u1');
@@ -35,7 +35,7 @@ void main() {
     );
 
     expect(
-      repo.send(uid: 'u1', email: 'a@b.com', text: 'Hi'),
+      repo.send(uid: 'u1', email: 'a@b.com', kind: 'Other', text: 'Hi'),
       throwsA(isA<http.ClientException>()),
     );
   });

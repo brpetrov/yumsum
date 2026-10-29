@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/feedback_provider.dart';
+import 'package:lean_streak/widgets/pill_toggle.dart';
 
 /// Lets the user write to the developer without leaving the app; a thank-you
 /// snackbar follows once it's sent.
@@ -20,6 +21,16 @@ Future<void> showFeedbackDialog(BuildContext context) async {
   }
 }
 
+enum _Kind {
+  problem('Problem', 'What happened, and what did you expect?'),
+  idea('Idea', 'What would make YumSum better for you?'),
+  other('Other', 'Anything at all');
+
+  const _Kind(this.label, this.hint);
+  final String label;
+  final String hint;
+}
+
 class _FeedbackDialog extends ConsumerStatefulWidget {
   const _FeedbackDialog();
 
@@ -29,6 +40,7 @@ class _FeedbackDialog extends ConsumerStatefulWidget {
 
 class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
   final _textCtrl = TextEditingController();
+  var _kind = _Kind.problem;
   bool _sending = false;
   bool _failed = false;
 
@@ -47,7 +59,12 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
       final user = ref.read(authStateProvider).valueOrNull!;
       await ref
           .read(feedbackRepositoryProvider)
-          .send(uid: user.uid, email: user.email!, text: _textCtrl.text.trim());
+          .send(
+            uid: user.uid,
+            email: user.email!,
+            kind: _kind.label,
+            text: _textCtrl.text.trim(),
+          );
       if (mounted) Navigator.of(context).pop(true);
     } catch (_) {
       if (mounted) {
@@ -70,11 +87,11 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (email != null)
-            Text(
-              'Replies go to $email.',
-              style: TextStyle(color: AppColors.textSecondary, height: 1.4),
-            ),
+          PillToggle<_Kind>(
+            options: [for (final kind in _Kind.values) (kind, kind.label)],
+            selected: _kind,
+            onChanged: (kind) => setState(() => _kind = kind),
+          ),
           SizedBox(height: 16),
           TextField(
             key: const Key('feedback-text'),
@@ -85,8 +102,15 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
             inputFormatters: [LengthLimitingTextInputFormatter(4000)],
             textCapitalization: TextCapitalization.sentences,
             onChanged: (_) => setState(() {}),
-            decoration: InputDecoration(hintText: 'Ideas, problems, anything'),
+            decoration: InputDecoration(hintText: _kind.hint),
           ),
+          if (email != null) ...[
+            SizedBox(height: 12),
+            Text(
+              'Replies go to $email.',
+              style: TextStyle(color: AppColors.textSecondary, height: 1.4),
+            ),
+          ],
           if (_failed) ...[
             SizedBox(height: 12),
             Text(

@@ -13,9 +13,11 @@ class FeedbackRepository {
 
   static final endpoint = Uri.parse('https://formspree.io/f/mqppllqo');
 
+  /// [kind] (Problem, Idea or Other) goes in the subject, for sorting mail.
   Future<void> send({
     required String uid,
     required String email,
+    required String kind,
     required String text,
   }) async {
     final platform = kIsWeb ? 'web' : defaultTargetPlatform.name;
@@ -26,7 +28,7 @@ class FeedbackRepository {
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        '_subject': 'YumSum feedback',
+        '_subject': 'YumSum feedback: $kind',
         'email': email,
         'message': text,
         'user': uid,
