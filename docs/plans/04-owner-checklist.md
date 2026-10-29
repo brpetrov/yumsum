@@ -23,12 +23,19 @@
   - [ ] Deploy the smoother logo: `firebase deploy --only hosting:app` (already built in `build/hosting`)
 
 - [ ] **Lock down the Firebase API keys** (most important security item)
-  Google Cloud → APIs & Services → Credentials. For each of the three auto-created keys (browser, Android, iOS):
-  - [ ] Browser key: **Generative Language API** is not in its allowed APIs
-  - [ ] Android key: same
-  - [ ] iOS key: same
+  The keys in the app are public. If one may call the **Generative Language API** (Gemini itself), anyone can copy it and use Gemini directly, skipping App Check and the 10-a-day limit, on your credit. The app doesn't need it: its AI goes through the **Firebase AI Logic API**.
 
-  If unsure which APIs to allow, send Claude a screenshot of one key.
+  Open https://console.cloud.google.com/apis/credentials?project=lean-streak-project. Under API Keys, click each key's name, scroll to **API restrictions**, and:
+  - If it says **Restrict key**: open the APIs dropdown, untick **Generative Language API** if it's ticked, keep **Firebase AI Logic API** (formerly "Vertex AI in Firebase API") ticked, OK, Save.
+  - If it says **Don't restrict key**: choose Restrict key and tick, using the filter box, whichever of these the list shows: Cloud Firestore API, Identity Toolkit API, Token Service API, Firebase App Check API, Firebase AI Logic API, Firebase Installations API, Firebase Crashlytics API. OK, Save.
+  - Leave Application restrictions as they are.
+
+  - [ ] Browser key (auto created by Firebase)
+  - [ ] Android key (auto created by Firebase)
+  - [ ] iOS key (auto created by Firebase)
+  - [ ] Wait 5 minutes, then on the phone and on the website: sign in, and log a meal with an AI estimate. If anything fails, note the message here; choosing Don't restrict key again undoes it.
+
+  Don't change **Gemini Developer API key (auto created by Firebase)** if it's listed: that's Firebase's own server-side key, never in the app, and it needs the Generative Language API.
 
 ## Feedback emails
 
