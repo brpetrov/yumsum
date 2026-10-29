@@ -19,23 +19,6 @@ class DailySummaryRepository {
     await _dailySummaries(uid).doc(date).delete();
   }
 
-  Future<List<DailySummary>> fetchSummariesPage(
-    String uid, {
-    String? startAfterDate,
-    int limit = 14,
-  }) async {
-    Query<Map<String, dynamic>> query = _dailySummaries(
-      uid,
-    ).orderBy('date', descending: true).limit(limit);
-
-    if (startAfterDate != null) {
-      query = query.startAfter([startAfterDate]);
-    }
-
-    final snapshot = await query.get();
-    return snapshot.docs.map((doc) => DailySummary.fromFirestore(doc)).toList();
-  }
-
   Future<List<DailySummary>> fetchSummariesInRange(
     String uid, {
     required String startDate,
@@ -50,12 +33,11 @@ class DailySummaryRepository {
     return snapshot.docs.map((doc) => DailySummary.fromFirestore(doc)).toList();
   }
 
-  Future<List<DateTime>> fetchSummaryDates(String uid) async {
-    final snapshot = await _dailySummaries(uid).orderBy('date').get();
-
-    return snapshot.docs.map((doc) {
-      return DateTime.parse(doc.data()['date'] as String);
-    }).toList();
+  /// The earliest day with a summary, or null when nothing is logged yet.
+  Future<DateTime?> fetchFirstSummaryDate(String uid) async {
+    final snapshot = await _dailySummaries(uid).orderBy('date').limit(1).get();
+    if (snapshot.docs.isEmpty) return null;
+    return DateTime.parse(snapshot.docs.first.data()['date'] as String);
   }
 
   Stream<DailySummary?> watchSummary(String uid, String date) {

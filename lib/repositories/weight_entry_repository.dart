@@ -37,11 +37,13 @@ class WeightEntryRepository {
     }
   }
 
-  Future<WeightEntry?> latestEntry(String uid) async {
-    final snapshot = await _entries(
+  /// Real-time stream of the newest entry only, or null when there is none.
+  Stream<WeightEntry?> watchLatestEntry(String uid) {
+    return _entries(
       uid,
-    ).orderBy('dateKey', descending: true).limit(1).get();
-    if (snapshot.docs.isEmpty) return null;
-    return WeightEntry.fromFirestore(snapshot.docs.first);
+    ).orderBy('dateKey', descending: true).limit(1).snapshots().map((snapshot) {
+      if (snapshot.docs.isEmpty) return null;
+      return WeightEntry.fromFirestore(snapshot.docs.first);
+    });
   }
 }

@@ -116,7 +116,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   void _refreshActiveDateIfNeeded() {
     final nextDate = _normalizeDate(DateTime.now());
     if (!_isSameDate(_activeDate, nextDate)) {
-      ref.invalidate(reviewPeriodsProvider);
+      ref.invalidate(firstLoggedDayProvider);
       setState(() {
         _activeDate = nextDate;
       });
@@ -739,8 +739,7 @@ class _WeightCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final entries = ref.watch(weightEntriesProvider).valueOrNull ?? const [];
-    final latest = entries.lastOrNull;
+    final latest = ref.watch(latestWeightEntryProvider).valueOrNull;
     final daysAgo = latest == null
         ? 0
         : DateTime.now().difference(latest.date).inDays;

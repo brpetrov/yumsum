@@ -7,6 +7,7 @@ import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/past_day_edit_provider.dart';
+import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/repositories/day_edit_repository.dart';
 
 class LogMealController extends AsyncNotifier<void> {
@@ -67,7 +68,7 @@ class LogMealController extends AsyncNotifier<void> {
       await ref
           .read(dailySummaryServiceProvider)
           .recomputeForDate(uid, mealDate);
-      ref.invalidate(dailySummaryRepositoryProvider);
+      refreshHistory(ref);
       ref.invalidate(recentMealsProvider);
     });
   }
@@ -119,7 +120,7 @@ class LogMealController extends AsyncNotifier<void> {
       await ref
           .read(dailySummaryServiceProvider)
           .recomputeForDate(uid, meal.date);
-      ref.invalidate(dailySummaryRepositoryProvider);
+      refreshHistory(ref);
       ref.invalidate(recentMealsProvider);
     });
   }
