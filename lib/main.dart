@@ -11,6 +11,8 @@ import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/firebase_options.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
+import 'package:lean_streak/providers/theme_controller.dart';
+import 'package:lean_streak/widgets/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -41,6 +43,17 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
   final container = ProviderContainer(
     overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+  );
+  // The phone's launch screen stays up until the first frame, so draw the
+  // splash now; the app replaces it once Firebase is ready.
+  AppColors.isDark =
+      container.read(effectiveBrightnessProvider) == Brightness.dark;
+  runApp(
+    MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: AppColors.isDark ? AppTheme.dark : AppTheme.light,
+      home: const SplashScreen(),
+    ),
   );
   // Taps on a notification (later: shortcut, widget) only need the container,
   // so wire them before Firebase; a tap that started the app must not be lost.
