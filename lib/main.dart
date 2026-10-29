@@ -15,6 +15,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Logs carry food names, AI replies and token counts; keep them out of
+  // release builds' logcat and browser console.
+  if (kReleaseMode) debugPrint = (String? message, {int? wrapWidth}) {};
 
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
