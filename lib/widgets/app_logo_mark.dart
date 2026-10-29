@@ -1,12 +1,10 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-const _isWebKitBuild = bool.fromEnvironment('LEANSTREAK_WEBKIT_BUILD');
-
-/// The smiling bowl on the icon's orange tile. The WebKit build (Safari and
-/// iOS browsers, CPU-only CanvasKit) draws the bowl instead of decoding the
-/// PNG, as the old mark did.
+/// The smiling bowl on the icon's orange tile. The web draws the bowl: the
+/// PNG shrunk to a few dozen pixels on a desktop screen comes out soft.
 class AppLogoMark extends StatelessWidget {
   const AppLogoMark({super.key, this.size = 52});
 
@@ -28,13 +26,12 @@ class AppLogoMark extends StatelessWidget {
           colors: [Color(0xFFE08A45), Color(0xFFD2402C)],
         ),
       ),
-      child: _isWebKitBuild
+      child: kIsWeb
           ? const RepaintBoundary(child: CustomPaint(painter: _BowlPainter()))
           : Image.asset(
               'assets/logo.png',
               fit: BoxFit.contain,
-              // Decoded at the size it is shown: drawing the 512 px image a
-              // fraction of its size leaves jagged edges on the web.
+              // Decoded at the size it is shown, so it is shrunk once, well.
               cacheWidth: pixels,
               cacheHeight: pixels,
               filterQuality: FilterQuality.medium,

@@ -30,7 +30,6 @@ flutter build web `
   --no-web-resources-cdn `
   --no-wasm-dry-run `
   --dart-define=FLUTTER_WEB_CANVASKIT_FORCE_CPU_ONLY=true `
-  --dart-define=LEANSTREAK_WEBKIT_BUILD=true `
   -o $webkitBuild
 
 Reset-Directory $hostingBuild
