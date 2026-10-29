@@ -9,11 +9,13 @@
   Deploy both at once: the new rules need the new app code, or Reset all data and Delete account fail.
   Then run the app on the phone again so it has the new code too.
 
-- [ ] **Get the AI working on the phone**
+- [x] **Get the AI working on the phone** (done 29 October 2026: debug token added, AI works)
   Typed: "Could not estimate calories. Try again." Voice: "Could not understand the recording." Both are Firebase rejecting the phone, because it has no debug token yet.
-  - [ ] Run YumSum from VS Code. In the **Debug Console**, filter for `debug secret` and copy the code after the colon (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`).
-  - [ ] Firebase → App Check → Apps → **YumSum Android** row → **⋮** at the far right (shows on hover) → Manage debug tokens → Add debug token → name it "Boyan's phone", paste the code, Save.
-  - [ ] Wait a minute and try an AI estimate. If it still fails, note the exact message here, and whether AI works on the website:
+  - [x] Run YumSum from VS Code. In the **Debug Console**, filter for `debug secret` and copy the code after the colon (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`).
+  - [x] Firebase → App Check → Apps → **YumSum Android** row → **⋮** at the far right (shows on hover) → Manage debug tokens → Add debug token → name it "Boyan's phone", paste the code, Save.
+  - [x] Wait a minute and try an AI estimate.
+
+  Only debug builds need this, once per install: a reinstall or cleared app data makes a new code, which needs adding again. Play installs use Play Integrity and website visitors use reCAPTCHA, with nothing for them to do.
 
 - [ ] **Check the website** at https://yumsum.web.app/app/
   - [ ] Sign in with Google
