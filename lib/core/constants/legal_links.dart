@@ -5,7 +5,4 @@ abstract final class LegalLinks {
 
   /// Where the food data comes from; its licence asks for the credit.
   static final openFoodFacts = Uri.parse('https://world.openfoodfacts.org');
-  static final feedback = Uri.parse(
-    'mailto:broovenn@gmail.com?subject=YumSum%20feedback',
-  );
 }

@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:lean_streak/core/constants/app_info.dart';
+
 /// A new product as the user checked it, ready to send. [per100g] is keyed
 /// by Open Food Facts nutrient ids (`energy-kcal`, `proteins`, ...).
 typedef ProductContribution = ({
@@ -40,7 +42,6 @@ const _host = String.fromEnvironment(
   'OFF_HOST',
   defaultValue: 'world.openfoodfacts.org',
 );
-const _appVersion = '0.1.0';
 
 final _cyrillic = RegExp(r'[Ѐ-ӿ]');
 
@@ -69,12 +70,12 @@ class FoodContributionService {
     'user_id': userId,
     'password': password,
     'app_name': 'YumSum',
-    'app_version': _appVersion,
+    'app_version': appVersion,
     'app_uuid': appUuid,
   };
 
   Map<String, String> get _headers => {
-    if (!kIsWeb) 'User-Agent': 'YumSum/$_appVersion (broovenn@gmail.com)',
+    if (!kIsWeb) 'User-Agent': 'YumSum/$appVersion ($supportEmail)',
     // The test server sits behind a shared password of its own.
     if (host.endsWith('.net'))
       'Authorization': 'Basic ${base64Encode(utf8.encode('off:off'))}',
@@ -90,7 +91,7 @@ class FoodContributionService {
           ..._account,
           ...productFields(product, lc),
           // Open Food Facts asks for "user agent + user id", nothing personal.
-          'comment': 'YumSum $_appVersion user $appUuid',
+          'comment': 'YumSum $appVersion user $appUuid',
         },
       saved: (reply) => reply?['status'] == 1,
     );
