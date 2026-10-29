@@ -14,6 +14,8 @@ class AppLogoMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pixels = (size * 0.72 * MediaQuery.devicePixelRatioOf(context))
+        .round();
     return Container(
       width: size,
       height: size,
@@ -31,7 +33,11 @@ class AppLogoMark extends StatelessWidget {
           : Image.asset(
               'assets/logo.png',
               fit: BoxFit.contain,
-              filterQuality: FilterQuality.high,
+              // Decoded at the size it is shown: drawing the 512 px image a
+              // fraction of its size leaves jagged edges on the web.
+              cacheWidth: pixels,
+              cacheHeight: pixels,
+              filterQuality: FilterQuality.medium,
             ),
     );
   }
