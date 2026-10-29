@@ -44,9 +44,9 @@ The app sends feedback to a Formspree form (formspree.io, signed up with help.yu
 
 - [x] Create the Gmail account **help.yumsum@gmail.com**
 - [x] Create the Formspree form (`mqppllqo`); Claude switched the app to it and sent one test message (29 October 2026)
-- [ ] Check the test email from Claude arrived in help.yumsum (look in Spam too)
-- [ ] Deploy the website and the rules (the old `mail` rule is gone): `firebase deploy --only hosting:app,firestore:rules`
-- [ ] Run the app on the phone again, send feedback from Account Settings → Send feedback, and check it arrives
+- [x] Check the test email from Claude arrived in help.yumsum (look in Spam too)
+- [x] Deploy the website and the rules (the old `mail` rule is gone): `firebase deploy --only hosting:app,firestore:rules`
+- [x] Run the app on the phone again, send feedback from Account Settings → Send feedback, and check it arrives
 - [ ] Delete the unused "YumSum feedback" app password from your personal Gmail (myaccount.google.com/apppasswords)
 
 ## Tidy up
@@ -56,7 +56,11 @@ The app sends feedback to a Formspree form (formspree.io, signed up with help.yu
 
 ## Before Play closed testing (Claude can do these, just ask)
 
-- [ ] **Release signing**: create an upload key and wire it into the release build (release builds still use the debug key, which Play rejects). You keep the key file safe, outside Git.
+- [ ] **Release signing**: Play only accepts builds signed with your own upload key. Claude wired it in (the build reads `android/key.properties`, which Git ignores) and fixed release builds, which had been failing since Crashlytics was added.
+  - [ ] Create the key: in the VS Code terminal run `mkdir $HOME\keys`, then `keytool -genkeypair -v -keystore $HOME\keys\yumsum-upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload`. Choose a new password (6+ characters) and answer the questions (your name is enough; Enter skips the rest), then `yes`.
+  - [ ] In `android/key.properties`, replace both `CHANGE_ME` with that password, and save.
+  - [ ] Back up `C:\Users\brpet\keys\yumsum-upload.jks` and the password together somewhere safe (a password manager, or the file in Google Drive and the password in your head). If it's lost, Play support can swap in a new one, but it takes days.
+  - [ ] Tell Claude, who builds the app bundle and checks it's signed with the new key.
 - [ ] Add the Play signing SHA-1 and SHA-256 to **YumSum Android** in Firebase once Play App Signing is set up (Google sign-in and App Check need them)
 - [ ] App Check → change **YumSum Android**'s provider from Fraud Defense (the website's reCAPTCHA key, registered by mistake) to **Play Integrity**. It only matters for release builds, which use Play Integrity.
 - [ ] Once App Check metrics show nearly all requests verified: enforce App Check for **Cloud Firestore** and **Authentication**, not just AI Logic

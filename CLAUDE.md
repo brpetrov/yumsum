@@ -15,7 +15,7 @@ firebase deploy --only hosting:app  # Deploy just the app site
 firebase deploy --only firestore:rules  # Deploy Firestore security rules
 ```
 
-The VS Code configs (`.vscode/launch.json`) add `--web-port 5000` for Edge (see App Check) and `--dart-define-from-file=config/off_account.json` for Android (see Open Food Facts). `tools/build_hosting.ps1` builds the web app into `build/hosting` (an `/app` build plus a `/webkit` build for Safari/iOS, behind a small redirect page) and copies the legal pages there. Firebase Hosting serves it with SPA rewrites at `yumsum.web.app` (hosting target `app`); the project's default site `lean-streak-project.web.app` (target `old`, public folder `tools/hosting-redirect`) 301-redirects every path to the same path there. The targets are mapped in `.firebaserc`.
+Release builds are signed with the upload key named in `android/key.properties` (gitignored, outside the repo: `C:/Users/brpet/keys/yumsum-upload.jks`, alias `upload`); without that file they fall back to the debug key, which Play rejects. The VS Code configs (`.vscode/launch.json`) add `--web-port 5000` for Edge (see App Check) and `--dart-define-from-file=config/off_account.json` for Android (see Open Food Facts). `tools/build_hosting.ps1` builds the web app into `build/hosting` (an `/app` build plus a `/webkit` build for Safari/iOS, behind a small redirect page) and copies the legal pages there. Firebase Hosting serves it with SPA rewrites at `yumsum.web.app` (hosting target `app`); the project's default site `lean-streak-project.web.app` (target `old`, public folder `tools/hosting-redirect`) 301-redirects every path to the same path there. The targets are mapped in `.firebaserc`.
 
 ## Architecture
 
