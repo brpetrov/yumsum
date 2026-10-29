@@ -40,8 +40,9 @@
 
 ## Feedback emails
 
-- [ ] Create the Gmail account **help.yumsum@gmail.com**
-- [ ] Turn on 2-Step Verification for it, then create an app password at myaccount.google.com/apppasswords (copy the 16 characters)
+- [x] Create the Gmail account **help.yumsum@gmail.com**
+- [ ] Create an app password at myaccount.google.com/apppasswords (copy the 16 characters)
+  help.yumsum is too new: Google refuses 2-Step Verification ("We couldn't verify it's you"), even from the phone. So the emails are sent from your own older Gmail, which needs 2-Step Verification on. They still arrive at help.yumsum, and users never see the sending address. Use your own address below wherever it says help.yumsum in the SMTP settings. Once help.yumsum allows 2-Step Verification (try again in a week), you can switch the extension to it: Extensions → Manage → Reconfigure.
 - [ ] Firebase → Extensions → install **Trigger Email from Firestore**:
   - Firestore location: the same as the database (Firestore → Databases shows it)
   - Authentication type: Username & Password
