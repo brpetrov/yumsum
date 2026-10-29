@@ -82,8 +82,7 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
             autofocus: true,
             minLines: 4,
             maxLines: 8,
-            // The rules allow 4,000 characters, footer included.
-            inputFormatters: [LengthLimitingTextInputFormatter(3800)],
+            inputFormatters: [LengthLimitingTextInputFormatter(4000)],
             textCapitalization: TextCapitalization.sentences,
             onChanged: (_) => setState(() {}),
             decoration: InputDecoration(hintText: 'Ideas, problems, anything'),

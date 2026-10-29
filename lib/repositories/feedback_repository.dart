@@ -1,28 +1,43 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:lean_streak/core/constants/app_info.dart';
 
-/// Sends feedback by adding a document to `mail`, which the Firebase
-/// "Trigger Email from Firestore" extension emails to [supportEmail].
-/// `firestore.rules` only lets a user create one shaped exactly like this.
+/// Sends feedback to a Formspree form, which emails it to [supportEmail]
+/// with the user's address to reply to.
 class FeedbackRepository {
-  FeedbackRepository(this._db);
-  final FirebaseFirestore _db;
+  FeedbackRepository([http.Client? client]) : _client = client ?? http.Client();
+  final http.Client _client;
+
+  static final endpoint = Uri.parse('https://formspree.io/f/mqppllqo');
 
   Future<void> send({
     required String uid,
     required String email,
     required String text,
-  }) {
+  }) async {
     final platform = kIsWeb ? 'web' : defaultTargetPlatform.name;
-    return _db.collection('mail').add({
-      'to': supportEmail,
-      'replyTo': email,
-      'message': {
-        'subject': 'YumSum feedback',
-        'text': '$text\n\n--\nUser: $uid\nApp: $appVersion, $platform',
+    final response = await _client.post(
+      endpoint,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
       },
-    });
+      body: jsonEncode({
+        '_subject': 'YumSum feedback',
+        'email': email,
+        'message': text,
+        'user': uid,
+        'app': '$appVersion, $platform',
+      }),
+    );
+    if (response.statusCode != 200) {
+      throw http.ClientException(
+        'Feedback failed: ${response.statusCode}',
+        endpoint,
+      );
+    }
   }
 }

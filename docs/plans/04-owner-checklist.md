@@ -20,7 +20,7 @@
 - [x] **Check the website** at https://yumsum.web.app/app/ (done 29 October 2026)
   - [x] Sign in with Google
   - [x] Log a meal with an AI estimate
-  - [ ] Deploy the smoother logo: `firebase deploy --only hosting:app` (already built in `build/hosting`)
+  - [x] Logo: the website now draws it, so it stays sharp (goes live with the deploy below)
 
 - [ ] **Lock down the Firebase API keys** (most important security item)
   The keys in the app are public. If one may call the **Generative Language API** (Gemini itself), anyone can copy it and use Gemini directly, skipping App Check and the 10-a-day limit, on your credit. The app doesn't need it: its AI goes through the **Firebase AI Logic API**.
@@ -40,20 +40,14 @@
 
 ## Feedback emails
 
+The app sends feedback to a Formspree form (formspree.io, signed up with help.yumsum@gmail.com), which emails it to help.yumsum with the user's address to reply to. No Gmail password, no Firebase extension. Free up to 50 messages a month.
+
 - [x] Create the Gmail account **help.yumsum@gmail.com**
-- [ ] Create an app password at myaccount.google.com/apppasswords (copy the 16 characters)
-  help.yumsum is too new: Google refuses 2-Step Verification ("We couldn't verify it's you"), even from the phone. So the emails are sent from your own older Gmail, which needs 2-Step Verification on. They still arrive at help.yumsum, and users never see the sending address. Use your own address below wherever it says help.yumsum in the SMTP settings. Once help.yumsum allows 2-Step Verification (try again in a week), you can switch the extension to it: Extensions → Manage → Reconfigure.
-- [ ] Firebase → Extensions → install **Trigger Email from Firestore**:
-  - Firestore location: the same as the database (Firestore → Databases shows it)
-  - Authentication type: Username & Password
-  - SMTP connection URI: `smtps://help.yumsum@gmail.com@smtp.gmail.com:465`
-  - SMTP password: the app password
-  - Email documents collection: `mail`
-  - Default FROM: `YumSum <help.yumsum@gmail.com>`
-  - Leave Users collection, Templates collection and Default REPLY-TO blank
-- [ ] Optional: Firestore → TTL → add a policy on collection group `mail`, field `delivery.expireAt`, so sent feedback is cleared from the database
-- [ ] Send a test from Account Settings → Send feedback and check it arrives
-- [ ] Before 31 March 2027: Firebase Extensions shut down then (no installing or editing). Ask Claude to replace the extension with a small Cloud Function of our own, as Firebase's migration guide suggests.
+- [x] Create the Formspree form (`mqppllqo`); Claude switched the app to it and sent one test message (29 October 2026)
+- [ ] Check the test email from Claude arrived in help.yumsum (look in Spam too)
+- [ ] Deploy the website and the rules (the old `mail` rule is gone): `firebase deploy --only hosting:app,firestore:rules`
+- [ ] Run the app on the phone again, send feedback from Account Settings → Send feedback, and check it arrives
+- [ ] Delete the unused "YumSum feedback" app password from your personal Gmail (myaccount.google.com/apppasswords)
 
 ## Tidy up
 
