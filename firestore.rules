@@ -2,11 +2,140 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write, delete: if request.auth != null && request.auth.uid == userId;
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
 
-      match /{subcollection}/{document=**} {
-        allow read, write, delete: if request.auth != null && request.auth.uid == userId;
+    function text(value, max) {
+      return value is string && value.size() <= max;
+    }
+
+    function optionalText(value, max) {
+      return value == null || text(value, max);
+    }
+
+    function optionalNumber(value) {
+      return value == null || value is number;
+    }
+
+    // yyyy-MM-dd
+    function dateKey(value) {
+      return value is string && value.size() == 10;
+    }
+
+    // The documents below are written whole (set, not update), so each lists
+    // every field it may have. A new field in a model needs adding here too.
+
+    function validMeal(d) {
+      return d.keys().hasOnly(['id', 'date', 'timestamp', 'name', 'calories',
+                               'proteinGrams', 'createdAt', 'updatedAt'])
+        && text(d.id, 100)
+        && dateKey(d.date)
+        && d.timestamp is timestamp
+        && optionalText(d.get('name', null), 500)
+        && d.calories is number
+        && optionalNumber(d.get('proteinGrams', null))
+        && d.createdAt is timestamp
+        && d.updatedAt is timestamp;
+    }
+
+    function validSummary(d) {
+      return d.keys().hasOnly(['date', 'totalCalories', 'targetCalories',
+                               'calorieDelta', 'mealCount', 'proteinGrams',
+                               'status', 'dayOff', 'updatedAt'])
+        && dateKey(d.date)
+        && d.totalCalories is number
+        && d.targetCalories is number
+        && d.calorieDelta is number
+        && d.mealCount is number
+        && optionalNumber(d.get('proteinGrams', null))
+        && d.status in ['green', 'yellow', 'red']
+        && d.get('dayOff', false) is bool
+        && d.updatedAt is timestamp;
+    }
+
+    function validWeightEntry(d) {
+      return d.keys().hasOnly(['dateKey', 'weightKg', 'loggedAt', 'source'])
+        && dateKey(d.dateKey)
+        && d.weightKg is number
+        && d.loggedAt is timestamp
+        && text(d.source, 20);
+    }
+
+    // The AI allowance and past-day edit counters only ever go up by one.
+    // They are deleted only with the account: after the profile is gone, or
+    // in the same batch as it.
+    function counterCreate() {
+      return request.resource.data.keys().hasOnly(['count'])
+        && request.resource.data.count == 1;
+    }
+
+    function counterIncrement() {
+      return request.resource.data.keys().hasOnly(['count'])
+        && request.resource.data.count == resource.data.count + 1;
+    }
+
+    function profileGone(userId) {
+      return !existsAfter(/databases/$(database)/documents/users/$(userId));
+    }
+
+    match /users/{userId} {
+      // The profile is set whole at onboarding and partly updated later, and
+      // old profiles may carry fields the app no longer writes, so only the
+      // free-text fields are checked.
+      allow read, delete: if isOwner(userId);
+      allow create, update: if isOwner(userId)
+        && text(request.resource.data.get('name', ''), 200)
+        && text(request.resource.data.get('email', ''), 320)
+        && text(request.resource.data.get('country', ''), 100)
+        && text(request.resource.data.get('usualFood', ''), 500);
+
+      match /meals/{mealId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && validMeal(request.resource.data);
+      }
+
+      match /daily_summaries/{date} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && validSummary(request.resource.data);
+      }
+
+      match /weight_entries/{date} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && validWeightEntry(request.resource.data);
+      }
+
+      match /days_off/{date} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && request.resource.data.keys().hasOnly(['date'])
+          && dateKey(request.resource.data.date);
+      }
+
+      match /ai_usage/{date} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && counterCreate();
+        allow update: if isOwner(userId) && counterIncrement();
+        allow delete: if isOwner(userId) && profileGone(userId);
+      }
+
+      match /day_edits/{month} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && counterCreate();
+        allow update: if isOwner(userId) && counterIncrement();
+        allow delete: if isOwner(userId) && profileGone(userId);
+      }
+
+      // Legacy check-ins: no longer written, only deleted with the account.
+      match /check_ins/{document=**} {
+        allow read, delete: if isOwner(userId);
+      }
+
+      match /check_in_prompt_status/{document=**} {
+        allow read, delete: if isOwner(userId);
       }
     }
   }
