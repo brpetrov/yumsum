@@ -4,11 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/feedback_provider.dart';
+import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/repositories/feedback_repository.dart';
 import 'package:lean_streak/widgets/feedback_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class _User extends Fake implements User {
   @override
@@ -38,14 +41,22 @@ class _FakeFeedbackRepository extends Fake implements FeedbackRepository {
 
 void main() {
   late _FakeFeedbackRepository repo;
+  late SharedPreferences prefs;
+  final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-  Future<void> openDialog(WidgetTester tester) async {
+  Future<void> openDialog(
+    WidgetTester tester, {
+    Map<String, Object> stored = const {},
+  }) async {
     repo = _FakeFeedbackRepository();
+    SharedPreferences.setMockInitialValues(stored);
+    prefs = await SharedPreferences.getInstance();
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           authStateProvider.overrideWith((ref) => Stream<User?>.value(_User())),
           feedbackRepositoryProvider.overrideWithValue(repo),
+          sharedPreferencesProvider.overrideWithValue(prefs),
         ],
         child: MaterialApp(
           theme: AppTheme.light,
@@ -108,6 +119,34 @@ void main() {
     ]);
     expect(find.byType(AlertDialog), findsNothing);
     expect(find.text('Feedback sent. Thank you.'), findsOneWidget);
+    expect(prefs.getString('feedback.sent_day'), today);
+    expect(prefs.getInt('feedback.sent_count'), 1);
+  });
+
+  testWidgets('Three a day, then Send is off until tomorrow', (tester) async {
+    await openDialog(
+      tester,
+      stored: {'feedback.sent_day': today, 'feedback.sent_count': 3},
+    );
+    await tester.enterText(find.byKey(const Key('feedback-text')), 'More');
+    await tester.pump();
+
+    expect(sendButton(tester).onPressed, isNull);
+    expect(
+      find.text("You've sent 3 today. You can send more tomorrow."),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets("Yesterday's count doesn't block today", (tester) async {
+    await openDialog(
+      tester,
+      stored: {'feedback.sent_day': '2000-01-01', 'feedback.sent_count': 3},
+    );
+    await tester.enterText(find.byKey(const Key('feedback-text')), 'Hi');
+    await tester.pump();
+
+    expect(sendButton(tester).onPressed, isNotNull);
   });
 
   testWidgets('The chosen kind changes the prompt and is sent', (tester) async {

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/feedback_provider.dart';
+import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/widgets/pill_toggle.dart';
 
 /// Lets the user write to the developer without leaving the app; a thank-you
@@ -20,6 +22,12 @@ Future<void> showFeedbackDialog(BuildContext context) async {
     ).showSnackBar(SnackBar(content: Text('Feedback sent. Thank you.')));
   }
 }
+
+/// Per device and day: plenty for anyone with something to say, and one
+/// person can't use up the form's 50 a month.
+const _dailyLimit = 3;
+const _sentDayKey = 'feedback.sent_day';
+const _sentCountKey = 'feedback.sent_count';
 
 enum _Kind {
   problem('Problem', 'What happened, and what did you expect?'),
@@ -50,6 +58,14 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
     super.dispose();
   }
 
+  String get _today => DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+  int _sentToday() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    if (prefs.getString(_sentDayKey) != _today) return 0;
+    return prefs.getInt(_sentCountKey) ?? 0;
+  }
+
   Future<void> _send() async {
     setState(() {
       _sending = true;
@@ -65,6 +81,10 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
             kind: _kind.label,
             text: _textCtrl.text.trim(),
           );
+      final sent = _sentToday();
+      final prefs = ref.read(sharedPreferencesProvider);
+      await prefs.setString(_sentDayKey, _today);
+      await prefs.setInt(_sentCountKey, sent + 1);
       if (mounted) Navigator.of(context).pop(true);
     } catch (_) {
       if (mounted) {
@@ -79,7 +99,9 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
   @override
   Widget build(BuildContext context) {
     final email = ref.watch(authStateProvider).valueOrNull?.email;
-    final canSend = !_sending && _textCtrl.text.trim().isNotEmpty;
+    final limitReached = _sentToday() >= _dailyLimit;
+    final canSend =
+        !limitReached && !_sending && _textCtrl.text.trim().isNotEmpty;
 
     return AlertDialog(
       title: Text('Send feedback'),
@@ -108,6 +130,13 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
             SizedBox(height: 12),
             Text(
               'Replies go to $email.',
+              style: TextStyle(color: AppColors.textSecondary, height: 1.4),
+            ),
+          ],
+          if (limitReached) ...[
+            SizedBox(height: 12),
+            Text(
+              "You've sent $_dailyLimit today. You can send more tomorrow.",
               style: TextStyle(color: AppColors.textSecondary, height: 1.4),
             ),
           ],
