@@ -47,12 +47,12 @@ The app sends feedback to a Formspree form (formspree.io, signed up with help.yu
 - [x] Check the test email from Claude arrived in help.yumsum (look in Spam too)
 - [x] Deploy the website and the rules (the old `mail` rule is gone): `firebase deploy --only hosting:app,firestore:rules`
 - [x] Run the app on the phone again, send feedback from Account Settings → Send feedback, and check it arrives
-- [ ] Delete the unused "YumSum feedback" app password from your personal Gmail (myaccount.google.com/apppasswords)
+- [x] Delete the unused "YumSum feedback" app password from your personal Gmail (myaccount.google.com/apppasswords)
 
 ## Tidy up
 
-- [ ] Firebase → Project settings → Your apps: delete `lean_streak (android)`, `LeanStreak Android` and `lean_streak (ios)`
-- [ ] Push the commits to GitHub (say "push" to Claude, or use the Sync button)
+- [x] Firebase → Project settings → Your apps: delete `lean_streak (android)`, `LeanStreak Android` and `lean_streak (ios)`
+- [x] Push the commits to GitHub (say "push" to Claude, or use the Sync button)
 
 ## Before Play closed testing (Claude can do these, just ask)
 
