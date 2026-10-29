@@ -17,9 +17,10 @@
 
   Only debug builds need this, once per install: a reinstall or cleared app data makes a new code, which needs adding again. Play installs use Play Integrity and website visitors use reCAPTCHA, with nothing for them to do.
 
-- [ ] **Check the website** at https://yumsum.web.app/app/
-  - [ ] Sign in with Google
-  - [ ] Log a meal with an AI estimate
+- [x] **Check the website** at https://yumsum.web.app/app/ (done 29 October 2026)
+  - [x] Sign in with Google
+  - [x] Log a meal with an AI estimate
+  - [ ] Deploy the smoother logo: `firebase deploy --only hosting:app` (already built in `build/hosting`)
 
 - [ ] **Lock down the Firebase API keys** (most important security item)
   Google Cloud → APIs & Services → Credentials. For each of the three auto-created keys (browser, Android, iOS):
