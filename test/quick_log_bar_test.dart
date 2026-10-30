@@ -238,7 +238,7 @@ void main() {
   late List<CameraMode> cameraModes;
   late _FakeContributor contributor;
   // The photos the contribution camera last asked for.
-  List<String>? photoSteps;
+  List<PhotoStep>? photoSteps;
 
   Future<void> pumpCard(
     WidgetTester tester, {
@@ -503,7 +503,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final sent = contributor.sent.single;
-    expect(photoSteps, ['Front of the pack', 'Nutrition table']);
+    expect(photoSteps, [frontOfPackStep, nutritionTableStep]);
     expect(estimateService.readFront, isTrue);
     expect(sent.lang, 'bg');
     expect(sent.barcode, '3800000000017');
@@ -542,7 +542,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // One photo, of the table; what the product has isn't asked for again.
-    expect(photoSteps, ['Nutrition table']);
+    expect(photoSteps, [nutritionTableStep]);
     expect(estimateService.readFront, isFalse);
     expect(find.text('Check the nutrition'), findsOneWidget);
     expect(find.byKey(const ValueKey('contribute-name')), findsNothing);

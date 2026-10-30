@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
 
+import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 
 /// The bar's camera on phones, in one of two modes. Resolves to what it
@@ -14,11 +15,11 @@ class MealCameraPage extends StatefulWidget {
   /// to press.
   const MealCameraPage.barcode({super.key}) : photoSteps = const [];
 
-  /// A shutter, asking for one photo per step ("Take a photo of your
-  /// meal", or "Front of the pack" then "Nutrition table").
+  /// A shutter, asking for one photo per step (the meal, or the front of
+  /// the pack then the nutrition table), each explained on a card.
   const MealCameraPage.photos({super.key, required this.photoSteps});
 
-  final List<String> photoSteps;
+  final List<PhotoStep> photoSteps;
 
   @override
   State<MealCameraPage> createState() => _MealCameraPageState();
@@ -245,12 +246,8 @@ class _MealCameraPageState extends State<MealCameraPage>
     final camera = _camera;
     final ready = camera != null && camera.value.isInitialized;
     final steps = widget.photoSteps;
-    final hint = _scanning
-        ? 'Point at the barcode'
-        : steps.length == 1
-        ? steps.single
-        : '${_photos.length + 1} of ${steps.length} · '
-              '${steps[_photos.length.clamp(0, steps.length - 1)]}';
+    // Still the last step while the page closes after its photo.
+    final index = _scanning ? 0 : _photos.length.clamp(0, steps.length - 1);
 
     return PopScope(
       onPopInvokedWithResult: (didPop, _) {
@@ -338,12 +335,22 @@ class _MealCameraPageState extends State<MealCameraPage>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          hint,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: white.withValues(alpha: 0.9),
-                            fontSize: 15,
+                        // Fades from one step to the next, so the change
+                        // is noticed.
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          child: PhotoStepCard(
+                            key: ValueKey(index),
+                            step: _scanning
+                                ? const (
+                                    title: 'Point at the barcode',
+                                    tip:
+                                        'Hold it inside the box and it\'s '
+                                        'read by itself.',
+                                  )
+                                : steps[index],
+                            number: steps.length > 1 ? index + 1 : null,
+                            total: steps.length,
                           ),
                         ),
                         if (!_scanning) ...[
@@ -378,6 +385,80 @@ class _MealCameraPageState extends State<MealCameraPage>
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// What to photograph now, on a dark card over the camera: "Step 1 of 2"
+/// when there's more than one step, then what to take and a tip.
+class PhotoStepCard extends StatelessWidget {
+  const PhotoStepCard({
+    super.key,
+    required this.step,
+    this.number,
+    this.total = 1,
+  });
+
+  final PhotoStep step;
+  final int? number;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    const white = Colors.white;
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 420),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (number != null) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(
+                'Step $number of $total',
+                style: TextStyle(
+                  color: AppColors.onPrimary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
+          Text(
+            step.title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: white,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              height: 1.25,
+            ),
+          ),
+          if (step.tip case final tip?) ...[
+            const SizedBox(height: 6),
+            Text(
+              tip,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: white.withValues(alpha: 0.8),
+                fontSize: 14,
+                height: 1.35,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

@@ -493,8 +493,8 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       return _Offer.declined;
     }
     final steps = listed == null
-        ? const ['Front of the pack', 'Nutrition table']
-        : const ['Nutrition table'];
+        ? const [frontOfPackStep, nutritionTableStep]
+        : const [nutritionTableStep];
     final photos = await ref.read(productPhotosProvider)(context, steps);
     if (photos == null || photos.length < steps.length || !mounted) {
       return _Offer.abandoned;
