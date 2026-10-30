@@ -4,6 +4,13 @@
 
 ## Now
 
+- [ ] **Put the 30 October changes live** (new quick-log bar, optional protein, launch screen, web loading page)
+  - [ ] `firebase deploy --only hosting:app,firestore:rules` (the rules now check the new `trackProtein` field), then Ctrl+F5 on the website
+  - [ ] Run the app on the phone again from VS Code. Then close it fully and open it from the home screen: the launch screen should show the bowl alone on cream, and the app's splash should carry on from it
+  - [ ] Try the bar: photo, barcode and mic buttons; type a name and see Estimate, add calories and see Save
+  - [ ] Plan Settings → Track protein too? → No, Save: no protein on Today, in the bar, on meals or in History
+- [ ] **Open Food Facts account** (tomorrow): see "While Google checks your ID" below
+
 - [x] **Deploy the database rules and the website together** (done 29 October 2026)
   Run `firebase deploy --only firestore:rules,hosting` (the website is already built in `build/hosting`).
   Deploy both at once: the new rules need the new app code, or Reset all data and Delete account fail.

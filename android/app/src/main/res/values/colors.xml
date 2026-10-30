@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Matches AppPalette.light.background so the launch frame doesn't flash. -->
-    <color name="launch_background">#FAF2E7</color>
+    <color name="launch_background">#FBF0E4</color>
 
     <!-- The home-screen widget, from AppPalette.light. -->
     <color name="widget_surface">#FFFBF5</color>

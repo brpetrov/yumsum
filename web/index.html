@@ -31,29 +31,118 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 
   <title>YumSum</title>
-  <meta name="theme-color" content="#FAF2E7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#FBF0E4" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1A1512" media="(prefers-color-scheme: dark)">
   <link rel="manifest" href="manifest.json">
+  <!-- The app's code is the big download; start it before the loader runs. -->
+  <link rel="preload" href="main.dart.js" as="script">
   <style>
-    /* Match the app's warm background so there is no white flash on load. */
-    html, body { margin: 0; background: #FAF2E7; }
-    @media (prefers-color-scheme: dark) {
-      html, body { background: #1A1512; }
-      #loading { color: #BCAD9F; }
+    /* The same splash the app draws first (SplashScreen, AppLogoMark), so
+       nothing changes when it takes over; the app's fonts, which it will
+       fetch again from the browser's cache. */
+    @font-face {
+      font-family: Fredoka;
+      font-weight: 600;
+      font-display: swap;
+      src: url(assets/assets/fonts/Fredoka-SemiBold.ttf);
     }
+    @font-face {
+      font-family: Nunito;
+      font-weight: 600;
+      font-display: swap;
+      src: url(assets/assets/fonts/Nunito-SemiBold.ttf);
+    }
+    html, body { margin: 0; background: #FBF0E4; }
     #loading {
       position: fixed;
       inset: 0;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: #76665A;
-      font: 600 16px system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #2B1F18;
+      font: 600 15px Nunito, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #loading .tile {
+      width: 96px;
+      height: 96px;
+      padding: 13px;
+      box-sizing: border-box;
+      border-radius: 27px;
+      background: linear-gradient(135deg, #E08A45, #D2402C);
+      box-shadow: 0 12px 30px rgba(201, 77, 26, 0.3);
+    }
+    #loading .tile svg { display: block; width: 100%; height: 100%; }
+    #loading .name {
+      margin-top: 20px;
+      font: 600 38px Fredoka, Nunito, system-ui, sans-serif;
+    }
+    #loading .tagline { margin-top: 6px; color: #6F5F53; }
+    #loading .spinner {
+      margin-top: 32px;
+      width: 24px;
+      height: 24px;
+      box-sizing: border-box;
+      border: 2.5px solid rgba(201, 77, 26, 0.2);
+      border-top-color: #C94D1A;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (prefers-color-scheme: dark) {
+      html, body { background: #1A1512; }
+      #loading { color: #F6EDE3; }
+      #loading .tagline { color: #BCAD9F; }
+      #loading .spinner {
+        border-color: rgba(245, 138, 90, 0.2);
+        border-top-color: #F58A5A;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="loading">YumSum</div>
+  <div id="loading">
+    <div class="tile">
+      <!-- The bowl from AppLogoMark's painter, in its coordinates. -->
+      <svg viewBox="205 205 614 614" aria-hidden="true">
+        <defs>
+          <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="231" x2="0" y2="791">
+            <stop offset="0" stop-color="#7BE8A1"/><stop offset="1" stop-color="#38CFA3"/>
+          </linearGradient>
+          <linearGradient id="p" gradientUnits="userSpaceOnUse" x1="0" y1="231" x2="0" y2="791">
+            <stop offset="0" stop-color="#FBE9CF"/><stop offset="1" stop-color="#FBBA88"/>
+          </linearGradient>
+          <linearGradient id="b" gradientUnits="userSpaceOnUse" x1="0" y1="548" x2="0" y2="792">
+            <stop offset="0" stop-color="#FCEBD3"/><stop offset="1" stop-color="#F9D9B6"/>
+          </linearGradient>
+        </defs>
+        <g fill="none" stroke-width="53" stroke-linecap="round">
+          <path d="M512 231A280 280 0 0 1 788.8 553.4" stroke="url(#g)"/>
+          <path d="M235.2 553.4A280 280 0 0 1 521.8 231.2" stroke="url(#p)"/>
+        </g>
+        <path d="M512 345V390M605 382L582 413" fill="none" stroke="#FBE4C5" stroke-width="22" stroke-linecap="round"/>
+        <ellipse cx="512" cy="570" rx="230" ry="22" fill="#FCF3E2"/>
+        <path d="M505 590Q580 428 405 392Q330 554 505 590Z" fill="#1B6A32"/>
+        <path d="M520 590Q602 537 548 455Q466 508 520 590Z" fill="#2F7F3F"/>
+        <path d="M480 590Q461 440 312 468Q331 618 480 590Z" fill="#6EB752"/>
+        <g transform="translate(618 520) rotate(35)">
+          <ellipse rx="64" ry="93" fill="#FCF3E2"/>
+          <ellipse cx="10" cy="30" rx="43" ry="58" fill="#FCB81A"/>
+        </g>
+        <rect x="404" y="765" width="216" height="52" rx="26" fill="#F8CFA6"/>
+        <path d="M282 570A230 22 0 0 1 742 570C742 690 630 792 512 792C394 792 282 690 282 570Z" fill="url(#b)"/>
+        <path d="M742 570A230 22 0 0 1 282 570" fill="none" stroke="#FCF3E2" stroke-width="14" stroke-linecap="round"/>
+        <g fill="none" stroke="#A23419" stroke-width="19" stroke-linecap="round">
+          <path d="M385.3 669.4A33 33 0 0 1 450.7 669.4"/>
+          <path d="M571.3 669.4A33 33 0 0 1 636.7 669.4"/>
+          <path d="M554.2 693A51 51 0 0 1 467.8 693"/>
+        </g>
+      </svg>
+    </div>
+    <div class="name">YumSum</div>
+    <div class="tagline">Stay consistent. Stay lean.</div>
+    <div class="spinner"></div>
+  </div>
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader

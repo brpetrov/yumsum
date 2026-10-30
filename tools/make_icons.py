@@ -32,6 +32,9 @@ ANDROID_R = 0.26
 TILE_R = 0.38  # iOS, Play, web tiles
 FAVICON_R = 0.45  # larger, so the bowl still reads at 16 and 32 px
 MASKABLE_R = 0.36  # web maskable: the safe zone is 0.40
+# Android 12's launch screen draws the icon 240dp wide inside a 160dp circle;
+# 0.20 shows the bowl about as big as the app's own splash does.
+SPLASH_R = 0.20
 TILE_CORNER = 0.22  # rounded tiles' corner radius
 DENSITIES = {'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4}
 
@@ -176,6 +179,8 @@ def android(art, mono):
         save(tile(art, round(48 * d), inset=2 / 48), folder / 'ic_launcher.png')
         icon = round(24 * d)
         save(white(mono.fitted(icon, 20 * d)), RES / f'drawable-{name}' / 'ic_notification.png')
+    # The bowl alone, on the launch screen's background (values-v31/styles.xml).
+    save(art.placed(240 * 4, SPLASH_R), RES / 'drawable-xxxhdpi' / 'splash_icon.png')
 
 
 def ios(art):
