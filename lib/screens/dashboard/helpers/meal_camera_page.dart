@@ -7,18 +7,18 @@ import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart
 
 import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 
-/// The bar's camera on phones: a live picture that picks up a packet's
-/// barcode by itself, and a shutter for a photo of the plate. Resolves to
-/// whichever came first, or null when closed. [skipBarcode] is one the
-/// food database just didn't know, so the packet can be photographed.
-///
-/// With [photoSteps] it reads no barcodes: it asks for one photo per
-/// step ("Front of the pack", ...) and resolves to all of them.
+/// The bar's camera on phones, in one of two modes. Resolves to what it
+/// got, or null when closed.
 class MealCameraPage extends StatefulWidget {
-  const MealCameraPage({super.key, this.skipBarcode, this.photoSteps});
+  /// A live picture that picks up a packet's barcode by itself; nothing
+  /// to press.
+  const MealCameraPage.barcode({super.key}) : photoSteps = const [];
 
-  final String? skipBarcode;
-  final List<String>? photoSteps;
+  /// A shutter, asking for one photo per step ("Take a photo of your
+  /// meal", or "Front of the pack" then "Nutrition table").
+  const MealCameraPage.photos({super.key, required this.photoSteps});
+
+  final List<String> photoSteps;
 
   @override
   State<MealCameraPage> createState() => _MealCameraPageState();
@@ -47,7 +47,7 @@ class _MealCameraPageState extends State<MealCameraPage>
   String? _problem;
   final _photos = <XFile>[];
 
-  bool get _scanning => widget.photoSteps == null;
+  bool get _scanning => widget.photoSteps.isEmpty;
 
   @override
   void initState() {
@@ -165,10 +165,7 @@ class _MealCameraPageState extends State<MealCameraPage>
     _reading = true;
     try {
       final barcodes = await _scanner.processImage(image);
-      final code = barcodes
-          .map((barcode) => barcode.rawValue)
-          .nonNulls
-          .where((code) => code != widget.skipBarcode);
+      final code = barcodes.map((barcode) => barcode.rawValue).nonNulls;
       if (code.isNotEmpty && !_done) {
         _done = true;
         HapticFeedback.mediumImpact();
@@ -216,12 +213,11 @@ class _MealCameraPageState extends State<MealCameraPage>
         _done) {
       return;
     }
-    _done = true; // no barcode may win the race from here on
+    _done = true;
     try {
-      if (camera.value.isStreamingImages) await camera.stopImageStream();
       final photo = await camera.takePicture();
       _photos.add(photo);
-      if (_photos.length < (widget.photoSteps?.length ?? 1)) {
+      if (_photos.length < widget.photoSteps.length) {
         // On to the next step.
         HapticFeedback.lightImpact();
         if (mounted) setState(() => _done = false);
@@ -235,11 +231,7 @@ class _MealCameraPageState extends State<MealCameraPage>
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Could not take the photo. Try again.')),
       );
-      if (identical(_camera, camera)) {
-        if (_scanning && !camera.value.isStreamingImages) {
-          await camera.startImageStream(_onFrame);
-        }
-      } else if (_camera == null &&
+      if (_camera == null &&
           WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
         // The app went to the background mid-photo and is back already.
         _start();
@@ -253,8 +245,10 @@ class _MealCameraPageState extends State<MealCameraPage>
     final camera = _camera;
     final ready = camera != null && camera.value.isInitialized;
     final steps = widget.photoSteps;
-    final hint = steps == null
-        ? 'Scan a barcode\nor just take a photo of your meal'
+    final hint = _scanning
+        ? 'Point at the barcode'
+        : steps.length == 1
+        ? steps.single
         : '${_photos.length + 1} of ${steps.length} · '
               '${steps[_photos.length.clamp(0, steps.length - 1)]}';
 
@@ -352,29 +346,31 @@ class _MealCameraPageState extends State<MealCameraPage>
                             fontSize: 15,
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        Semantics(
-                          button: true,
-                          label: 'Take photo',
-                          child: GestureDetector(
-                            onTap: _takePhoto,
-                            child: Container(
-                              width: 76,
-                              height: 76,
-                              padding: const EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: white, width: 4),
-                              ),
-                              child: const DecoratedBox(
+                        if (!_scanning) ...[
+                          const SizedBox(height: 20),
+                          Semantics(
+                            button: true,
+                            label: 'Take photo',
+                            child: GestureDetector(
+                              onTap: _takePhoto,
+                              child: Container(
+                                width: 76,
+                                height: 76,
+                                padding: const EdgeInsets.all(5),
                                 decoration: BoxDecoration(
-                                  color: white,
                                   shape: BoxShape.circle,
+                                  border: Border.all(color: white, width: 4),
+                                ),
+                                child: const DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: white,
+                                    shape: BoxShape.circle,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ),

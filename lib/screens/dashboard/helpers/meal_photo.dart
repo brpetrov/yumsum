@@ -9,30 +9,38 @@ import 'package:lean_streak/screens/dashboard/helpers/meal_camera_page.dart';
 /// (one for a meal, one per step for a product).
 typedef MealCapture = ({String? barcode, List<XFile> photos});
 
-/// Opens the bar's camera, passing over a barcode the food database just
-/// didn't know; overridable in tests.
+/// The bar's two camera buttons.
+enum CameraMode { photo, barcode }
+
+/// Opens the bar's camera in [CameraMode]; overridable in tests.
 final mealCameraProvider =
     Provider<
-      Future<MealCapture?> Function(BuildContext context, String? skipBarcode)
+      Future<MealCapture?> Function(BuildContext context, CameraMode mode)
     >((ref) => openMealCamera);
 
-bool get _isMobile =>
+/// Only phones read barcodes: the scanner runs on the device, and the
+/// browser can't run it.
+bool get hasBarcodeScanner =>
     !kIsWeb &&
     (defaultTargetPlatform == TargetPlatform.android ||
         defaultTargetPlatform == TargetPlatform.iOS);
 
-/// Phones get the live camera, which reads a barcode by itself or takes a
-/// photo of the plate; elsewhere a file picker chooses a photo, resized so
-/// the upload stays small (and the AI bill tiny).
+/// Phones get the live camera; elsewhere a file picker chooses a photo,
+/// resized so the upload stays small (and the AI bill tiny).
 Future<MealCapture?> openMealCamera(
   BuildContext context,
-  String? skipBarcode,
+  CameraMode mode,
 ) async {
-  if (_isMobile) {
+  if (hasBarcodeScanner) {
     return Navigator.of(context).push<MealCapture>(
       MaterialPageRoute(
         fullscreenDialog: true,
-        builder: (_) => MealCameraPage(skipBarcode: skipBarcode),
+        builder: (_) => switch (mode) {
+          CameraMode.barcode => const MealCameraPage.barcode(),
+          CameraMode.photo => const MealCameraPage.photos(
+            photoSteps: ['Take a photo of your meal'],
+          ),
+        },
       ),
     );
   }
@@ -55,7 +63,7 @@ Future<List<XFile>?> takeProductPhotos(BuildContext context) async {
   final capture = await Navigator.of(context).push<MealCapture>(
     MaterialPageRoute(
       fullscreenDialog: true,
-      builder: (_) => const MealCameraPage(
+      builder: (_) => const MealCameraPage.photos(
         photoSteps: ['Front of the pack', 'Nutrition table'],
       ),
     ),

@@ -16,7 +16,7 @@ It also fixes LeanStreak's weakest spot. Bulgarian products and UK supermarket o
 4. The user checks the figures against the packet, fixes anything wrong, and taps **Contribute**. A line under the form says the photos and details will be public under open licences.
 5. A thank-you screen appears: "Thank you! … is now on Open Food Facts, for you and for everyone who scans it after you." From the second contribution it adds a count, e.g. "That's 3 products you've added". **Log it** goes straight to the usual amount sheet.
 
-**Not now** gives the old behaviour: the "isn't in the food database" message, and the camera ignores that barcode next time so the user can photograph the meal instead. Backing out after tapping Contribute just closes things quietly, so a later scan can offer it again. Closing the thank-you instead of tapping Log it still counts as contributed. The form can't be closed while it's sending.
+**Not now** gives the old behaviour: the "isn't in the food database" message, with a nudge to use the photo button instead. Backing out after tapping Contribute just closes things quietly, so a later scan can offer it again. Closing the thank-you instead of tapping Log it still counts as contributed. The form can't be closed while it's sending.
 
 ## What's built
 

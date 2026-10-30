@@ -188,7 +188,7 @@ void main() {
   late _FakeRecorder recorder;
   late _FakeFoodLookup foodLookup;
   late ProviderContainer container;
-  late List<String?> cameraSkips;
+  late List<CameraMode> cameraModes;
   late _FakeContributor contributor;
 
   Future<void> pumpCard(
@@ -206,7 +206,7 @@ void main() {
     estimateService = _FakeEstimateService();
     recorder = _FakeRecorder();
     foodLookup = _FakeFoodLookup();
-    cameraSkips = [];
+    cameraModes = [];
     container = ProviderContainer(
       overrides: [
         logMealControllerProvider.overrideWith(() => controller),
@@ -216,21 +216,26 @@ void main() {
         recentMealsProvider.overrideWith((ref) async => recents),
         audioRecorderProvider.overrideWithValue(recorder),
         userProfileProvider.overrideWith((ref) => Stream.value(null)),
-        mealCameraProvider.overrideWithValue((_, skip) async {
-          cameraSkips.add(skip);
-          return barcode != null
-              ? (barcode: barcode, photos: const <XFile>[])
-              : takesPhoto
-              ? (
-                  barcode: null,
-                  photos: [
-                    XFile.fromData(
-                      Uint8List.fromList([1, 2, 3]),
-                      path: 'a.jpg',
+        mealCameraProvider.overrideWithValue((_, mode) async {
+          cameraModes.add(mode);
+          return switch (mode) {
+            CameraMode.barcode =>
+              barcode == null
+                  ? null
+                  : (barcode: barcode, photos: const <XFile>[]),
+            CameraMode.photo =>
+              !takesPhoto
+                  ? null
+                  : (
+                      barcode: null,
+                      photos: [
+                        XFile.fromData(
+                          Uint8List.fromList([1, 2, 3]),
+                          path: 'a.jpg',
+                        ),
+                      ],
                     ),
-                  ],
-                )
-              : null;
+          };
         }),
         foodLookupServiceProvider.overrideWithValue(foodLookup),
         foodContributionServiceProvider.overrideWithValue(contributor),
@@ -282,7 +287,7 @@ void main() {
     await tester.enterText(kcalBox, '450');
     await tester.pump();
 
-    await tester.tap(find.byTooltip('Save'));
+    await tester.tap(find.widgetWithText(TextButton, 'Save'));
     await tester.pump();
 
     // Protein for typed meals is filled in by the controller, not the box.
@@ -327,12 +332,12 @@ void main() {
     await tester.enterText(nameBox, 'chicken wrap');
     await tester.pump();
 
-    await tester.tap(find.byTooltip('Estimate with AI'));
+    await tester.tap(find.widgetWithText(TextButton, 'Estimate'));
     await tester.pump();
     await tester.pump();
 
     expect(boxes(tester), ['chicken wrap', '520', '32']);
-    expect(find.byTooltip('Save'), findsOneWidget);
+    expect(find.widgetWithText(TextButton, 'Save'), findsOneWidget);
     expect(controller.saved, isEmpty);
 
     // The breakdown is one muted line until tapped.
@@ -364,7 +369,7 @@ void main() {
     tester,
   ) async {
     await pumpCard(tester, barcode: '5000112637922');
-    await tester.tap(find.byTooltip('Photo or barcode'));
+    await tester.tap(find.byTooltip('Scan a barcode'));
     await tester.pumpAndSettle();
 
     expect(foodLookup.lastBarcode, '5000112637922');
@@ -385,8 +390,9 @@ void main() {
 
   testWidgets('a meal photo goes to the AI', (tester) async {
     await pumpCard(tester);
-    await tester.tap(find.byTooltip('Photo or barcode'));
+    await tester.tap(find.byTooltip('Take a photo'));
     await tester.pumpAndSettle();
+    expect(cameraModes, [CameraMode.photo]);
     expect(foodLookup.lastBarcode, isNull);
     expect(estimateService.photoCalls, 1);
     expect(boxes(tester), ['Musaka', '640', '28']);
@@ -397,7 +403,7 @@ void main() {
   ) async {
     await pumpCard(tester, barcode: '3800000000017');
     foodLookup.food = null;
-    await tester.tap(find.byTooltip('Photo or barcode'));
+    await tester.tap(find.byTooltip('Scan a barcode'));
     await tester.pumpAndSettle();
 
     expect(find.text('Be the first to add this'), findsOneWidget);
@@ -439,7 +445,7 @@ void main() {
     await pumpCard(tester, barcode: '4000000000001');
     foodLookup.food = null;
     foodLookup.listed = true;
-    await tester.tap(find.byTooltip('Photo or barcode'));
+    await tester.tap(find.byTooltip('Scan a barcode'));
     await tester.pumpAndSettle();
     expect(find.text('Be the first to add this'), findsNothing);
     expect(
@@ -453,7 +459,7 @@ void main() {
   ) async {
     await pumpCard(tester, barcode: '3800000000017');
     foodLookup.food = null;
-    await tester.tap(find.byTooltip('Photo or barcode'));
+    await tester.tap(find.byTooltip('Scan a barcode'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Contribute'));
     await tester.pumpAndSettle();
@@ -466,16 +472,12 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Thank you!'), findsNothing);
     expect(find.textContaining('isn\'t on Open Food Facts'), findsNothing);
-    // The new product's barcode is not passed over next time.
-    await tester.tap(find.byTooltip('Photo or barcode'));
-    await tester.pumpAndSettle();
-    expect(cameraSkips.last, isNull);
   });
 
   testWidgets('a barcode the database lacks says so', (tester) async {
     await pumpCard(tester, barcode: '4000000000000');
     foodLookup.food = null;
-    await tester.tap(find.byTooltip('Photo or barcode'));
+    await tester.tap(find.byTooltip('Scan a barcode'));
     await tester.pumpAndSettle();
     // Not now: the plain message, and no contribution.
     await tester.tap(find.text('Not now'));
@@ -485,21 +487,18 @@ void main() {
     expect(find.textContaining('isn\'t on Open Food Facts'), findsOneWidget);
     expect(estimateService.photoCalls, 0);
     expect(boxes(tester), ['', '', '']);
-
-    // Opened again, the camera passes over that barcode so the packet can
-    // be photographed instead.
-    await tester.tap(find.byTooltip('Photo or barcode'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Not now'));
-    await tester.pumpAndSettle();
-    expect(cameraSkips, [null, '4000000000000']);
+    expect(cameraModes, [CameraMode.barcode]);
   });
 
   testWidgets('backing out of the camera changes nothing', (tester) async {
     await pumpCard(tester, takesPhoto: false);
-    await tester.tap(find.byTooltip('Photo or barcode'));
+    await tester.tap(find.byTooltip('Take a photo'));
     await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Scan a barcode'));
+    await tester.pumpAndSettle();
+    expect(cameraModes, [CameraMode.photo, CameraMode.barcode]);
     expect(estimateService.photoCalls, 0);
+    expect(foodLookup.lastBarcode, isNull);
     expect(boxes(tester), ['', '', '']);
   });
 
@@ -523,24 +522,50 @@ void main() {
     expect(find.text('Search foods'), findsNothing);
   });
 
-  testWidgets('the box offers the camera when empty and clear when not', (
-    tester,
-  ) async {
+  testWidgets(
+    'an empty box offers photo, barcode and mic; text gets one named button',
+    (tester) async {
+      await pumpCard(tester);
+      for (final way in ['Take a photo', 'Scan a barcode', 'Speak']) {
+        expect(find.byTooltip(way), findsOneWidget);
+      }
+      expect(find.byTooltip('Clear'), findsNothing);
+      expect(find.text('Save'), findsNothing);
+      expect(find.text('Estimate'), findsNothing);
+
+      // A name alone can be estimated.
+      await tester.enterText(nameBox, 'wrap');
+      await tester.pump();
+      for (final way in ['Take a photo', 'Scan a barcode', 'Speak']) {
+        expect(find.byTooltip(way), findsNothing);
+      }
+      expect(find.byTooltip('Clear'), findsOneWidget);
+      expect(find.text('Estimate'), findsOneWidget);
+
+      // With calories it saves.
+      await tester.enterText(kcalBox, '450');
+      await tester.pump();
+      expect(find.text('Estimate'), findsNothing);
+      expect(find.text('Save'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Clear'));
+      await tester.pump();
+      expect(boxes(tester), ['', '', '']);
+      expect(find.byTooltip('Speak'), findsOneWidget);
+    },
+  );
+
+  testWidgets('fits a 360dp phone', (tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     await pumpCard(tester);
-    expect(find.byTooltip('Photo or barcode'), findsOneWidget);
-    expect(find.byTooltip('Clear'), findsNothing);
-
-    await tester.enterText(nameBox, 'wrap');
+    // Three buttons beside the box, no overflow.
+    expect(find.byTooltip('Scan a barcode'), findsOneWidget);
+    await tester.enterText(nameBox, 'A long meal name that keeps going');
     await tester.pump();
-    await tester.enterText(kcalBox, '450');
-    await tester.pump();
-    expect(find.byTooltip('Photo or barcode'), findsNothing);
-    expect(find.byTooltip('Clear'), findsOneWidget);
-
-    await tester.tap(find.byTooltip('Clear'));
-    await tester.pump();
-    expect(boxes(tester), ['', '', '']);
-    expect(find.byTooltip('Photo or barcode'), findsOneWidget);
+    expect(find.text('Estimate'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('offers usual meals while the box is focused', (tester) async {
@@ -573,7 +598,7 @@ void main() {
     expect(boxes(tester), ['Chicken wrap', '450', '30']);
     expect(find.byType(ActionChip), findsNothing);
 
-    await tester.tap(find.byTooltip('Save'));
+    await tester.tap(find.widgetWithText(TextButton, 'Save'));
     await tester.pump();
     expect(controller.saved, [
       (name: 'Chicken wrap', calories: 450.0, protein: 30.0),
@@ -758,7 +783,7 @@ void main() {
     await tester.enterText(proteinBox, '35');
     await tester.pump();
 
-    await tester.tap(find.byTooltip('Save'));
+    await tester.tap(find.widgetWithText(TextButton, 'Save'));
     await tester.pump();
 
     expect(controller.saved, [

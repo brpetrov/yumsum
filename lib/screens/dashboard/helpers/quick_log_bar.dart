@@ -9,6 +9,7 @@ import 'package:record/record.dart';
 
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/wav.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
@@ -35,15 +36,15 @@ final audioRecorderProvider = Provider<AudioRecorder>((ref) {
 typedef _Entry = ({String? name, int? kcal, int? protein});
 
 /// The log composer pinned to the bottom of Today, under the thumb: a name
-/// box, with calorie and protein boxes under it once the bar is in use. A
-/// meal with calories saves straight away; one without can be estimated
-/// by the AI, or the camera used (it reads a packet's barcode by itself,
-/// or takes a photo of the plate). With the box empty the main
-/// button is the mic: it records a short note that the AI listens to
-/// itself, in English, Bulgarian or a mix. While the box is focused, meals
-/// are offered as chips for one-tap re-logging: the usual ones for this
-/// time of day, then recent ones matching what is typed, along with a
-/// search of packaged foods.
+/// box, with calorie and protein boxes under it once the bar is in use.
+/// Beside the empty box sit the other ways in, one button each: a photo
+/// of the plate for the AI, a packet's barcode (phones only) and the mic,
+/// which records a short note that the AI listens to itself, in English,
+/// Bulgarian or a mix. Once there is text they give way to one button that
+/// says what it does: Save for a meal with calories, Estimate for one
+/// without. While the box is focused, meals are offered as chips for
+/// one-tap re-logging: the usual ones for this time of day, then recent
+/// ones matching what is typed, along with a search of packaged foods.
 enum _Offer { declined, abandoned, contributed }
 
 class QuickLogBar extends ConsumerStatefulWidget {
@@ -84,10 +85,6 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   bool _listening = false;
   bool _working = false;
   List<EstimateItem> _aiItems = const [];
-
-  /// The last barcode the food database didn't know; the camera passes
-  /// over it next time so the packet itself can be photographed.
-  String? _missedBarcode;
   String? _error;
 
   _Entry get _entry {
@@ -404,17 +401,27 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     });
   }
 
-  /// One camera for everything: a barcode it reads is looked up in Open
-  /// Food Facts (label figures, no AI use); a photo goes to the AI.
+  /// A barcode the camera read is looked up in Open Food Facts (label
+  /// figures, no AI use).
+  Future<void> _scanBarcode() async {
+    final capture = await ref.read(mealCameraProvider)(
+      context,
+      CameraMode.barcode,
+    );
+    if (capture?.barcode case final barcode? when mounted) {
+      await _lookUpBarcode(barcode);
+    }
+  }
+
+  /// A photo of the plate goes to the AI.
   Future<void> _takePhoto() async {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
-    final capture = await ref.read(mealCameraProvider)(context, _missedBarcode);
-    if (capture == null || !mounted) return;
-    if (capture.barcode case final barcode?) {
-      await _lookUpBarcode(barcode);
-      return;
-    }
+    final capture = await ref.read(mealCameraProvider)(
+      context,
+      CameraMode.photo,
+    );
+    if (capture == null || capture.photos.isEmpty || !mounted) return;
     final bytes = await capture.photos.first.readAsBytes();
     if (!mounted) return;
 
@@ -455,7 +462,6 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     }
     if (!mounted) return;
     setState(() {
-      if (problem == null) _missedBarcode = barcode;
       _error =
           problem ??
           (found!.listed
@@ -629,32 +635,23 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                               color: AppColors.textPrimary,
                             ),
                             decoration: _boxDecoration(
-                              hint: 'What did you eat?',
-                              // Camera while empty; a clear button once
-                              // there is text, so a wrong voice or AI
-                              // result is one tap from gone.
-                              suffixIcon: _working || _listening
-                                  ? null
-                                  : hasText
+                              hint: 'Type a meal',
+                              // A clear button once there is text, so a
+                              // wrong voice or AI result is one tap from
+                              // gone.
+                              suffixIcon: hasText && !_working && !_listening
                                   ? IconButton(
                                       tooltip: 'Clear',
                                       onPressed: _reset,
                                       color: AppColors.textSecondary,
                                       icon: const Icon(Icons.close_rounded),
                                     )
-                                  : IconButton(
-                                      tooltip: 'Photo or barcode',
-                                      onPressed: _takePhoto,
-                                      color: AppColors.textSecondary,
-                                      icon: const Icon(
-                                        Icons.photo_camera_outlined,
-                                      ),
-                                    ),
+                                  : null,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        _buildAction(entry, hasText),
+                        const SizedBox(width: 10),
+                        _buildActions(entry, hasText),
                       ],
                     ),
                     // The number boxes span the whole bar, under the name
@@ -815,58 +812,122 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     );
   }
 
-  /// One thumb-sized button that changes with the boxes: mic when empty,
-  /// save once there are calories, estimate for a name without, stop while
-  /// listening.
-  Widget _buildAction(_Entry entry, bool hasText) {
-    final (IconData icon, String tooltip, VoidCallback? onPressed) = _listening
-        ? (Icons.stop_rounded, 'Stop', _toggleListening)
-        : _working
-        ? (Icons.more_horiz_rounded, 'Working', null)
-        : !hasText
-        ? (Icons.mic_rounded, 'Speak', _toggleListening)
-        : entry.kcal != null
-        ? (Icons.check_rounded, 'Save', _submit)
-        : entry.name != null
-        ? (Icons.auto_awesome_rounded, 'Estimate with AI', _submit)
-        : (Icons.check_rounded, 'Save', null);
-
-    // A big glossy bubble in the icon tile's colours, with a soft glow.
-    final glow = _listening ? AppColors.veryBad : AppColors.primary;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: onPressed == null ? AppColors.surfaceVariant : null,
-        gradient: onPressed == null
-            ? null
-            : _listening
-            ? LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color.lerp(glow, Colors.white, 0.15)!, glow],
-              )
-            : AppColors.primaryGradient,
-        boxShadow: onPressed == null
-            ? null
-            : [
-                BoxShadow(
-                  color: glow.withValues(alpha: AppColors.isDark ? 0.3 : 0.4),
-                  blurRadius: 18,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+  /// Beside the box: while it's empty, the other ways in as one round
+  /// button each (greyed while the bar is busy); the stop button while
+  /// listening; once there is text, one button that says what it does.
+  Widget _buildActions(_Entry entry, bool hasText) {
+    if (_listening) {
+      return _circle(Icons.stop_rounded, 'Stop', _toggleListening, stop: true);
+    }
+    if (!hasText) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _circle(
+            Icons.photo_camera_rounded,
+            'Take a photo',
+            _working ? null : _takePhoto,
+          ),
+          if (hasBarcodeScanner) ...[
+            const SizedBox(width: 6),
+            _circle(
+              Icons.qr_code_scanner_rounded,
+              'Scan a barcode',
+              _working ? null : _scanBarcode,
+            ),
+          ],
+          const SizedBox(width: 6),
+          _circle(
+            Icons.mic_rounded,
+            'Speak',
+            _working ? null : _toggleListening,
+          ),
+        ],
+      );
+    }
+    final (IconData icon, String label) = entry.kcal != null
+        ? (Icons.check_rounded, 'Save')
+        : (Icons.auto_awesome_rounded, 'Estimate');
+    final enabled = !_working && (entry.kcal != null || entry.name != null);
+    return _glossy(
+      enabled: enabled,
+      shape: const StadiumBorder(),
+      child: TextButton.icon(
+        onPressed: enabled ? _submit : null,
+        style: TextButton.styleFrom(
+          minimumSize: const Size(0, 56),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          foregroundColor: AppColors.onPrimary,
+          disabledForegroundColor: AppColors.textDisabled,
+          textStyle: AppTheme.display.copyWith(
+            fontSize: 15,
+            letterSpacing: 0.2,
+          ),
+        ),
+        icon: Icon(icon, size: 22),
+        label: Text(label),
       ),
+    );
+  }
+
+  Widget _circle(
+    IconData icon,
+    String tooltip,
+    VoidCallback? onPressed, {
+    bool stop = false,
+  }) {
+    return _glossy(
+      enabled: onPressed != null,
+      shape: const CircleBorder(),
+      glow: stop ? AppColors.veryBad : AppColors.primary,
       child: IconButton(
         onPressed: onPressed,
         tooltip: tooltip,
-        iconSize: 28,
+        iconSize: 24,
         style: IconButton.styleFrom(
-          minimumSize: const Size(58, 58),
+          minimumSize: const Size(44, 44),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           foregroundColor: AppColors.onPrimary,
           disabledForegroundColor: AppColors.textDisabled,
         ),
         icon: Icon(icon),
       ),
+    );
+  }
+
+  /// A glossy bubble in the icon tile's colours, with a soft glow; grey
+  /// when disabled.
+  Widget _glossy({
+    required bool enabled,
+    required ShapeBorder shape,
+    required Widget child,
+    Color? glow,
+  }) {
+    final color = glow ?? AppColors.primary;
+    return DecoratedBox(
+      decoration: ShapeDecoration(
+        shape: shape,
+        color: enabled ? null : AppColors.surfaceVariant,
+        gradient: !enabled
+            ? null
+            : glow == null
+            ? AppColors.primaryGradient
+            : LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color.lerp(color, Colors.white, 0.15)!, color],
+              ),
+        shadows: !enabled
+            ? null
+            : [
+                BoxShadow(
+                  color: color.withValues(alpha: AppColors.isDark ? 0.3 : 0.4),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+      ),
+      child: child,
     );
   }
 
