@@ -12,7 +12,6 @@ import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/past_day_edit_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
-import 'package:lean_streak/widgets/ai_mark.dart';
 import 'package:lean_streak/widgets/estimate_breakdown.dart';
 
 /// Opens the meal form: edits [existingMeal], or adds a meal on [date]
@@ -263,7 +262,7 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const AiMark(size: 20),
+                    : const Icon(Icons.auto_awesome_rounded, size: 18),
                 label: const Text('Estimate from name'),
               ),
             ),

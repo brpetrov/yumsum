@@ -24,7 +24,6 @@ import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 import 'package:lean_streak/screens/dashboard/helpers/portion_sheet.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
-import 'package:lean_streak/widgets/ai_mark.dart';
 import 'package:lean_streak/widgets/estimate_breakdown.dart';
 
 /// The microphone behind the bar's mic button; overridable in tests.
@@ -43,7 +42,7 @@ typedef _Entry = ({String? name, int? kcal, int? protein});
 /// mic, which records a short note that the AI listens to itself, in
 /// English, Bulgarian or a mix. Once the bar is in use (text, or the
 /// keyboard up for it) they slide away for one round button, so the box
-/// has the room: the AI mark to estimate a named meal, a tick to save one
+/// has the room: a sparkle to estimate a named meal, a tick to save one
 /// with calories. While the box is focused, meals are offered as chips for
 /// one-tap re-logging: the usual ones for this time of day, then recent
 /// ones matching what is typed, along with a search of packaged foods.
@@ -828,9 +827,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
 
   /// Beside the box: while the bar is idle, the other ways in as one round
   /// button each (greyed while the bar is busy); the stop button while
-  /// listening; once the bar is in use, one round button, AI to estimate
-  /// a named meal (greyed until there is a name) or a tick to save one
-  /// with calories. A change slides at the box's edge, which follows it.
+  /// listening; once the bar is in use, one round button, a sparkle to
+  /// estimate a named meal (greyed until there is a name) or a tick to save one
+  /// with calories. A change scales at the box's edge, which follows it.
   Widget _buildActions(_Entry entry, bool typing) {
     final (String kind, Widget buttons) = _listening
         ? (
@@ -882,7 +881,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
         : (
             'estimate',
             _circle(
-              const AiMark(),
+              const Icon(Icons.auto_awesome_rounded),
               'Estimate',
               _working || entry.name == null ? null : _submit,
             ),
@@ -890,9 +889,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     return AnimatedSwitcher(
       duration: _switchDuration,
       switchInCurve: Curves.easeOutCubic,
-      transitionBuilder: _slide,
-      // Anchored at the right, so the buttons slide in and out at the
-      // box's edge; the row is as wide as the wider set while both show.
+      transitionBuilder: _collapse,
+      // Anchored at the right, so the buttons come and go at the box's
+      // edge; the row is as wide as the wider set while both show.
       layoutBuilder: (current, previous) => Stack(
         alignment: Alignment.centerRight,
         children: [...previous, ?current],
@@ -901,21 +900,21 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     );
   }
 
-  /// Buttons on their way in or out fade while their row shrinks towards
-  /// the box, which clips them at its edge; a row that is fully in is not
-  /// clipped, so the glow shows.
-  static Widget _slide(Widget child, Animation<double> animation) {
+  /// Buttons on their way out shrink into the box's edge and fade, and
+  /// ones on their way in grow out of it, their row following their size
+  /// so the box's edge moves with them; nothing is clipped.
+  static Widget _collapse(Widget child, Animation<double> animation) {
     return FadeTransition(
       opacity: animation,
       child: AnimatedBuilder(
         animation: animation,
         child: child,
-        builder: (_, child) => ClipRect(
-          clipper: const _LeftEdge(),
-          clipBehavior: animation.value < 1 ? Clip.hardEdge : Clip.none,
-          child: Align(
+        builder: (_, child) => Align(
+          alignment: Alignment.centerRight,
+          widthFactor: animation.value,
+          child: Transform.scale(
+            scale: animation.value,
             alignment: Alignment.centerRight,
-            widthFactor: animation.value,
             child: child,
           ),
         ),
@@ -1009,16 +1008,4 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       ),
     );
   }
-}
-
-/// Clips at the left edge only; the glow is free on the other sides.
-class _LeftEdge extends CustomClipper<Rect> {
-  const _LeftEdge();
-
-  @override
-  Rect getClip(Size size) =>
-      Rect.fromLTRB(0, -40, size.width + 40, size.height + 40);
-
-  @override
-  bool shouldReclip(_LeftEdge oldClipper) => false;
 }
