@@ -75,7 +75,7 @@ Future<bool> inviteToContribute(
             const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: () => Navigator.of(context).pop(true),
-              icon: const Icon(Icons.volunteer_activism_rounded),
+              icon: const Icon(Icons.favorite_rounded),
               label: const Text('Contribute'),
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(52),
@@ -541,7 +541,7 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
                       color: AppColors.onPrimary,
                     ),
                   )
-                : const Icon(Icons.volunteer_activism_rounded),
+                : const Icon(Icons.favorite_rounded),
             label: const Text('Contribute'),
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(52),
