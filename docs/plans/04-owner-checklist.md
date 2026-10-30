@@ -7,7 +7,7 @@
 - [ ] **Put the 30 October changes live** (new quick-log bar, optional protein, launch screen, web loading page)
   - [ ] `firebase deploy --only hosting:app,firestore:rules` (the rules now check the new `trackProtein` field), then Ctrl+F5 on the website
   - [ ] Run the app on the phone again from VS Code. Then close it fully and open it from the home screen: the launch screen should show the bowl alone on cream, and the app's splash should carry on from it
-  - [ ] Try the bar: photo, barcode and mic buttons; type a name and see Estimate, add calories and see Save
+  - [ ] Try the bar: photo, barcode and mic buttons; tap the box and watch them slide away for the AI button; type a name (AI lights up), add calories (it becomes a tick)
   - [ ] Plan Settings → Track protein too? → No, Save: no protein on Today, in the bar, on meals or in History
 - [ ] **Open Food Facts account** (tomorrow): see "While Google checks your ID" below
 

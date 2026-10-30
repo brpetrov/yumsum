@@ -310,6 +310,11 @@ void main() {
     find.descendant(of: nameBox, matching: find.byType(EditableText)),
   );
 
+  /// The round button with [tooltip].
+  IconButton button(WidgetTester tester, String tooltip) => tester.widget(
+    find.ancestor(of: find.byTooltip(tooltip), matching: find.byType(IconButton)),
+  );
+
   testWidgets('saves typed name and calories without calling the AI', (
     tester,
   ) async {
@@ -317,9 +322,9 @@ void main() {
     await tester.enterText(nameBox, 'chicken wrap');
     await tester.pump();
     await tester.enterText(kcalBox, '450');
-    await tester.pump();
+    await tester.pumpAndSettle();
 
-    await tester.tap(find.widgetWithText(TextButton, 'Save'));
+    await tester.tap(find.byTooltip('Save'));
     await tester.pump();
 
     // Protein for typed meals is filled in by the controller, not the box.
@@ -362,14 +367,14 @@ void main() {
   ) async {
     await pumpCard(tester);
     await tester.enterText(nameBox, 'chicken wrap');
-    await tester.pump();
+    await tester.pumpAndSettle();
 
-    await tester.tap(find.widgetWithText(TextButton, 'Estimate'));
+    await tester.tap(find.byTooltip('Estimate'));
     await tester.pump();
     await tester.pump();
 
     expect(boxes(tester), ['chicken wrap', '520', '32']);
-    expect(find.widgetWithText(TextButton, 'Save'), findsOneWidget);
+    expect(find.byTooltip('Save'), findsOneWidget);
     expect(controller.saved, isEmpty);
 
     // The breakdown is one muted line until tapped.
@@ -555,34 +560,44 @@ void main() {
   });
 
   testWidgets(
-    'an empty box offers photo, barcode and mic; text gets one named button',
+    'an idle box offers photo, barcode and mic; in use, one button',
     (tester) async {
       await pumpCard(tester);
       for (final way in ['Take a photo', 'Scan a barcode', 'Speak']) {
         expect(find.byTooltip(way), findsOneWidget);
       }
       expect(find.byTooltip('Clear'), findsNothing);
-      expect(find.text('Save'), findsNothing);
-      expect(find.text('Estimate'), findsNothing);
+      expect(find.byTooltip('Save'), findsNothing);
+      expect(find.byTooltip('Estimate'), findsNothing);
 
-      // A name alone can be estimated.
-      await tester.enterText(nameBox, 'wrap');
-      await tester.pump();
+      // Tapping the box with the keyboard up makes room: the three slide
+      // out for an Estimate button, which waits for a name.
+      tester.view.viewInsets = const FakeViewPadding(bottom: 800);
+      addTearDown(tester.view.resetViewInsets);
+      await tester.tap(nameBox);
+      await tester.pumpAndSettle();
       for (final way in ['Take a photo', 'Scan a barcode', 'Speak']) {
         expect(find.byTooltip(way), findsNothing);
       }
+      expect(button(tester, 'Estimate').onPressed, isNull);
+
+      await tester.enterText(nameBox, 'wrap');
+      await tester.pump();
       expect(find.byTooltip('Clear'), findsOneWidget);
-      expect(find.text('Estimate'), findsOneWidget);
+      expect(button(tester, 'Estimate').onPressed, isNotNull);
 
       // With calories it saves.
       await tester.enterText(kcalBox, '450');
-      await tester.pump();
-      expect(find.text('Estimate'), findsNothing);
-      expect(find.text('Save'), findsOneWidget);
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('Estimate'), findsNothing);
+      expect(find.byTooltip('Save'), findsOneWidget);
 
+      // Cleared, once the keyboard is down, the three are back.
       await tester.tap(find.byTooltip('Clear'));
-      await tester.pump();
+      tester.view.resetViewInsets();
+      await tester.pumpAndSettle();
       expect(boxes(tester), ['', '', '']);
+      expect(find.byTooltip('Save'), findsNothing);
       expect(find.byTooltip('Speak'), findsOneWidget);
     },
   );
@@ -591,11 +606,11 @@ void main() {
       'the breakdown', (tester) async {
     await pumpCard(tester, trackProtein: false);
     await tester.enterText(nameBox, 'chicken wrap');
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(kcalBox, findsOneWidget);
     expect(proteinBox, findsNothing);
 
-    await tester.tap(find.widgetWithText(TextButton, 'Estimate'));
+    await tester.tap(find.byTooltip('Estimate'));
     await tester.pump();
     await tester.pump();
     expect(boxes(tester), ['chicken wrap', '520', '']);
@@ -613,8 +628,8 @@ void main() {
     // Three buttons beside the box, no overflow.
     expect(find.byTooltip('Scan a barcode'), findsOneWidget);
     await tester.enterText(nameBox, 'A long meal name that keeps going');
-    await tester.pump();
-    expect(find.text('Estimate'), findsOneWidget);
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('Estimate'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -644,11 +659,11 @@ void main() {
     expect(find.text('Ham sandwich · 500 kcal'), findsNothing);
 
     await tester.tap(find.text('Chicken wrap · 450 kcal'));
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(boxes(tester), ['Chicken wrap', '450', '30']);
     expect(find.byType(ActionChip), findsNothing);
 
-    await tester.tap(find.widgetWithText(TextButton, 'Save'));
+    await tester.tap(find.byTooltip('Save'));
     await tester.pump();
     expect(controller.saved, [
       (name: 'Chicken wrap', calories: 450.0, protein: 30.0),
@@ -664,7 +679,7 @@ void main() {
     expect(find.text(listening), findsOneWidget);
 
     recorder.audio.add(Uint8List(32000)); // one second of 16-bit mono
-    await tester.pump();
+    await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Stop'));
     await tester.pumpAndSettle();
 
@@ -719,7 +734,7 @@ void main() {
     await tester.tap(find.byTooltip('Speak'));
     await tester.pump();
     recorder.audio.add(Uint8List(2000));
-    await tester.pump();
+    await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Stop'));
     await tester.pumpAndSettle();
 
@@ -740,6 +755,7 @@ void main() {
       expect(find.text(listening), findsOneWidget);
       expect(container.read(launchActionProvider), isNull);
 
+      await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Stop'));
       await tester.pumpAndSettle();
     },
@@ -758,6 +774,7 @@ void main() {
     expect(find.text(listening), findsOneWidget);
     expect(container.read(launchActionProvider), isNull);
 
+    await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Stop'));
     await tester.pumpAndSettle();
   });
@@ -831,9 +848,9 @@ void main() {
     await tester.pump();
     await tester.enterText(kcalBox, '450');
     await tester.enterText(proteinBox, '35');
-    await tester.pump();
+    await tester.pumpAndSettle();
 
-    await tester.tap(find.widgetWithText(TextButton, 'Save'));
+    await tester.tap(find.byTooltip('Save'));
     await tester.pump();
 
     expect(controller.saved, [

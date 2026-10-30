@@ -9,7 +9,6 @@ import 'package:record/record.dart';
 
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
-import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/wav.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
@@ -25,6 +24,7 @@ import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 import 'package:lean_streak/screens/dashboard/helpers/portion_sheet.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
+import 'package:lean_streak/widgets/ai_mark.dart';
 import 'package:lean_streak/widgets/estimate_breakdown.dart';
 
 /// The microphone behind the bar's mic button; overridable in tests.
@@ -38,12 +38,13 @@ typedef _Entry = ({String? name, int? kcal, int? protein});
 
 /// The log composer pinned to the bottom of Today, under the thumb: a name
 /// box, with calorie and protein boxes under it once the bar is in use.
-/// Beside the empty box sit the other ways in, one button each: a photo
-/// of the plate for the AI, a packet's barcode (phones only) and the mic,
-/// which records a short note that the AI listens to itself, in English,
-/// Bulgarian or a mix. Once there is text they give way to one button that
-/// says what it does: Save for a meal with calories, Estimate for one
-/// without. While the box is focused, meals are offered as chips for
+/// Beside the idle box sit the other ways in, one round button each: a
+/// photo of the plate for the AI, a packet's barcode (phones only) and the
+/// mic, which records a short note that the AI listens to itself, in
+/// English, Bulgarian or a mix. Once the bar is in use (text, or the
+/// keyboard up for it) they slide away for one round button, so the box
+/// has the room: the AI mark to estimate a named meal, a tick to save one
+/// with calories. While the box is focused, meals are offered as chips for
 /// one-tap re-logging: the usual ones for this time of day, then recent
 /// ones matching what is typed, along with a search of packaged foods.
 enum _Offer { declined, abandoned, contributed }
@@ -64,6 +65,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   static const _silenceAfterSpeech = Duration(milliseconds: 2500);
   static const _speechDbfs = -30.0;
   static const _silenceDbfs = -45.0;
+  static const _switchDuration = Duration(milliseconds: 220);
   static const _limitMessage =
       'Today\'s ${AiUsageRepository.dailyLimit} AI estimates are used up. '
       'Type the calories yourself.';
@@ -537,6 +539,10 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     // body, where the bar lives.
     final keyboardUp = View.of(context).viewInsets.bottom > 0;
     final open = hasText || (focused && (keyboardUp || _isDesktop));
+    // The other ways in make room once the bar is in use: text, or the
+    // keyboard up to type it. Not for desktop's standing focus, which
+    // would hide them for good.
+    final typing = hasText || (focused && keyboardUp);
     final showStatus =
         _listening || _working || _error != null || _aiItems.isNotEmpty;
     // Watched whether or not the box is focused, so the chips are ready the
@@ -657,7 +663,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                           ),
                         ),
                         const SizedBox(width: 10),
-                        _buildActions(entry, hasText),
+                        _buildActions(entry, typing),
                       ],
                     ),
                     // The number boxes span the whole bar, under the name
@@ -820,66 +826,105 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     );
   }
 
-  /// Beside the box: while it's empty, the other ways in as one round
+  /// Beside the box: while the bar is idle, the other ways in as one round
   /// button each (greyed while the bar is busy); the stop button while
-  /// listening; once there is text, one button that says what it does.
-  Widget _buildActions(_Entry entry, bool hasText) {
-    if (_listening) {
-      return _circle(Icons.stop_rounded, 'Stop', _toggleListening, stop: true);
-    }
-    if (!hasText) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _circle(
-            Icons.photo_camera_rounded,
-            'Take a photo',
-            _working ? null : _takePhoto,
-          ),
-          if (hasBarcodeScanner) ...[
-            const SizedBox(width: 6),
+  /// listening; once the bar is in use, one round button, AI to estimate
+  /// a named meal (greyed until there is a name) or a tick to save one
+  /// with calories. A change slides at the box's edge, which follows it.
+  Widget _buildActions(_Entry entry, bool typing) {
+    final (String kind, Widget buttons) = _listening
+        ? (
+            'stop',
             _circle(
-              Icons.qr_code_scanner_rounded,
-              'Scan a barcode',
-              _working ? null : _scanBarcode,
+              const Icon(Icons.stop_rounded),
+              'Stop',
+              _toggleListening,
+              stop: true,
             ),
-          ],
-          const SizedBox(width: 6),
-          _circle(
-            Icons.mic_rounded,
-            'Speak',
-            _working ? null : _toggleListening,
-          ),
-        ],
-      );
-    }
-    final (IconData icon, String label) = entry.kcal != null
-        ? (Icons.check_rounded, 'Save')
-        : (Icons.auto_awesome_rounded, 'Estimate');
-    final enabled = !_working && (entry.kcal != null || entry.name != null);
-    return _glossy(
-      enabled: enabled,
-      shape: const StadiumBorder(),
-      child: TextButton.icon(
-        onPressed: enabled ? _submit : null,
-        style: TextButton.styleFrom(
-          minimumSize: const Size(0, 56),
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          foregroundColor: AppColors.onPrimary,
-          disabledForegroundColor: AppColors.textDisabled,
-          textStyle: AppTheme.display.copyWith(
-            fontSize: 15,
-            letterSpacing: 0.2,
+          )
+        : !typing
+        ? (
+            'ways',
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _circle(
+                  const Icon(Icons.photo_camera_rounded),
+                  'Take a photo',
+                  _working ? null : _takePhoto,
+                ),
+                if (hasBarcodeScanner) ...[
+                  const SizedBox(width: 6),
+                  _circle(
+                    const Icon(Icons.qr_code_scanner_rounded),
+                    'Scan a barcode',
+                    _working ? null : _scanBarcode,
+                  ),
+                ],
+                const SizedBox(width: 6),
+                _circle(
+                  const Icon(Icons.mic_rounded),
+                  'Speak',
+                  _working ? null : _toggleListening,
+                ),
+              ],
+            ),
+          )
+        : entry.kcal != null
+        ? (
+            'save',
+            _circle(
+              const Icon(Icons.check_rounded),
+              'Save',
+              _working ? null : _submit,
+            ),
+          )
+        : (
+            'estimate',
+            _circle(
+              const AiMark(),
+              'Estimate',
+              _working || entry.name == null ? null : _submit,
+            ),
+          );
+    return AnimatedSwitcher(
+      duration: _switchDuration,
+      switchInCurve: Curves.easeOutCubic,
+      transitionBuilder: _slide,
+      // Anchored at the right, so the buttons slide in and out at the
+      // box's edge; the row is as wide as the wider set while both show.
+      layoutBuilder: (current, previous) => Stack(
+        alignment: Alignment.centerRight,
+        children: [...previous, ?current],
+      ),
+      child: KeyedSubtree(key: ValueKey(kind), child: buttons),
+    );
+  }
+
+  /// Buttons on their way in or out fade while their row shrinks towards
+  /// the box, which clips them at its edge; a row that is fully in is not
+  /// clipped, so the glow shows.
+  static Widget _slide(Widget child, Animation<double> animation) {
+    return FadeTransition(
+      opacity: animation,
+      child: AnimatedBuilder(
+        animation: animation,
+        child: child,
+        builder: (_, child) => ClipRect(
+          clipper: const _LeftEdge(),
+          clipBehavior: animation.value < 1 ? Clip.hardEdge : Clip.none,
+          child: Align(
+            alignment: Alignment.centerRight,
+            widthFactor: animation.value,
+            child: child,
           ),
         ),
-        icon: Icon(icon, size: 22),
-        label: Text(label),
       ),
     );
   }
 
   Widget _circle(
-    IconData icon,
+    Widget icon,
     String tooltip,
     VoidCallback? onPressed, {
     bool stop = false,
@@ -898,7 +943,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
           foregroundColor: AppColors.onPrimary,
           disabledForegroundColor: AppColors.textDisabled,
         ),
-        icon: Icon(icon),
+        icon: icon,
       ),
     );
   }
@@ -964,4 +1009,16 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       ),
     );
   }
+}
+
+/// Clips at the left edge only; the glow is free on the other sides.
+class _LeftEdge extends CustomClipper<Rect> {
+  const _LeftEdge();
+
+  @override
+  Rect getClip(Size size) =>
+      Rect.fromLTRB(0, -40, size.width + 40, size.height + 40);
+
+  @override
+  bool shouldReclip(_LeftEdge oldClipper) => false;
 }
