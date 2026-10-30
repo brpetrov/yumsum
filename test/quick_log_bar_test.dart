@@ -619,6 +619,28 @@ void main() {
     },
   );
 
+  testWidgets('a button\'s tooltip shows above it, clear of the navigation '
+      'bar', (tester) async {
+    tester.view.padding = const FakeViewPadding(bottom: 144);
+    addTearDown(tester.view.resetPadding);
+    await pumpCard(tester);
+    // Where the bar lives: at the bottom of the screen.
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(
+          home: Scaffold(bottomNavigationBar: QuickLogBar()),
+        ),
+      ),
+    );
+    await tester.longPress(find.byTooltip('Take a photo'));
+    await tester.pumpAndSettle();
+    expect(
+      tester.getRect(find.text('Take a photo')).bottom,
+      lessThan(tester.getRect(find.byTooltip('Take a photo')).top),
+    );
+  });
+
   testWidgets('with protein off there is no protein box and no protein in '
       'the breakdown', (tester) async {
     await pumpCard(tester, trackProtein: false);

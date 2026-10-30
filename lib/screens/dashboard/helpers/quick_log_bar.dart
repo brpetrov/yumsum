@@ -953,21 +953,26 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     VoidCallback? onPressed, {
     bool stop = false,
   }) {
-    return _glossy(
-      enabled: onPressed != null,
-      shape: const CircleBorder(),
-      glow: stop ? AppColors.veryBad : AppColors.primary,
-      child: IconButton(
-        onPressed: onPressed,
-        tooltip: tooltip,
-        iconSize: 24,
-        style: IconButton.styleFrom(
-          minimumSize: const Size(44, 44),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          foregroundColor: AppColors.onPrimary,
-          disabledForegroundColor: AppColors.textDisabled,
+    // The bar sits at the bottom of the screen, so the tooltips show above
+    // the buttons, clear of the phone's navigation bar.
+    return TooltipTheme(
+      data: TooltipTheme.of(context).copyWith(preferBelow: false),
+      child: _glossy(
+        enabled: onPressed != null,
+        shape: const CircleBorder(),
+        glow: stop ? AppColors.veryBad : AppColors.primary,
+        child: IconButton(
+          onPressed: onPressed,
+          tooltip: tooltip,
+          iconSize: 24,
+          style: IconButton.styleFrom(
+            minimumSize: const Size(44, 44),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            foregroundColor: AppColors.onPrimary,
+            disabledForegroundColor: AppColors.textDisabled,
+          ),
+          icon: icon,
         ),
-        icon: icon,
       ),
     );
   }

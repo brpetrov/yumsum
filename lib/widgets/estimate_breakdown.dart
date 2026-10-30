@@ -50,9 +50,10 @@ class _EstimateBreakdownState extends State<EstimateBreakdown> {
 
     return InkWell(
       onTap: () => setState(() => _expanded = !_expanded),
-      borderRadius: BorderRadius.circular(6),
+      borderRadius: BorderRadius.circular(12),
+      // Room around the text, so the highlight doesn't crowd it.
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         child: _expanded
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
