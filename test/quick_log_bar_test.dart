@@ -354,6 +354,19 @@ void main() {
     expect(kcalBox, findsNothing);
     tester.view.viewInsets = const FakeViewPadding(bottom: 800);
     await tester.pump();
+    expect(kcalBox, findsOneWidget);
+
+    // So does swiping the bar down, which lets go of the box.
+    await tester.timedDrag(
+      find.byType(QuickLogBar),
+      const Offset(0, 80),
+      const Duration(milliseconds: 200),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(nameBox).focusNode!.hasFocus, isFalse);
+    expect(kcalBox, findsNothing);
+    await tester.tap(nameBox);
+    await tester.pumpAndSettle();
 
     await tester.enterText(kcalBox, '45x0 kcal');
     await tester.enterText(proteinBox, '21g');

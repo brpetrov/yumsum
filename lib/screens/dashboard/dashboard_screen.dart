@@ -274,6 +274,8 @@ class _DashboardContent extends StatelessWidget {
 
     return ListView(
       padding: EdgeInsets.zero,
+      // Scrolling the page lets go of the quick-log bar's box too.
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       children: [
         ResponsivePage(
           maxWidth: 720,

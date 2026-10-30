@@ -51,8 +51,15 @@ class LeanStreakApp extends ConsumerWidget {
 const double appMaxWidth = 760;
 
 Widget appShellBuilder(BuildContext context, Widget? child) {
+  // A tap on nothing in particular lets go of whichever box has the
+  // keyboard, which also folds the quick-log bar away.
+  final page = GestureDetector(
+    behavior: HitTestBehavior.opaque,
+    onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+    child: child,
+  );
   final mediaQuery = MediaQuery.of(context);
-  if (mediaQuery.size.width <= appMaxWidth) return child!;
+  if (mediaQuery.size.width <= appMaxWidth) return page;
 
   final theme = Theme.of(context);
   // A slightly deeper margin with a hairline edge makes the column read as a
@@ -80,7 +87,7 @@ Widget appShellBuilder(BuildContext context, Widget? child) {
             data: theme.copyWith(
               snackBarTheme: theme.snackBarTheme.copyWith(width: 480),
             ),
-            child: child!,
+            child: page,
           ),
         ),
       ),
