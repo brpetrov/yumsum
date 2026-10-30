@@ -56,21 +56,19 @@ Future<bool> inviteToContribute(
             const SizedBox(height: 8),
             Text(
               nutritionOnly
-                  ? 'Open Food Facts, the free, volunteer-run food list '
-                        'YumSum scans from, has this product but not its '
-                        'nutrition. Add it with one photo of the nutrition '
+                  ? 'This product is in the database, but its nutrition '
+                        'isn\'t yet. Add it with one photo of the nutrition '
                         'table and it\'ll be there for you and everyone who '
                         'scans it next.'
-                  : 'This product isn\'t on Open Food Facts yet, the free, '
-                        'volunteer-run food list YumSum scans from. Add it '
-                        'with two photos and it\'ll be there for you and '
-                        'everyone who scans it next.',
+                  : 'This product isn\'t in the database yet. Add it with '
+                        'two photos and it\'ll be there for you and everyone '
+                        'who scans it next.',
               textAlign: TextAlign.center,
               style: muted,
             ),
             const SizedBox(height: 6),
             Text(
-              'About a minute. The AI reads the label for you.',
+              'It takes 30 seconds and helps everyone, forever ♥',
               textAlign: TextAlign.center,
               style: muted.copyWith(fontSize: 13),
             ),
