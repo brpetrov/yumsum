@@ -604,11 +604,27 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 720),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+                  padding: EdgeInsets.fromLTRB(18, open ? 8 : 18, 18, 16),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // The drag handle a sheet has, while there is
+                      // something to swipe down.
+                      if (open) ...[
+                        Center(
+                          child: Container(
+                            key: const ValueKey('quick-log-handle'),
+                            width: 32,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: AppColors.outline,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
                       if (recents.isNotEmpty || search != null) ...[
                         _buildChips(recents, search),
                         const SizedBox(height: 12),

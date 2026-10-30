@@ -343,15 +343,19 @@ void main() {
 
     tester.view.viewInsets = const FakeViewPadding(bottom: 800);
     addTearDown(tester.view.resetViewInsets);
+    final handle = find.byKey(const ValueKey('quick-log-handle'));
+    expect(handle, findsNothing);
     await tester.tap(nameBox);
     await tester.pump();
     expect(kcalBox, findsOneWidget);
     expect(proteinBox, findsOneWidget);
+    expect(handle, findsOneWidget);
 
     // Back hides the keyboard but keeps focus: an empty bar folds away.
     tester.view.resetViewInsets();
     await tester.pump();
     expect(kcalBox, findsNothing);
+    expect(handle, findsNothing);
     tester.view.viewInsets = const FakeViewPadding(bottom: 800);
     await tester.pump();
     expect(kcalBox, findsOneWidget);
