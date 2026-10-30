@@ -121,7 +121,7 @@ To cover everyone's AI, roughly **1 in 30 daily users (about 3%)** needs to be o
 - [x] Spend-cap budget on AI Logic (done 24 October: **£3 a month** on "Gemini Developer API (AI Logic)"; the other services are unused)
 - [x] Per-user AI rate limit down to about 10 a minute (done 24 October)
 - [ ] Check the paid tier works: one AI estimate shows up as usage on <https://aistudio.google.com/billing>
-- [x] (me) Free allowance down to 10 a day; voice notes count (protein on save doesn't; Firestore rules can't make the counter tamper-proof, see step 4)
+- [x] (me) Free allowance down to 10 a day; voice notes count (protein on save doesn't; Firestore rules can't make the counter tamper-proof, see step 4). Back up to 20 a day for now on 30 October, while testing
 - [x] (me) Correct 429 and 402 handling and messages
 - [ ] (me) Read the logged token use during the next phone test, then update the figures here
 - [x] (me) Drop the unused "note"

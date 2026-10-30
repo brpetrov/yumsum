@@ -730,7 +730,7 @@ void main() {
   testWidgets('the mic says so before recording once the AI is used up', (
     tester,
   ) async {
-    await pumpCard(tester, aiUsed: 10);
+    await pumpCard(tester, aiUsed: 20);
     await tester.pump();
     await tester.tap(find.byTooltip('Speak'));
     await tester.pump();
@@ -738,14 +738,14 @@ void main() {
     expect(find.text(listening), findsNothing);
     expect(
       find.text(
-        'Today\'s 10 AI estimates are used up. Type the calories yourself.',
+        'Today\'s 20 AI estimates are used up. Type the calories yourself.',
       ),
       findsOneWidget,
     );
   });
 
   testWidgets('what is left of the AI shows once half is used', (tester) async {
-    await pumpCard(tester, aiUsed: 7);
+    await pumpCard(tester, aiUsed: 17);
     await tester.pump();
     expect(find.text('3 AI estimates left today'), findsNothing);
 
@@ -761,7 +761,7 @@ void main() {
   testWidgets('nothing about the AI allowance while under half is used', (
     tester,
   ) async {
-    await pumpCard(tester, aiUsed: 4);
+    await pumpCard(tester, aiUsed: 9);
     await tester.pump();
     await tester.enterText(nameBox, 'Wrap');
     await tester.pump();

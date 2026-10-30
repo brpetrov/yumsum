@@ -9,7 +9,7 @@ class AiUsageRepository {
   AiUsageRepository(this._db);
   final FirebaseFirestore _db;
 
-  static const int dailyLimit = 10;
+  static const int dailyLimit = 20;
 
   DocumentReference<Map<String, dynamic>> _doc(String uid, String date) =>
       _db.collection('users').doc(uid).collection('ai_usage').doc(date);
