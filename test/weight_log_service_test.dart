@@ -7,15 +7,27 @@ import 'package:lean_streak/repositories/weight_entry_repository.dart';
 import 'package:lean_streak/services/daily_summary_service.dart';
 import 'package:lean_streak/services/weight_log_service.dart';
 
-class _FakeWeightEntryRepository extends Fake
-    implements WeightEntryRepository {
+class _FakeWeightEntryRepository extends Fake implements WeightEntryRepository {
   WeightEntry? saved;
+  String? deleted;
 
   @override
   Future<void> upsertEntry(String uid, WeightEntry entry) async {
     saved = entry;
   }
+
+  @override
+  Future<void> deleteEntry(String uid, String dateKey) async {
+    deleted = dateKey;
+  }
 }
+
+WeightEntry _entry(String day, double kg) => WeightEntry(
+  dateKey: day,
+  weightKg: kg,
+  loggedAt: DateTime.parse(day),
+  source: WeightSource.manual,
+);
 
 class _FakeUserProfileRepository extends Fake implements UserProfileRepository {
   UserProfile? saved;
@@ -160,6 +172,52 @@ void main() {
 
       expect(result.newCalorieTarget, lessThan(result.previousCalorieTarget));
       expect(result.targetChanged, isTrue);
+    });
+
+    group('deleting a weigh-in', () {
+      final entries = [_entry('2026-06-01', 85), _entry('2026-06-07', 90)];
+
+      test('the newest takes the plan back to the one before', () async {
+        final result = await service.deleteEntry(
+          profile: _profile(),
+          entries: entries,
+          entry: entries.last,
+          at: DateTime(2026, 6, 8),
+        );
+
+        expect(weightRepo.deleted, '2026-06-07');
+        expect(profileRepo.saved!.currentWeightKg, 85);
+        expect(
+          result!.newCalorieTarget,
+          lessThan(result.previousCalorieTarget),
+        );
+        expect(summaryService.recomputed, ['2026-06-08']);
+      });
+
+      test('an older one leaves the plan alone', () async {
+        final result = await service.deleteEntry(
+          profile: _profile(),
+          entries: entries,
+          entry: entries.first,
+        );
+
+        expect(weightRepo.deleted, '2026-06-01');
+        expect(result, isNull);
+        expect(profileRepo.saved, isNull);
+        expect(summaryService.recomputed, isEmpty);
+      });
+
+      test('the only one leaves the plan alone', () async {
+        final result = await service.deleteEntry(
+          profile: _profile(),
+          entries: [entries.last],
+          entry: entries.last,
+        );
+
+        expect(weightRepo.deleted, '2026-06-07');
+        expect(result, isNull);
+        expect(profileRepo.saved, isNull);
+      });
     });
   });
 }

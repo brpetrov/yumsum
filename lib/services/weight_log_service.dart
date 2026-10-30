@@ -24,7 +24,8 @@ class WeightLogResult {
 }
 
 /// Records a weight reading and automatically recomputes the user's plan
-/// (calorie target, BMR/TDEE, target date) from the new weight.
+/// (calorie target, BMR/TDEE, target date) from the new weight; deleting the
+/// newest one takes the plan back to the one before.
 class WeightLogService {
   WeightLogService({
     required WeightEntryRepository weightEntryRepository,
@@ -56,6 +57,32 @@ class WeightLogService {
         source: source,
       ),
     );
+    return _replan(profile, weightKg, now);
+  }
+
+  /// Deletes one weigh-in from [entries] (oldest first). When it was the
+  /// newest and an older one is left, the plan goes back to that weight and
+  /// the change is returned; otherwise the plan stays and this returns null.
+  Future<WeightLogResult?> deleteEntry({
+    required UserProfile profile,
+    required List<WeightEntry> entries,
+    required WeightEntry entry,
+    DateTime? at,
+  }) async {
+    await _weightEntryRepository.deleteEntry(profile.uid, entry.dateKey);
+    if (entries.length < 2 || entries.last.dateKey != entry.dateKey) {
+      return null;
+    }
+    final previous = entries[entries.length - 2];
+    return _replan(profile, previous.weightKg, at ?? DateTime.now());
+  }
+
+  Future<WeightLogResult> _replan(
+    UserProfile profile,
+    double weightKg,
+    DateTime now,
+  ) async {
+    final dateKey = DateFormat('yyyy-MM-dd').format(now);
 
     // Recalculate the plan from the new weight, keeping every other input
     // (height, age, gender, activity, pace) as the user last set it.

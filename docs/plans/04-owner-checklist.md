@@ -9,6 +9,7 @@
   - [ ] Run the app on the phone again from VS Code. Then close it fully and open it from the home screen: the launch screen should show the bowl alone on cream, and the app's splash should carry on from it
   - [ ] Try the bar: photo, barcode and mic buttons; tap the box and watch them slide away for the sparkle button; type a name (it lights up), add calories (it becomes a tick)
   - [ ] Plan Settings → Track protein too? → No, Save: no protein on Today, in the bar, on meals or in History
+  - [ ] Weight & Progress: delete a weigh-in with the bin on its card. Deleting the newest one puts your target back to the one before
 - [ ] **Open Food Facts account** (tomorrow): see "While Google checks your ID" below
 
 - [x] **Deploy the database rules and the website together** (done 29 October 2026)

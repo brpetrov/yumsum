@@ -72,7 +72,11 @@ class ProgressScreen extends ConsumerWidget {
                     const SizedBox(height: 18),
                     _WeightChartCard(entries: entries, profile: profile),
                     const SizedBox(height: 22),
-                    _HistorySection(entries: entries),
+                    _HistorySection(
+                      entries: entries,
+                      onDelete: (entry) =>
+                          _deleteEntry(context, ref, entries, entry),
+                    ),
                     const SizedBox(height: 8),
                     Align(
                       alignment: Alignment.centerLeft,
@@ -116,6 +120,56 @@ class ProgressScreen extends ConsumerWidget {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  Future<void> _deleteEntry(
+    BuildContext context,
+    WidgetRef ref,
+    List<WeightEntry> entries,
+    WeightEntry entry,
+  ) async {
+    // Taking away the newest one takes the plan back to the one before.
+    final previous = entries.length > 1 && entries.last.dateKey == entry.dateKey
+        ? entries[entries.length - 2]
+        : null;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete weigh-in?'),
+        content: Text(
+          'Remove ${entry.weightKg.toStringAsFixed(1)} kg from '
+          '${DateFormat('EEE, d MMM').format(entry.date)}?'
+          '${previous == null ? '' : ' Your plan adjusts back to '
+                    '${previous.weightKg.toStringAsFixed(1)} kg.'}',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    final result = await ref
+        .read(weightLogControllerProvider.notifier)
+        .deleteEntry(entry);
+    if (!context.mounted) return;
+    final message = ref.read(weightLogControllerProvider).hasError
+        ? 'Could not delete the weigh-in. Try again.'
+        : result != null && result.targetChanged
+        ? 'Weigh-in deleted. New target: ${result.newCalorieTarget} kcal '
+              '(was ${result.previousCalorieTarget}).'
+        : 'Weigh-in deleted.';
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   /// Clears the chart and history so progress counts from the next weigh-in.
   Future<void> _resetHistory(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
@@ -123,8 +177,8 @@ class ProgressScreen extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('Reset progress?'),
         content: const Text(
-          'This clears your weight history and chart. Your plan, meals and '
-          'profile stay.',
+          'This clears all your weight history and chart progress. Are you '
+          'sure?',
         ),
         actions: [
           TextButton(
@@ -395,9 +449,10 @@ class _WeightChartCard extends StatelessWidget {
 }
 
 class _HistorySection extends StatelessWidget {
-  const _HistorySection({required this.entries});
+  const _HistorySection({required this.entries, required this.onDelete});
 
   final List<WeightEntry> entries;
+  final ValueChanged<WeightEntry> onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -421,7 +476,7 @@ class _HistorySection extends StatelessWidget {
           (entry) => Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: AppCard(
-              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+              padding: const EdgeInsets.fromLTRB(22, 4, 8, 4),
               child: Row(
                 children: [
                   Expanded(
@@ -448,6 +503,14 @@ class _HistorySection extends StatelessWidget {
                       fontSize: 18,
                       color: AppColors.textPrimary,
                     ),
+                  ),
+                  const SizedBox(width: 4),
+                  IconButton(
+                    onPressed: () => onDelete(entry),
+                    tooltip: 'Delete weigh-in',
+                    iconSize: 20,
+                    color: AppColors.textSecondary,
+                    icon: const Icon(Icons.delete_outline_rounded),
                   ),
                 ],
               ),

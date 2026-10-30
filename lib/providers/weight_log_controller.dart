@@ -34,6 +34,31 @@ class WeightLogController extends AsyncNotifier<void> {
     }
   }
 
+  /// Deletes one weigh-in. Returns the plan change when it was the newest
+  /// and the plan went back to the one before, else null; a failure leaves
+  /// the state in error.
+  Future<WeightLogResult?> deleteEntry(WeightEntry entry) async {
+    state = const AsyncLoading();
+
+    try {
+      final profile = ref.read(userProfileProvider).valueOrNull;
+      final entries = ref.read(weightEntriesProvider).valueOrNull;
+      if (profile == null || entries == null) {
+        throw Exception('Profile not loaded');
+      }
+
+      final result = await ref
+          .read(weightLogServiceProvider)
+          .deleteEntry(profile: profile, entries: entries, entry: entry);
+
+      state = const AsyncData(null);
+      return result;
+    } catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
+      return null;
+    }
+  }
+
   /// Clears the weight history. The profile keeps its current weight and
   /// plan, so only the chart and the "change since start" start over.
   Future<bool> resetHistory() async {

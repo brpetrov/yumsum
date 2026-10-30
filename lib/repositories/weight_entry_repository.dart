@@ -23,6 +23,10 @@ class WeightEntryRepository {
     });
   }
 
+  Future<void> deleteEntry(String uid, String dateKey) {
+    return _entries(uid).doc(dateKey).delete();
+  }
+
   /// Removes every entry, so progress counts from the next weigh-in.
   Future<void> deleteAll(String uid) async {
     while (true) {
