@@ -10,7 +10,8 @@
   - [ ] Try the bar: photo, barcode and mic buttons; tap the box and watch them slide away for the sparkle button; type a name (it lights up), add calories (it becomes a tick)
   - [ ] Plan Settings → Track protein too? → No, Save: no protein on Today, in the bar, on meals or in History
   - [ ] Weight & Progress: delete a weigh-in with the bin on its card. Deleting the newest one puts your target back to the one before
-- [ ] **Open Food Facts account** (tomorrow): see "While Google checks your ID" below
+- [x] **Open Food Facts account** (30 October 2026): made on the real server with help.yumsum, in `config/off_account.json`, login checked; API usage form sent. The test server was down all day, so testing goes straight to the real one
+  - [ ] Run "YumSum (Android)", scan a packet Open Food Facts doesn't know, contribute it, then check its page at world.openfoodfacts.org/product/ followed by the barcode: name, figures, language, both photos
 
 - [x] **Deploy the database rules and the website together** (done 29 October 2026)
   Run `firebase deploy --only firestore:rules,hosting` (the website is already built in `build/hosting`).
@@ -78,7 +79,7 @@ The app sends feedback to a Formspree form (formspree.io, signed up with help.yu
 - [ ] **Find 12 testers.** A new personal account can only go to production after a closed test with at least 12 testers who stay opted in for 14 days in a row. Collect 12 Gmail addresses (friends, family, colleagues with Android phones) now; this is the longest wait of all.
 - [ ] **Store listing** (Claude can make these): app name, short description (80 characters), full description, the 1024×500 feature graphic, 2–8 phone screenshots; the icon is `assets/android/play_store_512.png`.
 - [ ] **Account deletion page** (Claude can make it): Play asks for a web link that explains how to delete your account and data, e.g. https://yumsum.web.app/delete-account.
-- [ ] **Open Food Facts account**: `config/off_account.json` is still empty, so contributing has been off in every build so far. Either create a dedicated account at world.openfoodfacts.org (a password used nowhere else, as it's built into the app) and fill in the file, or launch without contributing.
+- [x] **Open Food Facts account**: done 30 October 2026, see "Now" above.
 - [ ] Authentication → Settings: check email enumeration protection is on. (The app asks for 6+ character passwords, Firebase's default; leave the length unless the app changes too.)
 
 ### Once Google has approved you
