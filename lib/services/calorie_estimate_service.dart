@@ -285,9 +285,12 @@ class CalorieEstimateService {
       'Do not include any other text.';
 
   // Contributed data is public, so the model must copy, not estimate.
-  String get _labelPromptTemplate =>
-      'The user photographed a food packet to add it to Open Food Facts: the '
-      'first image is the front of the pack, the second the nutrition table. '
+  String _labelPrompt({required bool withFront}) =>
+      '${withFront ? 'The user photographed a food packet to add it to Open '
+                'Food Facts: the first image is the front of the pack, the '
+                'second the nutrition table.' : 'The user photographed the '
+                'nutrition table on a food packet to add its figures to Open '
+                'Food Facts.'} '
       'Copy what is printed; never guess or estimate. Use the per 100 g (or '
       'per 100 ml) column. If the table only gives figures per serving and '
       'states the serving size, convert them to per 100 g. If energy is only '
@@ -436,11 +439,11 @@ class CalorieEstimateService {
     }
   }
 
-  /// Reads a packet's front and nutrition table for a contribution. Counts
-  /// towards the daily AI limit like [estimate].
+  /// Reads a packet's nutrition table, and its front when given, for a
+  /// contribution. Counts towards the daily AI limit like [estimate].
   Future<LabelReading> readLabel(
     String uid,
-    Uint8List front,
+    Uint8List? front,
     Uint8List label,
   ) async {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
@@ -453,8 +456,8 @@ class CalorieEstimateService {
       final map = _decode(
         await _generateWithRetries(_model, [
           Content.multi([
-            TextPart(_labelPromptTemplate),
-            InlineDataPart('image/jpeg', front),
+            TextPart(_labelPrompt(withFront: front != null)),
+            if (front != null) InlineDataPart('image/jpeg', front),
             InlineDataPart('image/jpeg', label),
           ]),
         ]),

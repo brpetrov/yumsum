@@ -23,6 +23,23 @@ typedef ProductContribution = ({
   String? lang,
 });
 
+/// Nutrition for a product Open Food Facts lists without it, as the user
+/// checked it. Only what the product lacks goes: [name] and [servingSize]
+/// are null when it has them, [labelPhoto] when it has a nutrition photo.
+typedef NutritionContribution = ({
+  String barcode,
+
+  /// The product's language, for its name and photo.
+  String lang,
+  String? name,
+  String? servingSize,
+
+  /// Figures per 100 ml, for a product sold by volume.
+  bool perVolume,
+  Map<String, double> per100g,
+  Uint8List? labelPhoto,
+});
+
 class FoodContributionException implements Exception {
   const FoodContributionException(this.message);
   final String message;
@@ -42,6 +59,10 @@ const _host = String.fromEnvironment(
   'OFF_HOST',
   defaultValue: 'world.openfoodfacts.org',
 );
+// A trial run (`--dart-define=OFF_DRY_RUN=true`, the "contribute dry run"
+// launch configuration): every screen, any barcode, but what would be sent
+// is only printed to the log, so nothing reaches Open Food Facts.
+const _dryRun = bool.fromEnvironment('OFF_DRY_RUN');
 
 final _cyrillic = RegExp(r'[Ѐ-ӿ]');
 
@@ -56,15 +77,17 @@ class FoodContributionService {
     this.userId = _userId,
     this.password = _password,
     this.host = _host,
+    this.dryRun = _dryRun,
   }) : _client = client ?? http.Client();
 
   final String appUuid;
   final String userId;
   final String password;
   final String host;
+  final bool dryRun;
   final http.Client _client;
 
-  bool get isConfigured => userId.isNotEmpty && password.isNotEmpty;
+  bool get isConfigured => dryRun || (userId.isNotEmpty && password.isNotEmpty);
 
   Map<String, String> get _account => {
     'user_id': userId,
@@ -90,39 +113,66 @@ class FoodContributionService {
         ..bodyFields = {
           ..._account,
           ...productFields(product, lc),
-          // Open Food Facts asks for "user agent + user id", nothing personal.
-          'comment': 'YumSum $appVersion user $appUuid',
+          'comment': _comment,
         },
       saved: (reply) => reply?['status'] == 1,
     );
-    for (final (field, bytes) in [
-      ('front_$lc', product.frontPhoto),
-      ('nutrition_$lc', product.labelPhoto),
-    ]) {
-      await _send(
-        http.MultipartRequest(
-            'POST',
-            Uri.https(host, '/cgi/product_image_upload.pl'),
-          )
-          ..fields.addAll({
-            ..._account,
-            'code': product.barcode,
-            'lc': lc,
-            'imagefield': field,
-          })
-          ..files.add(
-            http.MultipartFile.fromBytes(
-              'imgupload_$field',
-              bytes,
-              filename: '$field.jpg',
-            ),
-          ),
-        // A photo sent before (a retry after a dropped connection) comes
-        // back as "already exists" with its id, which is just as good.
-        saved: (reply) =>
-            reply?['status'] == 'status ok' || reply?['imgid'] != null,
-      );
+    await _upload(product.barcode, lc, 'front', product.frontPhoto);
+    await _upload(product.barcode, lc, 'nutrition', product.labelPhoto);
+  }
+
+  /// Adds the nutrition to a product Open Food Facts already lists, then
+  /// the nutrition photo if it has none. Nothing else on it is changed.
+  Future<void> addNutrition(NutritionContribution nutrition) async {
+    await _send(
+      http.Request('POST', Uri.https(host, '/cgi/product_jqm2.pl'))
+        ..bodyFields = {
+          ..._account,
+          ...nutritionFields(nutrition),
+          'comment': _comment,
+        },
+      saved: (reply) => reply?['status'] == 1,
+    );
+    if (nutrition.labelPhoto case final photo?) {
+      await _upload(nutrition.barcode, nutrition.lang, 'nutrition', photo);
     }
+  }
+
+  // Open Food Facts asks for "user agent + user id", nothing personal.
+  String get _comment => 'YumSum $appVersion user $appUuid';
+
+  /// Uploads a photo as the product's [kind] (front or nutrition) picture
+  /// in language [lc].
+  Future<void> _upload(
+    String barcode,
+    String lc,
+    String kind,
+    Uint8List bytes,
+  ) {
+    final field = '${kind}_$lc';
+    return _send(
+      http.MultipartRequest(
+          'POST',
+          Uri.https(host, '/cgi/product_image_upload.pl'),
+        )
+        ..fields.addAll({
+          ..._account,
+          'code': barcode,
+          'lc': lc,
+          'imagefield': field,
+        })
+        ..files.add(
+          http.MultipartFile.fromBytes(
+            'imgupload_$field',
+            bytes,
+            filename: '$field.jpg',
+          ),
+        ),
+      // A photo sent before (a retry after a dropped connection) comes
+      // back as "already exists" with its id, which is just as good.
+      saved: (reply) =>
+          reply?['status'] == 'status ok' || reply?['imgid'] != null,
+    );
   }
 
   /// Sends [request]; [saved] reads Open Food Facts' JSON reply. A wrong
@@ -131,6 +181,18 @@ class FoodContributionService {
     http.BaseRequest request, {
     required bool Function(Map<String, dynamic>? reply) saved,
   }) async {
+    if (dryRun) {
+      final fields = switch (request) {
+        http.Request(:final bodyFields) => {...bodyFields},
+        http.MultipartRequest(:final fields) => {...fields},
+        _ => <String, String>{},
+      }..remove('password');
+      debugPrint(
+        'Open Food Facts dry run, not sent: ${request.url.path} $fields',
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+      return;
+    }
     request.headers.addAll(_headers);
     final http.Response response;
     try {
@@ -206,16 +268,34 @@ Map<String, String> productFields(ProductContribution product, String lc) {
     'quantity': ?product.quantity,
     'serving_size': ?product.servingSize,
     'add_countries': ?country?.$1,
-    'nutrition_data_per':
-        _volume.hasMatch('${product.quantity} ${product.servingSize}')
+    'nutrition_data_per': soldByVolume(product.quantity, product.servingSize)
         ? '100ml'
         : '100g',
-    for (final MapEntry(key: id, :value) in product.per100g.entries) ...{
-      'nutriment_$id': _figure(value),
-      'nutriment_${id}_unit': id == 'energy-kcal' ? 'kcal' : 'g',
-    },
+    ..._nutriments(product.per100g),
   };
 }
+
+/// The form fields for [nutrition]: the figures, plus the name and serving
+/// size when the product had none.
+Map<String, String> nutritionFields(NutritionContribution nutrition) => {
+  'code': nutrition.barcode,
+  'product_name_${nutrition.lang}': ?nutrition.name,
+  'serving_size': ?nutrition.servingSize,
+  'nutrition_data_per': nutrition.perVolume ? '100ml' : '100g',
+  ..._nutriments(nutrition.per100g),
+};
+
+/// Whether a pack or serving size is a volume (ml, cl, l), so the label's
+/// figures are per 100 ml.
+bool soldByVolume(String? quantity, String? servingSize) =>
+    _volume.hasMatch('$quantity $servingSize');
+
+Map<String, String> _nutriments(Map<String, double> per100g) => {
+  for (final MapEntry(key: id, :value) in per100g.entries) ...{
+    'nutriment_$id': _figure(value),
+    'nutriment_${id}_unit': id == 'energy-kcal' ? 'kcal' : 'g',
+  },
+};
 
 String _figure(double value) =>
     value == value.roundToDouble() ? '${value.round()}' : '$value';

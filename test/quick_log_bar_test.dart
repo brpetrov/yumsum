@@ -85,23 +85,30 @@ class _FakeEstimateService implements CalorieEstimateService {
     );
   }
 
+  // Whether the last label reading had the front of the pack.
+  bool? readFront;
+
   @override
   Future<LabelReading> readLabel(
     String uid,
-    Uint8List front,
+    Uint8List? front,
     Uint8List label,
-  ) async => (
-    name: 'Лютеница',
-    lang: 'bg',
-    brand: 'Първа преса',
-    quantity: '260 g',
-    servingSize: null,
-    per100g: const {'energy-kcal': 95.0, 'proteins': 2.0},
-  );
+  ) async {
+    readFront = front != null;
+    return (
+      name: 'Лютеница',
+      lang: 'bg',
+      brand: 'Първа преса',
+      quantity: '260 g',
+      servingSize: null,
+      per100g: const {'energy-kcal': 95.0, 'proteins': 2.0},
+    );
+  }
 }
 
 class _FakeContributor extends Fake implements FoodContributionService {
   final sent = <ProductContribution>[];
+  final nutrition = <NutritionContribution>[];
 
   @override
   bool get isConfigured => true;
@@ -109,6 +116,11 @@ class _FakeContributor extends Fake implements FoodContributionService {
   @override
   Future<void> contribute(ProductContribution product) async {
     sent.add(product);
+  }
+
+  @override
+  Future<void> addNutrition(NutritionContribution added) async {
+    nutrition.add(added);
   }
 }
 
@@ -128,13 +140,19 @@ class _FakeFoodLookup implements FoodLookupService {
   );
   String? lastBarcode;
   String? lastQuery;
-  // Whether Open Food Facts knows the product when [food] is null.
+  // Whether Open Food Facts knows the product when [food] is null, and
+  // what it has when it's the nutrition that's missing.
   bool listed = false;
+  ListedProduct? needsNutrition;
 
   @override
   Future<BarcodeLookup> byBarcode(String barcode) async {
     lastBarcode = barcode;
-    return (listed: food != null || listed, food: food);
+    return (
+      listed: food != null || listed || needsNutrition != null,
+      food: food,
+      needsNutrition: needsNutrition,
+    );
   }
 
   @override
@@ -219,6 +237,8 @@ void main() {
   late ProviderContainer container;
   late List<CameraMode> cameraModes;
   late _FakeContributor contributor;
+  // The photos the contribution camera last asked for.
+  List<String>? photoSteps;
 
   Future<void> pumpCard(
     WidgetTester tester, {
@@ -237,6 +257,7 @@ void main() {
     recorder = _FakeRecorder();
     foodLookup = _FakeFoodLookup();
     cameraModes = [];
+    photoSteps = null;
     container = ProviderContainer(
       overrides: [
         logMealControllerProvider.overrideWith(() => controller),
@@ -271,12 +292,13 @@ void main() {
         }),
         foodLookupServiceProvider.overrideWithValue(foodLookup),
         foodContributionServiceProvider.overrideWithValue(contributor),
-        productPhotosProvider.overrideWithValue(
-          (_) async => [
-            XFile.fromData(_pixel, path: 'front.png'),
-            XFile.fromData(_pixel, path: 'label.png'),
-          ],
-        ),
+        productPhotosProvider.overrideWithValue((_, steps) async {
+          photoSteps = steps;
+          return [
+            for (final (i, _) in steps.indexed)
+              XFile.fromData(_pixel, path: 'photo$i.png'),
+          ];
+        }),
         sharedPreferencesProvider.overrideWithValue(prefs),
       ],
     );
@@ -312,7 +334,10 @@ void main() {
 
   /// The round button with [tooltip].
   IconButton button(WidgetTester tester, String tooltip) => tester.widget(
-    find.ancestor(of: find.byTooltip(tooltip), matching: find.byType(IconButton)),
+    find.ancestor(
+      of: find.byTooltip(tooltip),
+      matching: find.byType(IconButton),
+    ),
   );
 
   testWidgets('saves typed name and calories without calling the AI', (
@@ -478,6 +503,8 @@ void main() {
     await tester.pumpAndSettle();
 
     final sent = contributor.sent.single;
+    expect(photoSteps, ['Front of the pack', 'Nutrition table']);
+    expect(estimateService.readFront, isTrue);
     expect(sent.lang, 'bg');
     expect(sent.barcode, '3800000000017');
     expect(sent.brand, 'Първа преса');
@@ -493,7 +520,60 @@ void main() {
     expect(find.textContaining('isn\'t on Open Food Facts'), findsNothing);
   });
 
-  testWidgets('a listed product without calories is not offered', (
+  testWidgets('a listed product without calories gets only its nutrition '
+      'added, then is logged', (tester) async {
+    await pumpCard(tester, barcode: '3800000000024');
+    foodLookup.food = null;
+    foodLookup.needsNutrition = (
+      name: 'Лютеница',
+      brand: 'Първа преса',
+      quantity: '260 g',
+      servingSize: null,
+      lang: 'bg',
+      hasNutritionPhoto: false,
+      imageUrl: null,
+    );
+    await tester.tap(find.byTooltip('Scan a barcode'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Be the first to add this'), findsNothing);
+    expect(find.text('Add its nutrition'), findsOneWidget);
+    await tester.tap(find.text('Contribute'));
+    await tester.pumpAndSettle();
+
+    // One photo, of the table; what the product has isn't asked for again.
+    expect(photoSteps, ['Nutrition table']);
+    expect(estimateService.readFront, isFalse);
+    expect(find.text('Check the nutrition'), findsOneWidget);
+    expect(find.byKey(const ValueKey('contribute-name')), findsNothing);
+    expect(find.text('Brand'), findsNothing);
+    await tester.ensureVisible(find.widgetWithText(FilledButton, 'Contribute'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Contribute'));
+    await tester.pumpAndSettle();
+
+    final added = contributor.nutrition.single;
+    expect(contributor.sent, isEmpty);
+    expect(added.barcode, '3800000000024');
+    expect(added.lang, 'bg');
+    expect(added.name, isNull);
+    expect(added.servingSize, isNull);
+    expect(added.perVolume, isFalse);
+    expect(added.per100g, {'energy-kcal': 95.0, 'proteins': 2.0});
+    expect(added.labelPhoto, isNotNull);
+    expect(
+      find.textContaining('Лютеница now has its nutrition on Open Food Facts'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('Log it'));
+    await tester.pumpAndSettle();
+    // Open Food Facts' pack size (260 g) is the starting amount.
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+    expect(boxes(tester), ['Лютеница', '247', '5']);
+  });
+
+  testWidgets('a listed product with calories but no name is not offered', (
     tester,
   ) async {
     await pumpCard(tester, barcode: '4000000000001');
@@ -502,6 +582,7 @@ void main() {
     await tester.tap(find.byTooltip('Scan a barcode'));
     await tester.pumpAndSettle();
     expect(find.text('Be the first to add this'), findsNothing);
+    expect(find.text('Add its nutrition'), findsNothing);
     expect(
       find.textContaining('no calories for this product yet'),
       findsOneWidget,
@@ -576,48 +657,47 @@ void main() {
     expect(find.text('Search foods'), findsNothing);
   });
 
-  testWidgets(
-    'an idle box offers photo, barcode and mic; in use, one button',
-    (tester) async {
-      await pumpCard(tester);
-      for (final way in ['Take a photo', 'Scan a barcode', 'Speak']) {
-        expect(find.byTooltip(way), findsOneWidget);
-      }
-      expect(find.byTooltip('Clear'), findsNothing);
-      expect(find.byTooltip('Save'), findsNothing);
-      expect(find.byTooltip('Estimate'), findsNothing);
+  testWidgets('an idle box offers photo, barcode and mic; in use, one button', (
+    tester,
+  ) async {
+    await pumpCard(tester);
+    for (final way in ['Take a photo', 'Scan a barcode', 'Speak']) {
+      expect(find.byTooltip(way), findsOneWidget);
+    }
+    expect(find.byTooltip('Clear'), findsNothing);
+    expect(find.byTooltip('Save'), findsNothing);
+    expect(find.byTooltip('Estimate'), findsNothing);
 
-      // Tapping the box with the keyboard up makes room: the three slide
-      // out for an Estimate button, which waits for a name.
-      tester.view.viewInsets = const FakeViewPadding(bottom: 800);
-      addTearDown(tester.view.resetViewInsets);
-      await tester.tap(nameBox);
-      await tester.pumpAndSettle();
-      for (final way in ['Take a photo', 'Scan a barcode', 'Speak']) {
-        expect(find.byTooltip(way), findsNothing);
-      }
-      expect(button(tester, 'Estimate').onPressed, isNull);
+    // Tapping the box with the keyboard up makes room: the three slide
+    // out for an Estimate button, which waits for a name.
+    tester.view.viewInsets = const FakeViewPadding(bottom: 800);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.tap(nameBox);
+    await tester.pumpAndSettle();
+    for (final way in ['Take a photo', 'Scan a barcode', 'Speak']) {
+      expect(find.byTooltip(way), findsNothing);
+    }
+    expect(button(tester, 'Estimate').onPressed, isNull);
 
-      await tester.enterText(nameBox, 'wrap');
-      await tester.pump();
-      expect(find.byTooltip('Clear'), findsOneWidget);
-      expect(button(tester, 'Estimate').onPressed, isNotNull);
+    await tester.enterText(nameBox, 'wrap');
+    await tester.pump();
+    expect(find.byTooltip('Clear'), findsOneWidget);
+    expect(button(tester, 'Estimate').onPressed, isNotNull);
 
-      // With calories it saves.
-      await tester.enterText(kcalBox, '450');
-      await tester.pumpAndSettle();
-      expect(find.byTooltip('Estimate'), findsNothing);
-      expect(find.byTooltip('Save'), findsOneWidget);
+    // With calories it saves.
+    await tester.enterText(kcalBox, '450');
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('Estimate'), findsNothing);
+    expect(find.byTooltip('Save'), findsOneWidget);
 
-      // Cleared, once the keyboard is down, the three are back.
-      await tester.tap(find.byTooltip('Clear'));
-      tester.view.resetViewInsets();
-      await tester.pumpAndSettle();
-      expect(boxes(tester), ['', '', '']);
-      expect(find.byTooltip('Save'), findsNothing);
-      expect(find.byTooltip('Speak'), findsOneWidget);
-    },
-  );
+    // Cleared, once the keyboard is down, the three are back.
+    await tester.tap(find.byTooltip('Clear'));
+    tester.view.resetViewInsets();
+    await tester.pumpAndSettle();
+    expect(boxes(tester), ['', '', '']);
+    expect(find.byTooltip('Save'), findsNothing);
+    expect(find.byTooltip('Speak'), findsOneWidget);
+  });
 
   testWidgets('a button\'s tooltip shows above it, clear of the navigation '
       'bar', (tester) async {

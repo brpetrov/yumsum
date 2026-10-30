@@ -15,10 +15,14 @@ import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/services/food_contribution_service.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
 
-/// Offered when a scanned barcode isn't on Open Food Facts. Adding the
-/// product is put as what it is: a small good turn for everyone who scans
-/// it next. True when the user wants to contribute.
-Future<bool> inviteToContribute(BuildContext context) async {
+/// Offered when a scanned barcode isn't on Open Food Facts, or is there
+/// without its nutrition ([nutritionOnly]). Adding it is put as what it
+/// is: a small good turn for everyone who scans it next. True when the
+/// user wants to contribute.
+Future<bool> inviteToContribute(
+  BuildContext context, {
+  bool nutritionOnly = false,
+}) async {
   final muted = TextStyle(
     fontSize: 15,
     height: 1.4,
@@ -42,7 +46,7 @@ Future<bool> inviteToContribute(BuildContext context) async {
             ),
             const SizedBox(height: 12),
             Text(
-              'Be the first to add this',
+              nutritionOnly ? 'Add its nutrition' : 'Be the first to add this',
               textAlign: TextAlign.center,
               style: AppTheme.display.copyWith(
                 fontSize: 20,
@@ -51,10 +55,16 @@ Future<bool> inviteToContribute(BuildContext context) async {
             ),
             const SizedBox(height: 8),
             Text(
-              'This product isn\'t on Open Food Facts yet, the free, '
-              'volunteer-run food list YumSum scans from. Add it with two '
-              'photos and it\'ll be there for you and everyone who scans it '
-              'next.',
+              nutritionOnly
+                  ? 'Open Food Facts, the free, volunteer-run food list '
+                        'YumSum scans from, has this product but not its '
+                        'nutrition. Add it with one photo of the nutrition '
+                        'table and it\'ll be there for you and everyone who '
+                        'scans it next.'
+                  : 'This product isn\'t on Open Food Facts yet, the free, '
+                        'volunteer-run food list YumSum scans from. Add it '
+                        'with two photos and it\'ll be there for you and '
+                        'everyone who scans it next.',
               textAlign: TextAlign.center,
               style: muted,
             ),
@@ -91,11 +101,13 @@ typedef ContributionResult = ({bool contributed, PackagedFood? food});
 
 /// Reads the label in [photos] (front, then nutrition table) with the AI,
 /// lets the user check every figure, and sends the product to Open Food
-/// Facts.
+/// Facts. For a product it [listed] without nutrition, [photos] is just
+/// the table, and only what the product lacks is asked for and sent.
 Future<ContributionResult> showContributeSheet(
   BuildContext context, {
   required String barcode,
   required List<XFile> photos,
+  ListedProduct? listed,
 }) async {
   var contributed = false;
   final food = await showModalBottomSheet<PackagedFood>(
@@ -109,6 +121,7 @@ Future<ContributionResult> showContributeSheet(
     builder: (_) => _ContributeSheet(
       barcode: barcode,
       photos: photos,
+      listed: listed,
       onContributed: () => contributed = true,
     ),
   );
@@ -130,11 +143,13 @@ class _ContributeSheet extends ConsumerStatefulWidget {
   const _ContributeSheet({
     required this.barcode,
     required this.photos,
+    required this.listed,
     required this.onContributed,
   });
 
   final String barcode;
   final List<XFile> photos;
+  final ListedProduct? listed;
   final VoidCallback onContributed;
 
   @override
@@ -193,7 +208,7 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
       if (uid == null) throw const CalorieEstimateException('Not signed in.');
       final reading = await ref
           .read(calorieEstimateServiceProvider)
-          .readLabel(uid, images[0], images[1]);
+          .readLabel(uid, images.length > 1 ? images.first : null, images.last);
       if (!mounted) return;
       _name.text = reading.name ?? '';
       _brand.text = reading.brand ?? '';
@@ -204,8 +219,9 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
         _figures[key]?.text = _number(value);
       }
       _note =
-          'The AI read these from your photos. Check them against the '
-          'packet: they will be public.';
+          'The AI read these from your '
+          '${images.length > 1 ? 'photos' : 'photo'}. Check them against '
+          'the packet: they will be public.';
     } on DailyLimitExceededException {
       _note =
           'Daily AI limit reached. Copy the details from the packet '
@@ -229,8 +245,15 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
     return text.isEmpty ? null : text;
   }
 
+  // For a listed product, what it already has stands and isn't asked for.
+  ListedProduct? get _listed => widget.listed;
+  String? get _productName => _listed?.name ?? _text(_name);
+  String? get _servingSize => _listed?.servingSize ?? _text(_serving);
+  String? get _packSize =>
+      _listed == null ? _text(_quantity) : _listed!.quantity;
+
   Future<void> _contribute() async {
-    final name = _text(_name);
+    final name = _productName;
     final kcal = _figure('energy-kcal');
     if (name == null || kcal == null) {
       setState(() => _error = 'Add the product name and energy (kcal).');
@@ -239,23 +262,36 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
     final prefs = ref.read(sharedPreferencesProvider);
     final service = ref.read(foodContributionServiceProvider);
     final country = ref.read(userProfileProvider).valueOrNull?.country;
+    final per100g = {for (final id in labelNutrientIds) id: ?_figure(id)};
     setState(() {
       _sending = true;
       _error = null;
     });
     try {
-      await service.contribute((
-        barcode: widget.barcode,
-        name: name,
-        brand: _text(_brand),
-        quantity: _text(_quantity),
-        servingSize: _text(_serving),
-        per100g: {for (final id in labelNutrientIds) id: ?_figure(id)},
-        frontPhoto: _images![0],
-        labelPhoto: _images![1],
-        country: country,
-        lang: _lang,
-      ));
+      if (_listed case final listed?) {
+        await service.addNutrition((
+          barcode: widget.barcode,
+          lang: listed.lang ?? _lang ?? productLanguage(name),
+          name: listed.name == null ? name : null,
+          servingSize: listed.servingSize == null ? _text(_serving) : null,
+          perVolume: soldByVolume(listed.quantity, _servingSize),
+          per100g: per100g,
+          labelPhoto: listed.hasNutritionPhoto ? null : _images!.last,
+        ));
+      } else {
+        await service.contribute((
+          barcode: widget.barcode,
+          name: name,
+          brand: _text(_brand),
+          quantity: _text(_quantity),
+          servingSize: _text(_serving),
+          per100g: per100g,
+          frontPhoto: _images![0],
+          labelPhoto: _images![1],
+          country: country,
+          lang: _lang,
+        ));
+      }
     } on FoodContributionException catch (error) {
       if (mounted) {
         setState(() {
@@ -280,12 +316,12 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
   PackagedFood _food() {
     final protein = _figure('proteins');
     return (
-      name: _text(_name)!,
-      brand: _text(_brand),
+      name: _productName!,
+      brand: _listed == null ? _text(_brand) : _listed!.brand,
       kcalPer100g: _figure('energy-kcal')!.round(),
       proteinPer100g: protein?.round(),
-      servingGrams: gramsIn(_text(_serving)) ?? gramsIn(_text(_quantity)),
-      imageUrl: null,
+      servingGrams: gramsIn(_servingSize) ?? gramsIn(_packSize),
+      imageUrl: _listed?.imageUrl,
     );
   }
 
@@ -326,8 +362,8 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
           ),
           const SizedBox(height: 8),
           Text(
-            '${_text(_name)} is now on Open Food Facts for everyone who scans '
-            'it next.'
+            '$_productName ${_listed == null ? 'is now on' : 'now has its nutrition on'} '
+            'Open Food Facts for everyone who scans it next.'
             '${count > 1 ? ' That\'s $count products you\'ve added.' : ''}',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -353,6 +389,7 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
     final muted = TextStyle(fontSize: 13, color: AppColors.textSecondary);
     final images = _images;
     final ids = labelNutrientIds;
+    final listed = _listed;
 
     Widget box(
       TextEditingController controller,
@@ -379,14 +416,17 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Check the details',
+            listed == null ? 'Check the details' : 'Check the nutrition',
             style: AppTheme.display.copyWith(
               fontSize: 20,
               color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
-          Text('Barcode ${widget.barcode}', style: muted),
+          Text(
+            [?listed?.name, 'Barcode ${widget.barcode}'].join(' · '),
+            style: muted,
+          ),
           const SizedBox(height: 12),
           if (images != null)
             Row(
@@ -421,18 +461,31 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
           else if (_note != null)
             Text(_note!, style: muted),
           const SizedBox(height: 16),
-          box(_name, 'Product name', key: 'contribute-name'),
-          const SizedBox(height: 12),
-          box(_brand, 'Brand'),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(child: box(_quantity, 'Pack size, e.g. 400 g')),
-              const SizedBox(width: 12),
-              Expanded(child: box(_serving, 'Serving, e.g. 30 g')),
+          if (listed == null) ...[
+            box(_name, 'Product name', key: 'contribute-name'),
+            const SizedBox(height: 12),
+            box(_brand, 'Brand'),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(child: box(_quantity, 'Pack size, e.g. 400 g')),
+                const SizedBox(width: 12),
+                Expanded(child: box(_serving, 'Serving, e.g. 30 g')),
+              ],
+            ),
+            const SizedBox(height: 20),
+          ] else ...[
+            // Only what the product is missing besides its nutrition.
+            if (listed.name == null) ...[
+              box(_name, 'Product name', key: 'contribute-name'),
+              const SizedBox(height: 12),
             ],
-          ),
-          const SizedBox(height: 20),
+            if (listed.servingSize == null) ...[
+              box(_serving, 'Serving, e.g. 30 g'),
+              const SizedBox(height: 12),
+            ],
+            const SizedBox(height: 8),
+          ],
           Text(
             'PER 100 G (OR 100 ML)',
             style: muted.copyWith(
@@ -462,9 +515,13 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
           ],
           const SizedBox(height: 4),
           Text(
-            'Your photos and these details will be published on Open Food '
-            'Facts under open licences (CC BY-SA and ODbL), so anyone can use '
-            'them. Your name and email are never shared.',
+            '${listed == null
+                ? 'Your photos and these details'
+                : listed.hasNutritionPhoto
+                ? 'These figures'
+                : 'Your photo and these figures'} will be published on Open '
+            'Food Facts under open licences (CC BY-SA and ODbL), so anyone '
+            'can use them. Your name and email are never shared.',
             style: muted,
           ),
           if (_error != null) ...[

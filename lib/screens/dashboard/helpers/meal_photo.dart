@@ -53,19 +53,21 @@ Future<MealCapture?> openMealCamera(
   return photo == null ? null : (barcode: null, photos: [photo]);
 }
 
-/// Takes the two photos a new product needs; overridable in tests.
+/// Takes the photos a product contribution needs, one per step (the front
+/// and the nutrition table, or just the table); overridable in tests.
 final productPhotosProvider =
-    Provider<Future<List<XFile>?> Function(BuildContext context)>(
-      (ref) => takeProductPhotos,
-    );
+    Provider<
+      Future<List<XFile>?> Function(BuildContext context, List<String> steps)
+    >((ref) => takeProductPhotos);
 
-Future<List<XFile>?> takeProductPhotos(BuildContext context) async {
+Future<List<XFile>?> takeProductPhotos(
+  BuildContext context,
+  List<String> steps,
+) async {
   final capture = await Navigator.of(context).push<MealCapture>(
     MaterialPageRoute(
       fullscreenDialog: true,
-      builder: (_) => const MealCameraPage.photos(
-        photoSteps: ['Front of the pack', 'Nutrition table'],
-      ),
+      builder: (_) => MealCameraPage.photos(photoSteps: steps),
     ),
   );
   return capture?.photos;

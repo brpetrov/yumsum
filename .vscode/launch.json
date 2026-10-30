@@ -30,6 +30,18 @@
         "R5CX205WQNV",
         "--dart-define-from-file=config/off_account.json"
       ]
+    },
+    {
+      "name": "YumSum (Android, contribute dry run)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "-d",
+        "R5CX205WQNV",
+        "--dart-define-from-file=config/off_account.json",
+        "--dart-define=OFF_DRY_RUN=true"
+      ]
     }
   ]
 }

@@ -126,6 +126,84 @@ void main() {
     expect(label, contains('nutrition_sr'));
   });
 
+  test('adding nutrition sends the figures and nothing it already has', () {
+    final fields = nutritionFields((
+      barcode: '3800000000024',
+      lang: 'bg',
+      name: null,
+      servingSize: null,
+      perVolume: false,
+      per100g: const {'energy-kcal': 95, 'salt': 1.2},
+      labelPhoto: null,
+    ));
+    expect(fields, {
+      'code': '3800000000024',
+      'nutrition_data_per': '100g',
+      'nutriment_energy-kcal': '95',
+      'nutriment_energy-kcal_unit': 'kcal',
+      'nutriment_salt': '1.2',
+      'nutriment_salt_unit': 'g',
+    });
+
+    // A product with no name or serving gets the ones the user checked.
+    final drink = nutritionFields((
+      barcode: '5000000000002',
+      lang: 'en',
+      name: 'Orange juice',
+      servingSize: '250 ml',
+      perVolume: true,
+      per100g: const {},
+      labelPhoto: null,
+    ));
+    expect(drink['product_name_en'], 'Orange juice');
+    expect(drink['serving_size'], '250 ml');
+    expect(drink['nutrition_data_per'], '100ml');
+    expect(soldByVolume('1 l', null), isTrue);
+    expect(soldByVolume('400 g', '30 g'), isFalse);
+  });
+
+  test('the nutrition photo goes only when the product has none', () async {
+    final paths = <String>[];
+    final service = FoodContributionService(
+      appUuid: 'install-1',
+      userId: 'yumsum-app',
+      password: 'secret',
+      client: MockClient((request) async {
+        paths.add(request.url.path);
+        return request.url.path.endsWith('jqm2.pl')
+            ? http.Response('{"status": 1}', 200)
+            : http.Response('{"status": "status ok", "imgid": 1}', 200);
+      }),
+    );
+    NutritionContribution withPhoto(Uint8List? photo) => (
+      barcode: '3800000000024',
+      lang: 'bg',
+      name: null,
+      servingSize: null,
+      perVolume: false,
+      per100g: const {'energy-kcal': 95},
+      labelPhoto: photo,
+    );
+
+    await service.addNutrition(withPhoto(Uint8List.fromList([3, 4])));
+    expect(paths, ['/cgi/product_jqm2.pl', '/cgi/product_image_upload.pl']);
+    paths.clear();
+    await service.addNutrition(withPhoto(null));
+    expect(paths, ['/cgi/product_jqm2.pl']);
+  });
+
+  test('a dry run sends nothing, even without an account', () async {
+    final service = FoodContributionService(
+      appUuid: 'install-1',
+      userId: '',
+      password: '',
+      dryRun: true,
+      client: MockClient((_) async => fail('nothing should be sent')),
+    );
+    expect(service.isConfigured, isTrue);
+    await service.contribute(_lyutenitsa);
+  });
+
   test('a refusal or a dropped connection says so', () async {
     FoodContributionService replying(Future<http.Response> Function() reply) =>
         FoodContributionService(

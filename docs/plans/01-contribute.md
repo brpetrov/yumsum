@@ -1,6 +1,6 @@
 # Plan 1: Contribute to Open Food Facts
 
-*Written 23 October 2026. Status: built and tested in the app; waiting for an Open Food Facts account before it switches on.*
+*Written 23 October 2026. Status: built and tested in the app. The Open Food Facts account was made and checked on 30 October 2026, and the same day "Add its nutrition" was added for products listed without calories.*
 
 ## Why
 
@@ -10,11 +10,13 @@ It also fixes LeanStreak's weakest spot. Bulgarian products and UK supermarket o
 
 ## How it works for the user
 
-1. They scan a barcode. If Open Food Facts has never heard of it, a sheet appears: **Be the first to add this**, with **Contribute** and **Not now**. A product it does have but with no calories isn't offered, because that's someone else's entry and contributing would overwrite it. The user is told it has no calories yet.
+1. They scan a barcode. If Open Food Facts has never heard of it, a sheet appears: **Be the first to add this**, with **Contribute** and **Not now**. If it has the product but no calories, the sheet says **Add its nutrition** instead (see below).
 2. The camera asks for two photos: **1 of 2 · The front of the pack**, then **2 of 2 · The nutrition table**.
 3. One AI call reads both photos and fills in a form: name, brand, pack size, serving size, and energy, protein, fat, saturates, carbohydrate, sugars, fibre and salt per 100 g. The AI is told to copy what's printed and never guess. Anything it can't read stays blank.
 4. The user checks the figures against the packet, fixes anything wrong, and taps **Contribute**. A line under the form says the photos and details will be public under open licences.
 5. A thank-you screen appears: "Thank you! … is now on Open Food Facts, for you and for everyone who scans it after you." From the second contribution it adds a count, e.g. "That's 3 products you've added". **Log it** goes straight to the usual amount sheet.
+
+**Add its nutrition** (a product Open Food Facts lists without calories): one photo, of the nutrition table. The form asks only for the figures, plus the name or serving size if the product has none. Only those are sent, with the photo if the product has no nutrition photo yet; its name, brand and front photo are never touched, because they're someone else's work. A product with calories but no name isn't offered.
 
 **Not now** gives the old behaviour: the "isn't in the food database" message, with a nudge to use the photo button instead. Backing out after tapping Contribute just closes things quietly, so a later scan can offer it again. Closing the thank-you instead of tapping Log it still counts as contributed. The form can't be closed while it's sending.
 
@@ -105,7 +107,6 @@ The feature stays hidden until the app has an Open Food Facts account. Test on t
 - An optional third photo of the ingredients list.
 - "Products you've added" in Account Settings, linking to each product page.
 - Show the product's Nutri-Score after contributing, since Open Food Facts calculates it once nutrition and category are in.
-- Offer to fill in missing nutrition for products that exist but have no figures.
 
 ## Sources
 

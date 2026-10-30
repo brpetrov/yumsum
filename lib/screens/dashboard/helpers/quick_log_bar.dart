@@ -455,11 +455,13 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       await _usePackagedFood(food);
       return;
     }
-    // Only a product Open Food Facts has never heard of is offered: one
-    // it has without figures belongs to someone else's entry.
+    // A product Open Food Facts has never heard of can be added, and one
+    // it lists without calories can have its nutrition added; the rest of
+    // someone else's entry is left as it is.
     if (found != null &&
-        !found.listed &&
-        await _offerContribution(barcode) != _Offer.declined) {
+        (!found.listed || found.needsNutrition != null) &&
+        await _offerContribution(barcode, found.needsNutrition) !=
+            _Offer.declined) {
       return;
     }
     if (!mounted) return;
@@ -474,26 +476,34 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     });
   }
 
-  /// A barcode Open Food Facts doesn't know: invite the user to add it
-  /// and, once they have, log it straight away. Declined when they said
-  /// Not now (or can't: contributing needs the app's account and a phone
-  /// camera); abandoned when they started and then backed out, which
-  /// needs no message.
-  Future<_Offer> _offerContribution(String barcode) async {
+  /// A barcode Open Food Facts doesn't know, or [listed] without its
+  /// nutrition: invite the user to add it and, once they have, log it
+  /// straight away. Declined when they said Not now (or can't:
+  /// contributing needs the app's account and a phone camera); abandoned
+  /// when they started and then backed out, which needs no message.
+  Future<_Offer> _offerContribution(
+    String barcode,
+    ListedProduct? listed,
+  ) async {
     if (kIsWeb || !ref.read(foodContributionServiceProvider).isConfigured) {
       return _Offer.declined;
     }
-    if (!await inviteToContribute(context) || !mounted) {
+    if (!await inviteToContribute(context, nutritionOnly: listed != null) ||
+        !mounted) {
       return _Offer.declined;
     }
-    final photos = await ref.read(productPhotosProvider)(context);
-    if (photos == null || photos.length < 2 || !mounted) {
+    final steps = listed == null
+        ? const ['Front of the pack', 'Nutrition table']
+        : const ['Nutrition table'];
+    final photos = await ref.read(productPhotosProvider)(context, steps);
+    if (photos == null || photos.length < steps.length || !mounted) {
       return _Offer.abandoned;
     }
     final result = await showContributeSheet(
       context,
       barcode: barcode,
       photos: photos,
+      listed: listed,
     );
     if (!result.contributed || !mounted) return _Offer.abandoned;
     if (result.food case final food?) await _usePackagedFood(food);

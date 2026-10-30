@@ -17,10 +17,29 @@ typedef PackagedFood = ({
   String? imageUrl,
 });
 
+/// What Open Food Facts already has for a product it lists without a
+/// calorie figure, so its nutrition can be added and nothing else touched.
+typedef ListedProduct = ({
+  String? name,
+  String? brand,
+  String? quantity,
+  String? servingSize,
+
+  /// The product's main language on Open Food Facts, e.g. en or bg.
+  String? lang,
+  bool hasNutritionPhoto,
+  String? imageUrl,
+});
+
 /// A barcode lookup: [listed] is false when Open Food Facts has never
 /// heard of the product; [food] is null too when it has the product but
-/// no name or calorie figure for it.
-typedef BarcodeLookup = ({bool listed, PackagedFood? food});
+/// no name or calorie figure for it, and [needsNutrition] is what it has
+/// when the calorie figure is what's missing.
+typedef BarcodeLookup = ({
+  bool listed,
+  PackagedFood? food,
+  ListedProduct? needsNutrition,
+});
 
 class FoodLookupException implements Exception {
   const FoodLookupException(this.message);
@@ -45,19 +64,25 @@ class FoodLookupService {
       '/api/v2/product/$barcode.json',
       {
         'fields':
-            'product_name,product_name_en,brands,nutriments,serving_size,quantity,image_front_small_url',
+            'product_name,product_name_en,brands,nutriments,serving_size,quantity,image_front_small_url,lang,image_nutrition_small_url',
         'app_name': 'YumSum',
       },
     );
     final response = await _get(uri);
-    if (response.statusCode == 404) return (listed: false, food: null);
+    if (response.statusCode == 404) {
+      return (listed: false, food: null, needsNutrition: null);
+    }
     if (response.statusCode != 200) {
       throw const FoodLookupException(
         'The food database is not answering right now.',
       );
     }
     final json = jsonDecode(response.body) as Map<String, dynamic>;
-    return (listed: json['product'] is Map, food: parsePackagedFood(json));
+    return (
+      listed: json['product'] is Map,
+      food: parsePackagedFood(json),
+      needsNutrition: parseListedProduct(json),
+    );
   }
 
   /// Up to 20 products matching [query], those sold in [country] first,
@@ -129,11 +154,7 @@ PackagedFood? parsePackagedFood(Map<String, dynamic> json) {
 
   final nutriments = product['nutriments'];
   final n = nutriments is Map<String, dynamic> ? nutriments : const {};
-  final kcal =
-      _number(n['energy-kcal_100g']) ??
-      (_number(n['energy-kj_100g']) ?? _number(n['energy_100g']))?.let(
-        (kj) => kj / 4.184,
-      );
+  final kcal = _kcalPer100g(n);
   if (kcal == null) return null;
 
   // A comma-separated string from the product API, a list from search.
@@ -159,6 +180,32 @@ PackagedFood? parsePackagedFood(Map<String, dynamic> json) {
     imageUrl: _text(product['image_front_small_url']),
   );
 }
+
+/// What a product listed without a calorie figure already has. Null for an
+/// unknown product, or one with calories.
+ListedProduct? parseListedProduct(Map<String, dynamic> json) {
+  final product = json['product'];
+  if (product is! Map<String, dynamic>) return null;
+  final nutriments = product['nutriments'];
+  if (_kcalPer100g(nutriments is Map ? nutriments : const {}) != null) {
+    return null;
+  }
+  return (
+    name: _text(product['product_name_en']) ?? _text(product['product_name']),
+    brand: _text(product['brands'])?.split(',').first.trim(),
+    quantity: _text(product['quantity']),
+    servingSize: _text(product['serving_size']),
+    lang: _text(product['lang']),
+    hasNutritionPhoto: _text(product['image_nutrition_small_url']) != null,
+    imageUrl: _text(product['image_front_small_url']),
+  );
+}
+
+double? _kcalPer100g(Map<dynamic, dynamic> n) =>
+    _number(n['energy-kcal_100g']) ??
+    (_number(n['energy-kj_100g']) ?? _number(n['energy_100g']))?.let(
+      (kj) => kj / 4.184,
+    );
 
 final _grams = RegExp(r'(\d+(?:[.,]\d+)?)\s*(?:g|ml)\b', caseSensitive: false);
 

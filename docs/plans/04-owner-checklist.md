@@ -11,7 +11,8 @@
   - [ ] Plan Settings → Track protein too? → No, Save: no protein on Today, in the bar, on meals or in History
   - [ ] Weight & Progress: delete a weigh-in with the bin on its card. Deleting the newest one puts your target back to the one before
 - [x] **Open Food Facts account** (30 October 2026): made on the real server with help.yumsum, in `config/off_account.json`, login checked; API usage form sent. The test server was down all day, so testing goes straight to the real one
-  - [ ] Run "YumSum (Android)", scan a packet Open Food Facts doesn't know, contribute it, then check its page at world.openfoodfacts.org/product/ followed by the barcode: name, figures, language, both photos
+  - [ ] Try both flows safely first: run "YumSum (Android, contribute dry run)" and scan the two test barcodes Claude put on screen (3809990001236 is unknown, 5010251434573 is listed without calories). Nothing is sent; the AI reading still counts towards the 20 a day
+  - [ ] Then for real with "YumSum (Android)": scan a packet Open Food Facts doesn't know, or one it has without calories, contribute it, then check its page at world.openfoodfacts.org/product/ followed by the barcode
 
 - [x] **Deploy the database rules and the website together** (done 29 October 2026)
   Run `firebase deploy --only firestore:rules,hosting` (the website is already built in `build/hosting`).

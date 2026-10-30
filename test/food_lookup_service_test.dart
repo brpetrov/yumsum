@@ -22,6 +22,35 @@ void main() {
       '{"status": 1, "product": {"product_name": "Joghurt"}}',
     ).byBarcode('1');
     expect((bare.listed, bare.food), (true, null));
+    expect(bare.needsNutrition?.name, 'Joghurt');
+    expect(unknown.needsNutrition, isNull);
+  });
+
+  test('a listed product without calories says what it already has', () {
+    final listed = parseListedProduct(
+      _reply('''
+      {"product": {"product_name": "Лютеница", "brands": "Първа преса, Other",
+        "quantity": "260 g", "lang": "bg",
+        "image_nutrition_small_url": "https://images.openfoodfacts.org/n.jpg",
+        "nutriments": {"proteins_100g": 2}}}'''),
+    );
+    expect(listed, (
+      name: 'Лютеница',
+      brand: 'Първа преса',
+      quantity: '260 g',
+      servingSize: null,
+      lang: 'bg',
+      hasNutritionPhoto: true,
+      imageUrl: null,
+    ));
+
+    // One with calories needs nothing, even without a name.
+    expect(
+      parseListedProduct(
+        _reply('{"product": {"nutriments": {"energy-kcal_100g": 100}}}'),
+      ),
+      isNull,
+    );
   });
 
   test('a barcode lookup asks for the pack photo and reads it', () async {
