@@ -44,7 +44,7 @@ This follows Open Food Facts' own Flutter app and their server code (checked 23 
   - `nutriment_<id>` and `nutriment_<id>_unit` for each figure
 - **Account fields:** the app's shared account (`user_id`, `password`) plus `app_name`, `app_version` and `app_uuid`.
   - `app_uuid` is a random ID kept per install, so Open Food Facts' moderators can block one bad contributor without blocking the whole app.
-  - A `comment` of "LeanStreak 0.1.0 user <app_uuid>", as their docs ask. Nothing personal.
+  - A `comment` of "YumSum 0.1.0 user <app_uuid>", as their docs ask. Nothing personal.
 - **Photos:** two multipart `POST`s to `/cgi/product_image_upload.pl`, front first.
   - Each has `imagefield` set to `front_<lang>` or `nutrition_<lang>`, with the file in `imgupload_<imagefield>`.
   - The server sets them as the product's front and nutrition pictures. Only a photo sent as the front becomes the front picture.
@@ -57,7 +57,7 @@ This follows Open Food Facts' own Flutter app and their server code (checked 23 
 ### Rules this follows
 
 - **Data from the packet.** Open Food Facts' terms say data must "come directly from the label and packaging" and photos "must have been taken by the contributors themselves". The camera only takes new photos; there's no gallery picker. The AI copies the label, and the user checks it before anything is sent.
-- **Licences.** Photos are published under CC BY-SA and data under the Database Contents License, and Open Food Facts asks apps to get users' agreement in their own terms. LeanStreak's terms now say so, and the form repeats it in one line.
+- **Licences.** Photos are published under CC BY-SA and data under the Database Contents License, and Open Food Facts asks apps to get users' agreement in their own terms. YumSum's terms now say so, and the form repeats it in one line.
 - **Credit.** Account Settings links to Open Food Facts, as their licence asks of apps that reuse the data.
 - **Thanking contributors.** Their docs ask apps to congratulate users "for their contribution to Open Food Facts and the common good", which is what the thank-you screen does.
 
@@ -65,11 +65,11 @@ This follows Open Food Facts' own Flutter app and their server code (checked 23 
 
 The feature stays hidden until the app has an Open Food Facts account. Test on their **test server** first: it has its own accounts and its own database, so nothing real is touched.
 
-1. **Create a test account.** Go to <https://world.openfoodfacts.net/cgi/user.pl>; if the browser asks for a login, use `off` / `off`. Choose a username such as `leanstreak-app`. It's a username, not an email: the app sends the username.
+1. **Create a test account.** Go to <https://world.openfoodfacts.net/cgi/user.pl>; if the browser asks for a login, use `off` / `off`. Choose a username such as `yumsum-app`. It's a username, not an email: the app sends the username.
 2. **Fill in `config/off_account.json`** in the project (it already exists, empty; git ignores it):
    ```json
    {
-     "OFF_USER_ID": "leanstreak-app",
+     "OFF_USER_ID": "yumsum-app",
      "OFF_PASSWORD": "the password you chose",
      "OFF_HOST": "world.openfoodfacts.net"
    }
@@ -77,9 +77,9 @@ The feature stays hidden until the app has an Open Food Facts account. Test on t
    Don't paste the password into chat. Put it straight into the file.
 3. **Run the app** with the VS Code "YumSum (Android)" configuration, which passes that file. From a terminal: `flutter run --dart-define-from-file=config/off_account.json`.
 4. **Try it with a real packet.** Barcode lookups still come from the real database, so pick something it doesn't know: a local Bulgarian product or a supermarket own brand. Contribute it, then open `https://world.openfoodfacts.net/product/<barcode>` (login `off` / `off`). Check the name, figures, language and both photos.
-5. **When you're happy, create the real account** at <https://world.openfoodfacts.org> with the project email from Plan 2, not your personal Gmail.
+5. **When you're happy, create the real account** at <https://world.openfoodfacts.org> with help.yumsum@gmail.com, not your personal Gmail, and a password used nowhere else (it's built into the app).
 6. **Fill in Open Food Facts' API usage form:** <https://docs.google.com/forms/d/e/1FAIpQLSdIE3D8qvjC_zRJw1W8OmuHhsWJ_NSckiiniAHlfaVwUZCziQ/viewform>. Their docs ask apps to do this "so that we can identify your usage and prevent potential bans."
-7. **Optional but worth doing:** email `reuse@openfoodfacts.org`, or post in the `#api` channel on their Slack. Say you'd like the LeanStreak account listed as an app account, so each install's edits show as "leanstreak.<id>" rather than all under one username. Mention that the label is read by AI and checked by the user. They have no written rule on AI-read labels, and it's better they hear it from us.
+7. **Optional but worth doing:** email `reuse@openfoodfacts.org`, or post in the `#api` channel on their Slack. Say you'd like the YumSum account listed as an app account, so each install's edits show as "yumsum.<id>" rather than all under one username. Mention that the label is read by AI and checked by the user. They have no written rule on AI-read labels, and it's better they hear it from us.
 8. **Switch to the real server:** set `OFF_HOST` to `world.openfoodfacts.org` with the real username and password. The release build needs the same `--dart-define-from-file` flag.
 
 ## Phone checklist
