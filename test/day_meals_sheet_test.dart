@@ -6,6 +6,7 @@ import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/past_day_edit_provider.dart';
+import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/review/day_meals_sheet.dart';
 import 'package:lean_streak/widgets/day_status.dart';
 import 'package:intl/intl.dart';
@@ -107,6 +108,7 @@ void main() {
             dayEditsThisMonthProvider.overrideWith(
               (ref) => Stream.value(changesUsed),
             ),
+            userProfileProvider.overrideWith((ref) => Stream.value(null)),
           ],
           child: MaterialApp(
             home: Scaffold(body: DayMealsSheet(date: day)),

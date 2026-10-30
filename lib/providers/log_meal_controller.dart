@@ -8,6 +8,7 @@ import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/past_day_edit_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
+import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/repositories/day_edit_repository.dart';
 
 class LogMealController extends AsyncNotifier<void> {
@@ -39,11 +40,11 @@ class LogMealController extends AsyncNotifier<void> {
       final docRef = existingMeal == null ? repo.newMealRef(uid) : null;
       final mealName = (name?.trim().isEmpty ?? true) ? null : name!.trim();
 
-      // Only named meals get an AI protein estimate; calorie-only entries
-      // stay uncounted.
+      // Only named meals get an AI protein estimate, and only while
+      // protein is tracked; calorie-only entries stay uncounted.
       final protein =
           proteinGrams ??
-          (mealName == null
+          (mealName == null || !ref.read(trackProteinProvider)
               ? null
               : await _estimateProtein(mealName, calories));
 

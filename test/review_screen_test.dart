@@ -5,6 +5,7 @@ import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/period_review_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
+import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/review/review_screen.dart';
 import 'package:lean_streak/services/period_review_service.dart';
 
@@ -12,6 +13,7 @@ Widget _app(DateTime? firstDay) {
   return ProviderScope(
     overrides: [
       currentUidProvider.overrideWithValue('test'),
+      userProfileProvider.overrideWith((ref) => Stream.value(null)),
       firstLoggedDayProvider.overrideWith((ref) async => firstDay),
       reviewSummariesProvider.overrideWith((ref, range) async => {}),
       periodReviewProvider.overrideWith(

@@ -15,6 +15,7 @@ class CalorieBars extends StatelessWidget {
     required this.days,
     required this.summariesByDate,
     this.minimumSlots = 12,
+    this.showProtein = true,
   });
 
   static const _maxBarWidth = 12.0;
@@ -25,6 +26,9 @@ class CalorieBars extends StatelessWidget {
 
   /// Keeps bars from getting very wide when only a few days are shown.
   final int minimumSlots;
+
+  /// Whether a bar's tooltip mentions the day's protein.
+  final bool showProtein;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +59,7 @@ class CalorieBars extends StatelessWidget {
                               summariesByDate[DateFormat(
                                 'yyyy-MM-dd',
                               ).format(day)],
+                          showProtein: showProtein,
                         ),
                       ),
               ),
@@ -67,10 +72,15 @@ class CalorieBars extends StatelessWidget {
 }
 
 class _CalorieBar extends StatelessWidget {
-  const _CalorieBar({required this.day, required this.summary});
+  const _CalorieBar({
+    required this.day,
+    required this.summary,
+    required this.showProtein,
+  });
 
   final DateTime day;
   final DailySummary? summary;
+  final bool showProtein;
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +102,7 @@ class _CalorieBar extends StatelessWidget {
       message: summary == null
           ? '$dayLabel: no calories logged'
           : '$dayLabel: ${summary.totalCalories} kcal'
-                '${summary.proteinGrams == null ? '' : ' · ${summary.proteinGrams} g protein'}',
+                '${summary.proteinGrams == null || !showProtein ? '' : ' · ${summary.proteinGrams} g protein'}',
       waitDuration: const Duration(milliseconds: 250),
       child: Align(
         alignment: Alignment.bottomCenter,

@@ -10,6 +10,7 @@ import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/onboarding_controller.dart';
 import 'package:lean_streak/widgets/health_plan_preview_card.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
+import 'package:lean_streak/widgets/pill_toggle.dart';
 import 'package:lean_streak/widgets/plan_choices.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -34,6 +35,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   ActivityLevel _activityLevel = ActivityLevel.sedentary;
   TrainingFrequency _trainingFrequency = TrainingFrequency.none;
   WeightLossPace _weightLossPace = WeightLossPace.moderate;
+  bool _trackProtein = true;
 
   @override
   void dispose() {
@@ -106,6 +108,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           weightLossPace: _weightLossPace,
           country: _countryCtrl.text,
           usualFood: _foodCtrl.text,
+          trackProtein: _trackProtein,
         );
   }
 
@@ -440,6 +443,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       ),
                     ),
                     SizedBox(height: 20),
+
+                    const SectionLabel('TRACK PROTEIN TOO?'),
+                    Text(
+                      'Protein helps keep muscle while you lose weight. You can change this in Plan Settings.',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    PillToggle<bool>(
+                      options: const [(true, 'Yes'), (false, 'No')],
+                      selected: _trackProtein,
+                      onChanged: (value) =>
+                          setState(() => _trackProtein = value),
+                    ),
+                    SizedBox(height: 28),
 
                     if (preview != null) ...[
                       HealthPlanPreviewCard(

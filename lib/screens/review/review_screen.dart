@@ -9,6 +9,7 @@ import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/period_review.dart';
 import 'package:lean_streak/providers/period_review_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
+import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/review/day_meals_sheet.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/bowl_note.dart';
@@ -437,6 +438,7 @@ class _PeriodReviewCard extends ConsumerWidget {
                   days: days,
                   summariesByDate: summariesByDate,
                   minimumSlots: isMonth ? 12 : 7,
+                  showProtein: ref.watch(trackProteinProvider),
                 ),
               ),
               if (review.loggedDays > 0) ...[

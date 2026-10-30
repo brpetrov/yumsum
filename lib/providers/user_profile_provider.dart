@@ -17,3 +17,12 @@ final userProfileProvider = StreamProvider.autoDispose<UserProfile?>((ref) {
   if (uid == null) return Stream.value(null);
   return ref.watch(userProfileRepositoryProvider).watchProfile(uid);
 });
+
+/// Whether protein is shown and estimated; on until the profile says not.
+final trackProteinProvider = Provider.autoDispose<bool>((ref) {
+  return ref.watch(
+    userProfileProvider.select(
+      (profile) => profile.valueOrNull?.trackProtein ?? true,
+    ),
+  );
+});

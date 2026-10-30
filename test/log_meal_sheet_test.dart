@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
+import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
 
 typedef _Saved = ({String? date, String? name, double calories, Meal? edited});
@@ -38,7 +39,10 @@ void main() {
     controller = _FakeLogMealController();
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [logMealControllerProvider.overrideWith(() => controller)],
+        overrides: [
+          logMealControllerProvider.overrideWith(() => controller),
+          userProfileProvider.overrideWith((ref) => Stream.value(null)),
+        ],
         child: MaterialApp(
           home: Scaffold(
             body: Builder(

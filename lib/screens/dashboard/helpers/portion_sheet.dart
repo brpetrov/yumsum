@@ -19,18 +19,22 @@ Portion portionFor(PackagedFood food, int grams) => (
 
 /// Asks how much of [food] was eaten; resolves to the portion, or null if
 /// the sheet was dismissed.
-Future<Portion?> showPortionSheet(BuildContext context, PackagedFood food) =>
-    showModalBottomSheet<Portion>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.surface,
-      builder: (_) => _PortionSheet(food: food),
-    );
+Future<Portion?> showPortionSheet(
+  BuildContext context,
+  PackagedFood food, {
+  bool showProtein = true,
+}) => showModalBottomSheet<Portion>(
+  context: context,
+  isScrollControlled: true,
+  backgroundColor: AppColors.surface,
+  builder: (_) => _PortionSheet(food: food, showProtein: showProtein),
+);
 
 class _PortionSheet extends StatefulWidget {
-  const _PortionSheet({required this.food});
+  const _PortionSheet({required this.food, required this.showProtein});
 
   final PackagedFood food;
+  final bool showProtein;
 
   @override
   State<_PortionSheet> createState() => _PortionSheetState();
@@ -55,7 +59,9 @@ class _PortionSheetState extends State<_PortionSheet> {
   }
 
   String _amounts(int kcal, int? protein) =>
-      protein == null ? '$kcal kcal' : '$kcal kcal · $protein g protein';
+      protein == null || !widget.showProtein
+      ? '$kcal kcal'
+      : '$kcal kcal · $protein g protein';
 
   @override
   Widget build(BuildContext context) {

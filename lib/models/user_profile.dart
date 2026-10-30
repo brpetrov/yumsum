@@ -115,6 +115,7 @@ class UserProfile {
     required this.name,
     this.country = defaultCountry,
     this.usualFood = '',
+    this.trackProtein = true,
     required this.age,
     required this.gender,
     required this.heightCm,
@@ -145,6 +146,10 @@ class UserProfile {
   /// prompt so dish names and portions are read the way they mean them.
   final String country;
   final String usualFood;
+
+  /// Off hides protein everywhere (Today, the bar, meals, History) and
+  /// skips the automatic protein estimate; calories alone are tracked.
+  final bool trackProtein;
 
   final int age;
   final Gender gender;
@@ -191,6 +196,7 @@ class UserProfile {
       name: d['name'] as String,
       country: d['country'] as String? ?? defaultCountry,
       usualFood: d['usualFood'] as String? ?? legacyUsualFood,
+      trackProtein: d['trackProtein'] as bool? ?? true,
       age: d['age'] as int,
       gender: Gender.fromString(d['gender'] as String),
       heightCm: (d['heightCm'] as num).toDouble(),
@@ -223,6 +229,7 @@ class UserProfile {
     'name': name,
     'country': country,
     'usualFood': usualFood,
+    'trackProtein': trackProtein,
     'age': age,
     'gender': gender.value,
     'heightCm': heightCm,
@@ -253,6 +260,7 @@ class UserProfile {
     String? name,
     String? country,
     String? usualFood,
+    bool? trackProtein,
     int? age,
     Gender? gender,
     double? heightCm,
@@ -280,6 +288,7 @@ class UserProfile {
       name: name ?? this.name,
       country: country ?? this.country,
       usualFood: usualFood ?? this.usualFood,
+      trackProtein: trackProtein ?? this.trackProtein,
       age: age ?? this.age,
       gender: gender ?? this.gender,
       heightCm: heightCm ?? this.heightCm,

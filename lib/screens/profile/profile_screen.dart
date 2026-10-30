@@ -14,6 +14,7 @@ import 'package:lean_streak/widgets/day_status.dart';
 import 'package:lean_streak/widgets/health_plan_preview_card.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
+import 'package:lean_streak/widgets/pill_toggle.dart';
 import 'package:lean_streak/widgets/plan_choices.dart';
 
 class PlanSettingsScreen extends ConsumerStatefulWidget {
@@ -37,6 +38,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
   ActivityLevel _activityLevel = ActivityLevel.sedentary;
   TrainingFrequency _trainingFrequency = TrainingFrequency.none;
   WeightLossPace _weightLossPace = WeightLossPace.moderate;
+  bool _trackProtein = true;
 
   double? get _currentBmi {
     final currentWeight = double.tryParse(_currentWeightCtrl.text);
@@ -104,6 +106,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
     _activityLevel = profile.activityLevel;
     _trainingFrequency = profile.trainingFrequency;
     _weightLossPace = profile.weightLossPace;
+    _trackProtein = profile.trackProtein;
   }
 
   Future<void> _submit(UserProfile profile) async {
@@ -130,6 +133,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
           weightLossPace: _weightLossPace,
           country: _countryCtrl.text,
           usualFood: _foodCtrl.text,
+          trackProtein: _trackProtein,
         );
 
     if (!mounted) return;
@@ -444,6 +448,22 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                         ),
                       ),
                       SizedBox(height: 20),
+                      const SectionLabel('TRACK PROTEIN TOO?'),
+                      Text(
+                        'Protein helps keep muscle while you lose weight. Off hides it everywhere.',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      PillToggle<bool>(
+                        options: const [(true, 'Yes'), (false, 'No')],
+                        selected: _trackProtein,
+                        onChanged: (value) =>
+                            setState(() => _trackProtein = value),
+                      ),
+                      SizedBox(height: 28),
                       const SectionLabel(
                         'HOW FAST DO YOU WANT TO LOSE WEIGHT?',
                       ),

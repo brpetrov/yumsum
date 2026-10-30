@@ -9,10 +9,16 @@ import 'package:lean_streak/services/calorie_estimate_service.dart';
 /// a weight can be tapped and corrected; the item is rescaled and the new
 /// list handed back, with no further AI call.
 class EstimateBreakdown extends StatefulWidget {
-  const EstimateBreakdown({super.key, required this.items, this.onChanged});
+  const EstimateBreakdown({
+    super.key,
+    required this.items,
+    this.onChanged,
+    this.showProtein = true,
+  });
 
   final List<EstimateItem> items;
   final ValueChanged<List<EstimateItem>>? onChanged;
+  final bool showProtein;
 
   @override
   State<EstimateBreakdown> createState() => _EstimateBreakdownState();
@@ -88,7 +94,7 @@ class _EstimateBreakdownState extends State<EstimateBreakdown> {
                                     ),
                                   ),
                           Text(
-                            item.protein == null
+                            item.protein == null || !widget.showProtein
                                 ? '${item.kcal} kcal'
                                 : '${item.kcal} kcal · ${item.protein} g',
                             style: muted,

@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/models/meal.dart';
+import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
@@ -167,6 +168,34 @@ class _FakeRecorder extends Fake implements AudioRecorder {
   }
 }
 
+/// A profile that has switched protein off.
+final _noProteinProfile = UserProfile(
+  uid: 'user-1',
+  email: 'a@b.com',
+  name: 'Test',
+  trackProtein: false,
+  age: 30,
+  gender: Gender.male,
+  heightCm: 180,
+  currentWeightKg: 86,
+  targetWeightKg: 75,
+  activityLevel: ActivityLevel.lightlyActive,
+  trainingFrequency: TrainingFrequency.oneToTwo,
+  activityScaleVersion: currentActivityScaleVersion,
+  planCalculationVersion: currentPlanCalculationVersion,
+  weightLossPace: WeightLossPace.moderate,
+  targetDate: DateTime(2027),
+  bmi: 26.5,
+  bmr: 1800,
+  tdee: 2400,
+  dailyCalorieTarget: 1900,
+  goalPaceKgPerWeek: 0.5,
+  goalPaceLevel: GoalPaceLevel.values.first,
+  onboardingCompleted: true,
+  createdAt: DateTime(2026),
+  updatedAt: DateTime(2026),
+);
+
 /// A meal logged at this time of day [daysAgo] days ago.
 Meal _recent(String name, double kcal, double? protein, {int daysAgo = 1}) {
   final at = DateTime.now().subtract(Duration(days: daysAgo));
@@ -198,6 +227,7 @@ void main() {
     bool takesPhoto = true,
     String? barcode,
     int aiUsed = 0,
+    bool trackProtein = true,
   }) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
@@ -215,7 +245,9 @@ void main() {
         aiUsageTodayProvider.overrideWith((ref) => Stream.value(aiUsed)),
         recentMealsProvider.overrideWith((ref) async => recents),
         audioRecorderProvider.overrideWithValue(recorder),
-        userProfileProvider.overrideWith((ref) => Stream.value(null)),
+        userProfileProvider.overrideWith(
+          (ref) => Stream.value(trackProtein ? null : _noProteinProfile),
+        ),
         mealCameraProvider.overrideWithValue((_, mode) async {
           cameraModes.add(mode);
           return switch (mode) {
@@ -554,6 +586,24 @@ void main() {
       expect(find.byTooltip('Speak'), findsOneWidget);
     },
   );
+
+  testWidgets('with protein off there is no protein box and no protein in '
+      'the breakdown', (tester) async {
+    await pumpCard(tester, trackProtein: false);
+    await tester.enterText(nameBox, 'chicken wrap');
+    await tester.pump();
+    expect(kcalBox, findsOneWidget);
+    expect(proteinBox, findsNothing);
+
+    await tester.tap(find.widgetWithText(TextButton, 'Estimate'));
+    await tester.pump();
+    await tester.pump();
+    expect(boxes(tester), ['chicken wrap', '520', '']);
+    await tester.tap(find.text('Chicken wrap 400 · Mayo 120'));
+    await tester.pump();
+    expect(find.text('400 kcal'), findsOneWidget);
+    expect(find.text('400 kcal · 30 g'), findsNothing);
+  });
 
   testWidgets('fits a 360dp phone', (tester) async {
     tester.view.physicalSize = const Size(360, 640);

@@ -9,6 +9,7 @@ import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/past_day_edit_provider.dart';
+import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/repositories/day_edit_repository.dart';
 import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
 import 'package:lean_streak/widgets/bowl_note.dart';
@@ -79,10 +80,11 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
     final summary = ref
         .watch(dailySummaryForDateProvider(_dateKey))
         .valueOrNull;
+    final showProtein = ref.watch(trackProteinProvider);
     // From the meals rather than the summary, so days logged before protein
     // existed still show it once any meal has a value.
     final proteinMeals = meals?.where((meal) => meal.proteinGrams != null);
-    final protein = proteinMeals == null || proteinMeals.isEmpty
+    final protein = !showProtein || proteinMeals == null || proteinMeals.isEmpty
         ? null
         : proteinMeals
               .fold<double>(0, (sum, meal) => sum + meal.proteinGrams!)
@@ -183,6 +185,7 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
                     final meal = meals[index];
                     return MealRow(
                       meal: meal,
+                      showProtein: showProtein,
                       onEdit: canChange
                           ? () => showLogMealSheet(context, existingMeal: meal)
                           : () => setState(

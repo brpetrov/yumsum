@@ -17,6 +17,7 @@ import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
+import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/repositories/ai_usage_repository.dart';
 import 'package:lean_streak/screens/dashboard/helpers/contribute_sheet.dart';
 import 'package:lean_streak/screens/dashboard/helpers/food_search_sheet.dart';
@@ -509,7 +510,11 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   /// Asks how much of [food] was eaten; the box is then filled like an AI
   /// result, but with label figures and no AI usage.
   Future<void> _usePackagedFood(PackagedFood food) async {
-    final portion = await showPortionSheet(context, food);
+    final portion = await showPortionSheet(
+      context,
+      food,
+      showProtein: ref.read(trackProteinProvider),
+    );
     if (portion == null || !mounted) return;
     _fill(portion.name, portion.kcal, portion.protein);
     setState(() => _aiItems = const []);
@@ -539,6 +544,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     // are calories the meal is complete and suggestions would only repeat it.
     final allRecents =
         ref.watch(recentMealsProvider).valueOrNull ?? const <Meal>[];
+    final trackProtein = ref.watch(trackProteinProvider);
     final offering = focused && !_listening && !_working && entry.kcal == null;
     final recents = offering
         ? _matchingRecents(allRecents, _name.text)
@@ -595,7 +601,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                       const SizedBox(height: 12),
                     ],
                     if (showStatus) ...[
-                      _buildStatus(),
+                      _buildStatus(trackProtein),
                       const SizedBox(height: 12),
                     ] else if (aiHint != null) ...[
                       Padding(
@@ -669,16 +675,18 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                               unit: 'kcal',
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _numberBox(
-                              'quick-log-protein',
-                              _protein,
-                              _proteinFocus,
-                              hint: 'protein (g)',
-                              unit: 'g protein',
+                          if (trackProtein) ...[
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _numberBox(
+                                'quick-log-protein',
+                                _protein,
+                                _proteinFocus,
+                                hint: 'protein (g)',
+                                unit: 'g protein',
+                              ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                     ],
@@ -932,7 +940,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   }
 
   /// Listening, working or what went wrong, and an AI result's breakdown.
-  Widget _buildStatus() {
+  Widget _buildStatus(bool showProtein) {
     final (String? message, Color color) = _listening
         ? ('Listening... tap stop when you\'re done.', AppColors.textSecondary)
         : _working
@@ -947,7 +955,11 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
           if (message != null)
             Text(message, style: TextStyle(fontSize: 14, color: color)),
           if (_aiItems.isNotEmpty && !_working && !_listening)
-            EstimateBreakdown(items: _aiItems, onChanged: _itemsChanged),
+            EstimateBreakdown(
+              items: _aiItems,
+              onChanged: _itemsChanged,
+              showProtein: showProtein,
+            ),
         ],
       ),
     );

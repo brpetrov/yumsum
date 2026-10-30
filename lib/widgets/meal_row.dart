@@ -13,11 +13,13 @@ class MealRow extends StatelessWidget {
     required this.meal,
     required this.onEdit,
     required this.onDelete,
+    this.showProtein = true,
   });
 
   final Meal meal;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final bool showProtein;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +64,7 @@ class MealRow extends StatelessWidget {
                   color: AppColors.textPrimary,
                 ),
               ),
-              if (meal.proteinGrams != null) ...[
+              if (showProtein && meal.proteinGrams != null) ...[
                 const SizedBox(height: 3),
                 Text(
                   '${meal.proteinGrams!.round()} g protein',

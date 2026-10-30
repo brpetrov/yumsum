@@ -88,7 +88,8 @@ service cloud.firestore {
         && text(request.resource.data.get('name', ''), 200)
         && text(request.resource.data.get('email', ''), 320)
         && text(request.resource.data.get('country', ''), 100)
-        && text(request.resource.data.get('usualFood', ''), 500);
+        && text(request.resource.data.get('usualFood', ''), 500)
+        && request.resource.data.get('trackProtein', true) is bool;
 
       match /meals/{mealId} {
         allow read, delete: if isOwner(userId);

@@ -283,6 +283,7 @@ class _DashboardContent extends StatelessWidget {
             children: [
               _TodayCard(
                 summary: summary,
+                trackProtein: profile.trackProtein,
                 proteinLogged: proteinLogged,
                 proteinTarget: HealthCalculator.proteinTargetGrams(
                   targetWeightKg: profile.targetWeightKg,
@@ -295,6 +296,7 @@ class _DashboardContent extends StatelessWidget {
               const SizedBox(height: 18),
               _MealsCard(
                 meals: meals,
+                showProtein: profile.trackProtein,
                 onEditMeal: onEditMeal,
                 onDeleteMeal: onDeleteMeal,
               ),
@@ -348,16 +350,19 @@ class _DayOffButton extends ConsumerWidget {
   }
 }
 
-/// Calories left for the day, then daily protein, in one card.
+/// Calories left for the day, then daily protein (when tracked), in one
+/// card.
 class _TodayCard extends StatelessWidget {
   const _TodayCard({
     required this.summary,
+    required this.trackProtein,
     required this.proteinLogged,
     required this.proteinTarget,
     required this.mealsWithoutProtein,
   });
 
   final DailySummary summary;
+  final bool trackProtein;
   final int proteinLogged;
   final int proteinTarget;
   final int mealsWithoutProtein;
@@ -443,39 +448,41 @@ class _TodayCard extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           _ProgressBar(value: calorieProgress, color: barColor, height: 14),
-          const SizedBox(height: 22),
-          Row(
-            children: [
-              Text(
-                'Daily protein',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+          if (trackProtein) ...[
+            const SizedBox(height: 22),
+            Row(
+              children: [
+                Text(
+                  'Daily protein',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
-              ),
-              const Spacer(),
-              Text(
-                '$proteinLogged / $proteinTarget g',
-                style: AppTheme.display.copyWith(
-                  fontSize: 17,
-                  color: AppColors.textPrimary,
+                const Spacer(),
+                Text(
+                  '$proteinLogged / $proteinTarget g',
+                  style: AppTheme.display.copyWith(
+                    fontSize: 17,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            _ProgressBar(
+              value: proteinTarget <= 0 ? 0 : proteinLogged / proteinTarget,
+              color: AppColors.veryGood,
+            ),
+            if (mealsWithoutProtein > 0) ...[
+              const SizedBox(height: 10),
+              Text(
+                '$mealsWithoutProtein ${mealsWithoutProtein == 1 ? 'meal' : 'meals'} '
+                'not counted (no protein info)',
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             ],
-          ),
-          const SizedBox(height: 10),
-          _ProgressBar(
-            value: proteinTarget <= 0 ? 0 : proteinLogged / proteinTarget,
-            color: AppColors.veryGood,
-          ),
-          if (mealsWithoutProtein > 0) ...[
-            const SizedBox(height: 10),
-            Text(
-              '$mealsWithoutProtein ${mealsWithoutProtein == 1 ? 'meal' : 'meals'} '
-              'not counted (no protein info)',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-            ),
           ],
         ],
       ),
@@ -527,11 +534,13 @@ class _ProgressBar extends StatelessWidget {
 class _MealsCard extends StatelessWidget {
   const _MealsCard({
     required this.meals,
+    required this.showProtein,
     required this.onEditMeal,
     required this.onDeleteMeal,
   });
 
   final List<Meal> meals;
+  final bool showProtein;
   final ValueChanged<Meal> onEditMeal;
   final Future<void> Function(Meal meal) onDeleteMeal;
 
@@ -573,6 +582,7 @@ class _MealsCard extends StatelessWidget {
               if (index > 0) const Divider(height: 1, endIndent: 14),
               MealRow(
                 meal: meals[index],
+                showProtein: showProtein,
                 onEdit: () => onEditMeal(meals[index]),
                 onDelete: () => onDeleteMeal(meals[index]),
               ),
@@ -667,6 +677,7 @@ class _MonthPreviewCard extends ConsumerWidget {
                     child: CalorieBars(
                       days: days,
                       summariesByDate: summariesByDate,
+                      showProtein: ref.watch(trackProteinProvider),
                     ),
                   ),
                   const SizedBox(height: 16),

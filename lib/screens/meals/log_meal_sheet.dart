@@ -10,6 +10,7 @@ import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/past_day_edit_provider.dart';
+import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/widgets/estimate_breakdown.dart';
 
@@ -158,6 +159,7 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
   @override
   Widget build(BuildContext context) {
     final saving = ref.watch(logMealControllerProvider).isLoading;
+    final showProtein = ref.watch(trackProteinProvider);
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final dateLabel = _date == today
         ? null
@@ -212,34 +214,41 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
                     controller: _caloriesController,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    textInputAction: TextInputAction.next,
+                    textInputAction: showProtein
+                        ? TextInputAction.next
+                        : TextInputAction.done,
+                    onSubmitted: showProtein ? null : (_) => _submit(),
                     decoration: const InputDecoration(
                       labelText: 'Calories',
                       suffixText: 'kcal',
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextField(
-                    controller: _proteinController,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (_) => _submit(),
-                    decoration: const InputDecoration(
-                      labelText: 'Protein',
-                      suffixText: 'g',
+                if (showProtein) ...[
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _proteinController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _submit(),
+                      decoration: const InputDecoration(
+                        labelText: 'Protein',
+                        suffixText: 'g',
+                      ),
                     ),
                   ),
-                ),
+                ],
               ],
             ),
-            const SizedBox(height: 6),
-            Text(
-              'Leave protein blank to estimate it from the name.',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-            ),
+            if (showProtein) ...[
+              const SizedBox(height: 6),
+              Text(
+                'Leave protein blank to estimate it from the name.',
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              ),
+            ],
             const SizedBox(height: 4),
             Align(
               alignment: Alignment.centerLeft,
@@ -260,6 +269,7 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
             if (_estimateItems.isNotEmpty)
               EstimateBreakdown(
                 items: _estimateItems,
+                showProtein: showProtein,
                 onChanged: (items) {
                   final total = totalOf(items);
                   _caloriesController.text = '${total.kcal}';
