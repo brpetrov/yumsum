@@ -13,10 +13,10 @@
 - [x] **Open Food Facts account** (30 October 2026): made on the real server with help.yumsum, in `config/off_account.json`, login checked; API usage form sent. The test server was down all day, so testing goes straight to the real one
   - [ ] Try both flows safely first: run "YumSum (Android, contribute dry run)" and scan the two test barcodes Claude put on screen (3809990001236 is unknown, 5010251434573 is listed without calories). Nothing is sent; the AI reading still counts towards the 20 a day
   - [ ] Then for real with "YumSum (Android)": scan a packet Open Food Facts doesn't know, or one it has without calories, contribute it, then check its page at world.openfoodfacts.org/product/ followed by the barcode
-- [ ] **Recipes** (built 31 October 2026; all 40 recipes written, photos still placeholders): see `docs/plans/05-recipes.md`
-  - [x] The 40 recipes (written by Claude, checked by `flutter test test/recipes_asset_test.dart`)
+- [ ] **Recipes** (built 31 October 2026; all 40 recipes written, 10 photos in): see `docs/plans/05-recipes.md`
+  - [x] The 40 recipes (redone by Claude for easy, common, high-protein, lower-calorie meals; checked by `flutter test test/recipes_asset_test.dart`)
   - [ ] Read through them and change anything you'd cook differently, then run the check again
-  - [ ] Have Codex make the photos with the instruction under "Photos with Codex"
+  - [ ] Have Codex make the other 30 photos with the instruction under "Photos with Codex" (it skips the 10 already in `recipe-photos`)
   - [ ] `tools/build_hosting.ps1` and `firebase deploy --only hosting:app` (photos must be live before an app release that lists the recipes)
   - [ ] On the phone: menu → Recipes; a tile's + logs portions; a recipe page's Log a portion; type a recipe name in the bar for its chip
 
