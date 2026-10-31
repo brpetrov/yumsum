@@ -1,6 +1,6 @@
 # Plan 5: Recipes
 
-*Written 31 October 2026. Status: the Recipes page, recipe page, logging and bar chips are built and tested, with three sample recipes and plain placeholder photos. Next: fill the library (about 40 recipes) and make the photos.*
+*Written 31 October 2026. Status: built and tested, with the full library of 40 recipes (written by Claude on 31 October from the brief below). The photos are still plain placeholders. Next: generate the real photos (see "Photos with Codex"), then publish.*
 
 ## What it is
 
@@ -91,6 +91,14 @@
 >   ]
 > }
 > ```
+
+### Photos with Codex
+
+Paste this into Codex, in this repository:
+
+> For every recipe in `assets/recipes/recipes.json`, generate one image with the photo prompt in `docs/plans/05-recipes.md` (section "The photo prompt"), replacing [DISH NAME] with the recipe's `name`. Use the bowl or glass variant where the dish is served that way (soups, porridge, yoghurt, overnight oats). Save each image as `<id>.png` in a folder called `recipe-photos` at the repository root, where `<id>` is the recipe's `id`. Don't commit that folder. When all 40 exist, run `python -I tools/make_recipe_photos.py recipe-photos`, which replaces the placeholders in `tools/hosting/recipes/`, then run `flutter test test/recipes_asset_test.dart` and confirm it passes. Show me a contact sheet of all 40 so I can check the style matches.
+
+The placeholders are a plain plate drawing, about 3 KB each. Real photos come out at 35 to 80 KB, so a folder full of 3 KB files means the photos weren't replaced. Don't publish the website until they are.
 
 ### The photo prompt
 

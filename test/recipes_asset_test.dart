@@ -57,6 +57,7 @@ void main() {
     }
   });
 
-  // Switch on once the library is written:
-  // test('the library is complete', () => expect(recipes.length, greaterThanOrEqualTo(30)));
+  test('the library is complete', () {
+    expect(recipes.length, greaterThanOrEqualTo(30));
+  });
 }
