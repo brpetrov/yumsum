@@ -83,6 +83,15 @@ void main() {
 
     await tester.tap(find.byTooltip('Open navigation menu'));
     await tester.pumpAndSettle();
+    // The menu scrolls when the window is short.
+    await tester.scrollUntilVisible(
+      find.text('Dark'),
+      100,
+      scrollable: find.descendant(
+        of: find.byType(Drawer),
+        matching: find.byType(Scrollable),
+      ),
+    );
     await tester.tap(find.text('Dark'));
     await tester.pumpAndSettle();
 

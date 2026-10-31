@@ -233,6 +233,9 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                         controller: _countryCtrl,
                         textCapitalization: TextCapitalization.words,
                         textInputAction: TextInputAction.next,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(100),
+                        ],
                         decoration: InputDecoration(
                           labelText: 'Country you live in',
                           prefixIcon: Icon(Icons.public_rounded),
@@ -246,6 +249,9 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                         controller: _foodCtrl,
                         textCapitalization: TextCapitalization.sentences,
                         textInputAction: TextInputAction.next,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(100),
+                        ],
                         decoration: InputDecoration(
                           labelText: 'Food you usually eat (optional)',
                           hintText: 'e.g. Bulgarian home cooking, vegetarian',
