@@ -156,6 +156,7 @@ class _RecipeTile extends ConsumerWidget {
       recipe,
       ref.watch(remainingCaloriesTodayProvider),
     );
+    final muted = TextStyle(fontSize: 12.5, color: AppColors.textSecondary);
     return AppCard(
       padding: EdgeInsets.zero,
       onTap: () => context.push(AppRoutes.recipePath(recipe.id)),
@@ -209,36 +210,49 @@ class _RecipeTile extends ConsumerWidget {
                   [
                     '${recipe.kcalPerPortion} kcal',
                     if (showProtein) '${recipe.proteinPerPortion} g protein',
-                    '${recipe.minutes} min',
                   ].join(' · '),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    color: AppColors.textSecondary,
-                  ),
+                  style: muted,
                 ),
-                if (fits) ...[
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.schedule_rounded,
+                      size: 14,
+                      color: AppColors.textSecondary,
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.veryGood.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Text(
-                      'Fits today',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.veryGood,
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        '${recipe.minutes} min',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: muted,
                       ),
                     ),
-                  ),
-                ],
+                    if (fits)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.veryGood.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          'Fits today',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.veryGood,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ],
             ),
           ),

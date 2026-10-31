@@ -170,7 +170,7 @@ void main() {
     ) async {
       await pump(tester);
       expect(find.text('Pasta bolognese'), findsOneWidget);
-      expect(find.text('560 kcal · 42 g protein · 30 min'), findsOneWidget);
+      expect(find.text('560 kcal · 42 g protein'), findsOneWidget);
       expect(find.text('Cooked recently'), findsNothing);
 
       await tester.tap(find.widgetWithText(ChoiceChip, 'Breakfast'));
@@ -181,7 +181,7 @@ void main() {
 
     testWidgets('no protein on tiles when it is switched off', (tester) async {
       await pump(tester, trackProtein: false);
-      expect(find.text('560 kcal · 30 min'), findsOneWidget);
+      expect(find.text('560 kcal'), findsOneWidget);
     });
 
     testWidgets('marks what fits only once something is logged', (

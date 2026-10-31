@@ -145,6 +145,7 @@ class _RecipeBody extends ConsumerWidget {
                             width: 96,
                             child: Text(ingredient.amount, style: muted),
                           ),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               ingredient.item,
