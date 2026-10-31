@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/models/meal.dart';
+import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
@@ -16,6 +17,7 @@ import 'package:lean_streak/providers/food_lookup_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
+import 'package:lean_streak/providers/recipe_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 import 'package:lean_streak/screens/dashboard/helpers/quick_log_bar.dart';
@@ -24,6 +26,8 @@ import 'package:lean_streak/services/food_contribution_service.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
 import 'package:record/record.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'recipe_fixtures.dart';
 
 class _FakeLogMealController extends LogMealController {
   final saved = <({String? name, double calories, double? protein})>[];
@@ -246,6 +250,7 @@ void main() {
   Future<void> pumpCard(
     WidgetTester tester, {
     List<Meal> recents = const [],
+    List<Recipe> recipes = const [],
     LaunchAction? launchAction,
     bool takesPhoto = true,
     String? barcode,
@@ -268,6 +273,7 @@ void main() {
         currentUidProvider.overrideWithValue('user-1'),
         aiUsageTodayProvider.overrideWith((ref) => Stream.value(aiUsed)),
         recentMealsProvider.overrideWith((ref) async => recents),
+        recipesProvider.overrideWith((ref) async => recipes),
         audioRecorderProvider.overrideWithValue(recorder),
         userProfileProvider.overrideWith(
           (ref) => Stream.value(trackProtein ? null : _noProteinProfile),
@@ -813,6 +819,38 @@ void main() {
     await tester.pump();
     expect(controller.saved, [
       (name: 'Chicken wrap', calories: 450.0, protein: 30.0),
+    ]);
+  });
+
+  testWidgets('a typed recipe name offers a portion of it', (tester) async {
+    await pumpCard(
+      tester,
+      recipes: [testRecipe('Pasta bolognese', kcal: 560, protein: 42)],
+    );
+    await tester.pump();
+    await tester.tap(nameBox);
+    await tester.pump();
+    expect(find.byType(ActionChip), findsNothing);
+
+    await tester.enterText(nameBox, 'bolo');
+    await tester.pump();
+    final chip = find.widgetWithText(ActionChip, 'Pasta bolognese · 560 kcal');
+    expect(chip, findsOneWidget);
+    expect(
+      find.descendant(
+        of: chip,
+        matching: find.byIcon(Icons.menu_book_outlined),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(chip);
+    await tester.pumpAndSettle();
+    expect(boxes(tester), ['Pasta bolognese', '560', '42']);
+    await tester.tap(find.byTooltip('Save'));
+    await tester.pump();
+    expect(controller.saved, [
+      (name: 'Pasta bolognese', calories: 560.0, protein: 42.0),
     ]);
   });
 

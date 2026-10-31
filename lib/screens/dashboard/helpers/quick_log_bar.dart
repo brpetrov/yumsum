@@ -9,13 +9,16 @@ import 'package:record/record.dart';
 
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/helpers/meal_suggestions.dart';
 import 'package:lean_streak/helpers/wav.dart';
 import 'package:lean_streak/models/meal.dart';
+import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
+import 'package:lean_streak/providers/recipe_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/repositories/ai_usage_repository.dart';
 import 'package:lean_streak/screens/dashboard/helpers/contribute_sheet.dart';
@@ -559,11 +562,17 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     // are calories the meal is complete and suggestions would only repeat it.
     final allRecents =
         ref.watch(recentMealsProvider).valueOrNull ?? const <Meal>[];
+    final recipes = ref.watch(recipesProvider).valueOrNull ?? const <Recipe>[];
     final trackProtein = ref.watch(trackProteinProvider);
     final offering = focused && !_listening && !_working && entry.kcal == null;
     final recents = offering
-        ? _matchingRecents(allRecents, _name.text)
-        : const <Meal>[];
+        ? suggestionsFor(
+            recents: allRecents,
+            recipes: recipes,
+            query: _name.text,
+            now: DateTime.now(),
+          )
+        : const <MealSuggestion>[];
     // A name without calories can be searched for; the web can't reach
     // the search service.
     final query = _name.text.trim();
@@ -800,20 +809,10 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     );
   }
 
-  /// While the box is empty, the meals usually had around now; once
-  /// typing, up to three recent meals whose name contains the text.
-  List<Meal> _matchingRecents(List<Meal> all, String text) {
-    final query = text.trim().toLowerCase();
-    if (query.isEmpty) return usualMealsAt(all, DateTime.now());
-    return distinctRecentMeals(all)
-        .where((meal) => meal.name!.toLowerCase().contains(query))
-        .take(3)
-        .toList();
-  }
-
   /// One scrolling row of chips: a search for [search] when given, then
-  /// meals, which fill the boxes ready to save when tapped.
-  Widget _buildChips(List<Meal> recents, String? search) {
+  /// meals and recipe portions ([suggestionsFor]), which fill the boxes
+  /// ready to save when tapped.
+  Widget _buildChips(List<MealSuggestion> suggestions, String? search) {
     ActionChip chip(String label, VoidCallback onPressed, {Widget? avatar}) =>
         ActionChip(
           avatar: avatar,
@@ -839,15 +838,25 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
             color: AppColors.onPrimaryContainer,
           ),
         ),
-      for (final meal in recents)
-        chip('${meal.name} · ${meal.calories.round()} kcal', () {
-          _fill(meal.name!, meal.calories.round(), meal.proteinGrams?.round());
-          _focusNode.requestFocus();
-          setState(() {
-            _aiItems = const [];
-            _error = null;
-          });
-        }),
+      for (final meal in suggestions)
+        chip(
+          '${meal.name} · ${meal.kcal} kcal',
+          () {
+            _fill(meal.name, meal.kcal, meal.protein);
+            _focusNode.requestFocus();
+            setState(() {
+              _aiItems = const [];
+              _error = null;
+            });
+          },
+          avatar: meal.fromRecipe
+              ? Icon(
+                  Icons.menu_book_outlined,
+                  size: 18,
+                  color: AppColors.onPrimaryContainer,
+                )
+              : null,
+        ),
     ];
     return SizedBox(
       height: 40,
