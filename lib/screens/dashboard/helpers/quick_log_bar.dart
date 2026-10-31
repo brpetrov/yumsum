@@ -1037,7 +1037,26 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (message != null)
-            Text(message, style: TextStyle(fontSize: 14, color: color)),
+            Row(
+              children: [
+                if (_working && !_listening) ...[
+                  SizedBox.square(
+                    dimension: 14,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                Flexible(
+                  child: Text(
+                    message,
+                    style: TextStyle(fontSize: 14, color: color),
+                  ),
+                ),
+              ],
+            ),
           if (_aiItems.isNotEmpty && !_working && !_listening)
             EstimateBreakdown(
               items: _aiItems,

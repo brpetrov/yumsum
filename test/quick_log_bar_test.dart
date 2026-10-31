@@ -144,10 +144,13 @@ class _FakeFoodLookup implements FoodLookupService {
   // what it has when it's the nutrition that's missing.
   bool listed = false;
   ListedProduct? needsNutrition;
+  // Keeps the lookup waiting until completed.
+  Completer<void>? hold;
 
   @override
   Future<BarcodeLookup> byBarcode(String barcode) async {
     lastBarcode = barcode;
+    await hold?.future;
     return (
       listed: food != null || listed || needsNutrition != null,
       food: food,
@@ -571,6 +574,30 @@ void main() {
     await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
     expect(boxes(tester), ['Лютеница', '247', '5']);
+  });
+
+  testWidgets('a spinner shows beside Working while it looks', (tester) async {
+    await pumpCard(tester, barcode: '5000112637922');
+    foodLookup.hold = Completer();
+    await tester.tap(find.byTooltip('Scan a barcode'));
+    await tester.pump();
+    await tester.pump();
+
+    final working = find.ancestor(
+      of: find.text('Working...'),
+      matching: find.byType(Row),
+    );
+    expect(
+      find.descendant(
+        of: working.first,
+        matching: find.byType(CircularProgressIndicator),
+      ),
+      findsOneWidget,
+    );
+
+    foodLookup.hold!.complete();
+    await tester.pumpAndSettle();
+    expect(find.text('Working...'), findsNothing);
   });
 
   testWidgets('a listed product with calories but no name is not offered', (
