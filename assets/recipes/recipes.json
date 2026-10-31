@@ -1,0 +1,80 @@
+[
+  {
+    "id": "greek-yoghurt-berry-bowl",
+    "name": "Greek yoghurt berry bowl",
+    "description": "Thick yoghurt with berries, oats and honey.",
+    "cuisine": "Greek",
+    "category": "breakfast",
+    "tags": ["high-protein", "vegetarian", "quick"],
+    "servings": 1,
+    "minutes": 5,
+    "kcalPerPortion": 330,
+    "proteinPerPortion": 30,
+    "ingredients": [
+      { "item": "Greek yoghurt, 0% fat", "amount": "250 g", "kcal": 143, "protein": 25 },
+      { "item": "Mixed berries", "amount": "100 g", "kcal": 40, "protein": 1 },
+      { "item": "Rolled oats", "amount": "25 g", "kcal": 93, "protein": 3 },
+      { "item": "Honey", "amount": "1 tsp", "kcal": 22, "protein": 0 },
+      { "item": "Walnuts, chopped", "amount": "5 g", "kcal": 34, "protein": 1 }
+    ],
+    "steps": [
+      "Spoon the yoghurt into a bowl.",
+      "Top with the berries, oats and walnuts.",
+      "Drizzle over the honey."
+    ]
+  },
+  {
+    "id": "chicken-souvlaki-wrap",
+    "name": "Chicken souvlaki wrap",
+    "description": "Lemony grilled chicken with tzatziki in a warm flatbread.",
+    "cuisine": "Greek",
+    "category": "lunch",
+    "tags": ["high-protein", "quick"],
+    "servings": 2,
+    "minutes": 25,
+    "kcalPerPortion": 475,
+    "proteinPerPortion": 44,
+    "ingredients": [
+      { "item": "Chicken breast", "amount": "300 g", "kcal": 318, "protein": 70 },
+      { "item": "Wholemeal flatbreads", "amount": "2", "kcal": 400, "protein": 12 },
+      { "item": "Tzatziki", "amount": "100 g", "kcal": 110, "protein": 4 },
+      { "item": "Tomato, sliced", "amount": "1", "kcal": 18, "protein": 1 },
+      { "item": "Red onion, sliced", "amount": "½", "kcal": 20, "protein": 0 },
+      { "item": "Olive oil", "amount": "2 tsp", "kcal": 80, "protein": 0 },
+      { "item": "Lemon juice and dried oregano", "amount": "to taste", "kcal": 4, "protein": 0 }
+    ],
+    "steps": [
+      "Cut the chicken into chunks and toss with the oil, lemon juice and oregano.",
+      "Grill or pan-fry for 8 to 10 minutes until cooked through.",
+      "Warm the flatbreads, spread with tzatziki and fill with the chicken, tomato and onion."
+    ]
+  },
+  {
+    "id": "pasta-bolognese",
+    "name": "Pasta bolognese",
+    "description": "A lean beef ragù over spaghetti.",
+    "cuisine": "Italian",
+    "category": "dinner",
+    "tags": ["high-protein"],
+    "servings": 4,
+    "minutes": 40,
+    "kcalPerPortion": 560,
+    "proteinPerPortion": 42,
+    "ingredients": [
+      { "item": "Lean beef mince, 5% fat", "amount": "500 g", "kcal": 625, "protein": 105 },
+      { "item": "Spaghetti, dried", "amount": "320 g", "kcal": 1130, "protein": 40 },
+      { "item": "Chopped tomatoes", "amount": "2 × 400 g tins", "kcal": 170, "protein": 9 },
+      { "item": "Onion, chopped", "amount": "1", "kcal": 40, "protein": 1 },
+      { "item": "Carrot, grated", "amount": "1", "kcal": 25, "protein": 1 },
+      { "item": "Garlic", "amount": "2 cloves", "kcal": 8, "protein": 0 },
+      { "item": "Olive oil", "amount": "1 tbsp", "kcal": 120, "protein": 0 },
+      { "item": "Parmesan, grated", "amount": "30 g", "kcal": 120, "protein": 11 }
+    ],
+    "steps": [
+      "Soften the onion, carrot and garlic in the oil for 5 minutes.",
+      "Add the mince and brown it, breaking it up.",
+      "Stir in the tomatoes and simmer for 20 minutes.",
+      "Cook the spaghetti, then serve with the sauce and parmesan."
+    ]
+  }
+]
