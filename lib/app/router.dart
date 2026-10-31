@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/account/account_settings_screen.dart';
@@ -13,6 +14,8 @@ import 'package:lean_streak/screens/onboarding/onboarding_screen.dart';
 import 'package:lean_streak/screens/profile/profile_load_error_screen.dart';
 import 'package:lean_streak/screens/profile/profile_screen.dart';
 import 'package:lean_streak/screens/progress/progress_screen.dart';
+import 'package:lean_streak/screens/recipes/recipe_screen.dart';
+import 'package:lean_streak/screens/recipes/recipes_screen.dart';
 import 'package:lean_streak/screens/review/review_screen.dart';
 import 'package:lean_streak/widgets/splash_screen.dart';
 
@@ -31,6 +34,9 @@ class AppRoutes {
   static const planSettings = '/plan-settings';
   static const progress = '/progress';
   static const notifications = '/notifications';
+  static const recipes = '/recipes';
+  static const recipe = '/recipes/:id';
+  static String recipePath(String id) => '/recipes/$id';
 }
 
 // ---------------------------------------------------------------------------
@@ -109,6 +115,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.notifications,
         builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.recipes,
+        builder: (context, state) => const RecipesScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.recipe,
+        builder: (context, state) => RecipeScreen(
+          recipeId: state.pathParameters['id']!,
+          recipe: state.extra is Recipe ? state.extra! as Recipe : null,
+        ),
       ),
     ],
   );

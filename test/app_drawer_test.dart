@@ -20,6 +20,7 @@ void main() {
         for (final route in [
           AppRoutes.dashboard,
           AppRoutes.review,
+          AppRoutes.recipes,
           AppRoutes.progress,
           AppRoutes.planSettings,
           AppRoutes.notifications,
@@ -72,6 +73,12 @@ void main() {
     router.pop();
     await tester.pumpAndSettle();
     expect(location(), AppRoutes.dashboard);
+  });
+
+  testWidgets('the menu lists Recipes', (tester) async {
+    await pumpAt(tester, AppRoutes.dashboard);
+    await pick(tester, 'Recipes');
+    expect(location(), AppRoutes.recipes);
   });
 
   testWidgets('Today in the menu goes straight home', (tester) async {

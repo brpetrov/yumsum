@@ -80,6 +80,11 @@ class AppDrawer extends ConsumerWidget {
       label: 'History',
     ),
     (
+      route: AppRoutes.recipes,
+      icon: Icons.menu_book_outlined,
+      label: 'Recipes',
+    ),
+    (
       route: AppRoutes.progress,
       icon: Icons.monitor_weight_outlined,
       label: 'Weight & Progress',
