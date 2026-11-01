@@ -1,6 +1,6 @@
 # Plan 5: Recipes
 
-*Written 31 October 2026. Status: built and tested, with the full library of 40 recipes (written by Claude on 31 October, then redone the same day to the brief below: easy, common, fairly quick, high in protein and modest in calories). All 40 real photos are in. On 1 November each photo was checked against its recipe: 11 match, and 29 leave out part of the portion or show something else, so they are being redone from the plate descriptions under "Photo redo". Next: those 29, then publish.*
+*Written 31 October 2026. Status: built and tested, with the full library of 40 recipes (written by Claude on 31 October, then redone the same day to the brief below: easy, common, fairly quick, high in protein and modest in calories). All 40 real photos are in. On 1 November each photo was checked against its recipe: 11 matched, and the other 29 were redone from the plate descriptions under "Photo redo" and checked again; all 40 now show their recipe's portion. Next: publish.*
 
 ## What it is
 

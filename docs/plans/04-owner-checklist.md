@@ -17,7 +17,7 @@
   - [x] The 40 recipes (redone by Claude for easy, common, high-protein, lower-calorie meals; checked by `flutter test test/recipes_asset_test.dart`)
   - [ ] Read through them and change anything you'd cook differently, then run the check again
   - [x] Codex made all 40 photos; Claude checked each against its recipe (1 November): 11 match
-  - [ ] Have Codex redo the other 29 with the paste-in under "Photo redo" in `docs/plans/05-recipes.md`, then Claude checks them
+  - [x] Codex redid the other 29 from the plate descriptions under "Photo redo" in `docs/plans/05-recipes.md`; Claude checked them, all match (1 November)
   - [ ] `tools/build_hosting.ps1` and `firebase deploy --only hosting:app` (photos must be live before an app release that lists the recipes)
   - [ ] On the phone: menu → Recipes; a tile's + logs portions; a recipe page's Log a portion; type a recipe name in the bar for its chip
 
