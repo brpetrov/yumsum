@@ -1,6 +1,6 @@
 # Plan 5: Recipes
 
-*Written 31 October 2026. Status: built and tested, with the full library of 40 recipes (written by Claude on 31 October, then redone the same day to the brief below: easy, common, fairly quick, high in protein and modest in calories). All 40 real photos are in, and on 1 November each recipe was checked against its photo and adjusted to match; 4 photos showed the wrong dish and are being redone. Next: those 4, then publish.*
+*Written 31 October 2026. Status: built and tested, with the full library of 40 recipes (written by Claude on 31 October, then redone the same day to the brief below: easy, common, fairly quick, high in protein and modest in calories). All 40 real photos are in. On 1 November each photo was checked against its recipe: 11 match, and 29 leave out part of the portion or show something else, so they are being redone from the plate descriptions under "Photo redo". Next: those 29, then publish.*
 
 ## What it is
 
@@ -41,7 +41,7 @@
 >
 > **Easy and quick:** at most 4 steps and 9 ingredient lines; at most 40 minutes, most of them 30 or less.
 >
-> **One plate:** the ingredients are everything in a portion and all of it is on the plate, so the photo can show it. No "serve with" sides that the photo would leave out.
+> **One plate:** a portion, sides included, fits on one plate or in one bowl, so its photo can show all of it.
 >
 > **Nutrition:** high in protein, modest in calories. Per portion: breakfasts at most 450 kcal and at least 20 g protein; lunches at most 500 kcal and 25 g; dinners at most 550 kcal and 30 g; snacks at most 250 kcal and 12 g. Protein gives at least a quarter of the calories in every recipe (protein × 4 ÷ kcal ≥ 0.25). Tags: `high-protein` when protein is 30% or more of the calories, `quick` for 20 minutes or less, `low-calorie` for 350 kcal or less (snacks 150), plus `vegetarian` and `vegan` where true.
 >
@@ -101,6 +101,46 @@
 Paste this into Codex, in this repository:
 
 > For every recipe in `assets/recipes/recipes.json` that doesn't already have an image in `recipe-photos`, generate one image with the photo prompt in `docs/plans/05-recipes.md` (section "The photo prompt"), replacing [DISH NAME] with the recipe's `name` followed by exactly what is on the plate, taken from its ingredients (for example "Tuna rice cakes: two round puffed rice cakes topped with flaked tinned tuna and cucumber slices"). Show only those ingredients, nothing extra. Use the bowl or glass variant where the dish is served that way (soups, yoghurt, overnight oats, the smoothie, edamame). Save each image as `<id>.png` in a folder called `recipe-photos` at the repository root, where `<id>` is the recipe's `id`. Don't commit that folder. When all 40 exist, run `python -I tools/make_recipe_photos.py recipe-photos`, which replaces the placeholders in `tools/hosting/recipes/`, then run `flutter test test/recipes_asset_test.dart` and confirm it passes. Show me a contact sheet of all 40 so I can check the style matches.
+
+### Photo redo (1 November)
+
+Paste this into Codex:
+
+> Regenerate the 29 photos listed under "Photo redo" in `docs/plans/05-recipes.md` with the photo prompt in that file, using each line's description in place of [DISH NAME] (bowl variant where it says bowl), and overwrite `recipe-photos/<id>.png`. Each photo shows one portion and only what its description lists. Then run `python -I tools/make_recipe_photos.py recipe-photos` and `flutter test test/recipes_asset_test.dart`, and show me a contact sheet of the 29 with their ids.
+
+One portion each:
+
+- `greek-yoghurt-berry-bowl` (bowl): thick Greek yoghurt topped with strawberries, raspberries and blueberries, a sprinkle of plain rolled oats, a few chopped walnuts and a thin drizzle of honey. Raw rolled oats, not granola clusters; no seeds.
+- `tofu-scramble`: one slice of toasted wholemeal bread topped with golden turmeric tofu scramble, wilted spinach, softened onion and halved cherry tomatoes. No peppers.
+- `lighter-full-english`: two grilled bacon medallions, two poached eggs, a spoonful of baked beans, grilled mushrooms, one grilled tomato cut in half and one slice of wholemeal toast. No sausages, no hash brown, no fried eggs.
+- `skyr-overnight-oats` (bowl): creamy overnight oats with chia seeds through them, topped with mixed berries and a drizzle of honey. No banana, no nuts.
+- `tomato-feta-omelette`: a folded three-egg omelette filled with halved cherry tomatoes, wilted spinach and crumbled feta, with one slice of wholemeal toast on the plate.
+- `menemen`: Turkish menemen (soft eggs cooked into chopped tomatoes, green peppers and onion) topped with crumbled feta and chilli flakes, with one slice of wholemeal bread at the side of the plate.
+- `pea-and-ham-soup` (bowl): smooth, blended, bright green pea soup with shredded ham on top and a swirl of white yoghurt. No vegetable chunks, no carrots.
+- `tuna-white-bean-salad`: a bed of rocket topped with flaked tinned tuna, cannellini beans, halved cherry tomatoes, thinly sliced red onion and a few capers, glossy with olive oil.
+- `prawn-egg-open-sandwich`: two slices of dark rye bread spread with dill yoghurt, topped with cucumber slices, sliced boiled egg, small pink cooked prawns and dill sprigs.
+- `red-lentil-soup` (bowl): smooth, blended red lentil soup, orange and velvety, with a light dusting of paprika and a lemon wedge. No whole lentils or vegetable chunks.
+- `potatoes-herb-quark`: boiled new potatoes in their skins beside a generous spoonful of white quark mixed with grated cucumber, chopped pink radishes, chives and dill, with a drizzle of oil.
+- `tuna-nicoise-salad`: lettuce with chunks of flaked tinned tuna (not a seared tuna steak), halved new potatoes, green beans, quartered boiled eggs, cherry tomatoes and black olives.
+- `chicken-souvlaki-wrap`: one thin, soft wholemeal tortilla wrap, folded open, filled with grilled chicken chunks, white tzatziki with grated cucumber, sliced tomato and red onion. Not a thick pitta; no lettuce.
+- `tuna-pasta-salad`: pasta shapes with flaked tuna, yellow sweetcorn, diced red pepper and sliced spring onions in a light creamy dressing. No tomatoes, no cucumber.
+- `shopska-salad-chicken`: chopped tomatoes, cucumber, red pepper and red onion with finely grated white cheese heaped on top and parsley, sliced grilled chicken breast, and one warm wholemeal pitta at the side of the plate.
+- `turkey-steaks-mustard-mash`: one golden pan-fried turkey steak in a creamy mustard sauce, a mound of mashed potato and green beans.
+- `greek-lemon-chicken-potatoes`: roasted chicken thighs and golden potato wedges with lemon, garlic and oregano, and green beans.
+- `chicken-goulash` (bowl): chicken chunks, potato chunks, red pepper and onion in a deep red paprika and tomato sauce, with a spoonful of white yoghurt on top.
+- `garlic-prawn-spaghetti`: spaghetti with pink king prawns, halved cherry tomatoes, sliced garlic, wilted rocket, chilli flakes and parsley.
+- `salmon-dill-potatoes`: a baked salmon fillet, new potatoes tossed in butter and dill, green beans and a small spoonful of white dill yoghurt sauce.
+- `spinach-feta-frittata`: two wedges of thick spinach, feta and cherry tomato frittata, with a small pile of mixed salad leaves and one slice of wholemeal bread.
+- `chicken-curry`: mild chicken curry in a tomato and coconut sauce with wilted spinach through it, beside white basmati rice.
+- `chilli-con-carne`: chilli con carne (beef mince, kidney beans, red pepper) over white rice, with a spoonful of white yoghurt on top.
+- `cottage-cheese-tomato-pasta`: pasta shapes in a smooth, creamy pink tomato sauce with wilted spinach, and grated cheese on top. No tomato chunks, no cheese curds.
+- `beef-burgers-wedges`: one lean beef burger with a slice of melted cheese, lettuce, tomato and red onion in a brown wholemeal bun (no sesame seeds, not brioche), with oven potato wedges.
+- `chocolate-yoghurt-pot` (bowl): smooth chocolate Greek yoghurt topped with fresh raspberries. No chocolate shavings.
+- `chilli-edamame` (bowl): shelled green edamame beans, out of their pods, with chilli flakes, sea salt and a lemon wedge. No pods, no nuts.
+- `tuna-rice-cakes`: two round puffed rice cakes (the crunchy supermarket kind) topped with flaked tinned tuna mixed with a little yoghurt, thin cucumber slices and black pepper. Not fishcakes.
+- `cottage-cheese-crispbreads`: three rectangular rye crispbreads spread thickly with white cottage cheese, topped with cucumber slices, chives and black pepper.
+
+The 11 that already match, and are not to be redone: quark pancakes (the first version, with berries), smoked salmon and eggs on rye, chicken noodle soup, chicken Caesar salad, egg mayo sandwich, pasta bolognese, beef stroganoff, chicken stir-fry, cod with chorizo, devilled eggs and the berry smoothie. Rejected images are kept in `recipe-photos/rejected/`, where the converter doesn't look.
 
 The placeholders are a plain plate drawing, about 3 KB each. Real photos come out at 35 to 80 KB, so a folder full of 3 KB files means the photos weren't replaced. Don't publish the website until they are.
 
