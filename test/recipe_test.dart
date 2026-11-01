@@ -133,6 +133,72 @@ void main() {
     expect(matchingRecipes(recipes, '  '), isEmpty);
   });
 
+  test('search wants every word in the name, meal, cuisine, labels or '
+      'ingredients, forgiving plurals, accents and half-typed words', () {
+    Recipe dish(
+      String name,
+      List<String> items, {
+      String category = 'dinner',
+      String cuisine = 'Italian',
+      List<String> tags = const [],
+    }) => Recipe.fromJson(
+      _json(
+        change: {
+          'id': name.toLowerCase().replaceAll(RegExp('[^a-z]+'), '-'),
+          'name': name,
+          'category': category,
+          'cuisine': cuisine,
+          'tags': tags,
+          'ingredients': [
+            for (final item in items) {'item': item, 'amount': '1'},
+          ],
+        },
+      ),
+    );
+    final recipes = [
+      dish(
+        'Tomato and feta omelette',
+        ['Eggs', 'Cherry tomatoes', 'Feta'],
+        category: 'breakfast',
+        tags: ['quick', 'vegetarian'],
+      ),
+      dish(
+        'Tuna niçoise salad',
+        ['New potatoes', 'Eggs', 'Tuna in spring water'],
+        category: 'lunch',
+        cuisine: 'French',
+      ),
+      dish('Garlic prawn spaghetti', ['Spaghetti, dried', 'Raw king prawns']),
+      dish('Chicken stir-fry', ['Chicken breast', 'Egg noodles, dried']),
+      dish(
+        'Greek yoghurt berry bowl',
+        ['Greek yoghurt', 'Mixed berries'],
+        category: 'breakfast',
+        cuisine: 'Greek',
+        tags: ['vegetarian'],
+      ),
+    ];
+    List<String> search(String query) => [
+      for (final recipe in searchRecipes(recipes, query)) recipe.name,
+    ];
+
+    expect(search('  '), hasLength(5));
+    expect(search('EGGS'), ['Tomato and feta omelette', 'Tuna niçoise salad']);
+    expect(search('egg'), search('eggs'));
+    expect(search('egg noodles'), ['Chicken stir-fry']);
+    expect(search('potato'), ['Tuna niçoise salad']);
+    expect(search('nicoise'), ['Tuna niçoise salad']);
+    expect(search('french'), ['Tuna niçoise salad']);
+    expect(search('berries'), ['Greek yoghurt berry bowl']);
+    expect(search('berri'), ['Greek yoghurt berry bowl']);
+    expect(search('quick veggie breakfast'), ['Tomato and feta omelette']);
+    expect(search('fish'), ['Tuna niçoise salad']);
+    expect(search('pasta with prawns'), ['Garlic prawn spaghetti']);
+    expect(search('yogurt'), ['Greek yoghurt berry bowl']);
+    expect(search('to'), ['Tomato and feta omelette']);
+    expect(search('omelette lunch'), isEmpty);
+  });
+
   test('recently cooked recipes come from the last two weeks of meals, '
       'portions and all', () {
     final now = DateTime(2026, 10, 31, 12);

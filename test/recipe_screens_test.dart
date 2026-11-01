@@ -114,6 +114,10 @@ void main() {
     bool trackProtein = true,
     bool failing = false,
   }) async {
+    // Tall enough for every meal's section to be built.
+    tester.view.physicalSize = const Size(800, 2000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     controller = _FakeLogMealController(fails: failing);
@@ -165,18 +169,51 @@ void main() {
   }
 
   group('Recipes page', () {
-    testWidgets('shows a tile per recipe with its numbers, filtered by meal', (
-      tester,
-    ) async {
+    testWidgets('shows a tile per recipe with its numbers under its meal, '
+        'filtered by meal', (tester) async {
       await pump(tester);
       expect(find.text('Pasta bolognese'), findsOneWidget);
       expect(find.text('560 kcal · 42 g protein'), findsOneWidget);
       expect(find.text('Cooked recently'), findsNothing);
+      // The chip and the heading; no snack recipes, so no Snack heading.
+      expect(find.text('Lunch'), findsNWidgets(2));
+      expect(find.text('Snack'), findsOneWidget);
 
       await tester.tap(find.widgetWithText(ChoiceChip, 'Breakfast'));
       await tester.pumpAndSettle();
       expect(find.text('Overnight oats'), findsOneWidget);
       expect(find.text('Pasta bolognese'), findsNothing);
+      expect(find.text('Breakfast'), findsOneWidget);
+    });
+
+    testWidgets('search filters the sections and says when nothing matches', (
+      tester,
+    ) async {
+      await pump(tester, recent: [_meal('Pasta bolognese')]);
+      await tester.enterText(find.byType(TextField), 'OATS');
+      await tester.pumpAndSettle();
+      expect(find.text('Overnight oats'), findsOneWidget);
+      expect(find.text('Pasta bolognese'), findsNothing);
+      expect(find.text('Lunch'), findsOneWidget);
+      expect(find.text('Cooked recently'), findsNothing);
+
+      // Every fixture has beef mince; only one is a lunch.
+      await tester.enterText(find.byType(TextField), 'mince lunch');
+      await tester.pumpAndSettle();
+      expect(find.text('Lentil soup'), findsOneWidget);
+      expect(find.text('Overnight oats'), findsNothing);
+
+      await tester.enterText(find.byType(TextField), 'tofu');
+      await tester.pumpAndSettle();
+      expect(
+        find.text('No recipes match that. Try other words.'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.byTooltip('Clear'));
+      await tester.pumpAndSettle();
+      expect(find.text('Pasta bolognese'), findsNWidgets(2));
+      expect(find.text('Cooked recently'), findsOneWidget);
     });
 
     testWidgets('no protein on tiles when it is switched off', (tester) async {

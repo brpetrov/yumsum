@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
@@ -15,9 +16,9 @@ import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/widgets/bowl_note.dart';
 import 'package:lean_streak/widgets/recipe_photo.dart';
 
-/// The recipe library: what was cooked lately, a filter by meal, and a
-/// grid of photo tiles. A tile opens its recipe; its + logs a portion
-/// straight away.
+/// The recipe library: a search box, what was cooked lately, a filter by
+/// meal, and photo tiles under a heading per meal. A tile opens its recipe;
+/// its + logs a portion straight away.
 class RecipesScreen extends ConsumerStatefulWidget {
   const RecipesScreen({super.key});
 
@@ -26,7 +27,14 @@ class RecipesScreen extends ConsumerStatefulWidget {
 }
 
 class _RecipesScreenState extends ConsumerState<RecipesScreen> {
+  final _search = TextEditingController();
   RecipeCategory? _category;
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +58,16 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
   Widget _buildLibrary(List<Recipe> recipes) {
     final meals = ref.watch(recentMealsProvider).valueOrNull ?? const <Meal>[];
     final cooked = recentlyCookedRecipes(recipes, meals, DateTime.now());
-    final shown = [
-      for (final recipe in recipes)
-        if (_category == null || recipe.category == _category) recipe,
-    ];
+    final query = _search.text.trim();
+    final found = searchRecipes(recipes, query);
+    final sections = {
+      for (final category in RecipeCategory.values)
+        if (_category == null || category == _category)
+          category: [
+            for (final recipe in found)
+              if (recipe.category == category) recipe,
+          ],
+    }..removeWhere((_, shown) => shown.isEmpty);
     final label = TextStyle(
       fontSize: 13,
       fontWeight: FontWeight.w700,
@@ -72,12 +86,32 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
     );
 
     return CustomScrollView(
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       slivers: [
         SliverToBoxAdapter(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (cooked.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                child: TextField(
+                  controller: _search,
+                  onChanged: (_) => setState(() {}),
+                  textInputAction: TextInputAction.search,
+                  decoration: InputDecoration(
+                    hintText: 'Search recipes or ingredients',
+                    prefixIcon: const Icon(Icons.search_rounded),
+                    suffixIcon: _search.text.isEmpty
+                        ? null
+                        : IconButton(
+                            tooltip: 'Clear',
+                            icon: const Icon(Icons.close_rounded),
+                            onPressed: () => setState(_search.clear),
+                          ),
+                  ),
+                ),
+              ),
+              if (cooked.isNotEmpty && query.isEmpty) ...[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
                   child: Text('Cooked recently', style: label),
@@ -105,41 +139,65 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
             ],
           ),
         ),
-        if (shown.isEmpty)
-          const SliverToBoxAdapter(
+        if (sections.isEmpty)
+          SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.all(24),
-              child: BowlNote('No recipes here yet.'),
+              padding: const EdgeInsets.all(24),
+              child: BowlNote(
+                query.isEmpty
+                    ? 'No recipes here yet.'
+                    : 'No recipes match that. Try other words.',
+              ),
             ),
           )
         else
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
-            sliver: SliverLayoutBuilder(
-              builder: (context, constraints) {
-                const spacing = 14.0;
-                final width = constraints.crossAxisExtent;
-                final columns = width < 520 ? 2 : 3;
-                final tile = (width - spacing * (columns - 1)) / columns;
-                return SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: columns,
-                    mainAxisSpacing: spacing,
-                    crossAxisSpacing: spacing,
-                    // A 4:3 photo over a fixed block for the words.
-                    mainAxisExtent: tile * 3 / 4 + _RecipeTile.textHeight,
+          for (final MapEntry(key: category, value: shown)
+              in sections.entries) ...[
+            // A heading per meal, unless one meal is picked above.
+            if (_category == null)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+                  child: Text(
+                    category.label,
+                    style: AppTheme.display.copyWith(
+                      fontSize: 19,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
-                  delegate: SliverChildBuilderDelegate(
-                    (_, i) => _RecipeTile(recipe: shown[i]),
-                    childCount: shown.length,
-                  ),
-                );
-              },
-            ),
-          ),
+                ),
+              ),
+            _grid(shown),
+          ],
+        const SliverToBoxAdapter(child: SizedBox(height: 16)),
       ],
     );
   }
+
+  Widget _grid(List<Recipe> shown) => SliverPadding(
+    padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+    sliver: SliverLayoutBuilder(
+      builder: (context, constraints) {
+        const spacing = 14.0;
+        final width = constraints.crossAxisExtent;
+        final columns = width < 520 ? 2 : 3;
+        final tile = (width - spacing * (columns - 1)) / columns;
+        return SliverGrid(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: columns,
+            mainAxisSpacing: spacing,
+            crossAxisSpacing: spacing,
+            // A 4:3 photo over a fixed block for the words.
+            mainAxisExtent: tile * 3 / 4 + _RecipeTile.textHeight,
+          ),
+          delegate: SliverChildBuilderDelegate(
+            (_, i) => _RecipeTile(recipe: shown[i]),
+            childCount: shown.length,
+          ),
+        );
+      },
+    ),
+  );
 }
 
 class _RecipeTile extends ConsumerWidget {
