@@ -1,6 +1,6 @@
 # Plan 5: Recipes
 
-*Written 31 October 2026. Status: built and tested, with the full library of 40 recipes (written by Claude on 31 October, then redone the same day to the brief below: easy, common, fairly quick, high in protein and modest in calories). 10 real photos are in; the other 30 are still plain placeholders. Next: generate the rest (see "Photos with Codex"), then publish.*
+*Written 31 October 2026. Status: built and tested, with the full library of 40 recipes (written by Claude on 31 October, then redone the same day to the brief below: easy, common, fairly quick, high in protein and modest in calories). All 40 real photos are in, and on 1 November each recipe was checked against its photo and adjusted to match; 4 photos showed the wrong dish and are being redone. Next: those 4, then publish.*
 
 ## What it is
 
@@ -40,6 +40,8 @@
 > **Mix:** 8 breakfasts, 12 lunches, 14 dinners, 6 snacks. Easy, common dishes that people in Europe already cook at home on a weeknight: nothing fancy, nothing restaurant-only. Ingredients any supermarket sells (no saffron, bresaola, quinoa or the like). No fiddly techniques: no rolling, layering, skewering or breadcrumbing.
 >
 > **Easy and quick:** at most 4 steps and 9 ingredient lines; at most 40 minutes, most of them 30 or less.
+>
+> **One plate:** the ingredients are everything in a portion and all of it is on the plate, so the photo can show it. No "serve with" sides that the photo would leave out.
 >
 > **Nutrition:** high in protein, modest in calories. Per portion: breakfasts at most 450 kcal and at least 20 g protein; lunches at most 500 kcal and 25 g; dinners at most 550 kcal and 30 g; snacks at most 250 kcal and 12 g. Protein gives at least a quarter of the calories in every recipe (protein × 4 ÷ kcal ≥ 0.25). Tags: `high-protein` when protein is 30% or more of the calories, `quick` for 20 minutes or less, `low-calorie` for 350 kcal or less (snacks 150), plus `vegetarian` and `vegan` where true.
 >
@@ -98,7 +100,7 @@
 
 Paste this into Codex, in this repository:
 
-> For every recipe in `assets/recipes/recipes.json` that doesn't already have an image in `recipe-photos`, generate one image with the photo prompt in `docs/plans/05-recipes.md` (section "The photo prompt"), replacing [DISH NAME] with the recipe's `name`. Use the bowl or glass variant where the dish is served that way (soups, yoghurt, overnight oats, the smoothie, edamame). Save each image as `<id>.png` in a folder called `recipe-photos` at the repository root, where `<id>` is the recipe's `id`. Don't commit that folder. When all 40 exist, run `python -I tools/make_recipe_photos.py recipe-photos`, which replaces the placeholders in `tools/hosting/recipes/`, then run `flutter test test/recipes_asset_test.dart` and confirm it passes. Show me a contact sheet of all 40 so I can check the style matches.
+> For every recipe in `assets/recipes/recipes.json` that doesn't already have an image in `recipe-photos`, generate one image with the photo prompt in `docs/plans/05-recipes.md` (section "The photo prompt"), replacing [DISH NAME] with the recipe's `name` followed by exactly what is on the plate, taken from its ingredients (for example "Tuna rice cakes: two round puffed rice cakes topped with flaked tinned tuna and cucumber slices"). Show only those ingredients, nothing extra. Use the bowl or glass variant where the dish is served that way (soups, yoghurt, overnight oats, the smoothie, edamame). Save each image as `<id>.png` in a folder called `recipe-photos` at the repository root, where `<id>` is the recipe's `id`. Don't commit that folder. When all 40 exist, run `python -I tools/make_recipe_photos.py recipe-photos`, which replaces the placeholders in `tools/hosting/recipes/`, then run `flutter test test/recipes_asset_test.dart` and confirm it passes. Show me a contact sheet of all 40 so I can check the style matches.
 
 The placeholders are a plain plate drawing, about 3 KB each. Real photos come out at 35 to 80 KB, so a folder full of 3 KB files means the photos weren't replaced. Don't publish the website until they are.
 

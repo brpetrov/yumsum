@@ -16,7 +16,8 @@
 - [ ] **Recipes** (built 31 October 2026; all 40 recipes written, 10 photos in): see `docs/plans/05-recipes.md`
   - [x] The 40 recipes (redone by Claude for easy, common, high-protein, lower-calorie meals; checked by `flutter test test/recipes_asset_test.dart`)
   - [ ] Read through them and change anything you'd cook differently, then run the check again
-  - [ ] Have Codex make the other 30 photos with the instruction under "Photos with Codex" (it skips the 10 already in `recipe-photos`)
+  - [x] Codex made all 40 photos; Claude checked each against its recipe and adjusted the recipes to match (1 November)
+  - [ ] Have Codex redo the 4 wrong ones (lighter full English, tuna niçoise, tuna rice cakes, cottage cheese crispbreads), then Claude checks them
   - [ ] `tools/build_hosting.ps1` and `firebase deploy --only hosting:app` (photos must be live before an app release that lists the recipes)
   - [ ] On the phone: menu → Recipes; a tile's + logs portions; a recipe page's Log a portion; type a recipe name in the bar for its chip
 
