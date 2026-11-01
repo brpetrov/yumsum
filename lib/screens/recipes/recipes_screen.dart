@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -169,35 +170,52 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
               ),
             _grid(shown),
           ],
-        const SliverToBoxAdapter(child: SizedBox(height: 16)),
+        // Clear of the phone's navigation bar at the end.
+        SliverToBoxAdapter(
+          child: SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
+        ),
       ],
     );
   }
 
   Widget _grid(List<Recipe> shown) => SliverPadding(
     padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
-    sliver: SliverLayoutBuilder(
-      builder: (context, constraints) {
-        const spacing = 14.0;
-        final width = constraints.crossAxisExtent;
-        final columns = width < 520 ? 2 : 3;
-        final tile = (width - spacing * (columns - 1)) / columns;
-        return SliverGrid(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: columns,
-            mainAxisSpacing: spacing,
-            crossAxisSpacing: spacing,
-            // A 4:3 photo over a fixed block for the words.
-            mainAxisExtent: tile * 3 / 4 + _RecipeTile.textHeight,
-          ),
-          delegate: SliverChildBuilderDelegate(
-            (_, i) => _RecipeTile(recipe: shown[i]),
-            childCount: shown.length,
-          ),
-        );
-      },
+    sliver: SliverGrid(
+      gridDelegate: const _TileGrid(),
+      delegate: SliverChildBuilderDelegate(
+        (_, i) => _RecipeTile(recipe: shown[i]),
+        childCount: shown.length,
+      ),
     ),
   );
+}
+
+/// Two tiles a row on a phone, three on a wider screen, each a 4:3 photo
+/// over a fixed block for the words. Worked out at layout, which a scroll
+/// repeats every frame, so the tiles themselves aren't rebuilt.
+class _TileGrid extends SliverGridDelegate {
+  const _TileGrid();
+
+  static const _spacing = 14.0;
+
+  @override
+  SliverGridLayout getLayout(SliverConstraints constraints) {
+    final width = constraints.crossAxisExtent;
+    final columns = width < 520 ? 2 : 3;
+    final tile = (width - _spacing * (columns - 1)) / columns;
+    final height = tile * 3 / 4 + _RecipeTile.textHeight;
+    return SliverGridRegularTileLayout(
+      crossAxisCount: columns,
+      mainAxisStride: height + _spacing,
+      crossAxisStride: tile + _spacing,
+      childMainAxisExtent: height,
+      childCrossAxisExtent: tile,
+      reverseCrossAxis: axisDirectionIsReversed(constraints.crossAxisDirection),
+    );
+  }
+
+  @override
+  bool shouldRelayout(_TileGrid oldDelegate) => false;
 }
 
 class _RecipeTile extends ConsumerWidget {
