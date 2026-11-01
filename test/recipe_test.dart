@@ -12,6 +12,7 @@ Map<String, dynamic> _json({Map<String, dynamic> change = const {}}) => {
   'tags': ['high-protein', 'quick'],
   'servings': 4,
   'minutes': 40,
+  'prepMinutes': 10,
   'kcalPerPortion': 560,
   'proteinPerPortion': 42,
   'ingredients': [
@@ -56,6 +57,7 @@ void main() {
       ));
       expect(recipe.ingredients.last.kcal, isNull);
       expect(recipe.steps, hasLength(2));
+      expect(recipe.cookMinutes, 30);
       expect(
         recipe.photoUrl,
         'https://yumsum.web.app/recipes/pasta-bolognese.webp',
@@ -76,6 +78,8 @@ void main() {
         'tags': ['spicy'],
         'servings': 0,
         'minutes': 700,
+        // More prep than the whole recipe takes.
+        'prepMinutes': 41,
         'kcalPerPortion': 20,
         'proteinPerPortion': 200,
         'ingredients': <Object>[],

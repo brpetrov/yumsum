@@ -237,7 +237,7 @@ void main() {
       await tester.tap(find.text('Lentil soup'));
       await tester.pumpAndSettle();
       expect(router.state.uri.path, '/recipes/lentil-soup');
-      expect(find.text('Method'), findsOneWidget);
+      expect(find.text('How to make it'), findsOneWidget);
     });
 
     testWidgets('a tile\'s + logs portions without opening it', (tester) async {
@@ -280,9 +280,20 @@ void main() {
     testWidgets('shows the recipe and logs a portion', (tester) async {
       await pump(tester, at: '/recipes/pasta-bolognese');
       expect(find.text('560 kcal · 42 g protein per portion'), findsOneWidget);
-      expect(find.text('30 min · serves 4'), findsOneWidget);
+      // Prep, cooking and portions.
+      expect(find.text('10 min'), findsOneWidget);
+      expect(find.text('20 min'), findsOneWidget);
+      expect(find.text('Serves'), findsOneWidget);
       expect(find.text('Beef mince'), findsOneWidget);
       expect(find.text('Simmer and serve.'), findsOneWidget);
+      // The step's time stands out.
+      final step = tester.widget<Text>(
+        find.text('Brown the mince for 5 minutes.'),
+      );
+      final time = (step.textSpan! as TextSpan).children!
+          .cast<TextSpan>()
+          .firstWhere((span) => span.text == '5 minutes');
+      expect(time.style!.fontWeight, FontWeight.w800);
 
       await tester.tap(find.text('Log a portion'));
       await tester.pumpAndSettle();
@@ -318,6 +329,17 @@ void main() {
       await tester.tap(find.text('Log a portion'));
       await tester.pumpAndSettle();
       expect(find.text('560 kcal'), findsOneWidget);
+    });
+
+    testWidgets('puts the ingredients beside the steps when there is room, '
+        'and above them on a phone', (tester) async {
+      await pump(tester, at: '/recipes/pasta-bolognese');
+      double top(String text) => tester.getTopLeft(find.text(text)).dy;
+      expect(top('How to make it'), top('Ingredients'));
+
+      tester.view.physicalSize = const Size(400, 2400);
+      await tester.pumpAndSettle();
+      expect(top('How to make it'), greaterThan(top('Ingredients')));
     });
 
     testWidgets('an unknown recipe says so', (tester) async {

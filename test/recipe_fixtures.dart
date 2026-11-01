@@ -18,6 +18,7 @@ Recipe testRecipe(
   int protein = 40,
   int servings = 4,
   int minutes = 30,
+  int prepMinutes = 10,
 }) => Recipe(
   id: name.toLowerCase().replaceAll(' ', '-'),
   name: name,
@@ -26,11 +27,12 @@ Recipe testRecipe(
   tags: const [RecipeTag.highProtein],
   servings: servings,
   minutes: minutes,
+  prepMinutes: prepMinutes,
   kcalPerPortion: kcal,
   proteinPerPortion: protein,
   ingredients: const [
     (item: 'Beef mince', amount: '500 g', kcal: null, protein: null),
     (item: 'Spaghetti', amount: '320 g', kcal: null, protein: null),
   ],
-  steps: const ['Brown the mince.', 'Simmer and serve.'],
+  steps: const ['Brown the mince for 5 minutes.', 'Simmer and serve.'],
 );

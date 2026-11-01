@@ -43,6 +43,7 @@ class Recipe {
     required this.tags,
     required this.servings,
     required this.minutes,
+    required this.prepMinutes,
     required this.kcalPerPortion,
     required this.proteinPerPortion,
     required this.ingredients,
@@ -56,7 +57,12 @@ class Recipe {
   final RecipeCategory category;
   final List<RecipeTag> tags;
   final int servings;
+
+  /// Prep plus cooking.
   final int minutes;
+
+  /// Chopping, mixing and the like, before anything cooks.
+  final int prepMinutes;
   final int kcalPerPortion;
   final int proteinPerPortion;
   final List<Ingredient> ingredients;
@@ -132,6 +138,7 @@ class Recipe {
     ];
 
     final description = text('description', 140, optional: true);
+    final minutes = number('minutes', 1, 600);
     return Recipe(
       id: id,
       name: text('name', 60),
@@ -140,7 +147,8 @@ class Recipe {
       category: category,
       tags: tags,
       servings: number('servings', 1, 12),
-      minutes: number('minutes', 1, 600),
+      minutes: minutes,
+      prepMinutes: number('prepMinutes', 0, minutes),
       kcalPerPortion: number('kcalPerPortion', 50, 1500),
       proteinPerPortion: number('proteinPerPortion', 0, 150),
       ingredients: ingredients,
@@ -149,6 +157,9 @@ class Recipe {
   }
 
   String get photoUrl => '$recipePhotoBase$id.webp';
+
+  /// The rest of [minutes] after the prep; 0 for dishes with no cooking.
+  int get cookMinutes => minutes - prepMinutes;
 
   int kcalFor(double portions) => (kcalPerPortion * portions).round();
   int proteinFor(double portions) => (proteinPerPortion * portions).round();

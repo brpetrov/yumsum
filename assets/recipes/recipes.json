@@ -8,6 +8,7 @@
     "tags": ["high-protein", "vegetarian", "quick", "low-calorie"],
     "servings": 1,
     "minutes": 5,
+    "prepMinutes": 5,
     "kcalPerPortion": 332,
     "proteinPerPortion": 30,
     "ingredients": [
@@ -18,9 +19,9 @@
       {"item": "Walnuts, chopped", "amount": "5 g", "kcal": 34, "protein": 1}
     ],
     "steps": [
-      "Spoon the yoghurt into a bowl.",
-      "Top with the berries, oats and walnuts.",
-      "Drizzle over the honey."
+      "Spoon the yoghurt into a bowl and smooth the top.",
+      "Scatter over the berries, oats and walnuts. Frozen berries can go straight on; they soften in about 5 minutes.",
+      "Drizzle over the honey and eat straight away."
     ]
   },
   {
@@ -32,6 +33,7 @@
     "tags": ["high-protein", "vegetarian", "vegan", "quick", "low-calorie"],
     "servings": 2,
     "minutes": 15,
+    "prepMinutes": 5,
     "kcalPerPortion": 343,
     "proteinPerPortion": 26,
     "ingredients": [
@@ -44,9 +46,11 @@
       {"item": "Wholemeal bread", "amount": "2 slices (80 g)", "kcal": 174, "protein": 8}
     ],
     "steps": [
-      "Soften the onion in the oil for 3 minutes.",
-      "Crumble in the tofu, add the spices and fry for 5 minutes.",
-      "Stir in the tomatoes and spinach until wilted, and serve on toast."
+      "Chop the onion and halve the tomatoes. Pat the tofu dry with kitchen paper.",
+      "Heat the oil in a large frying pan over a medium heat. Add the onion and cook for 3 minutes, stirring now and then, until soft.",
+      "Crumble the tofu into the pan with your fingers, then stir in the turmeric, smoked paprika and a pinch of salt and pepper. Fry for 5 minutes, stirring, until hot and lightly golden. Meanwhile, toast the bread.",
+      "Add the tomatoes and spinach and stir for 2 minutes, until the spinach has wilted.",
+      "Split the scramble between 2 plates and serve with the toast."
     ]
   },
   {
@@ -58,6 +62,7 @@
     "tags": ["high-protein", "vegetarian", "quick", "low-calorie"],
     "servings": 2,
     "minutes": 20,
+    "prepMinutes": 5,
     "kcalPerPortion": 345,
     "proteinPerPortion": 26,
     "ingredients": [
@@ -69,9 +74,11 @@
       {"item": "Honey", "amount": "2 tsp", "kcal": 45, "protein": 0}
     ],
     "steps": [
-      "Mix the quark, eggs and flour into a thick batter.",
-      "Fry spoonfuls in a little butter for 2 to 3 minutes a side.",
-      "Serve with the berries and honey."
+      "Beat the quark and eggs together in a bowl, then stir in the flour to make a thick batter.",
+      "Heat a little of the butter in a large non-stick frying pan over a medium heat.",
+      "Drop in heaped tablespoons of batter, spaced apart, and flatten them slightly. Cook for 2 to 3 minutes a side, until golden and set in the middle.",
+      "Keep the cooked pancakes warm on a plate while you fry the rest, adding a little butter each time. You should get about 10.",
+      "Split the pancakes between 2 plates and top with the berries and honey."
     ]
   },
   {
@@ -83,6 +90,7 @@
     "tags": ["high-protein", "quick"],
     "servings": 2,
     "minutes": 20,
+    "prepMinutes": 5,
     "kcalPerPortion": 408,
     "proteinPerPortion": 36,
     "ingredients": [
@@ -95,9 +103,11 @@
       {"item": "Olive oil", "amount": "1 tsp", "kcal": 40, "protein": 0}
     ],
     "steps": [
-      "Grill the bacon, mushrooms and tomatoes for 8 to 10 minutes.",
-      "Warm the beans and poach the eggs.",
-      "Toast the bread and serve everything together."
+      "Heat the grill to high. Halve the tomatoes and wipe the mushrooms clean.",
+      "Lay the bacon, mushrooms and tomatoes (cut side up) on the grill pan and brush the vegetables with the oil. Grill for 8 to 10 minutes, turning the bacon and mushrooms halfway, until the bacon is cooked.",
+      "Meanwhile, warm the beans in a small pan over a low heat for 4 to 5 minutes, stirring now and then.",
+      "Poach the eggs: bring a deep pan of water to a gentle simmer, crack in the eggs one at a time and cook for 3 to 4 minutes, until the whites are set. Lift them out with a slotted spoon.",
+      "Toast the bread, then split everything between 2 plates."
     ]
   },
   {
@@ -109,6 +119,7 @@
     "tags": ["vegetarian", "quick"],
     "servings": 2,
     "minutes": 5,
+    "prepMinutes": 5,
     "kcalPerPortion": 417,
     "proteinPerPortion": 28,
     "ingredients": [
@@ -120,9 +131,9 @@
       {"item": "Honey", "amount": "2 tsp", "kcal": 45, "protein": 0}
     ],
     "steps": [
-      "Stir the oats, skyr, milk and chia seeds together.",
-      "Divide between two jars, cover and chill overnight.",
-      "Top with the berries and honey in the morning."
+      "Stir the oats, skyr, milk and chia seeds together in a bowl until there are no dry bits.",
+      "Split between 2 jars or boxes, cover and put in the fridge for at least 6 hours, or overnight.",
+      "In the morning, give each jar a stir and top with the berries and honey. Eat cold. They keep in the fridge for up to 2 days."
     ]
   },
   {
@@ -134,6 +145,7 @@
     "tags": ["quick"],
     "servings": 2,
     "minutes": 10,
+    "prepMinutes": 3,
     "kcalPerPortion": 421,
     "proteinPerPortion": 31,
     "ingredients": [
@@ -145,9 +157,10 @@
       {"item": "Fresh dill", "amount": "a few sprigs", "kcal": 0, "protein": 0}
     ],
     "steps": [
+      "Slice the cucumber and chop the dill. Beat the eggs in a bowl with a pinch of salt and pepper.",
       "Toast the rye bread.",
-      "Beat the eggs and scramble them gently in the butter over a low heat.",
-      "Top the toast with cucumber, eggs and salmon, then scatter over the dill."
+      "Melt the butter in a non-stick pan over a low heat. Pour in the eggs and stir gently for 3 to 4 minutes, until softly set. Take the pan off the heat while they still look a little wet; they keep cooking.",
+      "Split the toast between 2 plates. Top with the cucumber, then the eggs and smoked salmon, and scatter over the dill."
     ]
   },
   {
@@ -159,6 +172,7 @@
     "tags": ["vegetarian", "quick"],
     "servings": 1,
     "minutes": 10,
+    "prepMinutes": 3,
     "kcalPerPortion": 422,
     "proteinPerPortion": 30,
     "ingredients": [
@@ -170,9 +184,10 @@
       {"item": "Wholemeal bread", "amount": "1 slice (40 g)", "kcal": 87, "protein": 4}
     ],
     "steps": [
-      "Wilt the spinach and tomatoes in the oil for a minute.",
-      "Pour in the beaten eggs and cook until almost set.",
-      "Scatter over the feta, fold and serve with toast."
+      "Halve the tomatoes and crumble the feta. Beat the eggs in a bowl with a pinch of pepper (the feta is already salty).",
+      "Heat the oil in a small non-stick frying pan over a medium heat. Add the tomatoes and spinach and stir for 1 minute, until the spinach wilts.",
+      "Pour in the eggs and tilt the pan so they spread evenly. Cook for 2 to 3 minutes, pulling the edges into the middle now and then, until almost set on top. Meanwhile, toast the bread.",
+      "Scatter the feta over half the omelette, fold it over and slide it onto a plate. Serve with the toast."
     ]
   },
   {
@@ -183,7 +198,8 @@
     "category": "breakfast",
     "tags": ["vegetarian", "quick"],
     "servings": 2,
-    "minutes": 15,
+    "minutes": 20,
+    "prepMinutes": 5,
     "kcalPerPortion": 443,
     "proteinPerPortion": 29,
     "ingredients": [
@@ -197,10 +213,11 @@
       {"item": "Chilli flakes", "amount": "a pinch", "kcal": 0, "protein": 0}
     ],
     "steps": [
-      "Soften the onion and peppers in the oil for 5 minutes.",
-      "Add the tomatoes and cook for 5 minutes until saucy.",
-      "Stir in the beaten eggs and cook gently until just set.",
-      "Top with feta and chilli, and serve with the bread."
+      "Chop the onion, peppers and tomatoes. Beat the eggs in a bowl with a pinch of salt and pepper.",
+      "Heat the oil in a large frying pan over a medium heat. Add the onion and peppers and cook for 5 minutes, stirring now and then, until soft.",
+      "Add the tomatoes and cook for 5 minutes, stirring, until they break down into a thick sauce. Meanwhile, toast the bread.",
+      "Turn the heat to low and pour in the eggs. Stir gently for 3 to 4 minutes, until just set but still soft.",
+      "Split between 2 plates, scatter over the feta and chilli flakes, and serve with the toast."
     ]
   },
   {
@@ -211,7 +228,8 @@
     "category": "lunch",
     "tags": ["high-protein", "low-calorie"],
     "servings": 4,
-    "minutes": 30,
+    "minutes": 35,
+    "prepMinutes": 5,
     "kcalPerPortion": 273,
     "proteinPerPortion": 35,
     "ingredients": [
@@ -224,9 +242,12 @@
       {"item": "Bay leaf, black pepper and parsley", "amount": "to taste", "kcal": 0, "protein": 0}
     ],
     "steps": [
-      "Simmer the chicken, vegetables and bay leaf in the stock for 20 minutes.",
-      "Lift out the chicken and the onion, shred the chicken and add the noodles to the pot for 4 minutes.",
-      "Return the chicken and serve with parsley."
+      "Slice the carrots and celery, and peel and halve the onion.",
+      "Put the chicken, carrots, celery, onion and bay leaf in a large pan, pour in the stock and bring to the boil over a high heat.",
+      "Turn the heat down and simmer gently for 20 minutes, until the chicken is cooked through with no pink in the middle.",
+      "Lift out the chicken and shred it with 2 forks. Lift out the onion and bay leaf too and throw them away.",
+      "Add the noodles to the pan and simmer for 4 minutes, until soft. Stir the chicken back in and season with black pepper and a little salt.",
+      "Split between 4 bowls and scatter with chopped parsley. Leftovers keep in the fridge for up to 2 days; reheat until piping hot."
     ]
   },
   {
@@ -237,7 +258,8 @@
     "category": "lunch",
     "tags": ["high-protein", "low-calorie"],
     "servings": 4,
-    "minutes": 30,
+    "minutes": 35,
+    "prepMinutes": 5,
     "kcalPerPortion": 297,
     "proteinPerPortion": 27,
     "ingredients": [
@@ -250,10 +272,12 @@
       {"item": "Greek yoghurt, 0% fat, to serve", "amount": "100 g", "kcal": 57, "protein": 10}
     ],
     "steps": [
-      "Soften the onion in the oil, then add the potato and stock.",
-      "Simmer for 15 minutes, add the peas and cook for 5 more.",
-      "Blend until smooth, stir in most of the ham and heat through.",
-      "Serve topped with yoghurt and the rest of the ham."
+      "Chop the onion, and peel the potato and cut it into small cubes.",
+      "Heat the oil in a large pan over a medium heat. Add the onion and cook for 5 minutes, stirring now and then, until soft.",
+      "Add the potato and stock, bring to the boil, then simmer for 12 minutes, until the potato is soft.",
+      "Add the peas, bring back to a simmer and cook for 3 minutes.",
+      "Take the pan off the heat and blend until smooth with a stick blender. Stir in most of the ham and heat gently for 2 minutes.",
+      "Split between 4 bowls and top each with a spoonful of yoghurt and the rest of the ham. Keeps in the fridge for up to 2 days, or in the freezer for up to 3 months."
     ]
   },
   {
@@ -265,6 +289,7 @@
     "tags": ["high-protein", "quick", "low-calorie"],
     "servings": 2,
     "minutes": 10,
+    "prepMinutes": 10,
     "kcalPerPortion": 327,
     "proteinPerPortion": 37,
     "ingredients": [
@@ -277,9 +302,11 @@
       {"item": "Lemon juice and capers", "amount": "to taste", "kcal": 5, "protein": 0}
     ],
     "steps": [
-      "Toss the beans, onion and tomatoes with the oil and lemon juice.",
-      "Fold in the tuna in large flakes, and the capers.",
-      "Serve on the rocket."
+      "Drain the tuna. Drain the beans, rinse them under cold water and shake dry.",
+      "Finely slice the red onion and halve the tomatoes.",
+      "In a large bowl, toss the beans, onion and tomatoes with the oil, a good squeeze of lemon juice and a pinch of salt and pepper.",
+      "Gently fold in the tuna in large flakes, and the capers.",
+      "Split the rocket between 2 plates and spoon the salad on top."
     ]
   },
   {
@@ -291,6 +318,7 @@
     "tags": ["high-protein", "quick", "low-calorie"],
     "servings": 2,
     "minutes": 15,
+    "prepMinutes": 5,
     "kcalPerPortion": 345,
     "proteinPerPortion": 35,
     "ingredients": [
@@ -302,9 +330,11 @@
       {"item": "Fresh dill and lemon", "amount": "to taste", "kcal": 0, "protein": 0}
     ],
     "steps": [
-      "Boil the eggs for 9 minutes, then cool and slice them.",
-      "Mix the yoghurt with chopped dill and a squeeze of lemon, and spread some on the bread.",
-      "Top with cucumber, egg, prawns and the rest of the yoghurt."
+      "Bring a small pan of water to the boil. Lower in the eggs with a spoon and boil for 9 minutes.",
+      "Meanwhile, slice the cucumber and chop the dill. Mix the dill into the yoghurt with a squeeze of lemon and a pinch of salt.",
+      "Move the eggs into a bowl of cold water for 2 minutes, then peel and slice them.",
+      "Spread half the yoghurt over the 4 slices of rye bread. Top with the cucumber, egg and prawns, then spoon over the rest of the yoghurt.",
+      "Serve 2 slices each."
     ]
   },
   {
@@ -315,7 +345,8 @@
     "category": "lunch",
     "tags": ["vegetarian", "quick"],
     "servings": 2,
-    "minutes": 15,
+    "minutes": 20,
+    "prepMinutes": 5,
     "kcalPerPortion": 366,
     "proteinPerPortion": 27,
     "ingredients": [
@@ -327,9 +358,11 @@
       {"item": "Dijon mustard and black pepper", "amount": "½ tsp", "kcal": 3, "protein": 0}
     ],
     "steps": [
-      "Boil the eggs for 10 minutes, then cool and peel them.",
-      "Mash them with the yoghurt, mayonnaise, mustard and pepper.",
-      "Spread on the bread, add the cress and close the sandwiches."
+      "Bring a pan of water to the boil. Lower in the eggs with a spoon and boil for 10 minutes.",
+      "Move the eggs into a bowl of cold water for 3 minutes, then peel them.",
+      "Mash the eggs with a fork, then mix in the yoghurt, mayonnaise, mustard and a good pinch of black pepper.",
+      "Spread the egg mayo over 2 slices of bread, add the cress and the other 2 slices, and cut in half.",
+      "One sandwich each. Egg mayo keeps in the fridge for up to 2 days."
     ]
   },
   {
@@ -340,7 +373,8 @@
     "category": "lunch",
     "tags": ["vegetarian", "vegan"],
     "servings": 4,
-    "minutes": 30,
+    "minutes": 35,
+    "prepMinutes": 5,
     "kcalPerPortion": 381,
     "proteinPerPortion": 25,
     "ingredients": [
@@ -354,10 +388,12 @@
       {"item": "Lemon juice", "amount": "1 lemon", "kcal": 5, "protein": 0}
     ],
     "steps": [
-      "Soften the onion and carrot in the oil for 5 minutes.",
-      "Stir in the tomato purée, spices and lentils, then add the stock.",
-      "Simmer for 20 minutes until the lentils fall apart.",
-      "Blend until smooth and serve with a squeeze of lemon."
+      "Chop the onion and carrot. Rinse the lentils in a sieve under cold water.",
+      "Heat the oil in a large pan over a medium heat. Add the onion and carrot and cook for 5 minutes, stirring now and then, until soft.",
+      "Stir in the tomato purée, cumin and paprika and cook for 1 minute.",
+      "Add the lentils and stock and bring to the boil. Turn the heat down and simmer for 20 minutes, stirring now and then, until the lentils fall apart.",
+      "Blend until smooth with a stick blender, then add a good squeeze of lemon juice and a pinch of salt.",
+      "Split between 4 bowls. Keeps in the fridge for up to 2 days, or in the freezer for up to 3 months."
     ]
   },
   {
@@ -369,6 +405,7 @@
     "tags": ["high-protein", "quick"],
     "servings": 2,
     "minutes": 20,
+    "prepMinutes": 5,
     "kcalPerPortion": 388,
     "proteinPerPortion": 51,
     "ingredients": [
@@ -381,10 +418,11 @@
       {"item": "Lemon juice, garlic and Dijon mustard", "amount": "to taste", "kcal": 10, "protein": 0}
     ],
     "steps": [
-      "Toss the bread with 1 tsp of the oil and toast it in a pan for 5 minutes until crisp.",
-      "Fry the chicken in the rest of the oil for 6 to 7 minutes a side, then slice.",
-      "Whisk the yoghurt, lemon, garlic, mustard and most of the parmesan.",
-      "Toss the lettuce in the dressing and top with the chicken, croutons and the rest of the parmesan."
+      "Cut the bread into small cubes and slice the chicken into thin strips. Wash the lettuce, shake it dry and tear it into pieces.",
+      "Heat 1 tsp of the oil in a large frying pan over a medium heat. Fry the bread for 5 minutes, turning often, until golden and crisp, then tip onto a plate.",
+      "Heat the rest of the oil in the same pan over a medium-high heat. Add the chicken with a pinch of salt and pepper and fry for 6 to 8 minutes, turning, until golden and cooked through with no pink in the middle.",
+      "Meanwhile, make the dressing: whisk the yoghurt with a squeeze of lemon, half a crushed garlic clove, a little mustard and most of the Parmesan. Add a splash of water if it's too thick.",
+      "Toss the lettuce with the dressing, split between 2 plates, and top with the chicken, croutons and the rest of the Parmesan."
     ]
   },
   {
@@ -396,6 +434,7 @@
     "tags": ["high-protein", "vegetarian"],
     "servings": 2,
     "minutes": 25,
+    "prepMinutes": 5,
     "kcalPerPortion": 401,
     "proteinPerPortion": 31,
     "ingredients": [
@@ -407,9 +446,11 @@
       {"item": "Chives, dill and salt", "amount": "to taste", "kcal": 0, "protein": 0}
     ],
     "steps": [
-      "Boil the potatoes for 15 to 20 minutes until tender.",
-      "Stir the cucumber, radishes, herbs and salt into the quark.",
-      "Serve the potatoes with the quark and a drizzle of oil."
+      "Scrub the potatoes (no need to peel) and halve any big ones. Put them in a pan of cold salted water.",
+      "Bring to the boil, then simmer for 15 to 20 minutes, until a knife slides in easily.",
+      "Meanwhile, grate the cucumber and squeeze out the water with your hands. Chop the radishes, chives and dill.",
+      "Stir the cucumber, radishes and herbs into the quark with a pinch of salt.",
+      "Drain the potatoes and split them between 2 plates with the herb quark. Drizzle the oil over the quark."
     ]
   },
   {
@@ -420,7 +461,8 @@
     "category": "lunch",
     "tags": ["high-protein"],
     "servings": 2,
-    "minutes": 25,
+    "minutes": 30,
+    "prepMinutes": 5,
     "kcalPerPortion": 412,
     "proteinPerPortion": 39,
     "ingredients": [
@@ -435,9 +477,11 @@
       {"item": "Dijon mustard and red wine vinegar", "amount": "1 tsp each", "kcal": 8, "protein": 0}
     ],
     "steps": [
-      "Boil the potatoes for 15 minutes in one pan, adding the eggs for the last 9 and the beans for the last 4.",
-      "Cool the eggs and quarter them, and whisk the oil, mustard and vinegar.",
-      "Toss everything with the lettuce, tuna, tomatoes and olives."
+      "Halve any large potatoes and trim the green beans. Put the potatoes in a pan of cold salted water and bring to the boil.",
+      "Simmer the potatoes for 15 minutes in all: lower in the eggs after 6 minutes, and add the beans for the last 4 minutes.",
+      "Drain, and put the eggs in cold water for 2 minutes. Peel and quarter the eggs, and halve the potatoes.",
+      "Whisk the oil, mustard and vinegar with a pinch of salt and pepper to make the dressing.",
+      "Split the lettuce between 2 plates. Top with the potatoes, beans, tomatoes, olives, eggs and the tuna in large flakes, then spoon over the dressing."
     ]
   },
   {
@@ -449,6 +493,7 @@
     "tags": ["high-protein", "quick"],
     "servings": 2,
     "minutes": 20,
+    "prepMinutes": 5,
     "kcalPerPortion": 424,
     "proteinPerPortion": 49,
     "ingredients": [
@@ -462,10 +507,11 @@
       {"item": "Lemon juice, garlic and dried oregano", "amount": "to taste", "kcal": 5, "protein": 0}
     ],
     "steps": [
-      "Toss the chicken with the oil, lemon juice and oregano.",
-      "Grill or pan-fry for 8 to 10 minutes until cooked through.",
-      "Squeeze the cucumber dry and stir it into the yoghurt with a little garlic.",
-      "Warm the wraps and fill with the tzatziki, chicken, tomato and onion."
+      "In a bowl, toss the chicken with the oil, a squeeze of lemon juice, the oregano and a pinch of salt.",
+      "Heat a large frying pan or griddle over a medium-high heat. Cook the chicken for 8 to 10 minutes, turning now and then, until golden and cooked through with no pink in the middle.",
+      "Meanwhile, make the tzatziki: grate the cucumber, squeeze out the water with your hands, and stir it into the yoghurt with a little crushed garlic and a pinch of salt.",
+      "Slice the tomato and red onion. Warm the wraps in a dry pan for 30 seconds a side.",
+      "Spread the tzatziki over the wraps, add the chicken, tomato and onion, and roll up. One wrap each."
     ]
   },
   {
@@ -476,7 +522,8 @@
     "category": "lunch",
     "tags": ["high-protein", "quick"],
     "servings": 2,
-    "minutes": 15,
+    "minutes": 20,
+    "prepMinutes": 5,
     "kcalPerPortion": 462,
     "proteinPerPortion": 42,
     "ingredients": [
@@ -490,9 +537,11 @@
       {"item": "Lemon juice and black pepper", "amount": "to taste", "kcal": 2, "protein": 0}
     ],
     "steps": [
-      "Cook the pasta, then rinse under cold water and drain.",
-      "Mix the yoghurt, mayonnaise and lemon juice.",
-      "Stir in the pasta, tuna, sweetcorn, pepper and spring onions."
+      "Bring a large pan of salted water to the boil. Cook the pasta for 10 to 12 minutes, or as the packet says, until just tender.",
+      "Meanwhile, dice the pepper and slice the spring onions. Drain the tuna and sweetcorn.",
+      "Drain the pasta, rinse it under cold water until cool, and drain well again.",
+      "In a large bowl, mix the yoghurt, mayonnaise, a squeeze of lemon juice and a good pinch of black pepper.",
+      "Stir in the pasta, tuna, sweetcorn, pepper and spring onions. Split between 2 bowls or lunch boxes. Keeps in the fridge for up to 2 days."
     ]
   },
   {
@@ -504,6 +553,7 @@
     "tags": ["high-protein", "quick"],
     "servings": 2,
     "minutes": 20,
+    "prepMinutes": 8,
     "kcalPerPortion": 486,
     "proteinPerPortion": 50,
     "ingredients": [
@@ -518,9 +568,11 @@
       {"item": "Red wine vinegar and parsley", "amount": "to taste", "kcal": 0, "protein": 0}
     ],
     "steps": [
-      "Season and grill or pan-fry the chicken for 12 to 15 minutes, then slice.",
-      "Toss the vegetables with the oil and vinegar.",
-      "Grate the cheese over the top and serve with the chicken and warm pitta."
+      "Chop the tomatoes, cucumber and pepper into bite-sized pieces and slice the red onion. Put them in a large bowl.",
+      "Slice the chicken into strips and season with salt and pepper. Heat 1 tsp of the oil in a frying pan over a medium-high heat and fry the chicken for 6 to 8 minutes, turning, until golden and cooked through with no pink in the middle.",
+      "Toss the vegetables with the rest of the oil, a splash of vinegar and a pinch of salt.",
+      "Warm the pitta in a toaster or a dry pan for 1 to 2 minutes.",
+      "Split the salad between 2 plates, grate the cheese over the top and scatter with chopped parsley. Serve with the chicken and pitta."
     ]
   },
   {
@@ -531,7 +583,8 @@
     "category": "dinner",
     "tags": ["high-protein"],
     "servings": 4,
-    "minutes": 30,
+    "minutes": 35,
+    "prepMinutes": 10,
     "kcalPerPortion": 372,
     "proteinPerPortion": 38,
     "ingredients": [
@@ -544,10 +597,12 @@
       {"item": "Olive oil", "amount": "1 tsp", "kcal": 40, "protein": 0}
     ],
     "steps": [
-      "Boil the potatoes for 15 to 20 minutes, then mash with the milk.",
-      "Fry the steaks in the oil for 3 to 4 minutes a side until cooked through.",
-      "Take the pan off the heat, stir in the crème fraîche and mustard, and warm through.",
-      "Boil the beans for 4 minutes and serve with the steaks, sauce and mash."
+      "Peel the potatoes and cut them into even chunks. Put them in a large pan of cold salted water, bring to the boil, then simmer for 15 to 20 minutes, until soft.",
+      "Meanwhile, trim the green beans and season the steaks with salt and pepper.",
+      "When the potatoes have about 10 minutes left, heat the oil in a large frying pan over a medium-high heat. Fry the steaks for 3 to 4 minutes a side, until cooked through with no pink in the middle, then move them to a plate.",
+      "Boil the green beans in a small pan for 4 minutes, then drain.",
+      "Take the frying pan off the heat and stir in the crème fraîche, mustard and a splash of water. Put the steaks back and warm through over a low heat for 1 to 2 minutes, without letting it boil.",
+      "Drain the potatoes and mash them with the milk and a pinch of salt. Split the mash, beans, steaks and sauce between 4 plates."
     ]
   },
   {
@@ -559,6 +614,7 @@
     "tags": ["high-protein"],
     "servings": 2,
     "minutes": 25,
+    "prepMinutes": 5,
     "kcalPerPortion": 375,
     "proteinPerPortion": 44,
     "ingredients": [
@@ -572,9 +628,11 @@
       {"item": "Smoked paprika", "amount": "½ tsp", "kcal": 0, "protein": 0}
     ],
     "steps": [
-      "Fry the chorizo and garlic in the oil for 2 minutes.",
-      "Add the tomatoes, beans and paprika and simmer for 5 minutes, then stir in the spinach.",
-      "Sit the fish on top, cover and cook for 8 to 10 minutes until it flakes."
+      "Dice the chorizo, slice the garlic and halve the tomatoes. Drain and rinse the beans.",
+      "Heat the oil in a large frying pan over a medium heat. Fry the chorizo and garlic for 2 minutes, until the chorizo gives off its red oil.",
+      "Add the tomatoes, beans, paprika and 3 tbsp water. Simmer for 5 minutes, until the tomatoes soften, then stir in the spinach until it wilts.",
+      "Season the fish with salt and pepper and sit it on top of the beans. Cover with a lid (or a baking tray) and cook over a low heat for 8 to 10 minutes, until the fish is white all the way through and flakes easily.",
+      "Split the beans and fish between 2 plates."
     ]
   },
   {
@@ -586,6 +644,7 @@
     "tags": ["high-protein"],
     "servings": 4,
     "minutes": 40,
+    "prepMinutes": 10,
     "kcalPerPortion": 379,
     "proteinPerPortion": 34,
     "ingredients": [
@@ -599,9 +658,11 @@
       {"item": "Green beans, to serve", "amount": "300 g", "kcal": 75, "protein": 6}
     ],
     "steps": [
-      "Toss the chicken and potatoes in a roasting tray with the oil, lemon, garlic and oregano.",
-      "Pour in the stock and roast at 220°C for 35 minutes, turning once, until golden.",
-      "Boil the green beans for 4 minutes and serve alongside."
+      "Heat the oven to 220°C (200°C fan). Cut the potatoes into thin wedges (no need to peel), zest and juice the lemon, and crush the garlic.",
+      "In a large roasting tin, toss the chicken and potatoes with the oil, lemon zest and juice, garlic, oregano and a good pinch of salt and pepper. Spread everything out in one layer.",
+      "Pour the stock into the tin and roast for 30 minutes, turning everything halfway, until the potatoes are golden and the chicken is cooked through with no pink in the middle.",
+      "For the last few minutes, boil the green beans in a pan of water for 4 minutes, then drain.",
+      "Split between 4 plates and spoon over the lemony juices from the tin. Leftovers keep in the fridge for up to 2 days."
     ]
   },
   {
@@ -612,7 +673,8 @@
     "category": "dinner",
     "tags": ["high-protein"],
     "servings": 4,
-    "minutes": 40,
+    "minutes": 45,
+    "prepMinutes": 10,
     "kcalPerPortion": 422,
     "proteinPerPortion": 37,
     "ingredients": [
@@ -627,10 +689,12 @@
       {"item": "Greek yoghurt, 0% fat, to serve", "amount": "100 g", "kcal": 57, "protein": 10}
     ],
     "steps": [
-      "Brown the chicken in the oil, then add the onions and peppers and cook for 5 minutes.",
-      "Stir in the paprika, then the tomatoes, potatoes and stock.",
-      "Simmer for 25 minutes until the potatoes are tender.",
-      "Serve with a spoonful of yoghurt."
+      "Cut the chicken into large bite-sized pieces. Slice the onions and peppers, and cut the potatoes into 2 cm chunks.",
+      "Heat the oil in a large pan over a medium-high heat. Add the chicken and cook for 5 minutes, turning, until browned all over.",
+      "Add the onions and peppers and cook for 5 minutes, stirring now and then, until they start to soften.",
+      "Stir in the paprika for 1 minute, then add the tomatoes, potatoes, stock and a pinch of salt. Bring to the boil.",
+      "Turn the heat down, cover and simmer for 20 minutes, stirring now and then, until the potatoes are tender and the chicken is cooked through.",
+      "Split between 4 bowls and top each with a spoonful of yoghurt. Leftovers keep in the fridge for up to 2 days; reheat until piping hot."
     ]
   },
   {
@@ -642,6 +706,7 @@
     "tags": ["quick"],
     "servings": 2,
     "minutes": 20,
+    "prepMinutes": 5,
     "kcalPerPortion": 463,
     "proteinPerPortion": 32,
     "ingredients": [
@@ -654,10 +719,11 @@
       {"item": "Chilli flakes, lemon and parsley", "amount": "to taste", "kcal": 5, "protein": 0}
     ],
     "steps": [
-      "Cook the spaghetti.",
-      "Fry the garlic and chilli in the oil for a minute, add the tomatoes and cook for 3 minutes.",
-      "Add the prawns and cook for 3 to 4 minutes until pink.",
-      "Toss with the spaghetti, rocket, lemon juice and parsley."
+      "Bring a large pan of salted water to the boil. If the prawns are frozen, put them in a bowl of cold water for 10 minutes to defrost, then drain.",
+      "Slice the garlic and halve the tomatoes. Cook the spaghetti for 10 to 12 minutes, or as the packet says. Scoop out a mugful of the cooking water, then drain.",
+      "Meanwhile, heat the oil in a large frying pan over a medium heat. Fry the garlic and a pinch of chilli flakes for 1 minute, then add the tomatoes and cook for 3 minutes, until soft.",
+      "Add the prawns and cook for 3 to 4 minutes, stirring, until pink all over.",
+      "Toss in the spaghetti, rocket, a squeeze of lemon and a splash of the cooking water. Split between 2 plates and scatter with chopped parsley."
     ]
   },
   {
@@ -669,6 +735,7 @@
     "tags": [],
     "servings": 4,
     "minutes": 25,
+    "prepMinutes": 8,
     "kcalPerPortion": 469,
     "proteinPerPortion": 35,
     "ingredients": [
@@ -682,10 +749,12 @@
       {"item": "Egg noodles or white rice, dried", "amount": "240 g", "kcal": 852, "protein": 18}
     ],
     "steps": [
-      "Cook the noodles or rice.",
-      "Fry the beef in half the oil over a high heat for 2 minutes, then set aside.",
-      "Soften the onion and mushrooms in the rest of the oil for 6 minutes, then stir in the paprika, mustard and stock.",
-      "Stir in the crème fraîche and the beef, heat through and serve over the noodles or rice."
+      "Slice the onion and mushrooms. Put a pan of water on to boil for the noodles or rice.",
+      "Cook the noodles for 4 to 5 minutes, or the rice for 10 to 12 minutes (or as the packet says), then drain.",
+      "Meanwhile, heat half the oil in a large frying pan over a high heat. Fry the beef for 2 minutes, stirring, until browned but still a little pink inside, then tip it onto a plate.",
+      "Turn the heat to medium, add the rest of the oil, the onion and the mushrooms, and cook for 6 minutes, stirring now and then, until soft and golden.",
+      "Stir in the paprika, mustard and stock and bubble for 2 minutes. Turn the heat to low, stir in the crème fraîche, then add the beef and its juices and warm through for 1 minute, without letting it boil.",
+      "Split the noodles or rice between 4 plates and spoon the stroganoff over them."
     ]
   },
   {
@@ -697,6 +766,7 @@
     "tags": ["high-protein"],
     "servings": 2,
     "minutes": 30,
+    "prepMinutes": 5,
     "kcalPerPortion": 481,
     "proteinPerPortion": 37,
     "ingredients": [
@@ -708,10 +778,12 @@
       {"item": "Butter", "amount": "10 g", "kcal": 74, "protein": 0}
     ],
     "steps": [
-      "Boil the potatoes for 15 to 20 minutes, adding the beans for the last 4.",
-      "Bake the salmon at 200°C for 12 to 15 minutes.",
-      "Stir chopped dill and lemon into the yoghurt.",
-      "Toss the potatoes in the butter and dill, and serve with the salmon, beans and sauce."
+      "Heat the oven to 200°C (180°C fan). Halve any large potatoes, put them in a pan of cold salted water and bring to the boil, then simmer for 15 to 20 minutes, until tender.",
+      "Meanwhile, put the salmon on a baking tray lined with baking paper, season with salt and pepper and bake for 12 to 15 minutes, until it flakes easily.",
+      "Trim the beans and add them to the potato pan for the last 4 minutes.",
+      "Chop the dill. Stir half of it into the yoghurt with a squeeze of lemon and a pinch of salt.",
+      "Drain the potatoes and beans, and toss the potatoes with the butter and the rest of the dill.",
+      "Split between 2 plates and serve the salmon with the potatoes, beans and dill sauce."
     ]
   },
   {
@@ -723,6 +795,7 @@
     "tags": ["high-protein", "quick"],
     "servings": 2,
     "minutes": 20,
+    "prepMinutes": 5,
     "kcalPerPortion": 482,
     "proteinPerPortion": 48,
     "ingredients": [
@@ -735,10 +808,11 @@
       {"item": "Vegetable oil", "amount": "2 tsp", "kcal": 79, "protein": 0}
     ],
     "steps": [
-      "Cook the noodles and drain.",
-      "Stir-fry the chicken in the oil over a high heat for 5 minutes.",
-      "Add the vegetables, garlic and ginger and stir-fry for 3 minutes.",
-      "Add the noodles, soy sauce and honey and toss for a minute."
+      "Slice the chicken into thin strips, and grate the garlic and ginger. Mix the soy sauce and honey in a cup.",
+      "Cook the noodles in a pan of boiling water for 4 minutes, or as the packet says. Drain and rinse under cold water so they don't stick.",
+      "Heat the oil in a wok or large frying pan over a high heat. Stir-fry the chicken for 5 minutes, until golden and cooked through with no pink in the middle.",
+      "Add the vegetables, garlic and ginger and stir-fry for 3 minutes, until the vegetables are just tender but still crunchy.",
+      "Add the noodles and the soy and honey mix and toss for 1 minute, until everything is hot. Split between 2 bowls."
     ]
   },
   {
@@ -750,6 +824,7 @@
     "tags": ["vegetarian", "quick"],
     "servings": 2,
     "minutes": 20,
+    "prepMinutes": 5,
     "kcalPerPortion": 482,
     "proteinPerPortion": 36,
     "ingredients": [
@@ -763,10 +838,11 @@
       {"item": "Wholemeal bread, to serve", "amount": "2 slices (80 g)", "kcal": 174, "protein": 8}
     ],
     "steps": [
-      "Wilt the spring onions and spinach in the oil in an ovenproof frying pan.",
-      "Pour in the beaten eggs, scatter over the tomatoes and feta and cook gently for 5 minutes.",
-      "Finish under a hot grill for 3 to 4 minutes until set.",
-      "Cut into wedges and serve with the salad and bread."
+      "Heat the grill to high. Slice the spring onions, halve the tomatoes and crumble the feta. Beat the eggs in a bowl with a pinch of salt and pepper.",
+      "Heat the oil in a non-stick frying pan about 24 cm across that can go under the grill, over a medium heat. Add the spring onions and spinach and stir for 2 minutes, until the spinach wilts.",
+      "Pour in the eggs and scatter over the tomatoes and feta. Cook gently for 5 minutes, without stirring, until the bottom is set.",
+      "Put the pan under the grill for 3 to 4 minutes, until the top is set and golden. Use an oven glove: the handle gets hot.",
+      "Cut into 4 wedges and serve 2 each with the salad leaves and bread."
     ]
   },
   {
@@ -778,6 +854,7 @@
     "tags": ["high-protein"],
     "servings": 4,
     "minutes": 35,
+    "prepMinutes": 5,
     "kcalPerPortion": 488,
     "proteinPerPortion": 43,
     "ingredients": [
@@ -791,10 +868,12 @@
       {"item": "Basmati rice, dried", "amount": "240 g", "kcal": 852, "protein": 18}
     ],
     "steps": [
-      "Soften the onion in the oil for 5 minutes, then stir in the curry paste for a minute.",
-      "Add the chicken, tomatoes and coconut milk and simmer for 20 minutes.",
-      "Cook the rice meanwhile.",
-      "Stir the spinach into the curry until wilted and serve with the rice."
+      "Chop the onion and cut the chicken into bite-sized pieces.",
+      "Heat the oil in a large pan over a medium heat. Add the onion and cook for 5 minutes, stirring now and then, until soft. Stir in the curry paste and cook for 1 minute.",
+      "Add the chicken and stir to coat, then pour in the tomatoes and coconut milk. Bring to the boil, then turn the heat down and simmer for 20 minutes, stirring now and then, until the chicken is cooked through.",
+      "Meanwhile, rinse the rice and cook it in a pan of boiling water for 10 to 12 minutes, or as the packet says, then drain.",
+      "Stir the spinach into the curry for 1 to 2 minutes, until it wilts.",
+      "Split the rice and curry between 4 plates. Leftover curry keeps in the fridge for up to 2 days; leftover rice only until the next day."
     ]
   },
   {
@@ -805,7 +884,8 @@
     "category": "dinner",
     "tags": ["high-protein"],
     "servings": 4,
-    "minutes": 35,
+    "minutes": 40,
+    "prepMinutes": 5,
     "kcalPerPortion": 499,
     "proteinPerPortion": 40,
     "ingredients": [
@@ -819,10 +899,12 @@
       {"item": "Greek yoghurt, 0% fat, to serve", "amount": "100 g", "kcal": 57, "protein": 10}
     ],
     "steps": [
-      "Soften the onion and pepper in the oil for 5 minutes, then add the mince and brown it.",
-      "Stir in the garlic and spices, then the tomatoes and beans, and simmer for 20 minutes.",
-      "Cook the rice meanwhile.",
-      "Serve the chilli over the rice with a spoonful of yoghurt."
+      "Chop the onion, pepper and garlic. Drain and rinse the kidney beans.",
+      "Heat the oil in a large pan over a medium heat. Add the onion and pepper and cook for 5 minutes, stirring now and then, until soft.",
+      "Turn the heat up, add the mince and cook for 5 minutes, breaking it up with a wooden spoon, until browned with no pink left.",
+      "Stir in the garlic, chilli powder, cumin and smoked paprika for 1 minute. Add the tomatoes, beans, a splash of water and a pinch of salt. Bring to the boil, then simmer for 20 minutes, stirring now and then, until thick.",
+      "Meanwhile, rinse the rice and cook it in a pan of boiling water for 10 to 12 minutes, or as the packet says, then drain.",
+      "Split the rice and chilli between 4 plates and top each with a spoonful of yoghurt. Leftover chilli keeps in the fridge for up to 2 days, or in the freezer for up to 3 months; leftover rice only until the next day."
     ]
   },
   {
@@ -833,7 +915,8 @@
     "category": "dinner",
     "tags": ["high-protein"],
     "servings": 4,
-    "minutes": 35,
+    "minutes": 40,
+    "prepMinutes": 5,
     "kcalPerPortion": 504,
     "proteinPerPortion": 40,
     "ingredients": [
@@ -847,10 +930,12 @@
       {"item": "Parmesan, grated", "amount": "30 g", "kcal": 120, "protein": 11}
     ],
     "steps": [
-      "Soften the onion, carrot and garlic in the oil for 5 minutes.",
-      "Add the mince and brown it, breaking it up.",
-      "Stir in the tomatoes and simmer for 20 minutes.",
-      "Cook the pasta, then serve with the sauce and parmesan."
+      "Peel and finely chop the onion and garlic, and grate the carrot.",
+      "Heat the oil in a large frying pan over a medium heat. Add the onion and carrot and cook for 5 minutes, stirring now and then, until soft. Add the garlic and cook for 1 minute more.",
+      "Turn the heat up a little, add the mince and cook for 5 minutes, breaking it up with a wooden spoon, until browned with no pink left.",
+      "Stir in the tomatoes with a pinch of salt and pepper and bring to a bubble. Turn the heat down and simmer for 20 minutes, stirring now and then, until thick. Add a splash of water if it gets too dry.",
+      "When the sauce has about 15 minutes left, bring a large pan of salted water to the boil. Cook the pasta for 10 to 12 minutes, or as the packet says, then drain.",
+      "Split the pasta between 4 plates, spoon the sauce over it and scatter with the Parmesan. Leftover sauce keeps in the fridge for up to 2 days, or in the freezer for up to 3 months."
     ]
   },
   {
@@ -862,6 +947,7 @@
     "tags": ["vegetarian", "quick"],
     "servings": 2,
     "minutes": 20,
+    "prepMinutes": 3,
     "kcalPerPortion": 504,
     "proteinPerPortion": 33,
     "ingredients": [
@@ -875,10 +961,11 @@
       {"item": "Dried basil and chilli flakes", "amount": "to taste", "kcal": 0, "protein": 0}
     ],
     "steps": [
-      "Cook the pasta.",
-      "Soften the garlic in the oil, add the passata and basil and simmer for 5 minutes.",
-      "Take off the heat and blend in the cottage cheese, or stir it in for a chunkier sauce.",
-      "Toss with the pasta and spinach and top with the cheese."
+      "Bring a large pan of salted water to the boil and chop the garlic.",
+      "Cook the pasta for 10 to 12 minutes, or as the packet says, then drain.",
+      "Meanwhile, heat the oil in a saucepan over a low heat. Fry the garlic for 1 minute, then add the passata, basil and a pinch of chilli flakes and simmer for 5 minutes.",
+      "Take the sauce off the heat and blend in the cottage cheese with a stick blender until smooth and creamy, or just stir it in for a chunkier sauce.",
+      "Toss the pasta with the sauce and spinach until the spinach wilts. Split between 2 bowls and top with the grated cheese."
     ]
   },
   {
@@ -889,7 +976,8 @@
     "category": "dinner",
     "tags": ["high-protein"],
     "servings": 4,
-    "minutes": 40,
+    "minutes": 45,
+    "prepMinutes": 10,
     "kcalPerPortion": 523,
     "proteinPerPortion": 42,
     "ingredients": [
@@ -902,10 +990,12 @@
       {"item": "Smoked paprika, salt and pepper", "amount": "to taste", "kcal": 5, "protein": 0}
     ],
     "steps": [
-      "Toss the wedges with the oil and paprika and roast at 220°C for 30 to 35 minutes, turning once.",
-      "Season the mince and shape it into four burgers.",
-      "Grill or pan-fry for 4 to 5 minutes a side, adding the cheese for the last minute.",
-      "Serve in the buns with the salad, and the wedges on the side."
+      "Heat the oven to 220°C (200°C fan). Cut the potatoes into wedges (no need to peel).",
+      "On a large baking tray, toss the wedges with the oil, smoked paprika and a pinch of salt, and spread them out. Roast for 30 to 35 minutes, turning halfway, until golden and crisp.",
+      "Meanwhile, season the mince with salt and pepper and shape it into 4 flat burgers, a little wider than the buns. Slice the tomato and red onion, and wash the lettuce.",
+      "When the wedges have about 12 minutes left, heat a large frying pan over a medium-high heat (no oil needed). Cook the burgers for 4 to 5 minutes a side, until cooked through with no pink in the middle. Lay a cheese slice on each for the last minute.",
+      "Halve the buns and toast them, cut side down, in the pan for 1 minute.",
+      "Fill the buns with the lettuce, tomato, onion and burgers. One burger each, with the wedges on the side."
     ]
   },
   {
@@ -916,7 +1006,8 @@
     "category": "snack",
     "tags": ["high-protein", "vegetarian", "quick", "low-calorie"],
     "servings": 2,
-    "minutes": 15,
+    "minutes": 20,
+    "prepMinutes": 5,
     "kcalPerPortion": 147,
     "proteinPerPortion": 15,
     "ingredients": [
@@ -926,9 +1017,11 @@
       {"item": "Smoked paprika and chives", "amount": "to taste", "kcal": 0, "protein": 0}
     ],
     "steps": [
-      "Boil the eggs for 10 minutes, cool and halve them.",
-      "Mash the yolks with the yoghurt and mustard.",
-      "Spoon back into the whites and dust with paprika and chives."
+      "Bring a pan of water to the boil. Lower in the eggs with a spoon and boil for 10 minutes.",
+      "Move the eggs into a bowl of cold water for 3 minutes, then peel them and cut them in half lengthways.",
+      "Scoop the yolks into a bowl and mash them with the yoghurt, mustard and a pinch of salt and pepper until smooth.",
+      "Spoon the mix back into the whites. Dust with smoked paprika and scatter over chopped chives.",
+      "4 halves each. They keep in the fridge, covered, for up to 2 days."
     ]
   },
   {
@@ -940,6 +1033,7 @@
     "tags": ["high-protein", "vegetarian", "quick"],
     "servings": 1,
     "minutes": 5,
+    "prepMinutes": 5,
     "kcalPerPortion": 169,
     "proteinPerPortion": 22,
     "ingredients": [
@@ -949,8 +1043,9 @@
       {"item": "Raspberries, fresh or frozen", "amount": "50 g", "kcal": 12, "protein": 1}
     ],
     "steps": [
-      "Stir the cocoa and honey into the yoghurt until smooth.",
-      "Top with the raspberries."
+      "Spoon the yoghurt into a bowl and add the cocoa and honey.",
+      "Stir for 1 minute, until smooth and evenly brown.",
+      "Top with the raspberries. Frozen ones can go straight on; they soften in about 10 minutes."
     ]
   },
   {
@@ -961,7 +1056,8 @@
     "category": "snack",
     "tags": ["high-protein", "vegetarian", "vegan", "quick"],
     "servings": 2,
-    "minutes": 5,
+    "minutes": 10,
+    "prepMinutes": 2,
     "kcalPerPortion": 186,
     "proteinPerPortion": 17,
     "ingredients": [
@@ -970,8 +1066,10 @@
       {"item": "Chilli flakes, lemon juice and sea salt", "amount": "to taste", "kcal": 2, "protein": 0}
     ],
     "steps": [
-      "Boil the beans for 3 to 4 minutes and drain.",
-      "Toss with the soy sauce, chilli flakes, lemon juice and salt."
+      "Bring a pan of water to the boil.",
+      "Add the edamame straight from the freezer and boil for 3 to 4 minutes, until tender. Drain well.",
+      "Toss them in a bowl with the soy sauce, a pinch of chilli flakes, a squeeze of lemon and a pinch of sea salt.",
+      "Split between 2 bowls and eat warm."
     ]
   },
   {
@@ -983,6 +1081,7 @@
     "tags": ["high-protein", "quick"],
     "servings": 1,
     "minutes": 5,
+    "prepMinutes": 5,
     "kcalPerPortion": 195,
     "proteinPerPortion": 29,
     "ingredients": [
@@ -993,8 +1092,9 @@
       {"item": "Lemon juice and black pepper", "amount": "to taste", "kcal": 0, "protein": 0}
     ],
     "steps": [
-      "Mix the tuna with the yoghurt, lemon juice and pepper.",
-      "Pile onto the rice cakes and top with cucumber."
+      "Drain the tuna well and tip it into a bowl.",
+      "Mix in the yoghurt, a squeeze of lemon and a pinch of black pepper.",
+      "Pile it onto the rice cakes and top with the cucumber or tomato. Eat straight away, before the rice cakes go soft."
     ]
   },
   {
@@ -1006,6 +1106,7 @@
     "tags": ["high-protein", "vegetarian", "quick"],
     "servings": 1,
     "minutes": 5,
+    "prepMinutes": 5,
     "kcalPerPortion": 231,
     "proteinPerPortion": 21,
     "ingredients": [
@@ -1015,8 +1116,9 @@
       {"item": "Black pepper and chives", "amount": "to taste", "kcal": 0, "protein": 0}
     ],
     "steps": [
-      "Spread the cottage cheese on the crispbreads.",
-      "Top with cucumber, chives and black pepper."
+      "Slice the cucumber and chop the chives.",
+      "Spread the cottage cheese over the crispbreads.",
+      "Top with the cucumber, chives and a good pinch of black pepper."
     ]
   },
   {
@@ -1028,6 +1130,7 @@
     "tags": ["high-protein", "vegetarian", "quick"],
     "servings": 1,
     "minutes": 5,
+    "prepMinutes": 5,
     "kcalPerPortion": 242,
     "proteinPerPortion": 24,
     "ingredients": [
@@ -1037,8 +1140,9 @@
       {"item": "Banana", "amount": "½", "kcal": 48, "protein": 1}
     ],
     "steps": [
-      "Put everything in a blender.",
-      "Blend until smooth and drink straight away."
+      "Peel the half banana and break it into chunks.",
+      "Put the milk, yoghurt, frozen berries and banana in a blender.",
+      "Blend for 1 minute, until smooth and thick. Pour into a glass and drink straight away."
     ]
   }
 ]

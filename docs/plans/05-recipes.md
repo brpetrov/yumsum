@@ -39,7 +39,7 @@
 >
 > **Mix:** 8 breakfasts, 12 lunches, 14 dinners, 6 snacks. Easy, common dishes that people in Europe already cook at home on a weeknight: nothing fancy, nothing restaurant-only. Ingredients any supermarket sells (no saffron, bresaola, quinoa or the like). No fiddly techniques: no rolling, layering, skewering or breadcrumbing.
 >
-> **Easy and quick:** at most 4 steps and 9 ingredient lines; at most 40 minutes, most of them 30 or less.
+> **Easy and quick:** at most 9 ingredient lines; at most 45 minutes in all, most of them 30 or less, with the times honest (water coming to the boil, the oven heating).
 >
 > **One plate:** a portion, sides included, fits on one plate or in one bowl, so its photo can show all of it.
 >
@@ -47,7 +47,9 @@
 >
 > **Figures:** for every ingredient, give its kcal and protein for the amount used in the whole recipe, from per-100 g values in the UK government's CoFID tables (McCance and Widdowson's) or Open Food Facts' generic entries. Then per portion = the sum ÷ servings, rounded to whole numbers. The totals are checked, so they must add up.
 >
-> **Writing:** metric amounts; common supermarket ingredients; British English; sentence case; short imperative steps of one to three sentences; no exclamation marks.
+> **Writing:** metric amounts; common supermarket ingredients; British English; sentence case; no exclamation marks.
+>
+> **Steps:** 3 to 7, each one to three short imperative sentences, so a beginner can cook it without guessing. Start with the prep (what to chop and how). Every cooking step says the heat ("a large frying pan over a medium heat", "220°C (200°C fan)"), how long, written in digits ("5 minutes", "10 to 12 minutes"; the app shows these in bold), and how to tell it's done ("until soft", "no pink in the middle", "until it flakes easily"). Say when to start a second thing ("Meanwhile…", "When the sauce has 15 minutes left…"). The last step splits it into equal portions, so each matches the calories logged, and for dishes that keep, says how long: 2 days in the fridge, cooked rice only until the next day, 3 months frozen for soups, sauces and chilli (Food Standards Agency). Salt, pepper and water may be used without being listed.
 >
 > **Order:** breakfasts, lunches, dinners, snacks; within each, lowest calories first.
 >
@@ -62,7 +64,8 @@
 > | `category` | text | `breakfast`, `lunch`, `dinner` or `snack` |
 > | `tags` | list of text | any of `high-protein`, `vegetarian`, `vegan`, `quick`, `low-calorie`; no repeats; may be empty |
 > | `servings` | whole number | 1–12; the ingredient amounts are for this many |
-> | `minutes` | whole number | prep plus cooking |
+> | `minutes` | whole number | prep plus cooking, start to finish |
+> | `prepMinutes` | whole number | the chopping and mixing before anything cooks; at most `minutes` (all of it for a dish with no cooking) |
 > | `kcalPerPortion` | whole number | 50–1500 |
 > | `proteinPerPortion` | whole number, grams | 0–150 |
 > | `ingredients` | list | each `{"item": "Lean beef mince, 5% fat", "amount": "500 g", "kcal": 625, "protein": 105}` |
@@ -79,6 +82,7 @@
 >   "tags": ["high-protein", "vegetarian", "quick"],
 >   "servings": 1,
 >   "minutes": 5,
+>   "prepMinutes": 5,
 >   "kcalPerPortion": 330,
 >   "proteinPerPortion": 30,
 >   "ingredients": [
@@ -89,9 +93,9 @@
 >     { "item": "Walnuts, chopped", "amount": "5 g", "kcal": 34, "protein": 1 }
 >   ],
 >   "steps": [
->     "Spoon the yoghurt into a bowl.",
->     "Top with the berries, oats and walnuts.",
->     "Drizzle over the honey."
+>     "Spoon the yoghurt into a bowl and smooth the top.",
+>     "Scatter over the berries, oats and walnuts. Frozen berries can go straight on; they soften in about 5 minutes.",
+>     "Drizzle over the honey and eat straight away."
 >   ]
 > }
 > ```
