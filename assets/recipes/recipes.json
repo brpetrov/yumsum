@@ -663,7 +663,7 @@
   {
     "id": "beef-stroganoff",
     "name": "Beef stroganoff",
-    "description": "Strips of lean beef and mushrooms in a light paprika cream, with rice.",
+    "description": "Strips of lean beef and mushrooms in a light paprika cream, over noodles or rice.",
     "cuisine": "Eastern European",
     "category": "dinner",
     "tags": [],
@@ -679,13 +679,13 @@
       {"item": "Sweet paprika and Dijon mustard", "amount": "1 tsp each", "kcal": 15, "protein": 1},
       {"item": "Olive oil", "amount": "2 tsp", "kcal": 79, "protein": 0},
       {"item": "Beef stock", "amount": "150 ml", "kcal": 4, "protein": 0},
-      {"item": "White rice, dried", "amount": "240 g", "kcal": 852, "protein": 18}
+      {"item": "Egg noodles or white rice, dried", "amount": "240 g", "kcal": 852, "protein": 18}
     ],
     "steps": [
-      "Cook the rice.",
+      "Cook the noodles or rice.",
       "Fry the beef in half the oil over a high heat for 2 minutes, then set aside.",
       "Soften the onion and mushrooms in the rest of the oil for 6 minutes, then stir in the paprika, mustard and stock.",
-      "Stir in the crème fraîche and the beef, heat through and serve over the rice."
+      "Stir in the crème fraîche and the beef, heat through and serve over the noodles or rice."
     ]
   },
   {
@@ -828,7 +828,7 @@
   {
     "id": "pasta-bolognese",
     "name": "Pasta bolognese",
-    "description": "A lean beef ragù over spaghetti.",
+    "description": "A lean beef ragù over spaghetti or tagliatelle.",
     "cuisine": "Italian",
     "category": "dinner",
     "tags": ["high-protein"],
@@ -838,7 +838,7 @@
     "proteinPerPortion": 40,
     "ingredients": [
       {"item": "Lean beef mince, 5% fat", "amount": "500 g", "kcal": 625, "protein": 105},
-      {"item": "Spaghetti, dried", "amount": "280 g", "kcal": 988, "protein": 35},
+      {"item": "Spaghetti or tagliatelle, dried", "amount": "280 g", "kcal": 988, "protein": 35},
       {"item": "Chopped tomatoes", "amount": "2 tins (800 g)", "kcal": 168, "protein": 8},
       {"item": "Onion, chopped", "amount": "1", "kcal": 40, "protein": 1},
       {"item": "Carrot, grated", "amount": "1", "kcal": 27, "protein": 0},
@@ -850,7 +850,7 @@
       "Soften the onion, carrot and garlic in the oil for 5 minutes.",
       "Add the mince and brown it, breaking it up.",
       "Stir in the tomatoes and simmer for 20 minutes.",
-      "Cook the spaghetti, then serve with the sauce and parmesan."
+      "Cook the pasta, then serve with the sauce and parmesan."
     ]
   },
   {
