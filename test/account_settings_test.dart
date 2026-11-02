@@ -2,13 +2,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/account_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/account/account_settings_screen.dart';
+import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakeAccountController extends AccountController {
@@ -74,7 +79,11 @@ void main() {
   late SharedPreferences prefs;
   late _FakeAccountController controller;
 
-  Future<void> pumpScreen(WidgetTester tester, {User? user}) async {
+  Future<void> pumpScreen(
+    WidgetTester tester, {
+    User? user,
+    Entitlement? entitlement,
+  }) async {
     SharedPreferences.setMockInitialValues({});
     prefs = await SharedPreferences.getInstance();
     controller = _FakeAccountController();
@@ -88,10 +97,22 @@ void main() {
           ),
           authStateProvider.overrideWith((ref) => Stream<User?>.value(user)),
           accountControllerProvider.overrideWith(() => controller),
+          entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
         ],
-        child: MaterialApp(
+        child: MaterialApp.router(
           theme: AppTheme.light,
-          home: const AccountSettingsScreen(),
+          routerConfig: GoRouter(
+            routes: [
+              GoRoute(
+                path: '/',
+                builder: (_, _) => const AccountSettingsScreen(),
+              ),
+              GoRoute(
+                path: AppRoutes.plus,
+                builder: (_, _) => const PlusScreen(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -147,5 +168,38 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Delete account'));
     await tester.pumpAndSettle();
     expect(controller.deletePasswords, ['']);
+  });
+
+  testWidgets('Without YumSum+, its row opens the YumSum+ page', (
+    tester,
+  ) async {
+    await pumpScreen(tester);
+    await tester.ensureVisible(find.text('YumSum+'));
+    expect(
+      find.text('Photo logging, 30 AI estimates a day and more'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('YumSum+'));
+    await tester.pumpAndSettle();
+    expect(find.text('Logging stays free. YumSum+ adds:'), findsOneWidget);
+    expect(find.text("YumSum+ isn't on sale yet."), findsOneWidget);
+  });
+
+  testWidgets('A grant shows as on, with nothing to manage', (tester) async {
+    await pumpScreen(
+      tester,
+      entitlement: Entitlement(
+        active: true,
+        source: EntitlementSource.manual,
+        expiresAt: DateTime.now().add(const Duration(days: 30)),
+      ),
+    );
+    await tester.ensureVisible(find.text('YumSum+'));
+    expect(find.textContaining('On until'), findsOneWidget);
+
+    await tester.tap(find.text('YumSum+'));
+    await tester.pumpAndSettle();
+    expect(find.text('Logging stays free. YumSum+ adds:'), findsNothing);
   });
 }

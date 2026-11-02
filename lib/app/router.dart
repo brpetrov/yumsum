@@ -11,6 +11,7 @@ import 'package:lean_streak/screens/auth/auth_screen.dart';
 import 'package:lean_streak/screens/dashboard/dashboard_screen.dart';
 import 'package:lean_streak/screens/notifications/notifications_screen.dart';
 import 'package:lean_streak/screens/onboarding/onboarding_screen.dart';
+import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/screens/profile/profile_load_error_screen.dart';
 import 'package:lean_streak/screens/profile/profile_screen.dart';
 import 'package:lean_streak/screens/progress/progress_screen.dart';
@@ -37,6 +38,7 @@ class AppRoutes {
   static const recipes = '/recipes';
   static const recipe = '/recipes/:id';
   static String recipePath(String id) => '/recipes/$id';
+  static const plus = '/plus';
 }
 
 // ---------------------------------------------------------------------------
@@ -126,6 +128,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           recipeId: state.pathParameters['id']!,
           recipe: state.extra is Recipe ? state.extra! as Recipe : null,
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.plus,
+        builder: (context, state) => const PlusScreen(),
       ),
     ],
   );

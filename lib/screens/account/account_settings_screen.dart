@@ -8,8 +8,10 @@ import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/providers/account_controller.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/core/constants/legal_links.dart';
+import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/widgets/feedback_dialog.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
 import 'package:lean_streak/widgets/password_confirm_dialog.dart';
@@ -279,6 +281,9 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         ),
                       ],
                       SizedBox(height: 28),
+                      const _AccountSectionLabel('YUMSUM+'),
+                      const _PlusTile(),
+                      SizedBox(height: 28),
                       const _AccountSectionLabel('HELP & LEGAL'),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
@@ -382,6 +387,36 @@ class _AccountSectionLabel extends StatelessWidget {
           letterSpacing: 1.0,
         ),
       ),
+    );
+  }
+}
+
+/// The account's YumSum+: what it adds (opening the YumSum+ page) until it
+/// has it, then its state, managed in Google Play for a subscription.
+class _PlusTile extends ConsumerWidget {
+  const _PlusTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final entitlement = ref.watch(entitlementProvider).valueOrNull;
+    final now = DateTime.now();
+    final plus = entitlement?.isPlusAt(now) ?? false;
+    final manage = managedInPlay(entitlement, now);
+
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      title: const Text('YumSum+'),
+      subtitle: Text(plusStatusLine(entitlement, now)),
+      trailing: manage
+          ? const Icon(Icons.open_in_new_rounded, size: 18)
+          : plus
+          ? null
+          : const Icon(Icons.chevron_right_rounded),
+      onTap: manage
+          ? () => openLegalPage(managePlusInPlay)
+          : plus
+          ? null
+          : () => showPlusPaywall(context),
     );
   }
 }

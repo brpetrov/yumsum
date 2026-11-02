@@ -139,5 +139,11 @@ service cloud.firestore {
         allow read, delete: if isOwner(userId);
       }
     }
+
+    // YumSum+. Only the server (or the owner, by hand in the console)
+    // writes it, so the app can read its own and nothing more.
+    match /entitlements/{userId} {
+      allow read: if isOwner(userId);
+    }
   }
 }
