@@ -255,7 +255,7 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
                               compact: compact,
                               line: plus
                                   ? 'Everything here is yours.'
-                                  : 'Log in a snap. Learn what works for you.',
+                                  : 'Shine bright with these smart perks.',
                               onClose: () => Navigator.of(context).maybePop(),
                             ),
                             for (final (icon, name, line) in _features)

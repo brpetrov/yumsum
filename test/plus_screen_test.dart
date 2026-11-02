@@ -25,10 +25,7 @@ void main() {
   testWidgets('offers the free week on both plans', (tester) async {
     await pumpScreen(tester, null);
     expect(find.text('Smart Snap'), findsOneWidget);
-    expect(
-      find.text('Log in a snap. Learn what works for you.'),
-      findsOneWidget,
-    );
+    expect(find.text('Shine bright with these smart perks.'), findsOneWidget);
     expect(find.text('£17.99'), findsOneWidget);
     expect(find.text('Save 50%'), findsOneWidget);
     expect(find.text('£1.50 a month'), findsOneWidget);
