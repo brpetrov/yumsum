@@ -139,6 +139,8 @@ For example, someone weighing every morning, logging every day, with weigh-ins 0
 
 A missed Monday (the app not opened all week) breaks the chain, so a cut waits again. Only the latest week is ever processed; missed weeks aren't caught up.
 
+**It never plans a faster loss than the pace you chose** (decided 2 November). A cut only brings your real loss back to that pace, at most 0.75 kg a week on the fast plan; it never deepens the deficit beyond it. If you lose faster than your pace, the target goes up (a raise, made the same Monday), and Today says so: "You're losing faster than your plan, so your target goes up a little."
+
 ### Step 9: the target and the goal date
 
 The adjustment corrects the formula's burn, so it's applied inside `calculatePlan`, before the minimum:

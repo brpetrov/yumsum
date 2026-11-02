@@ -102,10 +102,14 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     );
   }
 
-  /// AI estimates left today, or null until the count has loaded.
-  int? get _aiLeft => switch (ref.read(aiUsageTodayProvider).valueOrNull) {
-    final used? => max(0, AiUsageRepository.dailyLimit - used),
-    null => null,
+  /// AI estimates left today; null until the count has loaded, and for
+  /// the owner's account, which has no limit.
+  int? get _aiLeft => switch ((
+    ref.read(aiUsageTodayProvider).valueOrNull,
+    ref.read(aiDailyLimitProvider),
+  )) {
+    (final used?, final limit?) => max(0, limit - used),
+    _ => null,
   };
 
   // Touch devices choose between typing and the mic, so only desktop
@@ -580,13 +584,14 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     // Once half of today's AI estimates are used, a quiet count of what's
     // left, while the bar could still use one.
     ref.watch(aiUsageTodayProvider);
+    final limit = ref.watch(aiDailyLimitProvider) ?? 0;
     final left = _aiLeft;
     final aiHint =
         open &&
             !showStatus &&
             entry.kcal == null &&
             left != null &&
-            left <= AiUsageRepository.dailyLimit ~/ 2
+            left <= limit ~/ 2
         ? switch (left) {
             0 => 'No AI estimates left today',
             1 => '1 AI estimate left today',

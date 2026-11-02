@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +11,7 @@ import 'package:lean_streak/providers/theme_controller.dart';
 import 'package:lean_streak/widgets/app_logo_mark.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
 import 'package:lean_streak/widgets/pill_toggle.dart';
+import 'package:lean_streak/widgets/plus_mark.dart';
 
 /// The home shell: app bar with the menu, the page body, and an optional bar
 /// pinned to the bottom (kept above the keyboard).
@@ -164,6 +166,21 @@ class AppDrawer extends ConsumerWidget {
                       selected: page.route == current,
                       onTap: () => _open(context, page.route),
                     ),
+                  _PlusMenuItem(
+                    onTap: () {
+                      // Over the current page, like everywhere it opens from.
+                      final router = GoRouter.of(context);
+                      Navigator.of(context).pop();
+                      router.push(AppRoutes.plus);
+                    },
+                  ),
+                  if (kDebugMode)
+                    _MenuItem(
+                      icon: Icons.bug_report_outlined,
+                      label: 'Debug tools',
+                      selected: current == AppRoutes.debug,
+                      onTap: () => _open(context, AppRoutes.debug),
+                    ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(24, 18, 20, 8),
                     child: Text(
@@ -206,6 +223,33 @@ class AppDrawer extends ConsumerWidget {
             const SizedBox(height: 8),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// YumSum+ in the menu: the wordmark beside an orange badge, so it stands
+/// out from the plain pages.
+class _PlusMenuItem extends StatelessWidget {
+  const _PlusMenuItem({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+      child: ListTile(
+        shape: const StadiumBorder(),
+        visualDensity: const VisualDensity(vertical: -2),
+        contentPadding: const EdgeInsets.only(left: 6, right: 12),
+        horizontalTitleGap: 14,
+        leading: const PlusBadge(icon: Icons.auto_awesome_rounded),
+        title: const Align(
+          alignment: Alignment.centerLeft,
+          child: PlusMark(size: 18),
+        ),
+        onTap: onTap,
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/models/user_profile.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/repositories/ai_usage_repository.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
@@ -20,7 +21,14 @@ final calorieEstimateServiceProvider = Provider<CalorieEstimateService>((ref) {
     ref.watch(aiUsageRepositoryProvider),
     country: profile?.country ?? defaultCountry,
     usualFood: profile?.usualFood ?? '',
+    dailyLimit: ref.watch(aiDailyLimitProvider),
   );
+});
+
+/// How many AI estimates the user gets a day; null for the owner's admin
+/// account, which has no limit.
+final aiDailyLimitProvider = Provider.autoDispose<int?>((ref) {
+  return ref.watch(adminProvider) ? null : AiUsageRepository.dailyLimit;
 });
 
 /// Streams today's AI estimate usage count for the current user.

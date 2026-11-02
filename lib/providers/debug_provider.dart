@@ -1,0 +1,75 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:lean_streak/models/entitlement.dart';
+import 'package:lean_streak/providers/preferences_provider.dart';
+
+/// Who a debug build pretends the account is, to try each YumSum+ state
+/// without touching Firestore.
+enum DebugAccount {
+  real('Your real account'),
+  free('Free'),
+  plus('YumSum+'),
+  trialEnding('YumSum+ trial, ending in 2 days'),
+  ended('YumSum+ ended 3 days ago'),
+  admin('Admin');
+
+  const DebugAccount(this.label);
+
+  final String label;
+
+  /// The record the app sees instead of the real one.
+  Entitlement? entitlementAt(DateTime now) => switch (this) {
+    real || free => null,
+    plus => Entitlement(
+      active: true,
+      source: EntitlementSource.play,
+      state: 'active',
+      expiresAt: now.add(const Duration(days: 30)),
+    ),
+    trialEnding => Entitlement(
+      active: true,
+      source: EntitlementSource.play,
+      state: 'active',
+      inTrial: true,
+      expiresAt: now.add(const Duration(days: 2)),
+    ),
+    ended => Entitlement(
+      active: false,
+      source: EntitlementSource.play,
+      state: 'expired',
+      expiresAt: now.subtract(const Duration(days: 3)),
+    ),
+    admin => const Entitlement(
+      active: true,
+      source: EntitlementSource.manual,
+      admin: true,
+    ),
+  };
+}
+
+/// The debug tools' "Pretend to be", kept on the phone. Release builds
+/// always see the real account.
+class DebugAccountNotifier extends Notifier<DebugAccount> {
+  static const _key = 'debug.account';
+
+  @override
+  DebugAccount build() {
+    if (!kDebugMode) return DebugAccount.real;
+    final saved = ref.watch(sharedPreferencesProvider).getString(_key);
+    return DebugAccount.values.firstWhere(
+      (account) => account.name == saved,
+      orElse: () => DebugAccount.real,
+    );
+  }
+
+  Future<void> set(DebugAccount account) async {
+    state = account;
+    await ref.read(sharedPreferencesProvider).setString(_key, account.name);
+  }
+}
+
+final debugAccountProvider =
+    NotifierProvider<DebugAccountNotifier, DebugAccount>(
+      DebugAccountNotifier.new,
+    );

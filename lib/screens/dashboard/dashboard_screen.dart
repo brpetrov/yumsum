@@ -22,6 +22,7 @@ import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
 import 'package:lean_streak/screens/dashboard/helpers/creatine_offer.dart';
 import 'package:lean_streak/screens/dashboard/helpers/day_off_dialog.dart';
+import 'package:lean_streak/screens/dashboard/helpers/plus_prompt_card.dart';
 import 'package:lean_streak/screens/dashboard/helpers/quick_log_bar.dart';
 import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
 import 'package:lean_streak/screens/progress/helpers/log_weight_dialog.dart';
@@ -305,6 +306,7 @@ class _DashboardContent extends StatelessWidget {
               const SizedBox(height: 18),
               _MonthPreviewCard(date: date, onOpenReview: onOpenReview),
               const SizedBox(height: 18),
+              const PlusPromptCard(),
               const _WeightCard(),
             ],
           ),

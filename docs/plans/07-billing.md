@@ -69,6 +69,8 @@ You can switch YumSum+ on for anyone by hand. Firebase console → Firestore →
 
 It takes effect within seconds, on the phone and the website. Delete the document to take it away.
 
+**Your own account** also gets `admin` (boolean, true): YumSum+ for good, no daily AI limit and no limit on changing past days. A debug build has **Debug tools** in the menu, which shows your User ID to copy and can pretend to be a free, subscribed, trial, ended or admin account on that phone only. (Built 2 November.)
+
 **A live manual grant wins:** the functions never overwrite a `manual` document that is still active and unexpired; they only record the purchase in `playPurchases`. To try a real purchase on an account that has a grant, delete the grant first.
 
 ## In the app
@@ -168,7 +170,7 @@ Every entry point calls `showPlusPaywall(context)`. Each belongs to its own plan
 - **Macros** (plan 10).
 - **Account Settings' "YumSum+" row**, below.
 
-No banner, no pop-up at start, nothing in the menu.
+Also, as you decided on 2 November: a **YumSum+ row in the menu** for everyone, with the orange badge, and a **YumSum+ card on Today** for people without it, which its cross hides for two weeks. No pop-up at start. (Built.)
 
 ### Account Settings
 

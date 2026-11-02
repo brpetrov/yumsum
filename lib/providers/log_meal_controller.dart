@@ -7,6 +7,7 @@ import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/past_day_edit_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/repositories/day_edit_repository.dart';
@@ -75,6 +76,7 @@ class LogMealController extends AsyncNotifier<void> {
   }
 
   Future<void> _ensurePastDayChangeLeft(String uid) async {
+    if (ref.read(adminProvider)) return;
     final used = await ref
         .read(dayEditRepositoryProvider)
         .fetchCount(uid, currentEditMonthKey());

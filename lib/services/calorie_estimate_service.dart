@@ -196,10 +196,15 @@ class CalorieEstimateService {
     this._usageRepo, {
     required String country,
     required String usualFood,
+    int? dailyLimit = AiUsageRepository.dailyLimit,
   }) : _country = country,
-       _usualFood = usualFood;
+       _usualFood = usualFood,
+       _dailyLimit = dailyLimit;
 
   final AiUsageRepository _usageRepo;
+
+  /// Estimates allowed a day; null for no limit (the owner's account).
+  final int? _dailyLimit;
 
   /// From the profile: where the user lives and what they usually eat.
   final String _country;
@@ -322,7 +327,7 @@ class CalorieEstimateService {
   Future<CalorieEstimate> estimate(String uid, String description) async {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final count = await _usageRepo.watchCount(uid, today).first;
-    if (count >= AiUsageRepository.dailyLimit) {
+    if (_dailyLimit case final limit? when count >= limit) {
       throw const DailyLimitExceededException();
     }
 
@@ -362,7 +367,7 @@ class CalorieEstimateService {
   Future<VoiceMealParsed> parseVoiceAudio(String uid, Uint8List wav) async {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final count = await _usageRepo.watchCount(uid, today).first;
-    if (count >= AiUsageRepository.dailyLimit) {
+    if (_dailyLimit case final limit? when count >= limit) {
       throw const DailyLimitExceededException();
     }
 
@@ -403,7 +408,7 @@ class CalorieEstimateService {
   Future<VoiceMealParsed> estimateFromPhoto(String uid, Uint8List jpeg) async {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final count = await _usageRepo.watchCount(uid, today).first;
-    if (count >= AiUsageRepository.dailyLimit) {
+    if (_dailyLimit case final limit? when count >= limit) {
       throw const DailyLimitExceededException();
     }
 
@@ -448,7 +453,7 @@ class CalorieEstimateService {
   ) async {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final count = await _usageRepo.watchCount(uid, today).first;
-    if (count >= AiUsageRepository.dailyLimit) {
+    if (_dailyLimit case final limit? when count >= limit) {
       throw const DailyLimitExceededException();
     }
 

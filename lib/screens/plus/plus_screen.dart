@@ -5,11 +5,11 @@ import 'package:intl/intl.dart';
 
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
-import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
+import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 
 /// Opens the YumSum+ page over the current one, so Back returns to it.
@@ -37,6 +37,7 @@ String plusStatusLine(Entitlement? entitlement, DateTime now) {
         ? 'Off until the payment problem is fixed in Google Play'
         : 'Photo logging, 30 AI estimates a day and more';
   }
+  if (e.admin) return 'Admin: everything on, no daily limits';
   final until = e.expiresAt == null
       ? null
       : DateFormat('d MMMM').format(e.expiresAt!);
@@ -94,14 +95,22 @@ class PlusScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                const SizedBox(height: 8),
+                const Center(
+                  child: PlusBadge(size: 64, icon: Icons.auto_awesome_rounded),
+                ),
+                const SizedBox(height: 14),
+                const Center(child: PlusMark(size: 30)),
+                const SizedBox(height: 8),
                 Text(
                   'Logging stays free. YumSum+ adds:',
-                  style: AppTheme.display.copyWith(
-                    fontSize: 22,
-                    color: AppColors.textPrimary,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 24),
                 for (final (icon, line) in _features)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 14),

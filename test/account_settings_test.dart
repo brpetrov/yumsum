@@ -14,6 +14,7 @@ import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/account/account_settings_screen.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
+import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakeAccountController extends AccountController {
@@ -174,13 +175,13 @@ void main() {
     tester,
   ) async {
     await pumpScreen(tester);
-    await tester.ensureVisible(find.text('YumSum+'));
+    await tester.ensureVisible(find.byType(PlusMark));
     expect(
       find.text('Photo logging, 30 AI estimates a day and more'),
       findsOneWidget,
     );
 
-    await tester.tap(find.text('YumSum+'));
+    await tester.tap(find.byType(PlusMark));
     await tester.pumpAndSettle();
     expect(find.text('Logging stays free. YumSum+ adds:'), findsOneWidget);
     expect(find.text("YumSum+ isn't on sale yet."), findsOneWidget);
@@ -195,10 +196,10 @@ void main() {
         expiresAt: DateTime.now().add(const Duration(days: 30)),
       ),
     );
-    await tester.ensureVisible(find.text('YumSum+'));
+    await tester.ensureVisible(find.byType(PlusMark));
     expect(find.textContaining('On until'), findsOneWidget);
 
-    await tester.tap(find.text('YumSum+'));
+    await tester.tap(find.byType(PlusMark));
     await tester.pumpAndSettle();
     expect(find.text('Logging stays free. YumSum+ adds:'), findsNothing);
   });

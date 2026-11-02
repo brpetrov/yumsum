@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/debug_provider.dart';
 import 'package:lean_streak/repositories/entitlement_repository.dart';
 
 final entitlementRepositoryProvider = Provider<EntitlementRepository>((ref) {
@@ -10,20 +11,26 @@ final entitlementRepositoryProvider = Provider<EntitlementRepository>((ref) {
 });
 
 /// The account's YumSum+ details (state, dates), or null if it never had it.
+/// A debug build can pretend to be another account (the debug tools).
 final entitlementProvider = StreamProvider.autoDispose<Entitlement?>((ref) {
+  final pretend = ref.watch(debugAccountProvider);
+  if (pretend != DebugAccount.real) {
+    return Stream.value(pretend.entitlementAt(DateTime.now()));
+  }
   final uid = ref.watch(currentUidProvider);
   if (uid == null) return Stream.value(null);
   return ref.watch(entitlementRepositoryProvider).watch(uid);
 });
 
-/// Whether the signed-in account has YumSum+ now. Gates read it as
-/// `ref.watch(plusProvider).valueOrNull ?? false`, so they stay shut while
-/// it loads.
-final plusProvider = StreamProvider.autoDispose<bool>((ref) {
-  final uid = ref.watch(currentUidProvider);
-  if (uid == null) return Stream.value(false);
-  return ref
-      .watch(entitlementRepositoryProvider)
-      .watch(uid)
-      .map((e) => e?.isPlusAt(DateTime.now()) ?? false);
+/// Whether the signed-in account has YumSum+ now. False while the record
+/// loads, so a gate never flashes open.
+final plusProvider = Provider.autoDispose<bool>((ref) {
+  return ref.watch(entitlementProvider).valueOrNull?.isPlusAt(DateTime.now()) ??
+      false;
+});
+
+/// The owner's account, which has every YumSum+ feature and no daily
+/// limits. False until the record loads, so the limits hold meanwhile.
+final adminProvider = Provider.autoDispose<bool>((ref) {
+  return ref.watch(entitlementProvider).valueOrNull?.admin ?? false;
 });

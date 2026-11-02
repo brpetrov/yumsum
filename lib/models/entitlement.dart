@@ -21,7 +21,8 @@ enum EntitlementSource {
 /// Whether an account has YumSum+. Stored at `entitlements/{uid}`, which
 /// only the server writes (the rules give the app read access alone), or
 /// the owner by hand: a hand-typed grant may hold just `active`, `source`
-/// and `expiresAt`, so every other field is optional.
+/// and `expiresAt`, so every other field is optional. The owner's own
+/// account also carries `admin`.
 class Entitlement {
   const Entitlement({
     required this.active,
@@ -29,6 +30,7 @@ class Entitlement {
     this.expiresAt,
     this.inTrial = false,
     this.state,
+    this.admin = false,
     DateTime? endedAt,
   }) : _endedAt = endedAt;
 
@@ -42,6 +44,9 @@ class Entitlement {
   /// Play's state: `active`, `grace`, `cancelled`, `hold`, `paused`,
   /// `pending` or `expired`.
   final String? state;
+
+  /// The owner: YumSum+ for good, and no daily AI or past-day limits.
+  final bool admin;
   final DateTime? _endedAt;
 
   factory Entitlement.fromFirestore(
@@ -56,6 +61,7 @@ class Entitlement {
       expiresAt: date('expiresAt'),
       inTrial: data['inTrial'] == true,
       state: data['state'] as String?,
+      admin: data['admin'] == true,
       endedAt: date('endedAt'),
     );
   }
@@ -63,7 +69,7 @@ class Entitlement {
   /// Checks the date on the device too, so a missed notice from Play can't
   /// leave YumSum+ on for ever.
   bool isPlusAt(DateTime now) =>
-      active && (expiresAt == null || now.isBefore(expiresAt!));
+      admin || (active && (expiresAt == null || now.isBefore(expiresAt!)));
 
   /// When YumSum+ last switched off: the stored end, or [expiresAt] once it
   /// has passed (a missed notice from Play, or a grant that ran out).

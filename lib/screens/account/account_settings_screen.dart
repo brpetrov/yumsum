@@ -12,6 +12,8 @@ import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/core/constants/legal_links.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
+import 'package:lean_streak/widgets/app_card.dart';
+import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:lean_streak/widgets/feedback_dialog.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
 import 'package:lean_streak/widgets/password_confirm_dialog.dart';
@@ -403,20 +405,42 @@ class _PlusTile extends ConsumerWidget {
     final plus = entitlement?.isPlusAt(now) ?? false;
     final manage = managedInPlay(entitlement, now);
 
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      title: const Text('YumSum+'),
-      subtitle: Text(plusStatusLine(entitlement, now)),
-      trailing: manage
-          ? const Icon(Icons.open_in_new_rounded, size: 18)
-          : plus
-          ? null
-          : const Icon(Icons.chevron_right_rounded),
+    return AppCard(
+      padding: const EdgeInsets.fromLTRB(16, 16, 14, 16),
       onTap: manage
           ? () => openLegalPage(managePlusInPlay)
           : plus
           ? null
           : () => showPlusPaywall(context),
+      child: Row(
+        children: [
+          const PlusBadge(size: 42, icon: Icons.auto_awesome_rounded),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const PlusMark(size: 19),
+                const SizedBox(height: 3),
+                Text(
+                  plusStatusLine(entitlement, now),
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.3,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (manage || !plus)
+            Icon(
+              manage ? Icons.open_in_new_rounded : Icons.chevron_right_rounded,
+              size: manage ? 18 : 24,
+              color: AppColors.textSecondary,
+            ),
+        ],
+      ),
     );
   }
 }

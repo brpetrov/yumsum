@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,6 +9,7 @@ import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/account/account_settings_screen.dart';
 import 'package:lean_streak/screens/auth/auth_screen.dart';
 import 'package:lean_streak/screens/dashboard/dashboard_screen.dart';
+import 'package:lean_streak/screens/debug/debug_screen.dart';
 import 'package:lean_streak/screens/notifications/notifications_screen.dart';
 import 'package:lean_streak/screens/onboarding/onboarding_screen.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
@@ -39,6 +40,7 @@ class AppRoutes {
   static const recipe = '/recipes/:id';
   static String recipePath(String id) => '/recipes/$id';
   static const plus = '/plus';
+  static const debug = '/debug';
 }
 
 // ---------------------------------------------------------------------------
@@ -133,6 +135,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.plus,
         builder: (context, state) => const PlusScreen(),
       ),
+      if (kDebugMode)
+        GoRoute(
+          path: AppRoutes.debug,
+          builder: (context, state) => const DebugScreen(),
+        ),
     ],
   );
 

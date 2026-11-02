@@ -6,6 +6,7 @@ import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
+import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -25,6 +26,7 @@ void main() {
           AppRoutes.planSettings,
           AppRoutes.notifications,
           AppRoutes.profile,
+          AppRoutes.plus,
         ])
           GoRoute(
             path: route,
@@ -86,5 +88,17 @@ void main() {
     await pick(tester, 'Today');
     expect(location(), AppRoutes.dashboard);
     expect(router.canPop(), isFalse);
+  });
+
+  testWidgets('YumSum+ opens over the current page', (tester) async {
+    await pumpAt(tester, AppRoutes.review);
+    await tester.tap(find.byTooltip('Open navigation menu'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(PlusMark));
+    await tester.pumpAndSettle();
+    expect(location(), AppRoutes.plus);
+    router.pop();
+    await tester.pumpAndSettle();
+    expect(location(), AppRoutes.review);
   });
 }

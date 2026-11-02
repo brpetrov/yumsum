@@ -9,6 +9,7 @@ import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/past_day_edit_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/repositories/day_edit_repository.dart';
 import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
@@ -90,7 +91,7 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
               .fold<double>(0, (sum, meal) => sum + meal.proteinGrams!)
               .round();
     final pastDay = isPastDay(_dateKey, DateTime.now());
-    final changesLeft = pastDay
+    final changesLeft = pastDay && !ref.watch(adminProvider)
         ? DayEditRepository.monthlyLimit -
               (ref.watch(dayEditsThisMonthProvider).valueOrNull ?? 0)
         : null;
