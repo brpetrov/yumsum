@@ -62,7 +62,7 @@ class _PlusPromptCardState extends ConsumerState<PlusPromptCard> {
                   const PlusMark(size: 19),
                   const SizedBox(height: 4),
                   Text(
-                    'Smart Snap, the Adaptive Formula, AI Insights and '
+                    'Smart Snap, the Adaptive Formula, an AI Assisted Coach and '
                     'Detailed Macros.',
                     style: TextStyle(
                       fontSize: 14,

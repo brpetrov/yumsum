@@ -86,8 +86,8 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
     ),
     (
       Icons.insights_rounded,
-      'AI Insights',
-      'Every Monday, the AI reviews your week.',
+      'AI Assisted Coach',
+      'Weekly and monthly reviews, with advice.',
     ),
     (
       Icons.pie_chart_outline_rounded,
