@@ -164,7 +164,7 @@ After launch, check once a month:
 ## Checklist
 
 - [x] The name: **YumSum Star** (2 November)
-- [ ] (Claude) Step 1: YumSum Star switch, manual grant, paywall (plan 07)
+- [x] (Claude) Step 1: YumSum Star switch, manual grant, paywall (plan 07), with admin and debug tools (2 November)
 - [ ] (you) Grant yourself YumSum Star in the Firebase console (plan 07 explains how) and try every feature on the phone
 - [ ] (Claude) Steps 2–6, one at a time, each tried on your phone
 - [ ] (you) Once Google approves your account: create the app, payments profile, subscription and trial (plan 07)
