@@ -62,8 +62,8 @@ class _PlusPromptCardState extends ConsumerState<PlusPromptCard> {
                   const PlusMark(size: 19),
                   const SizedBox(height: 4),
                   Text(
-                    'Photo logging, a target that learns from your '
-                    'weigh-ins, full macros and a weekly review.',
+                    'Smart Snap, the Adaptive Formula, AI Insights and '
+                    'Detailed Macros.',
                     style: TextStyle(
                       fontSize: 14,
                       height: 1.35,

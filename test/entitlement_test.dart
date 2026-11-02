@@ -54,7 +54,7 @@ void main() {
     expect(ended.endedAt(_now), _earlier);
     expect(
       plusStatusLine(ended, _now),
-      'Photo logging, 30 AI estimates a day and more',
+      'Smart Snap, 30 AI estimates a day and more',
     );
     expect(managedInPlay(ended, _now), isFalse);
   });
@@ -85,7 +85,7 @@ void main() {
   test('no record means no YumSum Star', () {
     expect(
       plusStatusLine(null, _now),
-      'Photo logging, 30 AI estimates a day and more',
+      'Smart Snap, 30 AI estimates a day and more',
     );
     expect(managedInPlay(null, _now), isFalse);
   });

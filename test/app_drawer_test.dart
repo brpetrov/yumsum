@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/models/entitlement.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
@@ -12,7 +14,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   late GoRouter router;
 
-  Future<void> pumpAt(WidgetTester tester, String location) async {
+  Future<void> pumpAt(
+    WidgetTester tester,
+    String location, {
+    Entitlement? entitlement,
+  }) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     router = GoRouter(
@@ -40,7 +46,10 @@ void main() {
     );
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
+        ],
         child: MaterialApp.router(theme: AppTheme.light, routerConfig: router),
       ),
     );
@@ -59,14 +68,14 @@ void main() {
 
   String location() => router.state.uri.path;
 
-  testWidgets('from Today the menu opens a page above it', (tester) async {
+  testWidgets('from Home the menu opens a page above it', (tester) async {
     await pumpAt(tester, AppRoutes.dashboard);
     await pick(tester, 'History');
     expect(location(), AppRoutes.review);
     expect(router.canPop(), isTrue);
   });
 
-  testWidgets('from a page the menu swaps pages, so Back lands on Today', (
+  testWidgets('from a page the menu swaps pages, so Back lands on Home', (
     tester,
   ) async {
     await pumpAt(tester, AppRoutes.review);
@@ -83,9 +92,9 @@ void main() {
     expect(location(), AppRoutes.recipes);
   });
 
-  testWidgets('Today in the menu goes straight home', (tester) async {
+  testWidgets('Home in the menu goes straight home', (tester) async {
     await pumpAt(tester, AppRoutes.review);
-    await pick(tester, 'Today');
+    await pick(tester, 'Home');
     expect(location(), AppRoutes.dashboard);
     expect(router.canPop(), isFalse);
   });
@@ -94,11 +103,39 @@ void main() {
     await pumpAt(tester, AppRoutes.review);
     await tester.tap(find.byTooltip('Open navigation menu'));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byType(PlusMark));
+    await tester.pumpAndSettle();
     await tester.tap(find.byType(PlusMark));
     await tester.pumpAndSettle();
     expect(location(), AppRoutes.plus);
     router.pop();
     await tester.pumpAndSettle();
     expect(location(), AppRoutes.review);
+  });
+
+  testWidgets('without YumSum Star, Become a Star beside the logo opens it', (
+    tester,
+  ) async {
+    await pumpAt(tester, AppRoutes.review);
+    await pick(tester, 'Become a Star');
+    expect(location(), AppRoutes.plus);
+    expect(find.byTooltip('YumSum Star'), findsNothing);
+  });
+
+  testWidgets('a member sees the star beside the logo instead', (tester) async {
+    await pumpAt(
+      tester,
+      AppRoutes.review,
+      entitlement: const Entitlement(
+        active: true,
+        source: EntitlementSource.manual,
+      ),
+    );
+    await tester.tap(find.byTooltip('Open navigation menu'));
+    await tester.pumpAndSettle();
+    expect(find.text('Become a Star'), findsNothing);
+    await tester.tap(find.byTooltip('YumSum Star'));
+    await tester.pumpAndSettle();
+    expect(location(), AppRoutes.plus);
   });
 }

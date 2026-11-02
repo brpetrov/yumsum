@@ -37,7 +37,7 @@ void main() {
   testWidgets('shows what YumSum Star adds to someone without it', (tester) async {
     await pumpCard(tester);
     expect(find.byType(PlusMark), findsOneWidget);
-    expect(find.textContaining('Photo logging'), findsOneWidget);
+    expect(find.textContaining('Smart Snap'), findsOneWidget);
   });
 
   testWidgets('not for someone who has YumSum Star', (tester) async {

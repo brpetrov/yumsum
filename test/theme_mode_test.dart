@@ -7,6 +7,7 @@ import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/providers/activity_scale_migration_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/reminder_provider.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
@@ -23,6 +24,7 @@ void main() {
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
           currentUidProvider.overrideWithValue('test'),
+          entitlementProvider.overrideWith((ref) => Stream.value(null)),
           activityScaleMigrationProvider.overrideWith((ref) async {}),
           reminderSyncProvider.overrideWith((ref) async {}),
           goRouterProvider.overrideWithValue(
@@ -92,6 +94,8 @@ void main() {
         matching: find.byType(Scrollable),
       ),
     );
+    // Its last step lands without a frame.
+    await tester.pump();
     await tester.tap(find.text('Dark'));
     await tester.pumpAndSettle();
 

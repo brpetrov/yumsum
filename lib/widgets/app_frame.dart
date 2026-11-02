@@ -19,6 +19,7 @@ class AppFrame extends ConsumerWidget {
   const AppFrame({
     super.key,
     required this.title,
+    this.titleBadge,
     this.subtitle,
     this.actions,
     required this.body,
@@ -26,6 +27,9 @@ class AppFrame extends ConsumerWidget {
   });
 
   final String title;
+
+  /// Shown right after the title, like Home's YumSum Star badge.
+  final Widget? titleBadge;
   final String? subtitle;
   final List<Widget>? actions;
   final Widget body;
@@ -33,15 +37,24 @@ class AppFrame extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final heading = titleBadge == null
+        ? Text(title)
+        : Row(
+            children: [
+              Flexible(child: Text(title, overflow: TextOverflow.ellipsis)),
+              const SizedBox(width: 10),
+              titleBadge!,
+            ],
+          );
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: subtitle == null
-            ? Text(title)
+            ? heading
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title),
+                  heading,
                   Text(
                     subtitle!,
                     style: TextStyle(
@@ -69,13 +82,13 @@ class AppFrame extends ConsumerWidget {
   }
 }
 
-/// The menu, shown on every page: Today first, then the other pages,
+/// The menu, shown on every page: Home first, then the other pages,
 /// appearance and log out.
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
   static const _pages = [
-    (route: AppRoutes.dashboard, icon: Icons.today_outlined, label: 'Today'),
+    (route: AppRoutes.dashboard, icon: Icons.home_outlined, label: 'Home'),
     (
       route: AppRoutes.review,
       icon: Icons.calendar_month_outlined,
@@ -108,8 +121,8 @@ class AppDrawer extends ConsumerWidget {
     ),
   ];
 
-  /// Today is the root and every other page sits one level above it, so
-  /// moving between pages swaps the top one and Back always lands on Today.
+  /// Home is the root and every other page sits one level above it, so
+  /// moving between pages swaps the top one and Back always lands on Home.
   void _open(BuildContext context, String route) {
     Navigator.of(context).pop();
     final router = GoRouter.of(context);
@@ -129,6 +142,13 @@ class AppDrawer extends ConsumerWidget {
     final isWorking = authState.isLoading;
     final current = GoRouter.maybeOf(context)?.state.uri.path;
 
+    // Over the current page, like everywhere it opens from.
+    void openPlus() {
+      final router = GoRouter.of(context);
+      Navigator.of(context).pop();
+      router.push(AppRoutes.plus);
+    }
+
     return Drawer(
       child: SafeArea(
         child: Column(
@@ -147,13 +167,23 @@ class AppDrawer extends ConsumerWidget {
                         const AppLogoMark(size: 38),
                         SizedBox(width: 12),
                         Expanded(
-                          child: Text(
-                            'YumSum',
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTheme.display.copyWith(
-                              fontSize: 27,
-                              color: AppColors.textPrimary,
-                            ),
+                          // The badge drops under the name when the menu
+                          // is too narrow for both.
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 4,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                'YumSum',
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTheme.display.copyWith(
+                                  fontSize: 27,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              StarBadge(onTap: openPlus),
+                            ],
                           ),
                         ),
                       ],
@@ -166,14 +196,7 @@ class AppDrawer extends ConsumerWidget {
                       selected: page.route == current,
                       onTap: () => _open(context, page.route),
                     ),
-                  _PlusMenuItem(
-                    onTap: () {
-                      // Over the current page, like everywhere it opens from.
-                      final router = GoRouter.of(context);
-                      Navigator.of(context).pop();
-                      router.push(AppRoutes.plus);
-                    },
-                  ),
+                  _PlusMenuItem(onTap: openPlus),
                   if (kDebugMode)
                     _MenuItem(
                       icon: Icons.bug_report_outlined,

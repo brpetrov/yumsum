@@ -38,7 +38,7 @@ String plusStatusLine(Entitlement? entitlement, DateTime now) {
   if (e == null || !e.isPlusAt(now)) {
     return e?.state == 'hold' && e?.source == EntitlementSource.play
         ? 'Off until the payment problem is fixed in Google Play'
-        : 'Photo logging, 30 AI estimates a day and more';
+        : 'Smart Snap, 30 AI estimates a day and more';
   }
   if (e.admin) return 'Admin: everything on, no daily limits';
   final until = e.expiresAt == null
@@ -69,11 +69,31 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
   bool _yearly = true;
 
   static const _features = [
-    (Icons.photo_camera_rounded, 'Log meals from a photo of your plate'),
-    (Icons.auto_awesome_rounded, '30 AI estimates a day, not 10'),
-    (Icons.tune_rounded, 'A calorie target that learns from you'),
-    (Icons.insights_rounded, 'A weekly review of how you ate'),
-    (Icons.pie_chart_outline_rounded, 'Fat, carbs, sugars, fibre and salt'),
+    (
+      Icons.photo_camera_rounded,
+      'Smart Snap',
+      'Capture your meal. The AI does the rest.',
+    ),
+    (
+      Icons.auto_awesome_rounded,
+      'Triple the AI estimates',
+      '30 a day, not 10. Type, speak or snap.',
+    ),
+    (
+      Icons.tune_rounded,
+      'Adaptive Formula',
+      'Weigh in and your target adjusts to you.',
+    ),
+    (
+      Icons.insights_rounded,
+      'AI Insights',
+      'What worked, what didn\'t, and a tip to try.',
+    ),
+    (
+      Icons.pie_chart_outline_rounded,
+      'Detailed Macros',
+      'The full label: fat, carbs, sugars, fibre, salt.',
+    ),
   ];
 
   Future<void> _comingSoon() => showDialog<void>(
@@ -108,6 +128,7 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
 
     final Widget offer;
     if (plus) {
+      final status = plusStatusLine(entitlement, now);
       offer = AppCard(
         child: Row(
           children: [
@@ -118,7 +139,7 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'You have YumSum Star',
+                    'You\'re already a bright YumSum Star',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
@@ -126,9 +147,11 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
                     ),
                   ),
                   Text(
-                    plusStatusLine(entitlement, now),
+                    'Thank you for helping YumSum grow.',
                     style: muted.copyWith(fontSize: 14),
                   ),
+                  // A plain "On" adds nothing to the line above.
+                  if (status != 'On') Text(status, style: muted),
                 ],
               ),
             ),
@@ -158,8 +181,8 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
                     title: 'Yearly',
                     price: '£17.99',
                     per: 'a year',
-                    note: 'Half the monthly price',
-                    badge: 'Best value',
+                    note: '£1.50 a month',
+                    badge: 'Save 50%',
                     selected: _yearly,
                     onTap: () => setState(() => _yearly = true),
                   ),
@@ -217,7 +240,7 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
               // short for it all.
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final compact = constraints.maxHeight < 760;
+                  final compact = constraints.maxHeight < 800;
                   return SingleChildScrollView(
                     padding: const EdgeInsets.fromLTRB(24, 0, 24, 4),
                     child: ConstrainedBox(
@@ -230,25 +253,39 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
                           children: [
                             _Header(
                               compact: compact,
+                              line: plus
+                                  ? 'Everything here is yours.'
+                                  : 'Log in a snap. Learn what works for you.',
                               onClose: () => Navigator.of(context).maybePop(),
                             ),
-                            for (final (icon, line) in _features)
+                            for (final (icon, name, line) in _features)
                               Padding(
                                 padding: EdgeInsets.only(
-                                  bottom: compact ? 6 : 10,
+                                  bottom: compact ? 8 : 14,
                                 ),
                                 child: Row(
                                   children: [
-                                    IconBubble(icon, size: compact ? 30 : 34),
+                                    IconBubble(icon, size: compact ? 34 : 38),
                                     const SizedBox(width: 14),
                                     Expanded(
-                                      child: Text(
-                                        line,
-                                        style: TextStyle(
-                                          fontSize: 15.5,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.textPrimary,
-                                        ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            name,
+                                            style: TextStyle(
+                                              fontSize: 15.5,
+                                              height: 1.2,
+                                              fontWeight: FontWeight.w800,
+                                              color: AppColors.textPrimary,
+                                            ),
+                                          ),
+                                          Text(
+                                            line,
+                                            style: muted.copyWith(height: 1.25),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
@@ -300,12 +337,17 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
 }
 
 /// The top of the page: the bowl with its star on a warm glow, the
-/// wordmark and one line, with a close button. [compact] makes the bowl
+/// wordmark and one [line], with a close button. [compact] makes the bowl
 /// smaller, for short screens.
 class _Header extends StatelessWidget {
-  const _Header({required this.compact, required this.onClose});
+  const _Header({
+    required this.compact,
+    required this.line,
+    required this.onClose,
+  });
 
   final bool compact;
+  final String line;
   final VoidCallback onClose;
 
   @override
@@ -315,7 +357,7 @@ class _Header extends StatelessWidget {
       alignment: Alignment.topCenter,
       children: [
         Padding(
-          padding: EdgeInsets.only(top: 8, bottom: compact ? 10 : 16),
+          padding: EdgeInsets.only(top: 8, bottom: compact ? 12 : 20),
           child: Column(
             children: [
               PlusHero(size: compact ? 104 : 150),
@@ -323,7 +365,7 @@ class _Header extends StatelessWidget {
               const PlusMark(size: 34),
               const SizedBox(height: 6),
               Text(
-                'Get more from every meal.',
+                line,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
               ),

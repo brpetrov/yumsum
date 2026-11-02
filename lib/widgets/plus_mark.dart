@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 
 /// The YumSum Star wordmark, with "Star" in the icon's orange. (The code
 /// calls the paid tier "plus", from before it had a name.)
@@ -45,6 +47,60 @@ class PlusStar extends StatelessWidget {
     height: size,
     excludeFromSemantics: true,
   );
+}
+
+/// YumSum Star at a glance, beside the logo in the menu and the name on Home: the
+/// star for members, a "Become a Star" chip for everyone else. Nothing while
+/// the account loads, so a member never sees the chip flash.
+class StarBadge extends ConsumerWidget {
+  const StarBadge({super.key, required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (!ref.watch(entitlementProvider).hasValue) {
+      return const SizedBox.shrink();
+    }
+    if (ref.watch(plusProvider)) {
+      return Tooltip(
+        message: 'YumSum Star',
+        child: InkResponse(
+          onTap: onTap,
+          radius: 20,
+          child: const PlusStar(size: 28),
+        ),
+      );
+    }
+    return Material(
+      color: AppColors.primaryContainer,
+      shape: const StadiumBorder(),
+      child: InkWell(
+        customBorder: const StadiumBorder(),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(6, 4, 12, 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const PlusStar(size: 20),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  'Become a Star',
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTheme.display.copyWith(
+                    fontSize: 14,
+                    color: AppColors.onPrimaryContainer,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// The logo's smiling bowl with its star (`design/plus-hero.png`), on a soft

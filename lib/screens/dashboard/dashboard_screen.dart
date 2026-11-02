@@ -25,6 +25,7 @@ import 'package:lean_streak/screens/dashboard/helpers/day_off_dialog.dart';
 import 'package:lean_streak/screens/dashboard/helpers/plus_prompt_card.dart';
 import 'package:lean_streak/screens/dashboard/helpers/quick_log_bar.dart';
 import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
+import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/screens/progress/helpers/log_weight_dialog.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
@@ -33,6 +34,7 @@ import 'package:lean_streak/widgets/calorie_bars.dart';
 import 'package:lean_streak/widgets/day_status.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
 import 'package:lean_streak/widgets/meal_row.dart';
+import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -138,9 +140,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     final profileAsync = ref.watch(userProfileProvider);
     final today = _activeDate;
     final dateKey = DateFormat('yyyy-MM-dd').format(today);
+    // The first name only, so the Star badge still fits beside it on a phone.
+    final firstName = profileAsync.valueOrNull?.name.split(' ').first;
 
     return AppFrame(
-      title: 'Today',
+      title: firstName ?? 'Home',
+      titleBadge: StarBadge(onTap: () => showPlusPaywall(context)),
       subtitle: DateFormat('EEEE, d MMMM').format(today),
       actions: [_DayOffButton(date: dateKey)],
       bottom: const QuickLogBar(),

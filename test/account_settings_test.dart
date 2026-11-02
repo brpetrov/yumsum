@@ -177,7 +177,7 @@ void main() {
     await pumpScreen(tester);
     await tester.ensureVisible(find.byType(PlusMark));
     expect(
-      find.text('Photo logging, 30 AI estimates a day and more'),
+      find.text('Smart Snap, 30 AI estimates a day and more'),
       findsOneWidget,
     );
 
