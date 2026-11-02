@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -58,6 +59,25 @@ void main() {
     );
     await tester.pumpAndSettle();
   }
+
+  testWidgets('the chart shows the weigh-ins as dots under the trend line', (
+    tester,
+  ) async {
+    await pumpScreen(tester);
+    final chart = tester.widget<LineChart>(find.byType(LineChart));
+    final [trend, weighIns] = chart.data.lineBarsData;
+    // A week later the trend has moved 1 - 0.9^7 of the way to 85.2.
+    expect(trend.spots.last.y, closeTo(86.0 - 0.8 * 0.5217031, 1e-6));
+    expect(trend.dotData.show, isFalse);
+    expect([for (final s in weighIns.spots) s.y], [86.0, 85.2]);
+    expect(weighIns.barWidth, 0);
+    expect(
+      find.text(
+        'The line is your trend: your weight without the daily ups and downs.',
+      ),
+      findsOneWidget,
+    );
+  });
 
   testWidgets('a weigh-in can be deleted, after asking', (tester) async {
     await pumpScreen(tester);

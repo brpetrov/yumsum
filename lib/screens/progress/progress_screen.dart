@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/helpers/weight_trend.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/models/weight_entry.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
@@ -304,6 +305,11 @@ class _WeightChartCard extends StatelessWidget {
     final spots = entries
         .map((entry) => FlSpot(xFor(entry), entry.weightKg))
         .toList();
+    final trend = weightTrend(entries);
+    final trendSpots = [
+      for (var i = 0; i < entries.length; i++)
+        FlSpot(spots[i].x, trend[i].trendKg),
+    ];
 
     final target = profile?.targetWeightKg;
     final weights = entries.map((e) => e.weightKg).toList();
@@ -323,126 +329,179 @@ class _WeightChartCard extends StatelessWidget {
 
     return AppCard(
       padding: const EdgeInsets.fromLTRB(10, 24, 20, 16),
-      child: SizedBox(
-        height: 240,
-        child: LineChart(
-          LineChartData(
-            minX: 0,
-            maxX: maxX,
-            minY: minY,
-            maxY: maxY,
-            gridData: FlGridData(
-              show: true,
-              drawVerticalLine: false,
-              getDrawingHorizontalLine: (_) =>
-                  FlLine(color: AppColors.divider, strokeWidth: 1),
-            ),
-            borderData: FlBorderData(show: false),
-            titlesData: FlTitlesData(
-              topTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-              rightTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 40,
-                  getTitlesWidget: (value, meta) {
-                    if (value == meta.min || value == meta.max) {
-                      return const SizedBox.shrink();
-                    }
-                    return Text(
-                      value.toStringAsFixed(0),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textSecondary,
-                      ),
-                    );
-                  },
+      child: Column(
+        children: [
+          SizedBox(
+            height: 240,
+            child: LineChart(
+              LineChartData(
+                minX: 0,
+                maxX: maxX,
+                minY: minY,
+                maxY: maxY,
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  getDrawingHorizontalLine: (_) =>
+                      FlLine(color: AppColors.divider, strokeWidth: 1),
                 ),
-              ),
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 28,
-                  interval: labelInterval,
-                  getTitlesWidget: (value, meta) {
-                    // fl_chart always adds a label at the end of the axis,
-                    // which collides with the last regular one.
-                    if (value == meta.max && value % labelInterval != 0) {
-                      return const SizedBox.shrink();
-                    }
-                    final date = firstDate.add(Duration(days: value.round()));
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Text(
-                        DateFormat('d MMM').format(date),
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            extraLinesData: target == null
-                ? const ExtraLinesData()
-                : ExtraLinesData(
-                    horizontalLines: [
-                      HorizontalLine(
-                        y: target,
-                        color: AppColors.veryGood,
-                        strokeWidth: 2,
-                        dashArray: [6, 4],
-                        label: HorizontalLineLabel(
-                          show: true,
-                          alignment: Alignment.topRight,
+                borderData: FlBorderData(show: false),
+                titlesData: FlTitlesData(
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 40,
+                      getTitlesWidget: (value, meta) {
+                        if (value == meta.min || value == meta.max) {
+                          return const SizedBox.shrink();
+                        }
+                        return Text(
+                          value.toStringAsFixed(0),
                           style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.veryGood,
+                            fontSize: 11,
+                            color: AppColors.textSecondary,
                           ),
-                          labelResolver: (_) => 'Target',
-                        ),
+                        );
+                      },
+                    ),
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 28,
+                      interval: labelInterval,
+                      getTitlesWidget: (value, meta) {
+                        // fl_chart always adds a label at the end of the axis,
+                        // which collides with the last regular one.
+                        if (value == meta.max && value % labelInterval != 0) {
+                          return const SizedBox.shrink();
+                        }
+                        final date = firstDate.add(
+                          Duration(days: value.round()),
+                        );
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            DateFormat('d MMM').format(date),
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                extraLinesData: target == null
+                    ? const ExtraLinesData()
+                    : ExtraLinesData(
+                        horizontalLines: [
+                          HorizontalLine(
+                            y: target,
+                            color: AppColors.veryGood,
+                            strokeWidth: 2,
+                            dashArray: [6, 4],
+                            label: HorizontalLineLabel(
+                              show: true,
+                              alignment: Alignment.topRight,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.veryGood,
+                              ),
+                              labelResolver: (_) => 'Target',
+                            ),
+                          ),
+                        ],
                       ),
+                lineTouchData: LineTouchData(
+                  touchTooltipData: LineTouchTooltipData(
+                    getTooltipItems: (touched) => [
+                      for (final spot in touched)
+                        LineTooltipItem(
+                          spot.barIndex == 0
+                              ? 'Trend ${spot.y.toStringAsFixed(1)} kg'
+                              : '${spot.y.toStringAsFixed(1)} kg',
+                          TextStyle(
+                            color: AppColors.veryGood,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
                     ],
                   ),
-            lineBarsData: [
-              LineChartBarData(
-                spots: spots,
-                isCurved: true,
-                color: AppColors.veryGood,
-                barWidth: 4,
-                isStrokeCapRound: true,
-                // Round beads with a cream rim, over a soft green wash.
-                dotData: FlDotData(
-                  show: true,
-                  getDotPainter: (spot, _, _, _) => FlDotCirclePainter(
-                    radius: 5.5,
+                ),
+                lineBarsData: [
+                  // The trend: a smooth green line over a soft green wash.
+                  LineChartBarData(
+                    spots: trendSpots,
+                    isCurved: true,
+                    preventCurveOverShooting: true,
                     color: AppColors.veryGood,
-                    strokeWidth: 3,
-                    strokeColor: AppColors.surface,
+                    barWidth: 4,
+                    isStrokeCapRound: true,
+                    dotData: const FlDotData(show: false),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          AppColors.veryGood.withValues(alpha: 0.22),
+                          AppColors.veryGood.withValues(alpha: 0.02),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-                belowBarData: BarAreaData(
-                  show: true,
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      AppColors.veryGood.withValues(alpha: 0.22),
-                      AppColors.veryGood.withValues(alpha: 0.02),
-                    ],
+                  // The weigh-ins: round beads with a cream rim and no line,
+                  // hollow when set aside as a likely typo.
+                  LineChartBarData(
+                    spots: spots,
+                    color: AppColors.veryGood,
+                    barWidth: 0,
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, _, _, i) => trend[i].setAside
+                          ? FlDotCirclePainter(
+                              radius: 4.5,
+                              color: AppColors.surface,
+                              strokeWidth: 2,
+                              strokeColor: AppColors.textSecondary,
+                            )
+                          : FlDotCirclePainter(
+                              radius: 4.5,
+                              color: AppColors.veryGood,
+                              strokeWidth: 2.5,
+                              strokeColor: AppColors.surface,
+                            ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: Text(
+              'The line is your trend: your weight without the daily ups '
+              'and downs.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12.5,
+                height: 1.35,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

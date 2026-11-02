@@ -605,7 +605,7 @@ These go beyond what we agreed on 1–2 November, or change it slightly:
 ## Checklist
 
 - [ ] (you) Agree the decisions above, or change them
-- [ ] (Claude) Step 1, the trend line; (you) try it on the phone
+- [ ] (Claude) Step 1, the trend line (built 2 November); (you) try it on the phone
 - [ ] (Claude) Steps 2–3 with their tests; deploy the rules
 - [ ] (Claude) Steps 4–7 and the widget tests
 - [ ] (you) Grant yourself YumSum Star, switch on the morning reminder, weigh in daily for 6 weeks
