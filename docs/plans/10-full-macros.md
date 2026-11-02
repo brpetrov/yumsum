@@ -4,13 +4,13 @@
 
 ## The short version
 
-1. **YumSum+ shows the rest of the food label beside calories and protein:** fat, saturates, carbs, sugars, fibre and salt.
+1. **YumSum Star shows the rest of the food label beside calories and protein:** fat, saturates, carbs, sugars, fibre and salt.
    - Today gets one quiet line that opens on a tap, and each meal shows its own figures on a tap.
    - They are plain totals with no targets. Only fibre (aim for 30 g a day) and salt (no more than 6 g) get the UK guide.
-2. **Saved for everyone, shown only to YumSum+.** Free users never see them. When someone subscribes or starts the trial, their history is already there.
+2. **Saved for everyone, shown only to YumSum Star.** Free users never see them. When someone subscribes or starts the trial, their history is already there.
 3. **Packet labels and recipes cost nothing, so their figures are always saved.** That covers barcodes, search, contributions and the 40 recipes.
    - The AI gives six totals for the meal, not for each item. On paper that adds about 14% to a typed estimate.
-   - If your measurement on the phone says 15% or less, every estimate asks for them. Otherwise only YumSum+ estimates do.
+   - If your measurement on the phone says 15% or less, every estimate asks for them. Otherwise only YumSum Star estimates do.
 4. **Data first, display last.** First one `Nutrients` value on meals and daily summaries, with six optional fields in `firestore.rules` (you deploy those before anything writes them). Then the sources, then the display.
 5. **The 40 recipes need the six figures** for every ingredient and portion. They come from the same tables as their calories, and the recipe test checks them.
 
@@ -22,9 +22,9 @@ Nothing changes: no macros line and no teaser on Today. The paywall (plan 07) li
 
 > **Full macros:** fat, saturates, carbs, sugars, fibre and salt for your meals. Meals you've already logged show theirs too.
 
-If the cost check leaves the AI asking only YumSum+ users, the second sentence becomes "Barcodes and recipes you've already logged show theirs too."
+If the cost check leaves the AI asking only YumSum Star users, the second sentence becomes "Barcodes and recipes you've already logged show theirs too."
 
-### YumSum+
+### YumSum Star
 
 **Today.** One muted line sits under the protein bar, or under the calorie bar when protein is off. A tap opens it:
 
@@ -120,14 +120,14 @@ It's a class rather than a record typedef because it carries these helpers.
 
 ## Where the numbers come from
 
-| Source | Free user | YumSum+ |
+| Source | Free user | YumSum Star |
 |---|---|---|
 | Barcode and food search | Saved | Saved |
 | Contribution, then Log it | Saved | Saved |
 | Recipe (tile +, Log a portion, chip) | Saved | Saved |
 | Chip for one of your own meals | Copied | Copied |
 | AI estimate, typed or voice | Saved if the cost check allows | Saved |
-| AI estimate, photo | No photos (YumSum+ only, plan 06) | Saved |
+| AI estimate, photo | No photos (YumSum Star only, plan 06) | Saved |
 | Fill-in when a named meal is saved without them | Not asked | Asked |
 | Calories typed with no name | None | None |
 
@@ -153,10 +153,10 @@ No AI call is ever made just to fill in figures a free user can't see.
 **Corrected weights.** When a weight is changed in the breakdown, the meal's macros scale with its calories: 440 → 520 kcal multiplies every figure by 520/440. This is rough: more rice should mean more carbs, not more fat. Exact figures need per-item macros (Later).
 
 **The fill-in on saving.**
-- **The call:** `estimateProtein(name, kcal)` becomes `estimateNutrients(name, kcal)` and returns `({int? protein, Nutrients? macros})`. It asks for macros only for YumSum+.
+- **The call:** `estimateProtein(name, kcal)` becomes `estimateNutrients(name, kcal)` and returns `({int? protein, Nutrients? macros})`. It asks for macros only for YumSum Star.
 - **When it runs:** `LogMealController` calls it for a named meal in two cases:
   - protein is missing and tracked, as now
-  - macros are missing and the user has YumSum+
+  - macros are missing and the user has YumSum Star
 - **Allowance:** it still doesn't count, as plan 06 keeps it.
 - **Protein off:** protein it returns anyway is saved, as now.
 
@@ -172,15 +172,15 @@ Assumptions: about 35 more output tokens (the `macros` object) and 70 more input
 |---|---|---|---|
 | Typed estimate | $0.00075 | $0.00086 | +14% |
 | 10-second voice note | $0.00096 | $0.00107 | +11% |
-| Meal photo (YumSum+ only) | $0.0011 | $0.0012 | +10% |
-| Fill-in on saving (macros for YumSum+ only) | about $0.00015 | about $0.00026 | +70%, but only for subscribers |
+| Meal photo (YumSum Star only) | $0.0011 | $0.0012 | +10% |
+| Fill-in on saving (macros for YumSum Star only) | about $0.00015 | about $0.00026 | +70%, but only for subscribers |
 
 - **Per item would cost too much.** Macros for each of about 5 items add about 175 output tokens, which is +60% or more a call.
 - **A bare list of six numbers** instead of named keys would halve the extra. But a mixed-up order would go unnoticed, so I'd rather not.
 
 **The trade-off, plainly.**
 - **Asking everyone** costs about 1p a month per free user who estimates 3 meals a day, roughly £9 a month at 1,000 such users. It buys the moment when someone starts the trial and finds months of fat, carbs and salt already there.
-- **Asking only YumSum+** costs free users nothing. Their history then shows macros only for packets and recipes.
+- **Asking only YumSum Star** costs free users nothing. Their history then shows macros only for packets and recipes.
 
 **The rule.** Measure a typed estimate both ways on your phone (Steps for you):
 - 15% or less: set `macrosForEveryone` to `true`.
@@ -230,7 +230,7 @@ Decide before the closed test, so the testers' history is what launch will be.
 - **Edits.** `LogMealController.submit` gains `Nutrients? macros`.
   - Today it rebuilds the `Meal` from its arguments, so an edit would wipe the macros.
   - When an edit passes none, it keeps the meal's own, scaled to the new calories, unless the name changed.
-  - A renamed meal loses them, because hidden figures for a different food are worse than none. For YumSum+, the fill-in on saving puts new ones in.
+  - A renamed meal loses them, because hidden figures for a different food are worse than none. For YumSum Star, the fill-in on saving puts new ones in.
 - **Chips.** `MealSuggestion` gains `Nutrients? macros`, from the meal or the recipe, so re-logging copies them like protein.
 
 ## What gets built
@@ -294,7 +294,7 @@ Then you measure (Steps for you), and I set `macrosForEveryone`.
 
 ### Step 5: showing them
 
-- `lib/providers/user_profile_provider.dart`: `showMacrosProvider`, true with YumSum+, next to `trackProteinProvider`.
+- `lib/providers/user_profile_provider.dart`: `showMacrosProvider`, true with YumSum Star, next to `trackProteinProvider`.
 - `lib/widgets/macro_totals.dart` (new):
   - `MacroTotals`, the block for Today and the day sheet, built from a list of meals
   - `macrosLine(Nutrients)`, the one-line form for rows, the recipe page and the amount sheet
@@ -315,7 +315,7 @@ Then you measure (Steps for you), and I set `macrosForEveryone`.
 | `test/nutrients_test.dart` (new) | Scaling, totals over meals that have each nutrient, Firestore round trip with unknowns left out, rounding to 0.1 g, the edit rule |
 | `daily_summary_service_test` | Summary macros are totals over meals that have them, and are left out when no meal has any |
 | `food_lookup_service_test` | Macros read from `nutriments` for barcode and search; sodium × 2.5 when salt is missing; string values; none at all gives null |
-| `portion_sheet_test` | `portionFor` scales macros; the line shows for YumSum+ only |
+| `portion_sheet_test` | `portionFor` scales macros; the line shows for YumSum Star only |
 | `contribute_sheet_test` | The product handed to Log it keeps the label's macros |
 | `meal_suggestions_test` | Chips carry macros from meals and recipes |
 | `quick_log_bar_test` | Covers four things:<br>• barcode, estimate and chip fills are saved with macros<br>• a corrected weight or typed calories scale them<br>• editing the name drops them<br>• the fake's `submit` gains `macros` |
@@ -323,8 +323,8 @@ Then you measure (Steps for you), and I set `macrosForEveryone`.
 | `log_meal_sheet_test` | The estimate's macros are saved, scaled to edited calories. An edit with the same name keeps them; a renamed meal drops them. The fake's `submit` gains `macros`. |
 | `recipe_test`, `recipe_fixtures.dart` | The new fields and their ranges |
 | `recipes_asset_test` | Sums, saturates ≤ fat, sugars ≤ carbs, the energy check |
-| `recipe_screens_test` | Log a portion passes macros; the recipe page line shows for YumSum+ only; the fake's `submit` |
-| `day_meals_sheet_test` | The block shows for YumSum+ and not for free; a tap on a row shows its macros |
+| `recipe_screens_test` | Log a portion passes macros; the recipe page line shows for YumSum Star only; the fake's `submit` |
+| `day_meals_sheet_test` | The block shows for YumSum Star and not for free; a tap on a row shows its macros |
 | `test/macro_totals_test.dart` (new) | Closed line, open grid, "at least", the guides, "not counted", the empty cases |
 
 Tests override `plusProvider` both ways, as plan 06's do.
@@ -339,7 +339,7 @@ Tests override `plusProvider` both ways, as plan 06's do.
 
    An app that writes the new fields under the old rules can't save those meals ("Could not save meal").
 2. **Measure the cost after step 4,** in a debug build on the phone, with `macrosForEveryone` still `false`.
-   - Type the same 10 everyday meals and tap the sparkle for each: once signed in without YumSum+, then once with your manual grant.
+   - Type the same 10 everyday meals and tap the sparkle for each: once signed in without YumSum Star, then once with your manual grant.
    - Send me the "AI tokens: in …, out …, thinking …" lines from the debug console.
    - Each call costs in × $0.30 + (out + thinking) × $2.50 per million tokens. I'll compare the averages, set the switch, and update plan 03's figures from the same lines (its token check is still open).
 3. **Look over a few recipes** after the data job. Check the fat and salt look right for the dish.

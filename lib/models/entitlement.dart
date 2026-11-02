@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// Who switched YumSum+ on: a Play subscription, or the owner by hand in
+/// Who switched YumSum Star on: a Play subscription, or the owner by hand in
 /// the Firebase console.
 enum EntitlementSource {
   play('play'),
@@ -18,7 +18,7 @@ enum EntitlementSource {
   }
 }
 
-/// Whether an account has YumSum+. Stored at `entitlements/{uid}`, which
+/// Whether an account has YumSum Star. Stored at `entitlements/{uid}`, which
 /// only the server writes (the rules give the app read access alone), or
 /// the owner by hand: a hand-typed grant may hold just `active`, `source`
 /// and `expiresAt`, so every other field is optional. The owner's own
@@ -45,7 +45,7 @@ class Entitlement {
   /// `pending` or `expired`.
   final String? state;
 
-  /// The owner: YumSum+ for good, and no daily AI or past-day limits.
+  /// The owner: YumSum Star for good, and no daily AI or past-day limits.
   final bool admin;
   final DateTime? _endedAt;
 
@@ -67,11 +67,11 @@ class Entitlement {
   }
 
   /// Checks the date on the device too, so a missed notice from Play can't
-  /// leave YumSum+ on for ever.
+  /// leave YumSum Star on for ever.
   bool isPlusAt(DateTime now) =>
       admin || (active && (expiresAt == null || now.isBefore(expiresAt!)));
 
-  /// When YumSum+ last switched off: the stored end, or [expiresAt] once it
+  /// When YumSum Star last switched off: the stored end, or [expiresAt] once it
   /// has passed (a missed notice from Play, or a grant that ran out).
   DateTime? endedAt(DateTime now) =>
       _endedAt ??

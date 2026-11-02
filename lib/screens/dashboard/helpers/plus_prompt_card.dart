@@ -8,10 +8,10 @@ import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 
-/// When the YumSum+ card on Today was hidden until, in milliseconds.
+/// When the YumSum Star card on Today was hidden until, in milliseconds.
 const plusPromptHiddenKey = 'plus.prompt_hidden_until';
 
-/// Today's card for people without YumSum+: what it adds, opening its page.
+/// Today's card for people without YumSum Star: what it adds, opening its page.
 /// Its cross hides it for two weeks. It brings the gap below it, so nothing
 /// is left behind when it's hidden.
 class PlusPromptCard extends ConsumerStatefulWidget {

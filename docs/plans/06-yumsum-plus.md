@@ -1,10 +1,10 @@
-# Plan 6: YumSum+
+# Plan 6: YumSum Star
 
 *Written 2 November 2026. Status: planned, not built. You agreed the contents on 1–2 November. Each big feature has its own plan (07–10). This one holds the decisions they all share, the two small features, and the order of work.*
 
 ## The short version
 
-1. **YumSum+** (said "YumSum Plus") is the paid tier: **£2.99 a month or £17.99 a year**, with a **7-day free trial** of everything.
+1. **YumSum Star** is the paid tier: **£2.99 a month or £17.99 a year**, with a **7-day free trial** of everything.
 2. It pays for what costs money each time, or does thinking for you over weeks:
    - photo logging
    - more AI estimates
@@ -19,15 +19,12 @@
 
 ## The name
 
-**YumSum+**, written with the plus sign and said "YumSum Plus":
-- The "+" plays on the "Sum" in YumSum.
-- It looks premium as a wordmark, the way Disney+ and Apple TV+ do.
-- It's short enough for a badge on a button.
-- Plans 03 and 05 already called the tier "Plus".
+**YumSum Star**, chosen on 2 November 2026 over YumSum+, Pro, Max and Gold:
+- It's catchy, and no other calorie app uses it.
+- The tier has a mascot: the smiling star you made from the logo (`design/plus-star.png`), which sits beside its name in the menu and Account Settings. The logo's smiling bowl with the star (`design/plus-hero.png`) heads the YumSum Star page and the card on Today.
+- The wordmark is "YumSum Star" with "Star" in the icon's orange.
 
-In the code it is `plus` (`plusProvider`).
-
-If you'd rather have **YumSum Pro**, it's a wording change across the plans and the paywall, nothing more.
+In the code it is still `plus` (`plusProvider`, `PlusScreen`), from before it had a name, as the Dart package is still `lean_streak`.
 
 ## What's in it
 
@@ -79,14 +76,14 @@ Billing, the paywall and who counts as a subscriber are in `07-billing.md`.
 - **Free:**
   - 10 AI estimates a day, typed or by voice.
   - The **photo button stays in the bar** with a small "+" mark, so people know it exists. Tapping it opens the paywall with the trial.
-- **YumSum+:**
+- **YumSum Star:**
   - **30 AI estimates a day**, photos included.
   - The photo button works as it does today.
 - **On the website:**
   - The paywall says to subscribe in the Android app.
-  - A subscriber who signs in on the web gets everything, because YumSum+ belongs to the account, not the phone.
+  - A subscriber who signs in on the web gets everything, because YumSum Star belongs to the account, not the phone.
 - **The "N AI estimates left today" hint** works as now, against the person's own limit, once half is used.
-- **When a free user's 10 are gone,** the message says so and mentions YumSum+ once: "Today's 10 AI estimates are used up. Type the calories yourself, or get 30 a day with YumSum+."
+- **When a free user's 10 are gone,** the message says so and mentions YumSum Star once: "Today's 10 AI estimates are used up. Type the calories yourself, or get 30 a day with YumSum Star."
 
 ### Why 30, not 50
 
@@ -132,7 +129,7 @@ Everything below goes into the build your 12 testers get. The order puts first w
 
 | Step | What | Why then |
 |---|---|---|
-| 1 | **The YumSum+ switch** (plan 07, first part): the account's YumSum+ record, `plusProvider`, a manual grant you set in the Firebase console, and the paywall screen without real purchases | Every feature below needs it. The manual grant lets you and early testers use YumSum+ before Play billing exists. |
+| 1 | **The YumSum Star switch** (plan 07, first part): the account's YumSum Star record, `plusProvider`, a manual grant you set in the Firebase console, and the paywall screen without real purchases | Every feature below needs it. The manual grant lets you and early testers use YumSum Star before Play billing exists. |
 | 2 | **Weight trend line** (plan 08, free part) | Small, useful to everyone, and the Adaptive formula is built on it |
 | 3 | **Adaptive formula** (plan 08) | It needs weeks of your own weigh-ins and meals to prove, so it should start running on your phone first |
 | 4 | **Photo logging and the allowance** (this plan) | Small once step 1 exists |
@@ -140,17 +137,17 @@ Everything below goes into the build your 12 testers get. The order puts first w
 | 6 | **Full macros** (plan 10) | The biggest data change: new fields, a rules deploy, the 40 recipes' figures |
 | 7 | **Real Play billing** (plan 07, the rest) | Needs your ID check passed, the app created in Play Console and a payments profile, so it comes last. It must be in the closed-test build |
 
-Then the closed test. Each tester gets YumSum+ by a **manual grant** for the 14 days, because Play's test subscriptions stop after about half an hour (plan 07). All 12 also go on Play's licence-testing list, so the two or three you ask to try a purchase pay nothing. If billing isn't ready when the testers are, start the test with manual grants anyway: the 14 days are the longest wait.
+Then the closed test. Each tester gets YumSum Star by a **manual grant** for the 14 days, because Play's test subscriptions stop after about half an hour (plan 07). All 12 also go on Play's licence-testing list, so the two or three you ask to try a purchase pay nothing. If billing isn't ready when the testers are, start the test with manual grants anyway: the 14 days are the longest wait.
 
 ## How to tell it's working
 
 After launch, check once a month:
-- **Trials started and converted** (Play Console → Monetise → Subscriptions). Plan 03 says about 1 in 30 daily users on YumSum+ covers everyone's AI. A typical freemium app converts about 2% of downloads.
+- **Trials started and converted** (Play Console → Monetise → Subscriptions). Plan 03 says about 1 in 30 daily users on YumSum Star covers everyone's AI. A typical freemium app converts about 2% of downloads.
 - **AI cost per subscriber** on <https://aistudio.google.com/billing>, against the £1.06–£2.12 they leave you.
 - **Cancellation reasons.** Play asks people who cancel and shows the answers.
 - **Weigh-ins.** How many subscribers weigh in at least 3 times a week, since the Adaptive formula depends on it.
 
-## Not in YumSum+
+## Not in YumSum Star
 
 - **Fasting timers.** A different habit, more notifications, and free apps already do it well.
 - **Streaks and badges.** No pressure is part of what YumSum is.
@@ -160,15 +157,15 @@ After launch, check once a month:
 ## Risks
 
 - **People who pay expect polish.** Each feature gets tried on your phone before the closed test, not just in tests.
-- **Play approval can be slow.** Your ID check is still pending. The manual grant (step 1) means testers can try YumSum+ even if billing isn't ready, but purchases themselves must be tested before production.
+- **Play approval can be slow.** Your ID check is still pending. The manual grant (step 1) means testers can try YumSum Star even if billing isn't ready, but purchases themselves must be tested before production.
 - **Your address goes public** with a payments profile (plan 03). Decide before step 7.
-- **One subscription across the web and phones** depends on the account record being right. Plan 07 keeps it written by the server only, so a modified app can't grant itself YumSum+.
+- **One subscription across the web and phones** depends on the account record being right. Plan 07 keeps it written by the server only, so a modified app can't grant itself YumSum Star.
 
 ## Checklist
 
-- [ ] Keep the name **YumSum+**, or change it to YumSum Pro
-- [ ] (Claude) Step 1: YumSum+ switch, manual grant, paywall (plan 07)
-- [ ] (you) Grant yourself YumSum+ in the Firebase console (plan 07 explains how) and try every feature on the phone
+- [x] The name: **YumSum Star** (2 November)
+- [ ] (Claude) Step 1: YumSum Star switch, manual grant, paywall (plan 07)
+- [ ] (you) Grant yourself YumSum Star in the Firebase console (plan 07 explains how) and try every feature on the phone
 - [ ] (Claude) Steps 2–6, one at a time, each tried on your phone
 - [ ] (you) Once Google approves your account: create the app, payments profile, subscription and trial (plan 07)
 - [ ] (Claude) Step 7: real billing; (you) deploy the functions and test a purchase as a licence tester

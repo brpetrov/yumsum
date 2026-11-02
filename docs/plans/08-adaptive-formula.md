@@ -1,6 +1,6 @@
 # Plan 8: Adaptive formula
 
-*Written 2 November 2026. Status: planned, not built. A YumSum+ feature (plan 06), with a free weight trend line that can ship first. Every number below is a starting value. It was checked in a simulation of the rules (noisy daily weights, your own plan, and each bad case in the table), and gets tuned with your real data.*
+*Written 2 November 2026. Status: planned, not built. A YumSum Star feature (plan 06), with a free weight trend line that can ship first. Every number below is a starting value. It was checked in a simulation of the rules (noisy daily weights, your own plan, and each bad case in the table), and gets tuned with your real data.*
 
 ## The short version
 
@@ -207,7 +207,7 @@ Away from the minimum, this is simply **plan target + adjustment**, and the goal
 | **First open of the week on a phone with an empty offline cache** | It finds too little data, so no change that week. That's the safe side. |
 | **Maintain mode** | Works the same and keeps your weight steady. Simulated: someone burning 200 less than the formula reached −210 and stopped gaining. |
 | **Switching it off, then on** | Off: back to the plain plan at once. On: starts fresh at 0, learning from the recent weeks already logged. |
-| **YumSum+ ends** | Frozen for 2 weeks, then back to the plain plan (see What you see). |
+| **YumSum Star ends** | Frozen for 2 weeks, then back to the plain plan (see What you see). |
 | **"2,000 to 1,500 after one weigh-in"** | Impossible; see below. |
 
 ## Your plan, week by week
@@ -321,11 +321,11 @@ Buttons: **Got it**, and **Remind me each morning** on phones when the weigh-in 
 
 The weekly weigh-in reminder becomes **Weigh-in reminder**. Its day list gains **Every day** at the top, and its subtitle reads "Every day at 07:30" or "Saturdays at 20:00". The free default stays Saturday 20:00.
 
-### When YumSum+ ends
+### When YumSum Star ends
 
-- The adjustment stays frozen for **2 weeks** from `Entitlement.endedAt` (plan 07: set when YumSum+ switches off, cleared when it comes back, and falling back to `expiresAt` once that has passed). No Monday steps run meanwhile.
-- Play's grace period for failed payments keeps YumSum+ on, and with it the formula.
-- Today shows a one-time dialog (only if the adjustment isn't 0), titled **Your YumSum+ has ended**: "Your target goes back to your standard plan on 15 November." Button: Got it.
+- The adjustment stays frozen for **2 weeks** from `Entitlement.endedAt` (plan 07: set when YumSum Star switches off, cleared when it comes back, and falling back to `expiresAt` once that has passed). No Monday steps run meanwhile.
+- Play's grace period for failed payments keeps YumSum Star on, and with it the formula.
+- Today shows a one-time dialog (only if the adjustment isn't 0), titled **Your YumSum Star has ended**: "Your target goes back to your standard plan on 15 November." Button: Got it.
 - On that date the adjustment goes to 0 and the target returns to the formula. The switch shows off with the "+".
 - Your own switch setting is kept, so subscribing again turns it back on, starting fresh.
 
@@ -354,7 +354,7 @@ Kept minimal, in the code's own style. In order, each tried on your phone before
 
 | Field | Type, default | Meaning |
 |---|---|---|
-| `adaptiveOn` | bool, `true` | your switch (it only acts with YumSum+) |
+| `adaptiveOn` | bool, `true` | your switch (it only acts with YumSum Star) |
 | `adaptiveKcal` | int, `0` | the adjustment |
 | `adaptiveWeek` | String?, yyyy-MM-dd | the Monday last processed |
 | `adaptiveNote` | String? | that Monday's result: `learning`, `paused`, `few_weigh_ins`, `few_days`, `unusual`, `steady`, `first_sign`, `lowered`, `raised`, `off` |
@@ -548,7 +548,7 @@ Skipped unless `config/adaptive_replay.json` exists (add it to `.gitignore`). It
 ## Trying it on yourself
 
 **Before you start:**
-- Grant yourself YumSum+ (plan 07's manual grant). The switch is on by default.
+- Grant yourself YumSum Star (plan 07's manual grant). The switch is on by default.
 - Take "Remind me each morning" in the dialog.
 - Weigh in every morning after the toilet, before eating, and log everything as usual.
 
@@ -608,7 +608,7 @@ These go beyond what we agreed on 1–2 November, or change it slightly:
 - [ ] (Claude) Step 1, the trend line; (you) try it on the phone
 - [ ] (Claude) Steps 2–3 with their tests; deploy the rules
 - [ ] (Claude) Steps 4–7 and the widget tests
-- [ ] (you) Grant yourself YumSum+, switch on the morning reminder, weigh in daily for 6 weeks
+- [ ] (you) Grant yourself YumSum Star, switch on the morning reminder, weigh in daily for 6 weeks
 - [ ] (you) Each Monday, check the line, the sum and the debug log; copy the JSON into the replay file once a fortnight
 - [ ] (Claude) Tune the starting values from the replay, then update this plan and CLAUDE.md
 

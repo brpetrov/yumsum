@@ -64,7 +64,7 @@ class DebugScreen extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  'To give an account YumSum+ for real, add a document with '
+                  'To give an account YumSum Star for real, add a document with '
                   'this ID under entitlements in the Firebase console.',
                   style: muted,
                 ),
@@ -100,10 +100,10 @@ class DebugScreen extends ConsumerWidget {
                     await ref
                         .read(sharedPreferencesProvider)
                         .remove(plusPromptHiddenKey);
-                    say('The YumSum+ card is back on Today.');
+                    say('The YumSum Star card is back on Today.');
                   },
                   icon: const Icon(Icons.replay_rounded),
-                  label: const Text('Show the YumSum+ card again'),
+                  label: const Text('Show the YumSum Star card again'),
                 ),
               ],
             ),

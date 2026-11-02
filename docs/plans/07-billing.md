@@ -4,20 +4,20 @@
 
 ## The short version
 
-1. **YumSum+ is sold only in the Android app, through Google Play Billing** (the official `in_app_purchase` plugin), and checked by three small Cloud Functions of our own. No RevenueCat, so Google's 15% is the only fee. This replaces plan 03's RevenueCat recommendation; RevenueCat stays the fallback if the server side proves too much.
-2. **Whether someone has YumSum+ lives in one document per account that only the server writes**, `entitlements/{uid}`. The app reads it through `plusProvider`, so it works on the website (and a future iPhone app) for anyone who subscribed on Android. You can also write that document yourself in the Firebase console (a **manual grant**), so every YumSum+ feature can be built and tested before billing works.
+1. **YumSum Star is sold only in the Android app, through Google Play Billing** (the official `in_app_purchase` plugin), and checked by three small Cloud Functions of our own. No RevenueCat, so Google's 15% is the only fee. This replaces plan 03's RevenueCat recommendation; RevenueCat stays the fallback if the server side proves too much.
+2. **Whether someone has YumSum Star lives in one document per account that only the server writes**, `entitlements/{uid}`. The app reads it through `plusProvider`, so it works on the website (and a future iPhone app) for anyone who subscribed on Android. You can also write that document yourself in the Firebase console (a **manual grant**), so every YumSum Star feature can be built and tested before billing works.
 3. **The paywall is short and honest:** what you get, £2.99 a month or £17.99 a year, 7 days free once per Google account, "Cancel any time in Google Play".
-4. **Testers get YumSum+ by manual grant.** Play's test subscriptions renew every few minutes and stop after six renewals (about half an hour for monthly), so they can't cover a 14-day closed test. Testers try a purchase once; the grant covers the rest.
+4. **Testers get YumSum Star by manual grant.** Play's test subscriptions renew every few minutes and stop after six renewals (about half an hour for monthly), so they can't cover a 14-day closed test. Testers try a purchase once; the grant covers the rest.
 5. **Your steps start once Google approves your ID and the app exists:** payments profile (your address goes public), the subscription, a Pub/Sub topic, one deploy, access for the functions' service account, licence testers. Running costs stay inside Google's free allowances at this size.
 
 ## Decided (1–2 November 2026)
 
-- **YumSum+** (said "YumSum Plus"; `plus` in code) contains: photo logging, 30 AI estimates a day instead of 10, the Adaptive formula (`08-adaptive-formula.md`), the AI weekly review (`09-ai-weekly-review.md`), full macros (`10-full-macros.md`), and later "What should I eat?" (`05-recipes.md`). The gates are in `06-yumsum-plus.md`; this plan gives them `plusProvider` to read and a paywall to open.
+- **YumSum Star** (`plus` in code) contains: photo logging, 30 AI estimates a day instead of 10, the Adaptive formula (`08-adaptive-formula.md`), the AI weekly review (`09-ai-weekly-review.md`), full macros (`10-full-macros.md`), and later "What should I eat?" (`05-recipes.md`). The gates are in `06-yumsum-plus.md`; this plan gives them `plusProvider` to read and a paywall to open.
 - **One subscription, `yumsum_plus`**, with two auto-renewing base plans, `monthly` (£2.99) and `annual` (£17.99), each with a 7-day free trial offer.
 - **Bought only in the Android app.** The website's paywall says to subscribe in the Android app.
 - **Google Play Billing with our own functions; no RevenueCat**, to keep third-party fees at zero.
-- **When YumSum+ ends,** the Adaptive formula keeps its last value for 2 more weeks with a notice, then switches off (plan 08). The entitlement records when it ended. Play's grace period for failed payments keeps everything on meanwhile.
-- **All of YumSum+ is in the first closed test**, with every tester on Play's licence-testing list so any purchase they make is a free test purchase.
+- **When YumSum Star ends,** the Adaptive formula keeps its last value for 2 more weeks with a notice, then switches off (plan 08). The entitlement records when it ended. Play's grace period for failed payments keeps everything on meanwhile.
+- **All of YumSum Star is in the first closed test**, with every tester on Play's licence-testing list so any purchase they make is a free test purchase.
 
 ## What Google currently requires
 
@@ -26,7 +26,7 @@
 - **Acknowledge every new subscription within 3 days,** or Google refunds it and takes it back. Renewals need no acknowledgement. Google recommends doing it on the server, which is what `verifyPurchase` does.
 - **Free trials:** Play only returns the offers a person is eligible for, so the paywall shows "7 days free" only to someone who can have it. Trials can run from 3 days to 3 years.
 
-## Who has YumSum+: the entitlement document
+## Who has YumSum Star: the entitlement document
 
 **Where:** a top-level collection, `entitlements/{uid}`, not the profile and not under `users/{uid}`.
 
@@ -47,13 +47,13 @@ No write rule, so only the functions (which bypass the rules) can write it. `pla
 
 | Field | Type | Meaning |
 |---|---|---|
-| `active` | boolean | Play (or your grant) gives YumSum+ now |
+| `active` | boolean | Play (or your grant) gives YumSum Star now |
 | `expiresAt` | timestamp, optional | End of the paid period or the trial. Play pushes it on during a grace period. Left out on a manual grant with no end |
 | `inTrial` | boolean | In the 7 free days |
 | `productId` | text | `yumsum_plus` |
 | `basePlan` | text | `monthly` or `annual` |
 | `state` | text | `active`, `grace`, `cancelled`, `hold`, `paused`, `pending` or `expired`, for the Account Settings row |
-| `endedAt` | timestamp, optional | When YumSum+ last switched off; cleared when it comes back. Plan 08 counts its 2 weeks from here |
+| `endedAt` | timestamp, optional | When YumSum Star last switched off; cleared when it comes back. Plan 08 counts its 2 weeks from here |
 | `source` | text | `play` or `manual` |
 | `purchaseId` | text | The current Play purchase, as a SHA-256 of its token (Play only) |
 | `updatedAt` | timestamp | Last write |
@@ -62,14 +62,14 @@ No write rule, so only the functions (which bypass the rules) can write it. `pla
 
 ### Manual grants
 
-You can switch YumSum+ on for anyone by hand. Firebase console → Firestore → `entitlements` (Start collection the first time) → Add document:
+You can switch YumSum Star on for anyone by hand. Firebase console → Firestore → `entitlements` (Start collection the first time) → Add document:
 
 - **Document ID:** the person's User UID, from Authentication → Users (search by email).
 - **Fields:** `active` (boolean, true), `source` (string, `manual`), and `expiresAt` (timestamp) if it should end. Leave the rest out.
 
 It takes effect within seconds, on the phone and the website. Delete the document to take it away.
 
-**Your own account** also gets `admin` (boolean, true): YumSum+ for good, no daily AI limit and no limit on changing past days. A debug build has **Debug tools** in the menu, which shows your User ID to copy and can pretend to be a free, subscribed, trial, ended or admin account on that phone only. (Built 2 November.)
+**Your own account** also gets `admin` (boolean, true): YumSum Star for good, no daily AI limit and no limit on changing past days. A debug build has **Debug tools** in the menu, which shows your User ID to copy and can pretend to be a free, subscribed, trial, ended or admin account on that phone only. (Built 2 November.)
 
 **A live manual grant wins:** the functions never overwrite a `manual` document that is still active and unexpired; they only record the purchase in `playPurchases`. To try a real purchase on an account that has a grant, delete the grant first.
 
@@ -91,7 +91,7 @@ It takes effect within seconds, on the phone and the website. Delete the documen
 ### `plusProvider`
 
 ```dart
-/// Whether the signed-in account has YumSum+ now. False while loading,
+/// Whether the signed-in account has YumSum Star now. False while loading,
 /// so a gate never flashes open.
 final plusProvider = StreamProvider.autoDispose<bool>((ref) {
   final uid = ref.watch(currentUidProvider);
@@ -103,7 +103,7 @@ final plusProvider = StreamProvider.autoDispose<bool>((ref) {
 });
 ```
 
-- `isPlusAt` is `active` and (`expiresAt` missing or still ahead). Checking the date on the device as well means a missed notification from Play can't leave YumSum+ on for ever.
+- `isPlusAt` is `active` and (`expiresAt` missing or still ahead). Checking the date on the device as well means a missed notification from Play can't leave YumSum Star on for ever.
 - Gates read it as `ref.watch(plusProvider).valueOrNull ?? false`. A subscriber sees the locked look for a moment at start-up, while the document loads.
 - `entitlementProvider` (`StreamProvider.autoDispose<Entitlement?>`) gives the details (state, dates, plan) to Account Settings, the paywall and plan 08. `Entitlement.endedAt` returns the stored `endedAt`, or `expiresAt` once that has passed, which covers a missed notification and an expired manual grant.
 - **In tests** (which never touch Firebase): `plusProvider.overrideWith((ref) => Stream.value(true))`, and `entitlementProvider.overrideWith(...)` with a ready-made `Entitlement` where the screen shows details. The paywall's tests also override `billingServiceProvider` and `billingRepositoryProvider` with fakes.
@@ -114,24 +114,26 @@ final plusProvider = StreamProvider.autoDispose<bool>((ref) {
 2. **Buy:** `buyNonConsumable` with a `GooglePlayPurchaseParam` for the chosen plan or trial offer, and `applicationUserName` set to the SHA-256 of the user's uid (64 characters, Play's limit). Play uses it to spot fraud, and Google asks for a hash rather than a raw account ID.
 3. **Listen:** `plusPurchaseControllerProvider` listens to `purchaseStream` for the whole life of the app (Android only), started from `LeanStreakApp` beside `reminderSyncProvider`, as the plugin asks.
    - `purchased` or `restored`: show "Checking with Google Play", send the token (`verificationData.serverVerificationData`) to `verifyPurchase`, then call `completePurchase`. The server has already acknowledged by then; the app ignores the plugin's answer, because I couldn't confirm what Play says to a second acknowledgement.
-   - `pending`: "Google Play is waiting for your payment. YumSum+ switches on once it goes through." Nothing is granted. Google says pending payments apply to prepaid plans, so with auto-renewing plans this should be rare.
+   - `pending`: "Google Play is waiting for your payment. YumSum Star switches on once it goes through." Nothing is granted. Google says pending payments apply to prepaid plans, so with auto-renewing plans this should be rare.
    - `canceled` (the person closed Play's sheet): nothing.
    - `error`: the message below. "Already owned" runs a restore instead.
-4. **Show the result:** the entitlement document changes, `plusProvider` turns true, and the paywall closes with "YumSum+ is on." (with a trial: "YumSum+ is on. Your free week ends on 9 November.").
+4. **Show the result:** the entitlement document changes, `plusProvider` turns true, and the paywall closes with "YumSum Star is on." (with a trial: "YumSum Star is on. Your free week ends on 9 November.").
 
 ### Restoring and catching up
 
 - **Restore purchase** on the paywall calls `restorePurchases()`, and each active purchase it finds goes to `verifyPurchase`.
-- **At start-up** on Android, signed in and without YumSum+, the app restores quietly once. This picks up a purchase whose check never finished (the app was closed straight after paying, or the phone lost signal), within Play's 3 days. Errors stay silent here.
+- **At start-up** on Android, signed in and without YumSum Star, the app restores quietly once. This picks up a purchase whose check never finished (the app was closed straight after paying, or the phone lost signal), within Play's 3 days. Errors stay silent here.
 - **One subscription, one account:** a Play purchase belongs to the first YumSum account that checks it. Restoring it on another account says so. If the first account no longer exists, the purchase moves to the new one.
 
 ### The paywall
+
+*Built 2 November as a one-screen promo* (`lib/screens/plus/plus_screen.dart`): the smiling bowl with its star, "YumSum Star" and "Get more from every meal.", the five features in one line each, Yearly (£17.99, "Best value", "Half the monthly price") and Monthly (£2.99) tiles, the "Start 7 days free" button with the terms under it, and Restore purchase, Terms and Privacy. Until billing exists the prices are written in and the buttons show "Coming soon"; step C below loads Play's prices and starts the purchase. A screen under 760 px tall gets a smaller bowl and tighter rows, so it still fits without scrolling. The plan as first written follows.
 
 Route `/plus` (`AppRoutes.plus`, `PlusScreen`), pushed on top of the current page, so Back returns to it. Copy follows CLAUDE.md: British English, sentence case, no "Please", no exclamation marks.
 
 **On Android:**
 
-- **Heading:** "YumSum+". Under it: "Logging stays free. YumSum+ adds:"
+- **Heading:** "YumSum Star". Under it: "Logging stays free. YumSum Star adds:"
 - **One line each, with an icon:**
   - "Log a meal from a photo of your plate"
   - "30 AI estimates a day, instead of 10"
@@ -143,7 +145,7 @@ Route `/plus` (`AppRoutes.plus`, `PlusScreen`), pushed on top of the current pag
 - **Button:** "Start 7 days free" when the trial is offered, otherwise "Subscribe".
 - **Under the button, in readable type:** "Free until 9 November, then £17.99 a year. Renews every year until you cancel. Cancel any time in Google Play; cancel before 9 November and you pay nothing." Without a trial: "£2.99 a month. Renews every month until you cancel. Cancel any time in Google Play."
 - **At the bottom:** "Restore purchase", "Terms of use", "Privacy policy" (`LegalLinks`).
-- **Already on YumSum+:** the status from Account Settings, below, instead of the plans.
+- **Already on YumSum Star:** the status from Account Settings, below, instead of the plans.
 
 **Messages:**
 
@@ -152,11 +154,11 @@ Route `/plus` (`AppRoutes.plus`, `PlusScreen`), pushed on top of the current pag
 | Play can't be reached | "Could not reach Google Play. Check your connection and try again." |
 | The check fails | "Could not confirm your purchase. Try Restore purchase in a few minutes. If it still fails, Google Play refunds you automatically within 3 days." |
 | The purchase is on another account | "This Google Play subscription is linked to another YumSum account. Sign in with that account to use it." |
-| Restore finds nothing | "No YumSum+ subscription found on this Google account." |
+| Restore finds nothing | "No YumSum Star subscription found on this Google account." |
 
-**On the website:** the same heading and lines, then "Subscribe in the YumSum app for Android. YumSum+ then works here too, when you sign in with the same account." with a Google Play link once the app is public. No prices, because Play's local prices aren't available there.
+**On the website:** the same heading and lines, then "Subscribe in the YumSum app for Android. YumSum Star then works here too, when you sign in with the same account." with a Google Play link once the app is public. No prices, because Play's local prices aren't available there.
 
-**On an iPhone build:** "YumSum+ can't be bought on iPhone yet." Apple's rules don't let a UK app point people to another way to pay, so the iPhone version doesn't mention Android.
+**On an iPhone build:** "YumSum Star can't be bought on iPhone yet." Apple's rules don't let a UK app point people to another way to pay, so the iPhone version doesn't mention Android.
 
 **The UK's new subscription rules** (Digital Markets, Competition and Consumers Act; draft regulations laid on 19 October 2026, start expected January 2027) ask for the key facts together, just before purchase: the price, how often it's charged, when the trial ends and the first charge comes, and how to cancel. The text under the button does that, and Play's own purchase sheet is the final "Subscribe" step. Cancelling is in Google Play, online, in a few taps. Reminder notices are the open question; see Risks.
 
@@ -168,13 +170,13 @@ Every entry point calls `showPlusPaywall(context)`. Each belongs to its own plan
 - **Plan Settings' Adaptive formula switch** (plan 08).
 - **The locked weekly review line** in History (plan 09).
 - **Macros** (plan 10).
-- **Account Settings' "YumSum+" row**, below.
+- **Account Settings' "YumSum Star" row**, below.
 
-Also, as you decided on 2 November: a **YumSum+ row in the menu** for everyone, with the orange badge, and a **YumSum+ card on Today** for people without it, which its cross hides for two weeks. No pop-up at start. (Built.)
+Also, as you decided on 2 November: a **YumSum Star row in the menu** for everyone, with the orange badge, and a **YumSum Star card on Today** for people without it, which its cross hides for two weeks. No pop-up at start. (Built.)
 
 ### Account Settings
 
-A new section, `YUMSUM+`, above Help & legal in `account_settings_screen.dart`: one row, "YumSum+", whose second line follows the state:
+A new section, `YUMSUM+`, above Help & legal in `account_settings_screen.dart`: one row, "YumSum Star", whose second line follows the state:
 
 | State | Second line | Tap |
 |---|---|---|
@@ -182,15 +184,15 @@ A new section, `YUMSUM+`, above Help & legal in `account_settings_screen.dart`: 
 | Trial | "Free trial until 9 November" | Manage in Google Play |
 | Active | "Renews on 3 December" | Manage in Google Play |
 | Cancelled | "Ends on 3 December" | Manage in Google Play |
-| Grace | "Payment problem. Fix it in Google Play to keep YumSum+." | Manage in Google Play |
+| Grace | "Payment problem. Fix it in Google Play to keep YumSum Star." | Manage in Google Play |
 | Hold | "Off until the payment problem is fixed in Google Play" | Manage in Google Play |
 | Manual | "On until 16 November", or "On" | Nothing |
 
 Manage in Google Play opens `https://play.google.com/store/account/subscriptions?sku=yumsum_plus&package=com.bpetrov.yumsum`, which also works from the website.
 
-**Delete account:** while a Play subscription is renewing (`source` play, state not cancelled or expired), the delete dialog adds one line: "Deleting your account doesn't cancel YumSum+. Cancel it in Google Play first, or it keeps renewing." Play's account-deletion rules also ask that the deletion web page (plan 04) says to cancel subscriptions first.
+**Delete account:** while a Play subscription is renewing (`source` play, state not cancelled or expired), the delete dialog adds one line: "Deleting your account doesn't cancel YumSum Star. Cancel it in Google Play first, or it keeps renewing." Play's account-deletion rules also ask that the deletion web page (plan 04) says to cancel subscriptions first.
 
-**Deleting the entitlement:** the app can't delete a server-only document, so `AccountController.deleteAccount` calls `deleteBillingData` straight after re-authentication, before `AccountRepository.deleteAccountData`. If that call fails, nothing has been deleted yet and the usual "Could not delete your account." shows. Reset all data leaves YumSum+ alone.
+**Deleting the entitlement:** the app can't delete a server-only document, so `AccountController.deleteAccount` calls `deleteBillingData` straight after re-authentication, before `AccountRepository.deleteAccountData`. If that call fails, nothing has been deleted yet and the usual "Could not delete your account." shows. Reset all data leaves YumSum Star alone.
 
 ## The server: Cloud Functions
 
@@ -210,7 +212,7 @@ App Check enforced (`enforceAppCheck: true`) and signed-in only. Takes `{purchas
 2. Link it in a transaction on `playPurchases/{sha256(token)}`. If it's already linked to another account that still exists, refuse with "already linked". A link to a deleted account moves to this one.
 3. Write `entitlements/{uid}` from `entitlementFrom()` (unless a live manual grant is there), with this purchase as `purchaseId`.
 4. If Play says `ACKNOWLEDGEMENT_STATE_PENDING` and the state is active or in grace, acknowledge with `purchases.subscriptions.acknowledge`. An "already acknowledged" answer is fine.
-5. Return whether YumSum+ is on, so the paywall can say so.
+5. Return whether YumSum Star is on, so the paywall can say so.
 
 **From Play's state to the document:**
 
@@ -234,7 +236,7 @@ Triggered by Play's Real-time Developer Notifications on the topic `play-billing
 1. Decode the message. Ignore any other package. Log and stop on a `testNotification` (Play Console's "Send test message").
 2. Take the token from `subscriptionNotification` (renewed, cancelled, in grace, on hold, recovered, restarted, expired, revoked and the rest), or from `voidedPurchaseNotification` when `productType` is 1 (a refunded subscription).
 3. Find the account in `playPurchases`. A token it doesn't know is followed back through `linkedPurchaseToken` (a plan change) or `outOfAppPurchaseContext.expiredPurchaseToken` (resubscribing in the Play Store after expiry). If it's still unknown, log and stop: the app links it on its next start.
-4. Read the purchase with `subscriptionsv2.get`, write the entitlement (only if this purchase is the account's current `purchaseId` or newer, so a late "expired" for a replaced purchase doesn't switch YumSum+ off), and acknowledge if Play says it's still pending.
+4. Read the purchase with `subscriptionsv2.get`, write the entitlement (only if this purchase is the account's current `purchaseId` or newer, so a late "expired" for a replaced purchase doesn't switch YumSum Star off), and acknowledge if Play says it's still pending.
 
 Anything permanent (an unknown token, another app) returns normally so Pub/Sub doesn't retry it for days. Chargeback reviews (`pendingRefundReviewNotification`, which Google asks you to answer within 24 hours) are only logged for now; at this size they should be rare.
 
@@ -283,14 +285,14 @@ App Check enforced, signed-in only. Deletes `entitlements/{uid}` and the caller'
 **Now (no Play Console needed)**
 
 1. **Decide about your address.** The payments profile shows your full address on the store listing (plan 03). PO boxes aren't accepted.
-2. **Once I've built step A below:** deploy the rules (`firebase deploy --only firestore:rules`), then give yourself a manual grant to try the YumSum+ features.
+2. **Once I've built step A below:** deploy the rules (`firebase deploy --only firestore:rules`), then give yourself a manual grant to try the YumSum Star features.
 
 **Once Google approves your ID and you've created the app (plan 04)**
 
 3. **Payments profile:** Play Console → Payments profile → Create payments profile.
 4. **Upload a build with billing** to Internal testing (Test and release → Testing → Internal testing), with just you as a tester. I'll build it; the plugin adds the billing permission. Play only lets you create subscriptions once a build with billing is uploaded.
 5. **Create the subscription:** Monetize with Play → Products → Subscriptions → Create subscription.
-   - Product ID `yumsum_plus` (it can never be changed or reused), name "YumSum+", and its benefits (photo logging, 30 AI estimates a day, Adaptive formula, AI weekly review).
+   - Product ID `yumsum_plus` (it can never be changed or reused), name "YumSum Star", and its benefits (photo logging, 30 AI estimates a day, Adaptive formula, AI weekly review).
    - Base plan `monthly`: auto-renewing, 1 month, £2.99. Base plan `annual`: auto-renewing, 1 year, £17.99. Let Play convert the other countries' prices, then check Bulgaria's in euros and round it to a tidy figure if you like.
    - On each base plan: **grace period 7 days**, account hold left at Play's automatic length (60 days minus the grace period), resubscribe on.
    - On each base plan, Add offer: `monthly-trial` and `annual-trial`, eligibility **New customer acquisition → Never had this subscription**, one phase: **Free trial, 7 days**.
@@ -304,10 +306,10 @@ App Check enforced, signed-in only. Deletes `entitlements/{uid}` and the caller'
 12. **Try it yourself** with the phone checklist below.
 13. **Closed test:** the same build (or newer) to Closed testing with the 12 testers. Once each has signed up, add their manual grant.
 14. **Legal pages:** I'll draft the changes; you deploy hosting (`tools/build_hosting.ps1`, then `firebase deploy --only hosting:app`).
-    - `tools/hosting/privacy.html`: a "Subscriptions" item under What we collect (Google Play takes the payment and we never see card details; we keep the subscription's status, plan, trial, renewal and end dates and Play's purchase reference, linked to your account, to switch YumSum+ on wherever you sign in); Google Play under Who else sees it; deleted with the account.
-    - `tools/hosting/terms.html`: a YumSum+ section (what's included, prices shown before you buy, the trial once per Google account, automatic renewal until cancelled in Google Play, YumSum+ stays until the end of the paid period, refunds through Google Play and your legal rights, deleting the account doesn't cancel it). "The service" currently says the app is free of charge; it becomes "YumSum is free to use; YumSum+ is an optional paid subscription."
+    - `tools/hosting/privacy.html`: a "Subscriptions" item under What we collect (Google Play takes the payment and we never see card details; we keep the subscription's status, plan, trial, renewal and end dates and Play's purchase reference, linked to your account, to switch YumSum Star on wherever you sign in); Google Play under Who else sees it; deleted with the account.
+    - `tools/hosting/terms.html`: a YumSum Star section (what's included, prices shown before you buy, the trial once per Google account, automatic renewal until cancelled in Google Play, YumSum Star stays until the end of the paid period, refunds through Google Play and your legal rights, deleting the account doesn't cancel it). "The service" currently says the app is free of charge; it becomes "YumSum is free to use; YumSum Star is an optional paid subscription."
 15. **Data safety form:** add Financial info → **Purchase history** (collected, not shared, for app functionality and account management). Google's own pages don't say whether Play's billing data needs declaring; billing services advise declaring it, and over-declaring is the safe side.
-16. **Store listing:** mention YumSum+ as optional in the full description. The "In-app purchases" label appears by itself.
+16. **Store listing:** mention YumSum Star as optional in the full description. The "In-app purchases" label appears by itself.
 
 ## Build order (for me)
 
@@ -333,7 +335,7 @@ Once built, CLAUDE.md gets the new collections, the functions and the deploy com
 - [ ] Paywall: both plans with "7 days free" and £ prices
 - [ ] Buy monthly with "Test card, always approves": "Checking with Google Play", then on. `entitlements/{uid}` shows `active`, `inTrial`, `monthly`. No refund email 5 minutes later (acknowledged)
 - [ ] About 3 minutes later the trial ends: a renewal arrives, `inTrial` false
-- [ ] The website, same account: YumSum+ features unlocked
+- [ ] The website, same account: YumSum Star features unlocked
 - [ ] Manage in Google Play → cancel: "Ends on …", still on; after expiry off, `endedAt` set, plan 08's notice shows
 - [ ] Reinstall, sign in: on again (start-up restore); Restore purchase also works
 - [ ] A second YumSum account on the same phone, Restore purchase: "linked to another YumSum account"
@@ -349,7 +351,7 @@ Once built, CLAUDE.md gets the new collections, the functions and the deploy com
 ## Risks
 
 - **More server work than RevenueCat.** About 200 lines of TypeScript plus Cloud set-up. If it proves too much, RevenueCat is the fallback (free until $2,500 a month of revenue, then 1%, plan 03); the entitlement document and `plusProvider` would stay, fed by RevenueCat's webhook instead.
-- **A missed notification leaves the document stale.** The expiry check on the device ends YumSum+ on time anyway, and the start-up restore puts it back on for someone Play says is still subscribed.
+- **A missed notification leaves the document stale.** The expiry check on the device ends YumSum Star on time anyway, and the start-up restore puts it back on for someone Play says is still subscribed.
 - **The UK subscription rules aren't final.** The draft regulations still need Parliament's approval, and I couldn't find whether Google (selling through Play) or you count as the trader. If reminder notices before a trial ends or a yearly renewal fall to you, they must be in writing that can be kept (email counts; an in-app message that can't be kept doesn't), and the app has no way to send email today. Recheck in December, when the guidance should be out.
 - **Your address goes public** with the payments profile (plan 03).
 - **Plan 06 is being written alongside this one.** If it reads `plusProvider` differently, one of the two changes before building.
@@ -388,7 +390,7 @@ Once built, CLAUDE.md gets the new collections, the functions and the deploy com
 - [ ] Closed test; manual grants for the testers
 - [ ] Privacy policy and terms deployed
 - [ ] Data safety: Purchase history
-- [ ] Store listing mentions YumSum+
+- [ ] Store listing mentions YumSum Star
 
 ## Sources
 

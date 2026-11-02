@@ -228,8 +228,8 @@ class AppDrawer extends ConsumerWidget {
   }
 }
 
-/// YumSum+ in the menu: the wordmark beside an orange badge, so it stands
-/// out from the plain pages.
+/// YumSum Star in the menu: its smiling star beside the wordmark, so it
+/// stands out from the plain pages.
 class _PlusMenuItem extends StatelessWidget {
   const _PlusMenuItem({required this.onTap});
 

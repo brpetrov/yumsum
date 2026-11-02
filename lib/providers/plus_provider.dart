@@ -10,7 +10,7 @@ final entitlementRepositoryProvider = Provider<EntitlementRepository>((ref) {
   return EntitlementRepository(FirebaseFirestore.instance);
 });
 
-/// The account's YumSum+ details (state, dates), or null if it never had it.
+/// The account's YumSum Star details (state, dates), or null if it never had it.
 /// A debug build can pretend to be another account (the debug tools).
 final entitlementProvider = StreamProvider.autoDispose<Entitlement?>((ref) {
   final pretend = ref.watch(debugAccountProvider);
@@ -22,14 +22,14 @@ final entitlementProvider = StreamProvider.autoDispose<Entitlement?>((ref) {
   return ref.watch(entitlementRepositoryProvider).watch(uid);
 });
 
-/// Whether the signed-in account has YumSum+ now. False while the record
+/// Whether the signed-in account has YumSum Star now. False while the record
 /// loads, so a gate never flashes open.
 final plusProvider = Provider.autoDispose<bool>((ref) {
   return ref.watch(entitlementProvider).valueOrNull?.isPlusAt(DateTime.now()) ??
       false;
 });
 
-/// The owner's account, which has every YumSum+ feature and no daily
+/// The owner's account, which has every YumSum Star feature and no daily
 /// limits. False until the record loads, so the limits hold meanwhile.
 final adminProvider = Provider.autoDispose<bool>((ref) {
   return ref.watch(entitlementProvider).valueOrNull?.admin ?? false;

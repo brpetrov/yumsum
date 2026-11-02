@@ -30,7 +30,7 @@ void main() {
     expect(managedInPlay(grant, _now), isFalse);
   });
 
-  test('YumSum+ ends at expiresAt, which then counts as the end', () {
+  test('YumSum Star ends at expiresAt, which then counts as the end', () {
     final grant = Entitlement.fromMap({
       'active': true,
       'source': 'manual',
@@ -71,7 +71,7 @@ void main() {
     );
     expect(
       plusStatusLine(_play(state: 'grace'), _now),
-      'Payment problem. Fix it in Google Play to keep YumSum+.',
+      'Payment problem. Fix it in Google Play to keep YumSum Star.',
     );
     final hold = _play(state: 'hold', active: false);
     expect(
@@ -82,7 +82,7 @@ void main() {
     expect(managedInPlay(hold, _now), isTrue);
   });
 
-  test('no record means no YumSum+', () {
+  test('no record means no YumSum Star', () {
     expect(
       plusStatusLine(null, _now),
       'Photo logging, 30 AI estimates a day and more',
@@ -90,7 +90,7 @@ void main() {
     expect(managedInPlay(null, _now), isFalse);
   });
 
-  test('admin is YumSum+ for good, whatever else the record says', () {
+  test('admin is YumSum Star for good, whatever else the record says', () {
     final admin = Entitlement.fromMap({'admin': true});
     expect(admin.isPlusAt(_later), isTrue);
     expect(

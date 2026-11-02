@@ -283,7 +283,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         ),
                       ],
                       SizedBox(height: 28),
-                      const _AccountSectionLabel('YUMSUM+'),
+                      const _AccountSectionLabel('YUMSUM STAR'),
                       const _PlusTile(),
                       SizedBox(height: 28),
                       const _AccountSectionLabel('HELP & LEGAL'),
@@ -393,7 +393,7 @@ class _AccountSectionLabel extends StatelessWidget {
   }
 }
 
-/// The account's YumSum+: what it adds (opening the YumSum+ page) until it
+/// The account's YumSum Star: what it adds (opening the YumSum Star page) until it
 /// has it, then its state, managed in Google Play for a subscription.
 class _PlusTile extends ConsumerWidget {
   const _PlusTile();

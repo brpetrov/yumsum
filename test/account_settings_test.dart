@@ -171,7 +171,7 @@ void main() {
     expect(controller.deletePasswords, ['']);
   });
 
-  testWidgets('Without YumSum+, its row opens the YumSum+ page', (
+  testWidgets('Without YumSum Star, its row opens the YumSum Star page', (
     tester,
   ) async {
     await pumpScreen(tester);
@@ -183,8 +183,7 @@ void main() {
 
     await tester.tap(find.byType(PlusMark));
     await tester.pumpAndSettle();
-    expect(find.text('Logging stays free. YumSum+ adds:'), findsOneWidget);
-    expect(find.text("YumSum+ isn't on sale yet."), findsOneWidget);
+    expect(find.text('Start 7 days free'), findsOneWidget);
   });
 
   testWidgets('A grant shows as on, with nothing to manage', (tester) async {
@@ -201,6 +200,6 @@ void main() {
 
     await tester.tap(find.byType(PlusMark));
     await tester.pumpAndSettle();
-    expect(find.text('Logging stays free. YumSum+ adds:'), findsNothing);
+    expect(find.text('Start 7 days free'), findsNothing);
   });
 }

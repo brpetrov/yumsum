@@ -7,37 +7,53 @@ import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
 
 void main() {
-  Future<void> pumpScreen(WidgetTester tester, Entitlement? entitlement) =>
-      tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            entitlementProvider.overrideWith(
-              (ref) => Stream.value(entitlement),
-            ),
-          ],
-          child: MaterialApp(theme: AppTheme.light, home: const PlusScreen()),
-        ),
-      );
-
-  testWidgets('lists what YumSum+ adds, not on sale yet', (tester) async {
-    await pumpScreen(tester, null);
+  Future<void> pumpScreen(WidgetTester tester, Entitlement? entitlement) async {
+    tester.view.physicalSize = const Size(390 * 3, 844 * 3);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
+        ],
+        child: MaterialApp(theme: AppTheme.light, home: const PlusScreen()),
+      ),
+    );
     await tester.pumpAndSettle();
-    expect(find.text('Logging stays free. YumSum+ adds:'), findsOneWidget);
-    expect(find.text('Log a meal from a photo of your plate'), findsOneWidget);
-    expect(find.textContaining('Adaptive formula'), findsOneWidget);
-    expect(find.text('YumSum+ isn\'t on sale yet.'), findsOneWidget);
+  }
+
+  testWidgets('offers the free week on both plans', (tester) async {
+    await pumpScreen(tester, null);
+    expect(find.text('Log meals from a photo of your plate'), findsOneWidget);
+    expect(find.text('£17.99'), findsOneWidget);
+    expect(find.text('Best value'), findsOneWidget);
+    expect(find.textContaining('then £17.99 a year'), findsOneWidget);
+    await tester.ensureVisible(find.text('Monthly'));
+    await tester.tap(find.text('Monthly'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('then £2.99 a month'), findsOneWidget);
   });
 
-  testWidgets('shows the account\'s own YumSum+ once it has it', (
+  testWidgets("it isn't on sale yet, so starting says so", (tester) async {
+    await pumpScreen(tester, null);
+    await tester.ensureVisible(find.text('Start 7 days free'));
+    await tester.tap(find.text('Start 7 days free'));
+    await tester.pumpAndSettle();
+    expect(find.text('Coming soon'), findsOneWidget);
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    expect(find.text('Coming soon'), findsNothing);
+  });
+
+  testWidgets("shows the account's own YumSum Star once it has it", (
     tester,
   ) async {
     await pumpScreen(
       tester,
       const Entitlement(active: true, source: EntitlementSource.manual),
     );
-    await tester.pumpAndSettle();
-    expect(find.text('Your YumSum+'), findsOneWidget);
+    expect(find.text('You have YumSum Star'), findsOneWidget);
     expect(find.text('On'), findsOneWidget);
-    expect(find.text('YumSum+ isn\'t on sale yet.'), findsNothing);
+    expect(find.text('Start 7 days free'), findsNothing);
   });
 }

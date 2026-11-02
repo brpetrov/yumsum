@@ -1,10 +1,10 @@
 # Plan 9: AI weekly review
 
-*Written 2 November 2026. Status: planned, not built. Part of YumSum+ (`06-yumsum-plus.md`, step 5 of the order of work). It depends on the YumSum+ switch and paywall (`07-billing.md`), and it reads one thing from the Adaptive formula (`08-adaptive-formula.md`).*
+*Written 2 November 2026. Status: planned, not built. Part of YumSum Star (`06-yumsum-plus.md`, step 5 of the order of work). It depends on the YumSum Star switch and paywall (`07-billing.md`), and it reads one thing from the Adaptive formula (`08-adaptive-formula.md`).*
 
 ## The short version
 
-1. **Every Monday, a YumSum+ user gets "What I noticed" in History:** at most 3 short notes on the finished Monday–Sunday week. It shows in the week view, above the existing review card.
+1. **Every Monday, a YumSum Star user gets "What I noticed" in History:** at most 3 short notes on the finished Monday–Sunday week. It shows in the week view, above the existing review card.
 2. **The app works out every fact and the AI only writes.** Averages, weekdays against the weekend, protein, the biggest day and the ideas for a tip are all worked out in Dart. The AI gets those facts as plain lines and turns a few of them into sentences. A note that uses a number not in the facts is thrown away before anyone sees it.
 3. **It's written when someone opens the week, then kept.** The notes are saved in `weekly_reviews/{Monday}` along with the facts they were written from. If the facts change (a meal edited, a day taken off), they're written again the next time the week is opened. Nothing is written for a week still in progress, or for a week with fewer than 4 logged days.
 4. **It costs about 0.1p a week per subscriber** (one Gemini 3.5 Flash-Lite call). It doesn't use the user's daily AI allowance.
@@ -48,12 +48,12 @@
 | Situation | What shows |
 |---|---|
 | Month view, or the week isn't finished | Nothing new |
-| Finished week, fewer than 4 days logged that aren't days off, YumSum+ | The card with one muted line: "Not enough logged this week for notes. They need 4 days logged, not counting days off." No AI call. |
+| Finished week, fewer than 4 days logged that aren't days off, YumSum Star | The card with one muted line: "Not enough logged this week for notes. They need 4 days logged, not counting days off." No AI call. |
 | Same, free | Nothing |
-| Finished week with enough logged, free | **Locked card:** the title with a small "+" mark like plan 06's photo button, and "Short notes on your week every Monday, with YumSum+." Tapping anywhere opens the paywall (plan 07). |
-| YumSum+, loading | The title, a small spinner and "Looking over your week" |
-| YumSum+, failed | "Could not get this week's notes. Try again." with a **Try again** text button, which reloads the notes |
-| YumSum+, done | Up to 3 notes and the footer |
+| Finished week with enough logged, free | **Locked card:** the title with a small "+" mark like plan 06's photo button, and "Short notes on your week every Monday, with YumSum Star." Tapping anywhere opens the paywall (plan 07). |
+| YumSum Star, loading | The title, a small spinner and "Looking over your week" |
+| YumSum Star, failed | "Could not get this week's notes. Try again." with a **Try again** text button, which reloads the notes |
+| YumSum Star, done | Up to 3 notes and the footer |
 
 - **Why 4 days:** with fewer, any "pattern" is mostly chance. The model tends to read too much into thin data, and the call would cost money to say very little. The existing review already treats about 4 days in 7 as a week's minimum (`_buildGuidance` in `PeriodReviewService`). Days off don't count towards the 4, because they aren't judged.
 - **Every failure shows the same line:** busy, paused, offline or a bad answer. `aiErrorMessage` talks about estimates ("Could not estimate calories", "type the calories yourself"), which is wrong here. The detail goes to the debug log.
@@ -61,11 +61,11 @@
 
 ### On Today
 
-Decided: **yes, one line, for YumSum+ users only.** History opens in the month view, so without a pointer most people would never find the week view, and your testers would only get one or two Mondays to notice it.
+Decided: **yes, one line, for YumSum Star users only.** History opens in the month view, so without a pointer most people would never find the week view, and your testers would only get one or two Mondays to notice it.
 
 - **What:** a slim tappable `AppCard` above the month card: the sparkle bubble, "What I noticed last week" and a chevron. It opens History in the week view on last week.
 - **When:**
-  - the user has YumSum+
+  - the user has YumSum Star
   - last week had at least 4 logged days that aren't days off
   - last week's notes haven't been shown yet
   
@@ -219,7 +219,7 @@ If nothing is left, the call counts as failed. The card shows the error and noth
 
 - **Retries:** `generateWithRetries` makes 3 attempts on server errors and lost connections, as for estimates. A busy minute (429) isn't retried; the user taps Try again.
 - **Not counted** towards the daily AI allowance: `WeeklyReviewService` never touches `AiUsageRepository`. It's one automatic call a week, not something the user asks for each time. Plan 06's per-user rate limit, App Check and the £3 spend cap still apply.
-- **Who can call it:** YumSum+ is checked on the phone (`plusProvider`), like the photo button in plan 06. A modified app could ask for notes without paying. The cost is a tenth of a penny a week, and App Check and the rate limit cap it.
+- **Who can call it:** YumSum Star is checked on the phone (`plusProvider`), like the photo button in plan 06. A modified app could ask for notes without paying. The cost is a tenth of a penny a week, and App Check and the rate limit cap it.
 - **Cost:** about 1,000 input tokens (the instruction about 550, the facts 300–500, the schema about 30) and about 300 output tokens, including minimal thinking.
   - That's about $0.0003 in and $0.0008 out, about **0.1p a week with VAT**.
   - About **0.5p a month per subscriber**, counting the odd rewrite after an edit, against the £1.06–£2.12 they leave you.
@@ -228,7 +228,7 @@ If nothing is left, the call counts as failed. The card shows the error and noth
 
 ## When it's written
 
-- **When it's opened, never on a timer:** when a YumSum+ user opens a finished week in the week view (or taps the Today line).
+- **When it's opened, never on a timer:** when a YumSum Star user opens a finished week in the week view (or taps the Today line).
   - Nothing is spent on weeks nobody looks at.
   - No server code is needed. A scheduled Cloud Function would have to redo the facts in another language.
 - **Never for a week still in progress.** The card isn't shown, and the provider returns no notes for a week whose Sunday isn't before today.
@@ -299,14 +299,14 @@ The user can write their own cache, but it only changes what they see themselves
 
 **Privacy page.** Add to the AI section of `tools/hosting/privacy.html`:
 
-> If you have YumSum+, opening a finished week in History sends a summary of that week to Google's Gemini API, which writes a few notes. The summary includes each day's calories and target, protein, the names of a few meals, how many times you weighed in, your plan's calorie minimum and any change the Adaptive formula made. Your name, email and weight aren't sent.
+> If you have YumSum Star, opening a finished week in History sends a summary of that week to Google's Gemini API, which writes a few notes. The summary includes each day's calories and target, protein, the names of a few meals, how many times you weighed in, your plan's calorie minimum and any change the Adaptive formula made. Your name, email and weight aren't sent.
 
 Then check that the Play Data safety answers still match (plan 04).
 
 ### CLAUDE.md lines to update
 
 - **Screens:**
-  - History: "for finished weeks in the week view, YumSum+ users get What I noticed (`WeeklyNotesCard`, plan 09)"
+  - History: "for finished weeks in the week view, YumSum Star users get What I noticed (`WeeklyNotesCard`, plan 09)"
   - Today: "`WeeklyNotesLine` above the month card until last week's notes have been seen"
   - `ReviewScreen` takes an optional `initialWeek` as `extra`
 - **Device settings:** add `weekly_review.seen`.
@@ -345,11 +345,11 @@ Then check that the Play Data safety answers still match (plan 04).
   - Nothing left counts as a failure.
   - The instruction mentions the minimum, medical advice and days off.
 - **`test/weekly_notes_test.dart` (new, widgets):**
-  - With YumSum+, the notes and footer show.
+  - With YumSum Star, the notes and footer show.
   - A free user gets the locked card, and a tap opens the paywall.
   - A thin week shows the line, and `weeklyReviewProvider` is never read (count the calls in the override).
   - An error shows the copy, and Try again reads again.
-  - Today's line: shown with YumSum+ and 4 judged days last week, hidden once `weekly_review.seen` is last Monday, hidden for free users.
+  - Today's line: shown with YumSum Star and 4 judged days last week, hidden once `weekly_review.seen` is last Monday, hidden for free users.
 - **`test/review_screen_test.dart`:**
   - The month view and the current week show no notes card.
   - `initialWeek` opens the week view on that week.
@@ -395,7 +395,7 @@ Then check that the Play Data safety answers still match (plan 04).
 - [ ] (Claude) Provider, `WeeklyNotesCard`, `WeeklyNotesLine`, `initialWeek`, widget tests
 - [ ] (Claude) Privacy page paragraph and CLAUDE.md lines
 - [ ] (you) `tools/build_hosting.ps1` and `firebase deploy --only hosting:app` for the privacy page
-- [ ] (you) On the phone with YumSum+ granted: page back through your own finished weeks. Read the "AI tokens" lines in the log, and check two `weekly_reviews` documents in the console against the notes
+- [ ] (you) On the phone with YumSum Star granted: page back through your own finished weeks. Read the "AI tokens" lines in the log, and check two `weekly_reviews` documents in the console against the notes
 
 ## Sources
 

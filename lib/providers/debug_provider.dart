@@ -4,14 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 
-/// Who a debug build pretends the account is, to try each YumSum+ state
+/// Who a debug build pretends the account is, to try each YumSum Star state
 /// without touching Firestore.
 enum DebugAccount {
   real('Your real account'),
   free('Free'),
-  plus('YumSum+'),
-  trialEnding('YumSum+ trial, ending in 2 days'),
-  ended('YumSum+ ended 3 days ago'),
+  plus('YumSum Star'),
+  trialEnding('YumSum Star trial, ending in 2 days'),
+  ended('YumSum Star ended 3 days ago'),
   admin('Admin');
 
   const DebugAccount(this.label);

@@ -90,7 +90,7 @@ void main() {
     expect(router.canPop(), isFalse);
   });
 
-  testWidgets('YumSum+ opens over the current page', (tester) async {
+  testWidgets('YumSum Star opens over the current page', (tester) async {
     await pumpAt(tester, AppRoutes.review);
     await tester.tap(find.byTooltip('Open navigation menu'));
     await tester.pumpAndSettle();
