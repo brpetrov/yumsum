@@ -154,20 +154,19 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
         else
           for (final MapEntry(key: category, value: shown)
               in sections.entries) ...[
-            // A heading per meal, unless one meal is picked above.
-            if (_category == null)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
-                  child: Text(
-                    category.label,
-                    style: AppTheme.display.copyWith(
-                      fontSize: 19,
-                      color: AppColors.textPrimary,
-                    ),
+            // A heading per meal, even when one meal is picked above.
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+                child: Text(
+                  category.label,
+                  style: AppTheme.display.copyWith(
+                    fontSize: 19,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ),
+            ),
             _grid(shown),
           ],
         // Clear of the phone's navigation bar at the end.

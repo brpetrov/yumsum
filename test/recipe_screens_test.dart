@@ -183,7 +183,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Overnight oats'), findsOneWidget);
       expect(find.text('Pasta bolognese'), findsNothing);
-      expect(find.text('Breakfast'), findsOneWidget);
+      // The chip and the heading, which stays for the picked meal.
+      expect(find.text('Breakfast'), findsNWidgets(2));
     });
 
     testWidgets('search filters the sections and says when nothing matches', (
