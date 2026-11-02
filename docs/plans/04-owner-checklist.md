@@ -18,6 +18,7 @@
   - [ ] Read through them and change anything you'd cook differently, then run the check again
   - [x] Codex made all 40 photos; Claude checked each against its recipe (1 November): 11 match
   - [x] Codex redid the other 29 from the plate descriptions under "Photo redo" in `docs/plans/05-recipes.md`; Claude checked them, all match (1 November)
+- [ ] **YumSum+**, the paid tier (planned 2 November 2026): the order of work and your steps are in `docs/plans/06-yumsum-plus.md`, the Play side in `docs/plans/07-billing.md`. It goes into the first closed test
   - [ ] `tools/build_hosting.ps1` and `firebase deploy --only hosting:app` (photos must be live before an app release that lists the recipes)
   - [ ] On the phone: menu → Recipes; a tile's + logs portions; a recipe page's Log a portion; type a recipe name in the bar for its chip
 
@@ -94,7 +95,7 @@ The app sends feedback to a Formspree form (formspree.io, signed up with help.yu
 
 - [ ] **Create the app**: Play Console → Create app → YumSum, App, Free.
 - [ ] **App content** forms (Claude can draft the answers): privacy policy https://yumsum.web.app/privacy, ads (none), app access (sign-in needed, so give Google a test email account with a password), content rating, target audience (18+), data safety, health apps, account deletion link.
-- [ ] **First closed test**: Claude builds the bundle; upload it under Test and release → Testing → Closed testing, accept Play App Signing, add the 12 testers, and send them the opt-in link.
+- [ ] **First closed test**: Claude builds the bundle; upload it under Test and release → Testing → Closed testing, accept Play App Signing, add the 12 testers, and send them the opt-in link. Add the same 12 to Settings → License testing too, and give each a YumSum+ manual grant so they can try it (`docs/plans/07-billing.md`).
 - [ ] Add the Play signing SHA-1 and SHA-256 (Test and release → App integrity → App signing) to **YumSum Android** in Firebase → Project settings (Google sign-in and App Check need them)
 - [ ] App Check → change **YumSum Android**'s provider from Fraud Defense (the website's reCAPTCHA key, registered by mistake) to **Play Integrity**, and link the Cloud project `lean-streak-project` under App integrity → Play Integrity API in Play Console. Without this, AI fails in Play installs.
 - [ ] After 14 days with 12 testers: Play Console → Dashboard → **Apply for production**.

@@ -8,7 +8,7 @@
 - **Logging is the point.** Every tile has a round **+** that logs portions straight away, and the recipe page has a **Log a portion** button. Both ask how many portions, in halves from ½ to 10, then log the meal for today with the recipe's own protein, so no AI is used. More than one portion is logged as "Pasta bolognese × 1.5", so the day's list explains the calories.
 - **Cooked recently**, at the top of the page: recipes logged in the last two weeks, one tap to log another portion. Nothing extra is stored; it's worked out from the meals.
 - **In the quick-log bar,** typing a recipe's name offers it as a chip with a book icon, beside the user's own meals. The user's own meals keep at least two of the three places, and a matching recipe always gets one. With nothing typed, recipes never appear.
-- **The library is free; the AI is Plus.** The library costs nothing per use. "What should I eat?" (below) is the Plus feature, added once billing exists.
+- **The library is free; the AI is YumSum+.** The library costs nothing per use. "What should I eat?" (below) is a YumSum+ feature, added once billing exists (`06-yumsum-plus.md`).
 
 ## Where things live
 
@@ -156,10 +156,10 @@ Use the same prompt for every photo, changing only the dish name:
 
 For drinks or bowls, swap "plated on a plain matte cream ceramic plate" for "in a plain matte cream ceramic bowl" or "in a clear glass", and keep everything else the same.
 
-## Later: "What should I eat?" (Plus)
+## Later: "What should I eat?" (YumSum+)
 
 - One AI call returns three dishes that fit what's left today (calories and protein), in the same format as the library, so they open on the same recipe page and log the same way. An optional one-line wish box: "something with chicken", "vegetarian", "quick".
-- About 0.25p a call. A daily user would cost about 8p a month, against the £2.12 kept from a £2.99 Plus.
-- Hidden until Plus billing exists, so nothing is given away and taken back later. Billing would go through Play billing with a small Cloud Function and no other services, to keep fees down.
+- About 0.25p a call. A daily user would cost about 8p a month, against the £2.12 kept from a £2.99 YumSum+ month.
+- Hidden until YumSum+ exists, so nothing is given away and taken back later. Billing goes through Play billing with our own Cloud Functions and no other services, to keep fees down (`07-billing.md`).
 - In the code: the recipe page already accepts a recipe that isn't in the library, and a missing photo already shows the plain box.
-- Other Plus ideas, not planned: **Plan my week** (seven dinners from the library that fit the target, with a shopping list, and no AI cost), Save for later, a restaurant-menu photo, a weekly check-in.
+- Other YumSum+ ideas, not planned: **Plan my week** (seven dinners from the library that fit the target, with a shopping list, and no AI cost), Save for later, a restaurant-menu photo. (The weekly check-in idea became the Adaptive formula and the AI weekly review, plans 08 and 09.)

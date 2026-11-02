@@ -6,13 +6,13 @@
 
 1. **The free AI tier can't be used for the public launch.** Google's Gemini API terms say: *"You may use only Paid Services when making API Clients available to users in the European Economic Area, Switzerland, or the United Kingdom."* LeanStreak's users are in the UK and Bulgaria, so the Firebase project has to move to the paid **Blaze** plan before launch. That's a legal requirement, not just a capacity problem.
 2. **The paid tier is cheap per person.** It's about **£0.07 a month for someone who uses AI three times a day, every day**, and most entries (typed numbers, barcodes, chips) use no AI at all.
-3. **Costs grow with users, so the app has to earn something once it's popular.** The fair way: **logging stays free forever, and only the AI, which costs real money each time, gets a free daily allowance with a cheap "Plus" for more.** No banner ads.
+3. **Costs grow with users, so the app has to earn something once it's popular.** The fair way: **logging stays free forever, and only the AI, which costs real money each time, gets a free daily allowance with a cheap YumSum+ for more.** No banner ads.
 
 ## Decided (24 October 2026)
 
 - **No ads**, not even in the free version.
 - **10 free AI estimates a day** (typed, voice and photo together), down from 20.
-- **Paying for more comes later, not at launch.** The options to choose from then: Plus (a subscription), a "protein bar" one-off top-up of AI estimates, or a protein-bar tip. Inside the Play app any of these must go through Google Play's billing. A Buy Me a Coffee link is fine on the website, but Play's payments policy doesn't allow one in the app.
+- **Paying for more comes later, not at launch.** The options to choose from then: YumSum+ (a subscription), a "protein bar" one-off top-up of AI estimates, or a protein-bar tip. Inside the Play app any of these must go through Google Play's billing. A Buy Me a Coffee link is fine on the website, but Play's payments policy doesn't allow one in the app.
 - Contributing to Open Food Facts can wait until after launch. It stays hidden until the app has an account.
 
 ## Where things stood on 23 October
@@ -59,7 +59,7 @@ Google adds **20% UK VAT**, and you pay in pounds. These figures assume about 40
 3. **Lower the per-user rate limit** from 100 to about **10 requests a minute**. Google Cloud console → Quotas & System Limits → "Generate content requests per user".
 4. **Count every AI call.** *Done 24 October:* voice notes now count, and the mic says so before recording once the allowance is used up. The automatic protein estimate on saving a meal still doesn't count: it costs about a fifth of an estimate and comes with saving, so counting it would use up the allowance without the user asking for AI.
 
-   *Not done: tightening the Firestore rules on the counter.* A rule can't make it tamper-proof. Deleting the day's document resets it, and deleting an account needs that delete to work. Changing the phone's date also starts a fresh day. The counter is a fair limit for ordinary use. The real protection is App Check (only the genuine app can call the AI), the per-user rate limit and the spend cap. A tamper-proof allowance needs a small server function, which comes with Plus.
+   *Not done: tightening the Firestore rules on the counter.* A rule can't make it tamper-proof. Deleting the day's document resets it, and deleting an account needs that delete to work. Changing the phone's date also starts a fresh day. The counter is a fair limit for ordinary use. The real protection is App Check (only the genuine app can call the AI), the per-user rate limit and the spend cap. A tamper-proof allowance needs a small server function, which comes with YumSum+.
 5. **Clearer messages.** *Done 24 October:*
    - "The AI is busy right now. Try again in a minute." for quota and 429 errors, which on the paid tier are per-minute limits. They aren't retried automatically, because a per-user minute limit doesn't clear in a few seconds.
    - "Today's 10 AI estimates are used up…" only for the daily allowance
@@ -77,7 +77,7 @@ With all of that, **100 daily users cost about £5–£7 a month**, and nothing 
 What's fair to users:
 - **Free for ever:** typing meals and numbers, barcode scanning, food search, recent and usual meals, history, weight, reminders, Day off, contributing to Open Food Facts.
 - **Metered, because each use costs money:** AI estimates (typed, voice, photo). Everyone gets a **free daily allowance**, for example 10 a day, plenty for normal use.
-- **Plus, for people who want more:** more AI each day, and the "smart" features as they arrive: adaptive calorie target, Patterns, weekly recap.
+- **YumSum+, for people who want more:** decided on 2 November 2026; see `06-yumsum-plus.md`. Photo logging, 30 AI estimates a day, the Adaptive formula, the AI weekly review and full macros, at £2.99 a month or £17.99 a year with a 7-day trial.
 
 Nothing a free user relies on is ever taken away or hidden behind a paywall later. That's the difference from the apps people complain about: MyFitnessPal moved its barcode scanner behind Premium in 2022.
 
@@ -85,23 +85,23 @@ Nothing a free user relies on is ever taken away or hidden behind a paywall late
 
 | Option | What it earns | Verdict |
 |---|---|---|
-| **Plus subscription** at about **£2.99 a month or £17.99 a year** | You keep 85% after Play's fee, and Google handles VAT. So £2.99 a month is about **£2.12** to you, enough to pay for about 30 daily users' AI at 3 calls a day. | **Recommended.** Competitors charge £10.99–£15.99 a month; a cheap, honest Plus stands out. |
+| **YumSum+ subscription** at about **£2.99 a month or £17.99 a year** | You keep 85% after Play's fee, and Google handles VAT. So £2.99 a month is about **£2.12** to you, enough to pay for about 30 daily users' AI at 3 calls a day. | **Recommended.** Competitors charge £10.99–£15.99 a month; a cheap, honest YumSum+ stands out. |
 | **Rewarded ad, opt-in** ("watch a short ad for 5 more AI estimates today") | About 0.4–0.8p per view, enough for 4–9 AI calls | **Optional extra** for free users who run out. Never forced. |
 | **Banner ads** | About $0.04–$0.15 per daily user a month | **Not recommended.** It barely covers AI, ads are the top complaint in calorie-app reviews, Play forbids ads where people usually tap (next to the log bar), and it needs a consent pop-up and extra Data safety entries. |
 | **Interstitial (full-screen) ads** | More money | **No.** It interrupts logging, which is exactly what people hate. |
-| **Lifetime unlock** | One-off | **Not on its own.** The AI keeps costing money every month, so a one-off sale can't cover it for ever. A "lifetime Plus" with a fair-use AI cap could come later. |
+| **Lifetime unlock** | One-off | **Not on its own.** The AI keeps costing money every month, so a one-off sale can't cover it for ever. A lifetime YumSum+ with a fair-use AI cap could come later. |
 | **Tip jar** ("buy me a protein bar", £2.49) | Small, but goodwill | **Fine** as a Play Billing purchase. A Ko-fi link breaks Play's payment rules. |
 | **Bring your own AI key** | £0 cost to you | **No.** Gemini's terms are for developers, not consumers, and it's confusing. |
 
-### When to switch Plus on
+### When to switch YumSum+ on
 
-At launch, pay the AI yourself (Step A keeps it to a few pounds). Add Plus when **AI costs pass about £20 a month**, or around **300 daily users**.
+*Changed 2 November 2026:* YumSum+ goes into the first closed test, so the testers can try it (`06-yumsum-plus.md`). Until it does, you pay the AI yourself (Step A keeps it to a few pounds).
 
-To cover everyone's AI, roughly **1 in 30 daily users (about 3%)** needs to be on Plus at £2.99, if they all use AI three times a day; fewer if many just type numbers or scan. A typical freemium app converts about 2% of downloads (RevenueCat's 2025 median), so this is realistic but not guaranteed. Adjusting the free allowance (say 10 down to 7 a day) is the lever if it isn't.
+To cover everyone's AI, roughly **1 in 30 daily users (about 3%)** needs to be on YumSum+ at £2.99, if they all use AI three times a day; fewer if many just type numbers or scan. A typical freemium app converts about 2% of downloads (RevenueCat's 2025 median), so this is realistic but not guaranteed. Adjusting the free allowance (say 10 down to 7 a day) is the lever if it isn't.
 
-### Building Plus (when it's time)
+### Building YumSum+
 
-- **Play Billing through RevenueCat:** free until you earn $2,500 a month, then 1%. It handles receipts and "is this person subscribed?" without you running a server.
+- **Play Billing with our own Cloud Functions,** not RevenueCat, to keep third-party fees out (decided 31 October; how it works is in `07-billing.md`). RevenueCat stays the fallback: free until you earn $2,500 a month, then 1%.
 - A **paywall screen** that is honest and short: what you get, the price, "cancel any time in Google Play".
 - The AI allowance checks the subscription. Proper enforcement then moves server-side with a small Cloud Function, which is available on Blaze.
 - Play's fee: 10% plus a 5% billing fee, so **15%** for subscriptions and one-off purchases while you earn under $1M a year. You may need to enrol for the reduced rate in Play Console.
@@ -110,7 +110,7 @@ To cover everyone's AI, roughly **1 in 30 daily users (about 3%)** needs to be o
 
 - **Up to £1,000 a year** of income is covered by the **trading allowance**: no need to tell HMRC, but keep records. Above that, register for **Self Assessment by 5 October** after the tax year. You then choose either the £1,000 allowance or your actual costs (AI, domain, Play fee), not both.
 - **VAT:** Google charges and pays VAT on Play sales in the UK and EU, so you don't. You'd only register for VAT yourself above £90,000 a year.
-- **Your address goes public once you charge money on Play.** A personal account then shows your **full address** on the store listing. PO boxes aren't accepted for the payments profile. Decide whether you're happy with that, or want a business address service, before turning on Plus.
+- **Your address goes public once you charge money on Play.** A personal account then shows your **full address** on the store listing. PO boxes aren't accepted for the payments profile. Decide whether you're happy with that, or want a business address service, before turning on YumSum+.
 - **Check your employment contract** for clauses on side businesses or who owns what you build in your spare time.
 - **New UK subscription rules from January 2027** (DMCC Act): clear information before purchase, renewal reminders and easy cancellation. Play's own subscription screens cover most of this, but the paywall text should be clear.
 
@@ -128,9 +128,9 @@ To cover everyone's AI, roughly **1 in 30 daily users (about 3%)** needs to be o
 - [ ] (me) Update `firebase_ai` for low-resolution photos, if the measurements say photos matter
 - [x] (me) "AI estimates left today" hint
 
-**When costs pass about £20 a month**
-- [ ] Decide the free allowance and Plus contents
-- [ ] RevenueCat + Play Billing; paywall; server-side AI allowance
+**YumSum+ (before the closed test, see `06-yumsum-plus.md`)**
+- [x] Decide the free allowance and YumSum+ contents (2 November 2026: `06-yumsum-plus.md`)
+- [ ] Play Billing, Cloud Functions and the paywall (`07-billing.md`); server-side AI allowance later, only if abuse shows
 - [ ] Optional: opt-in rewarded ad for extra AI; tip-jar purchase
 - [ ] Payments profile (think about your public address first); tax registration if over £1,000
 
