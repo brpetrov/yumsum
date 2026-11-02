@@ -244,7 +244,7 @@ class _PlusMenuItem extends StatelessWidget {
         visualDensity: const VisualDensity(vertical: -2),
         contentPadding: const EdgeInsets.only(left: 6, right: 12),
         horizontalTitleGap: 14,
-        leading: const PlusBadge(star: true),
+        leading: const PlusStar(),
         title: const Align(
           alignment: Alignment.centerLeft,
           child: PlusMark(size: 18),

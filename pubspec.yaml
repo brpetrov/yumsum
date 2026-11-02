@@ -46,6 +46,7 @@ flutter:
     - assets/fonts/OFL.txt
     - assets/fonts/OFL-Fredoka.txt
     - assets/recipes/recipes.json
+    - assets/plus/
   fonts:
     - family: Nunito
       fonts:

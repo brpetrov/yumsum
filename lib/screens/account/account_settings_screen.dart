@@ -414,7 +414,7 @@ class _PlusTile extends ConsumerWidget {
           : () => showPlusPaywall(context),
       child: Row(
         children: [
-          const PlusBadge(size: 42, star: true),
+          const PlusStar(size: 44),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
