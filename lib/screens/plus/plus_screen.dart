@@ -77,7 +77,7 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
     (
       Icons.auto_awesome_rounded,
       'Triple the AI estimates',
-      '30 a day, not 10. Type, speak or snap.',
+      '30 a day, so you never run out.',
     ),
     (
       Icons.tune_rounded,
@@ -87,7 +87,7 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
     (
       Icons.insights_rounded,
       'AI Insights',
-      'What worked, what didn\'t, and a tip to try.',
+      'Every Monday, the AI reviews your week.',
     ),
     (
       Icons.pie_chart_outline_rounded,
