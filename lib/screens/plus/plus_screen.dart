@@ -96,9 +96,7 @@ class PlusScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 8),
-                const Center(
-                  child: PlusBadge(size: 64, icon: Icons.auto_awesome_rounded),
-                ),
+                const Center(child: PlusBadge(size: 64, star: true)),
                 const SizedBox(height: 14),
                 const Center(child: PlusMark(size: 30)),
                 const SizedBox(height: 8),

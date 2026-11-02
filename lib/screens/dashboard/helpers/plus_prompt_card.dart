@@ -53,7 +53,7 @@ class _PlusPromptCardState extends ConsumerState<PlusPromptCard> {
         onTap: () => showPlusPaywall(context),
         child: Row(
           children: [
-            const PlusBadge(size: 46, icon: Icons.auto_awesome_rounded),
+            const PlusBadge(size: 46, star: true),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
