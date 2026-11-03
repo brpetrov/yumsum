@@ -116,7 +116,7 @@ YumSum Star only (plan 10). `macrosForEveryone` in `calorie_estimate_service.dar
   - Rings in the bars' green: protein (when tracked), then carbs, fat and fibre, then the limits: sugars, saturates and salt, scrolling to the right.
   - Each is against a target from the plan (`HealthCalculator.macroTargets`): fat 30% of the calories, carbs the rest after protein and fat, saturates at most 10%, all sugars at most 18%, fibre at least 30 g, salt at most 6 g.
   - Colours: protein and fibre stay green however far over. Carbs and fat are judged like the calorie bar: green up to 10% over, amber up to 20%, red past that. Sugars, saturates and salt turn amber past their limit and red past 20% over.
-  - A tap on a ring, or the info button in the gap above them (in line with the end of the calorie bar), opens the guide.
+  - A tap on a ring, or the info button left of the first ring (in line with the start of the calorie bar), opens the guide.
   - Free users see the protein ring live and the rest dimmed and part-filled, with no figures, under an "Unlock full macros" chip; a tap anywhere there opens `/plus`.
 - **Elsewhere:**
   - History's day sheet uses `MacroTotals` (`lib/widgets/macro_totals.dart`): one line of fat, carbs and salt that opens to all six, with "at least" where some meals lack a figure.
