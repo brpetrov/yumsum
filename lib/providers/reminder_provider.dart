@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:lean_streak/helpers/adaptive_formula.dart';
 import 'package:lean_streak/helpers/weight_reminder.dart';
+import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
+import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/services/notification_service.dart';
 
 class ReminderSettings {
@@ -18,11 +23,15 @@ class ReminderSettings {
   final bool dailyMeal;
   final bool weeklyWeight;
 
-  /// [DateTime.monday] to [DateTime.sunday].
+  /// [DateTime.monday] to [DateTime.sunday], or [everyDay].
   final int weeklyDay;
   final TimeOfDay weeklyTime;
   final bool creatine;
   final TimeOfDay creatineTime;
+
+  /// The weigh-in reminder's day when it comes every morning, as the
+  /// Adaptive formula likes.
+  static const everyDay = 0;
 
   ReminderSettings copyWith({
     bool? dailyMeal,
@@ -89,8 +98,32 @@ class ReminderSettingsNotifier extends Notifier<ReminderSettings> {
   Future<bool> setWeeklyWeight(bool on) =>
       _set(on, (settings) => settings.copyWith(weeklyWeight: on));
 
-  Future<bool> setCreatine(bool on) =>
-      _set(on, (settings) => settings.copyWith(creatine: on));
+  /// Turning it on also keeps the Adaptive formula from learning for the
+  /// next 28 days, while creatine's extra water settles.
+  Future<bool> setCreatine(bool on) async {
+    final done = await _set(on, (settings) => settings.copyWith(creatine: on));
+    if (done && on) unawaited(_pauseAdaptiveForCreatine());
+    return done;
+  }
+
+  Future<void> _pauseAdaptiveForCreatine() async {
+    // Best effort: the reminder is on either way, and without the pause
+    // the formula only reads the water as slower loss for a few weeks.
+    try {
+      final uid = ref.read(currentUidProvider);
+      if (uid == null) return;
+      final profiles = ref.read(userProfileRepositoryProvider);
+      final profile = await profiles.fetchProfile(uid);
+      if (profile == null) return;
+      final now = DateTime.now();
+      final from = AdaptiveFormula.dateKey(
+        DateTime(now.year, now.month, now.day + AdaptiveFormula.creatineDays),
+      );
+      final current = profile.adaptiveFrom;
+      if (current != null && current.compareTo(from) >= 0) return;
+      await profiles.createProfile(profile.copyWith(adaptiveFrom: from));
+    } catch (_) {}
+  }
 
   Future<void> setCreatineTime(TimeOfDay time) async {
     state = state.copyWith(creatineTime: time);
@@ -188,12 +221,17 @@ final reminderSyncProvider = FutureProvider.autoDispose<void>((ref) async {
     await NotificationService.cancelWeeklyWeightReminder();
     return;
   }
+  final daily = settings.weeklyDay == ReminderSettings.everyDay;
+  final time = settings.weeklyTime;
   await NotificationService.scheduleWeeklyWeightReminder(
-    firstFireAt: nextWeekdayAt(
-      weekday: settings.weeklyDay,
-      hour: settings.weeklyTime.hour,
-      minute: settings.weeklyTime.minute,
-      now: DateTime.now(),
-    ),
+    daily: daily,
+    firstFireAt: daily
+        ? nextDailyAt(hour: time.hour, minute: time.minute, now: DateTime.now())
+        : nextWeekdayAt(
+            weekday: settings.weeklyDay,
+            hour: time.hour,
+            minute: time.minute,
+            now: DateTime.now(),
+          ),
   );
 });

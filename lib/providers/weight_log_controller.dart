@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/models/weight_entry.dart';
+import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
@@ -60,7 +61,9 @@ class WeightLogController extends AsyncNotifier<void> {
   }
 
   /// Clears the weight history. The profile keeps its current weight and
-  /// plan, so only the chart and the "change since start" start over.
+  /// plan, so only the chart and the "change since start" start over; the
+  /// Adaptive formula's adjustment goes, as the weigh-ins it learnt from
+  /// have.
   Future<bool> resetHistory() async {
     state = const AsyncLoading();
 
@@ -68,6 +71,7 @@ class WeightLogController extends AsyncNotifier<void> {
       final uid = ref.read(currentUidProvider);
       if (uid == null) throw Exception('Not authenticated');
       await ref.read(weightEntryRepositoryProvider).deleteAll(uid);
+      await resetAdaptive(ref, uid);
       state = const AsyncData(null);
       return true;
     } catch (error, stackTrace) {

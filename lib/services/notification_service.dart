@@ -141,9 +141,11 @@ class NotificationService {
     await _notifications.cancel(id: _dailyReminderId);
   }
 
-  /// Fires at [firstFireAt] and then weekly at the same weekday and time.
+  /// Fires at [firstFireAt] and then weekly at the same weekday and time,
+  /// or every day at that time when [daily].
   static Future<void> scheduleWeeklyWeightReminder({
     required DateTime firstFireAt,
+    bool daily = false,
   }) async {
     if (!isSupported) return;
     await _notifications.cancel(id: _weeklyWeightReminderId);
@@ -151,7 +153,9 @@ class NotificationService {
     await _notifications.zonedSchedule(
       id: _weeklyWeightReminderId,
       title: 'Time to weigh in',
-      body: 'Log this week\'s weight to keep your plan accurate.',
+      body: daily
+          ? 'Log today\'s weight to keep your plan accurate.'
+          : 'Log this week\'s weight to keep your plan accurate.',
       scheduledDate: tz.TZDateTime.from(firstFireAt, tz.local),
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
@@ -164,7 +168,9 @@ class NotificationService {
         iOS: DarwinNotificationDetails(),
       ),
       androidScheduleMode: await _androidScheduleMode(),
-      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+      matchDateTimeComponents: daily
+          ? DateTimeComponents.time
+          : DateTimeComponents.dayOfWeekAndTime,
       payload: payloadLogWeight,
     );
   }

@@ -5,10 +5,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/helpers/adaptive_formula.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
 import 'package:lean_streak/models/user_profile.dart';
+import 'package:lean_streak/providers/adaptive_formula_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/profile_controller.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
+import 'package:lean_streak/screens/dashboard/helpers/adaptive_dialogs.dart';
+import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/day_status.dart';
 import 'package:lean_streak/widgets/health_plan_preview_card.dart';
@@ -16,6 +21,7 @@ import 'package:lean_streak/widgets/responsive_page.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
 import 'package:lean_streak/widgets/pill_toggle.dart';
 import 'package:lean_streak/widgets/plan_choices.dart';
+import 'package:lean_streak/widgets/plus_mark.dart';
 
 class PlanSettingsScreen extends ConsumerStatefulWidget {
   const PlanSettingsScreen({super.key});
@@ -40,6 +46,11 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
   WeightLossPace _weightLossPace = WeightLossPace.moderate;
   bool _trackProtein = true;
 
+  /// The Adaptive formula's switch. Without YumSum Star it shows off but
+  /// keeps the stored value, so saving neither ends a lapse's 2 weeks early
+  /// nor loses the setting.
+  bool _adaptiveOn = true;
+
   double? get _currentBmi {
     final currentWeight = double.tryParse(_currentWeightCtrl.text);
     final height = double.tryParse(_heightCtrl.text);
@@ -59,7 +70,16 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
     super.dispose();
   }
 
-  HealthPlanCalculation? get _preview {
+  /// Whether the form changes what the Adaptive formula learnt from, so
+  /// saving starts it again.
+  bool _detailsChanged(UserProfile profile) =>
+      int.tryParse(_ageCtrl.text) != profile.age ||
+      double.tryParse(_heightCtrl.text) != profile.heightCm ||
+      _gender != profile.gender ||
+      _activityLevel != profile.activityLevel ||
+      _trainingFrequency != profile.trainingFrequency;
+
+  HealthPlanCalculation? _preview(UserProfile profile) {
     final currentWeight = double.tryParse(_currentWeightCtrl.text);
     final height = double.tryParse(_heightCtrl.text);
     final age = int.tryParse(_ageCtrl.text);
@@ -89,6 +109,9 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
       activityLevel: _activityLevel,
       trainingFrequency: _trainingFrequency,
       weightLossPace: _weightLossPace,
+      adaptiveKcal: _adaptiveOn && !_detailsChanged(profile)
+          ? profile.adaptiveKcal.toDouble()
+          : 0,
     );
   }
 
@@ -107,6 +130,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
     _trainingFrequency = profile.trainingFrequency;
     _weightLossPace = profile.weightLossPace;
     _trackProtein = profile.trackProtein;
+    _adaptiveOn = profile.adaptiveOn;
   }
 
   Future<void> _submit(UserProfile profile) async {
@@ -134,6 +158,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
           country: _countryCtrl.text,
           usualFood: _foodCtrl.text,
           trackProtein: _trackProtein,
+          adaptiveOn: _adaptiveOn,
         );
 
     if (!mounted) return;
@@ -176,7 +201,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
           }
 
           _seedForm(profile);
-          final preview = _preview;
+          final preview = _preview(profile);
           final currentBmi = _currentBmi;
 
           return SafeArea(
@@ -492,6 +517,14 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                         ),
                       ),
                       SizedBox(height: 20),
+                      const SectionLabel('PERSONAL ADJUSTMENT'),
+                      _AdaptiveSection(
+                        on: _adaptiveOn,
+                        onChanged: (on) => setState(() => _adaptiveOn = on),
+                        preview: preview,
+                        restarts: _detailsChanged(profile),
+                      ),
+                      SizedBox(height: 20),
                       if (preview != null) ...[
                         HealthPlanPreviewCard(
                           preview: preview,
@@ -540,6 +573,102 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
         ),
       ),
     );
+  }
+}
+
+/// The Adaptive formula's switch, and for a subscriber with it on, the sum
+/// it makes and how well it knows them so far.
+class _AdaptiveSection extends ConsumerWidget {
+  const _AdaptiveSection({
+    required this.on,
+    required this.onChanged,
+    required this.preview,
+    required this.restarts,
+  });
+
+  final bool on;
+  final ValueChanged<bool> onChanged;
+  final HealthPlanCalculation? preview;
+  final bool restarts;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final plus = ref.watch(plusProvider);
+    final muted = TextStyle(
+      fontSize: 13,
+      height: 1.35,
+      color: AppColors.textSecondary,
+    );
+    final preview = this.preview;
+    final progress = plus && on
+        ? ref.watch(adaptiveProgressProvider).valueOrNull
+        : null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Row(
+            children: [
+              const Flexible(child: Text('Adaptive formula')),
+              if (!plus) ...[
+                const SizedBox(width: 6),
+                const PlusStar(size: 20),
+              ],
+            ],
+          ),
+          subtitle: const Text(
+            'Learns from your weigh-ins and adjusts your target each Monday.',
+          ),
+          value: plus && on,
+          onChanged: plus ? onChanged : (_) => showPlusPaywall(context),
+        ),
+        if (plus && on) ...[
+          if (preview != null) Text(_sum(preview), style: muted),
+          if (progress != null) ...[
+            const SizedBox(height: 4),
+            Text(_stage(progress), style: muted),
+          ],
+          if (restarts) ...[
+            const SizedBox(height: 4),
+            Text('Saving starts it again from your new plan.', style: muted),
+          ],
+          TextButton(
+            onPressed: () => showAdaptiveIntro(context, ref),
+            style: TextButton.styleFrom(padding: EdgeInsets.zero),
+            child: const Text('How it works'),
+          ),
+        ],
+      ],
+    );
+  }
+
+  /// "1670 from your plan − 80 adaptive = 1590 kcal".
+  static String _sum(HealthPlanCalculation preview) {
+    final plan = preview.planCalorieTarget.round();
+    final target = preview.dailyCalorieTarget.round();
+    final amount = target - plan;
+    final sign = amount < 0 ? '−' : '+';
+    final minimum = preview.calorieTargetClamped ? ', your minimum' : '';
+    return '$plan from your plan $sign ${amount.abs()} adaptive = '
+        '$target kcal$minimum';
+  }
+
+  /// How well it knows you, in plain stages rather than a percentage.
+  static String _stage(AdaptiveMeasure measure) {
+    String count(int n, String one, String many) => '$n ${n == 1 ? one : many}';
+    final weighIns = count(measure.weighIns, 'weigh-in', 'weigh-ins');
+    final days = '${count(measure.daysLogged, 'day', 'days')} logged';
+    final weeks = count(measure.days ~/ 7, 'week', 'weeks');
+    final known = '$weighIns and $days in $weeks';
+    return switch (measure.stage) {
+      AdaptiveStage.paused => 'Paused: no weigh-in for 10 days.',
+      AdaptiveStage.learning => 'Learning: $weighIns, $days',
+      AdaptiveStage.gettingToKnow => 'Getting to know you: $known',
+      AdaptiveStage.fairlyWell => 'Knows you fairly well: $known',
+      AdaptiveStage.well => 'Knows you well: $known',
+    };
   }
 }
 

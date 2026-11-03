@@ -38,6 +38,7 @@ UserProfile _migrateProfile(UserProfile profile) {
     activityLevel: profile.activityLevel,
     trainingFrequency: profile.trainingFrequency,
     weightLossPace: profile.weightLossPace,
+    adaptiveKcal: profile.adaptiveKcal.toDouble(),
   );
 
   return profile.copyWith(

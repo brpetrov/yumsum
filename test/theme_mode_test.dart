@@ -6,6 +6,7 @@ import 'package:lean_streak/app/app.dart';
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/providers/activity_scale_migration_provider.dart';
+import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
@@ -26,6 +27,7 @@ void main() {
           currentUidProvider.overrideWithValue('test'),
           entitlementProvider.overrideWith((ref) => Stream.value(null)),
           activityScaleMigrationProvider.overrideWith((ref) async {}),
+          adaptiveMondayProvider.overrideWith((ref) async {}),
           reminderSyncProvider.overrideWith((ref) async {}),
           goRouterProvider.overrideWithValue(
             GoRouter(

@@ -12,14 +12,18 @@ import 'package:lean_streak/helpers/health_calculator.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/user_profile.dart';
+import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
+import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/reminder_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
+import 'package:lean_streak/screens/dashboard/helpers/adaptive_dialogs.dart';
 import 'package:lean_streak/screens/dashboard/helpers/creatine_offer.dart';
 import 'package:lean_streak/screens/dashboard/helpers/day_off_dialog.dart';
 import 'package:lean_streak/screens/dashboard/helpers/plus_prompt_card.dart';
@@ -67,6 +71,33 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       final profile = next.valueOrNull;
       if (profile != null) _maybeOfferCreatine(profile.createdAt);
     }, fireImmediately: true);
+    ref.listenManual(plusProvider, (_, plus) {
+      if (plus) _maybeShowAdaptiveIntro();
+    }, fireImmediately: true);
+    ref.listenManual(adaptiveLapseProvider, (_, back) {
+      if (back != null) _maybeShowAdaptiveLapse(back);
+    }, fireImmediately: true);
+  }
+
+  /// Once, after subscribing: how the Adaptive formula works.
+  void _maybeShowAdaptiveIntro() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    if (prefs.getBool(adaptiveIntroShownKey) == true) return;
+    prefs.setBool(adaptiveIntroShownKey, true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) showAdaptiveIntro(context, ref);
+    });
+  }
+
+  /// Once per end of YumSum Star: when the target goes back to the plan.
+  void _maybeShowAdaptiveLapse(DateTime back) {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final key = DateFormat('yyyy-MM-dd').format(back);
+    if (prefs.getString(adaptiveLapseNoticeKey) == key) return;
+    prefs.setString(adaptiveLapseNoticeKey, key);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) showAdaptiveLapse(context, back);
+    });
   }
 
   /// Once, in the first week: offer the daily creatine reminder.
@@ -187,6 +218,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 meals: meals,
                 summary: summary,
                 showMacros: ref.watch(showMacrosProvider),
+                adaptiveLine: ref.watch(adaptiveTodayLineProvider),
                 onOpenReview: () => context.push(AppRoutes.review),
                 onEditMeal: (meal) =>
                     showLogMealSheet(context, existingMeal: meal),
@@ -262,6 +294,7 @@ class _DashboardContent extends StatelessWidget {
     required this.meals,
     required this.summary,
     required this.showMacros,
+    required this.adaptiveLine,
     required this.onOpenReview,
     required this.onEditMeal,
     required this.onDeleteMeal,
@@ -272,6 +305,7 @@ class _DashboardContent extends StatelessWidget {
   final List<Meal> meals;
   final DailySummary summary;
   final bool showMacros;
+  final String? adaptiveLine;
   final VoidCallback onOpenReview;
   final ValueChanged<Meal> onEditMeal;
   final Future<void> Function(Meal meal) onDeleteMeal;
@@ -305,6 +339,7 @@ class _DashboardContent extends StatelessWidget {
                     .where((meal) => meal.proteinGrams == null)
                     .length,
                 macroMeals: showMacros ? meals : null,
+                adaptiveLine: adaptiveLine,
               ),
               const SizedBox(height: 18),
               _MealsCard(
@@ -375,6 +410,7 @@ class _TodayCard extends StatelessWidget {
     required this.proteinTarget,
     required this.mealsWithoutProtein,
     this.macroMeals,
+    required this.adaptiveLine,
   });
 
   final DailySummary summary;
@@ -385,6 +421,9 @@ class _TodayCard extends StatelessWidget {
 
   /// The meals whose macros are totalled; null when they aren't shown.
   final List<Meal>? macroMeals;
+
+  /// This week's Adaptive formula result, if there is one to show.
+  final String? adaptiveLine;
 
   @override
   Widget build(BuildContext context) {
@@ -502,6 +541,13 @@ class _TodayCard extends StatelessWidget {
                 style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             ],
+          ],
+          if (adaptiveLine case final line?) ...[
+            const SizedBox(height: 10),
+            Text(
+              line,
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            ),
           ],
           if (macroMeals case final meals? when meals.isNotEmpty) ...[
             const SizedBox(height: 14),

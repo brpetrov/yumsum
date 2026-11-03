@@ -23,6 +23,10 @@ service cloud.firestore {
       return value is string && value.size() == 10;
     }
 
+    function optionalDateKey(value) {
+      return value == null || dateKey(value);
+    }
+
     // The documents below are written whole (set, not update), so each lists
     // every field it may have. A new field in a model needs adding here too.
 
@@ -98,15 +102,23 @@ service cloud.firestore {
 
     match /users/{userId} {
       // The profile is set whole at onboarding and partly updated later, and
-      // old profiles may carry fields the app no longer writes, so only the
-      // free-text fields are checked.
+      // old profiles may carry fields the app no longer writes, so there is
+      // no hasOnly: only the free-text fields and the switches and Adaptive
+      // formula fields added since are checked.
       allow read, delete: if isOwner(userId);
       allow create, update: if isOwner(userId)
         && text(request.resource.data.get('name', ''), 200)
         && text(request.resource.data.get('email', ''), 320)
         && text(request.resource.data.get('country', ''), 100)
         && text(request.resource.data.get('usualFood', ''), 500)
-        && request.resource.data.get('trackProtein', true) is bool;
+        && request.resource.data.get('trackProtein', true) is bool
+        && request.resource.data.get('adaptiveOn', true) is bool
+        && request.resource.data.get('adaptiveKcal', 0) is number
+        && optionalDateKey(request.resource.data.get('adaptiveWeek', null))
+        && optionalDateKey(request.resource.data.get('adaptiveFrom', null))
+        && optionalText(request.resource.data.get('adaptiveNote', null), 20)
+        && request.resource.data.get('adaptiveChanges', []) is list
+        && request.resource.data.get('adaptiveChanges', []).size() <= 6;
 
       match /meals/{mealId} {
         allow read, delete: if isOwner(userId);

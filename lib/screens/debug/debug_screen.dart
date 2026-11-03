@@ -42,8 +42,8 @@ class DebugScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Only in debug builds. What you change here stays on this '
-                  'phone and never reaches your account.',
+                  'Only in debug builds. What you pick here is kept on this '
+                  'phone, not in your account.',
                   style: muted,
                 ),
                 const SizedBox(height: 24),
@@ -90,7 +90,10 @@ class DebugScreen extends ConsumerWidget {
                 ),
                 Text(
                   'Admin also lifts the daily AI limit and the limit on '
-                  'changing past days.',
+                  'changing past days. Your real plan reacts to a pretend '
+                  'account: Free, or an ended YumSum Star after 2 weeks, '
+                  'switches the Adaptive formula off and drops its '
+                  'adjustment.',
                   style: muted,
                 ),
                 const SizedBox(height: 24),

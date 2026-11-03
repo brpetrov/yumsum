@@ -44,6 +44,22 @@ void main() {
     expect(prefs.getInt('reminders.weekly_weight_hour'), 20);
   });
 
+  testWidgets('the weigh-in reminder can come every day', (tester) async {
+    await pumpScreen(tester);
+    expect(find.text('Weigh-in reminder'), findsOneWidget);
+
+    await tester.tap(find.text('Saturday'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Every day').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Every day at 20:00'), findsOneWidget);
+    expect(
+      prefs.getInt('reminders.weekly_weight_day'),
+      ReminderSettings.everyDay,
+    );
+  });
+
   testWidgets('the creatine reminder is off by default', (tester) async {
     await pumpScreen(tester);
     expect(find.text('Every day at 09:00'), findsOneWidget);
