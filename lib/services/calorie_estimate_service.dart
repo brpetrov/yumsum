@@ -7,18 +7,32 @@ import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:lean_streak/core/config/app_check.dart';
 
+import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/repositories/ai_usage_repository.dart';
+
+/// Whether every estimate asks for the macros, or only YumSum Star ones.
+/// Off until the owner has measured what they add to a call on the phone
+/// (plan 10): 15% or less of a typed estimate's cost turns it on.
+const macrosForEveryone = false;
 
 /// One component of an AI estimate; [grams] is the weight the AI assumed
 /// (ml for drinks), null when it gave none.
 typedef EstimateItem = ({String name, int? grams, int kcal, int? protein});
-typedef CalorieEstimate = ({int kcal, int? protein, List<EstimateItem> items});
+
+/// [macros] are for the whole meal, and only there when they were asked for.
+typedef CalorieEstimate = ({
+  int kcal,
+  int? protein,
+  Nutrients? macros,
+  List<EstimateItem> items,
+});
 
 /// A meal recognised from a voice note or a photo.
 typedef VoiceMealParsed = ({
   String name,
   int kcal,
   int? protein,
+  Nutrients? macros,
   List<EstimateItem> items,
 });
 
@@ -95,6 +109,34 @@ List<EstimateItem> parseEstimateItems(Object? raw) {
           protein: (entry['protein_g'] as num?)?.round(),
         ),
   ];
+}
+
+/// Reads the model's `macros` object, keeping non-negative numbers only.
+/// None at all when saturates come out above fat or sugars above carbs,
+/// which means the model mixed them up.
+Nutrients? parseNutrients(Object? raw) {
+  if (raw is! Map) return null;
+  final values = [
+    for (final key in ['fat', 'saturates', 'carbs', 'sugars', 'fibre', 'salt'])
+      switch (raw[key]) {
+        final num value when value >= 0 => value.toDouble(),
+        _ => null,
+      },
+  ];
+  final [fat, saturates, carbs, sugars, fibre, salt] = values;
+  if (values.every((value) => value == null) ||
+      (saturates ?? 0) > (fat ?? double.infinity) ||
+      (sugars ?? 0) > (carbs ?? double.infinity)) {
+    return null;
+  }
+  return Nutrients(
+    fat: fat,
+    saturates: saturates,
+    carbs: carbs,
+    sugars: sugars,
+    fibre: fibre,
+    salt: salt,
+  );
 }
 
 /// [item] at [grams] instead of the AI's weight, its calories and protein
@@ -197,9 +239,11 @@ class CalorieEstimateService {
     required String country,
     required String usualFood,
     int? dailyLimit = AiUsageRepository.dailyLimit,
+    bool plus = false,
   }) : _country = country,
        _usualFood = usualFood,
-       _dailyLimit = dailyLimit;
+       _dailyLimit = dailyLimit,
+       _plus = plus;
 
   final AiUsageRepository _usageRepo;
 
@@ -209,6 +253,11 @@ class CalorieEstimateService {
   /// From the profile: where the user lives and what they usually eat.
   final String _country;
   final String _usualFood;
+
+  /// YumSum Star, whose estimates always come with macros.
+  final bool _plus;
+
+  bool get _askMacros => macrosForEveryone || _plus;
 
   static const String _modelId = 'gemini-3.5-flash-lite';
   static const int _maxServerRetries = 3;
@@ -233,6 +282,22 @@ class CalorieEstimateService {
       'meat, fish, rice and pasta say in the item whether that weight is '
       'cooked or raw.\n';
 
+  // Six totals for the meal rather than per item, which would add about 60%
+  // to a call (plan 10).
+  static String _macros(bool ask) => ask
+      ? 'Also give the whole meal\'s fat, saturates, carbohydrate, sugars, '
+            'fibre and salt in grams, as a UK food label would: carbohydrate '
+            'without fibre, salt rather than sodium. Give them for the meal '
+            'only, not for each component. Whole grams, except salt to one '
+            'decimal.\n'
+      : '';
+
+  static String _macrosJson(bool ask, {bool orNull = false}) => ask
+      ? ', "macros": {"fat": <number>, "saturates": <number>, "carbs": '
+            '<number>, "sugars": <number>, "fibre": <number>, "salt": '
+            '<number>}${orNull ? ' or null' : ''}'
+      : '';
+
   // Listing each component before the total stops the model skipping the
   // oil, butter or gravy.
   String get _promptTemplate =>
@@ -244,9 +309,10 @@ class CalorieEstimateService {
       'they are usually cooked with. For branded or chain products use $_country '
       'nutrition figures. Then add them up.\n'
       '$_weights'
+      '${_macros(_askMacros)}'
       'Respond with ONLY a JSON object: {"items": [{"item": "<component>", "grams": <integer>, '
       '"kcal": <integer>, "protein_g": <integer>}], "kcal": <integer total>, '
-      '"protein_g": <integer total>}\n'
+      '"protein_g": <integer total>${_macrosJson(_askMacros)}}\n'
       'Do not include any other text.\n\n'
       'Meal: {input}';
 
@@ -264,14 +330,17 @@ class CalorieEstimateService {
       'are usually cooked with, and use $_country nutrition figures for branded or '
       'chain products. Then add them up.\n'
       'If the user gave calories but no protein, still estimate the protein '
-      'from the food. Only if nothing in the note says what the food was '
-      '(e.g. "400 calories for lunch"), set protein_g to null.\n'
+      '${_askMacros ? 'and macros ' : ''}from the food. Only if nothing in '
+      'the note says what the food was (e.g. "400 calories for lunch"), set '
+      'protein_g${_askMacros ? ' and macros' : ''} to null.\n'
       '$_weights'
+      '${_macros(_askMacros)}'
       'If the recording contains no meal, respond with {"error": "no meal"}.\n'
       'Respond with ONLY a JSON object: {"transcript": "<what the user said>", '
       '"name": "<short meal name>", "items": [{"item": "<component>", "grams": <integer>, "kcal": '
       '<integer>, "protein_g": <integer or null>}], "kcal": <integer total>, '
-      '"protein_g": <integer total or null>}\n'
+      '"protein_g": <integer total or null>'
+      '${_macrosJson(_askMacros, orNull: true)}}\n'
       'Do not include any other text.';
 
   String get _photoPromptTemplate =>
@@ -284,9 +353,11 @@ class CalorieEstimateService {
       'that product, using its label figures if they can be read. If the '
       'photo shows no food, respond with {"error": "no food"}.\n'
       '$_weights'
+      '${_macros(_askMacros)}'
       'Respond with ONLY a JSON object: {"name": "<short meal name>", '
       '"items": [{"item": "<component>", "grams": <integer>, "kcal": <integer>, "protein_g": '
-      '<integer>}], "kcal": <integer total>, "protein_g": <integer total>}\n'
+      '<integer>}], "kcal": <integer total>, "protein_g": <integer total>'
+      '${_macrosJson(_askMacros)}}\n'
       'Do not include any other text.';
 
   // Contributed data is public, so the model must copy, not estimate.
@@ -314,15 +385,28 @@ class CalorieEstimateService {
       'null>, "fiber": <number or null>, "salt": <number or null>}}\n'
       'Do not include any other text.';
 
-  String get _proteinPromptTemplate =>
+  // The fill-in on saving asks for macros only for YumSum Star: no call is
+  // made for figures a free user can't see.
+  String get _nutrientsPromptTemplate =>
       '$_context'
       'The user logged a meal by name with its calories. Assuming the '
       'calories are right, estimate how many grams of protein it contains.\n'
+      '${_macros(_plus)}'
       'If the name gives no clue what the food was (e.g. "Lunch" or "Snack"), '
-      'return null.\n'
-      'Respond with ONLY a JSON object: {"protein_g": <integer or null>}\n'
+      'return null${_plus ? ' for each' : ''}.\n'
+      'Respond with ONLY a JSON object: {"protein_g": <integer or null>'
+      '${_macrosJson(_plus, orNull: true)}}\n'
       'Do not include any other text.\n\n'
       'Meal: {name}\nCalories: {kcal}';
+
+  /// The prompts as sent, for tests: typed, voice, photo and the fill-in.
+  @visibleForTesting
+  List<String> get prompts => [
+    _promptTemplate,
+    _voicePromptTemplate,
+    _photoPromptTemplate,
+    _nutrientsPromptTemplate,
+  ];
 
   Future<CalorieEstimate> estimate(String uid, String description) async {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
@@ -346,6 +430,7 @@ class CalorieEstimateService {
       return (
         kcal: kcal,
         protein: protein,
+        macros: parseNutrients(map['macros']),
         items: parseEstimateItems(map['items']),
       );
     } on DailyLimitExceededException {
@@ -488,24 +573,32 @@ class CalorieEstimateService {
     }
   }
 
-  /// Protein for a meal logged by name and calories, or null when the name
-  /// says nothing about the food (e.g. "Lunch"). This doesn't count towards
-  /// the daily AI limit: it costs a fraction of an estimate, comes with
-  /// saving a meal, and counting it would use up the allowance unasked.
-  Future<int?> estimateProtein(String name, int kcal) async {
-    final prompt = _proteinPromptTemplate
+  /// Protein, and for YumSum Star the macros, for a meal logged by name and
+  /// calories; null when the name says nothing about the food (e.g.
+  /// "Lunch"). This doesn't count towards the daily AI limit: it costs a
+  /// fraction of an estimate, comes with saving a meal, and counting it
+  /// would use up the allowance unasked.
+  Future<({int? protein, Nutrients? macros})> estimateNutrients(
+    String name,
+    int kcal,
+  ) async {
+    final prompt = _nutrientsPromptTemplate
         .replaceFirst('{name}', name.trim())
         .replaceFirst('{kcal}', '$kcal');
     final map = _decode(
       await _generateWithRetries(_model, [Content.text(prompt)]),
     );
-    return (map['protein_g'] as num?)?.round();
+    return (
+      protein: (map['protein_g'] as num?)?.round(),
+      macros: parseNutrients(map['macros']),
+    );
   }
 
   VoiceMealParsed _mealFrom(Map<String, dynamic> map) => (
     name: map['name'] as String,
     kcal: (map['kcal'] as num).toInt(),
     protein: (map['protein_g'] as num?)?.round(),
+    macros: parseNutrients(map['macros']),
     items: parseEstimateItems(map['items']),
   );
 

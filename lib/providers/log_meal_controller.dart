@@ -44,13 +44,22 @@ class LogMealController extends AsyncNotifier<void> {
       final docRef = existingMeal == null ? repo.newMealRef(uid) : null;
       final mealName = (name?.trim().isEmpty ?? true) ? null : name!.trim();
 
-      // Only named meals get an AI protein estimate, and only while
-      // protein is tracked; calorie-only entries stay uncounted.
-      final protein =
-          proteinGrams ??
-          (mealName == null || !ref.read(trackProteinProvider)
+      var protein = proteinGrams;
+      var mealMacros =
+          macros ??
+          (existingMeal == null
               ? null
-              : await _estimateProtein(mealName, calories));
+              : macrosAfterEdit(existingMeal, mealName, calories));
+      // Only named meals get the AI's figures: protein while it is tracked,
+      // and macros for YumSum Star. Calorie-only entries stay uncounted.
+      if (mealName != null &&
+          ((protein == null && ref.read(trackProteinProvider)) ||
+              (mealMacros == null && ref.read(plusProvider)))) {
+        final filled = await _estimateNutrients(mealName, calories);
+        // Protein it returns while protein is off is still saved.
+        protein ??= filled.protein?.toDouble();
+        mealMacros ??= filled.macros;
+      }
 
       final meal = Meal(
         id: existingMeal?.id ?? docRef!.id,
@@ -59,11 +68,7 @@ class LogMealController extends AsyncNotifier<void> {
         name: mealName,
         calories: calories,
         proteinGrams: protein,
-        macros:
-            macros ??
-            (existingMeal == null
-                ? null
-                : macrosAfterEdit(existingMeal, mealName, calories)),
+        macros: mealMacros,
         createdAt: existingMeal?.createdAt ?? now,
         updatedAt: now,
       );
@@ -106,15 +111,17 @@ class LogMealController extends AsyncNotifier<void> {
     return DateTime(day.year, day.month, day.day, now.hour, now.minute);
   }
 
-  Future<double?> _estimateProtein(String name, double calories) async {
+  Future<({int? protein, Nutrients? macros})> _estimateNutrients(
+    String name,
+    double calories,
+  ) async {
     try {
-      final grams = await ref
+      return await ref
           .read(calorieEstimateServiceProvider)
-          .estimateProtein(name, calories.round());
-      return grams?.toDouble();
+          .estimateNutrients(name, calories.round());
     } catch (_) {
-      // Protein is optional; never block saving the meal.
-      return null;
+      // Protein and macros are optional; never block saving the meal.
+      return (protein: null, macros: null);
     }
   }
 

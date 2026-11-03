@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/meal.dart';
+import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
@@ -67,6 +68,11 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
   List<EstimateItem> _estimateItems = const [];
   String? _error;
 
+  // An estimate's macros, kept with its calories and scaled to the
+  // calories saved, as the quick-log bar does.
+  Nutrients? _macros;
+  int? _macrosKcal;
+
   bool get _isEditing => widget.existingMeal != null;
 
   String get _date =>
@@ -114,6 +120,8 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
         _proteinController.text = '${result.protein}';
       }
       _estimateItems = result.items;
+      _macros = result.macros;
+      _macrosKcal = result.kcal;
     } on DailyLimitExceededException {
       _error = 'Daily AI limit reached. Enter the calories yourself.';
     } on CalorieEstimateException catch (error) {
@@ -141,6 +149,12 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
           name: _nameController.text,
           calories: calories,
           proteinGrams: double.tryParse(_proteinController.text.trim()),
+          macros: switch ((_macros, _macrosKcal)) {
+            (final macros?, final from?) when from > 0 => macros.scaled(
+              calories / from,
+            ),
+            _ => null,
+          },
         );
 
     if (!mounted) return;
@@ -200,7 +214,8 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
               controller: _nameController,
               textCapitalization: TextCapitalization.sentences,
               textInputAction: TextInputAction.next,
-              onChanged: (_) => setState(() {}),
+              // An estimate's macros belong to the food it was for.
+              onChanged: (_) => setState(() => _macros = null),
               decoration: const InputDecoration(
                 labelText: 'Meal',
                 hintText: 'e.g. Musaka, chicken wrap',

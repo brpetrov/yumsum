@@ -1,7 +1,77 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lean_streak/repositories/ai_usage_repository.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 
+class _NoUsage extends Fake implements AiUsageRepository {}
+
 void main() {
+  group('macros', () {
+    test('parseNutrients keeps the six figures', () {
+      final macros = parseNutrients({
+        'fat': 18,
+        'saturates': 6,
+        'carbs': 52.5,
+        'sugars': 5,
+        'fibre': 4,
+        'salt': 2.1,
+      })!;
+      expect(
+        [
+          macros.fat,
+          macros.saturates,
+          macros.carbs,
+          macros.sugars,
+          macros.fibre,
+          macros.salt,
+        ],
+        [18, 6, 52.5, 5, 4, 2.1],
+      );
+    });
+
+    test('parseNutrients leaves out missing, negative and odd values', () {
+      final macros = parseNutrients({
+        'fat': 12,
+        'carbs': -3,
+        'sugars': '4',
+        'salt': null,
+      })!;
+      expect(macros.fat, 12);
+      expect(macros.carbs, isNull);
+      expect(macros.sugars, isNull);
+      expect(macros.salt, isNull);
+      expect(parseNutrients(null), isNull);
+      expect(parseNutrients('macros'), isNull);
+      expect(parseNutrients(<String, dynamic>{}), isNull);
+    });
+
+    test('parseNutrients drops a set with the figures mixed up', () {
+      expect(parseNutrients({'fat': 5, 'saturates': 8, 'carbs': 40}), isNull);
+      expect(parseNutrients({'carbs': 10, 'sugars': 25}), isNull);
+      // Saturates alone can't be checked against fat.
+      expect(parseNutrients({'saturates': 8})?.saturates, 8);
+    });
+
+    test('the prompts mention macros only when asked', () {
+      CalorieEstimateService service({required bool plus}) =>
+          CalorieEstimateService(
+            _NoUsage(),
+            country: 'United Kingdom',
+            usualFood: '',
+            plus: plus,
+          );
+
+      expect(macrosForEveryone, isFalse);
+      for (final prompt in service(plus: true).prompts) {
+        expect(prompt, contains('fat, saturates, carbohydrate, sugars'));
+        expect(prompt, contains('"macros": {"fat": <number>'));
+      }
+      for (final prompt in service(plus: false).prompts) {
+        expect(prompt, isNot(contains('macros')));
+        expect(prompt, isNot(contains('saturates')));
+      }
+    });
+  });
+
   group('nutritionContext', () {
     test('names the country and the usual food', () {
       final context = nutritionContext(

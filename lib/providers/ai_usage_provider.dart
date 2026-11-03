@@ -22,6 +22,7 @@ final calorieEstimateServiceProvider = Provider<CalorieEstimateService>((ref) {
     country: profile?.country ?? defaultCountry,
     usualFood: profile?.usualFood ?? '',
     dailyLimit: ref.watch(aiDailyLimitProvider),
+    plus: ref.watch(plusProvider),
   );
 });
 

@@ -306,7 +306,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
           .read(calorieEstimateServiceProvider)
           .estimate(uid, text);
       if (!mounted) return;
-      _fill(text, result.kcal, result.protein);
+      _fill(text, result.kcal, result.protein, macros: result.macros);
       _aiItems = result.items;
     });
   }
@@ -429,7 +429,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
           .read(calorieEstimateServiceProvider)
           .parseVoiceAudio(uid, wavFromPcm16(pcm, sampleRate: _sampleRate));
       if (!mounted) return;
-      _fill(result.name, result.kcal, result.protein);
+      _fill(result.name, result.kcal, result.protein, macros: result.macros);
       _aiItems = result.items;
     });
   }
@@ -463,7 +463,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
           .read(calorieEstimateServiceProvider)
           .estimateFromPhoto(uid, bytes);
       if (!mounted) return;
-      _fill(result.name, result.kcal, result.protein);
+      _fill(result.name, result.kcal, result.protein, macros: result.macros);
       _aiItems = result.items;
     });
   }

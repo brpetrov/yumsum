@@ -57,6 +57,7 @@ class _FakeEstimateService implements CalorieEstimateService {
     return (
       kcal: 520,
       protein: 32,
+      macros: const Nutrients(fat: 26, saturates: 6, carbs: 48, salt: 2.6),
       items: const [
         (name: 'Chicken wrap', grams: 200, kcal: 400, protein: 30),
         (name: 'Mayo', grams: 15, kcal: 120, protein: 2),
@@ -73,12 +74,19 @@ class _FakeEstimateService implements CalorieEstimateService {
       name: 'Lunch',
       kcal: 400,
       protein: null,
+      macros: null,
       items: const <EstimateItem>[],
     );
   }
 
   @override
-  Future<int?> estimateProtein(String name, int kcal) async => 30;
+  Future<({int? protein, Nutrients? macros})> estimateNutrients(
+    String name,
+    int kcal,
+  ) async => (protein: 30, macros: null);
+
+  @override
+  List<String> get prompts => const [];
 
   int photoCalls = 0;
 
@@ -89,6 +97,7 @@ class _FakeEstimateService implements CalorieEstimateService {
       name: 'Musaka',
       kcal: 640,
       protein: 28,
+      macros: null,
       items: const <EstimateItem>[],
     );
   }
@@ -463,6 +472,15 @@ void main() {
     expect(find.text('600 kcal · 45 g'), findsOneWidget);
     expect(boxes(tester), ['chicken wrap', '720', '47']);
     expect(estimateService.estimateCalls, 1);
+
+    // The meal's macros scale with its calories: 520 up to 720.
+    await tester.tap(find.byTooltip('Save'));
+    await tester.pump();
+    final macros = controller.savedMacros.single!;
+    expect(macros.fat, closeTo(36, 0.01));
+    expect(macros.carbs, closeTo(66.46, 0.01));
+    expect(macros.salt, closeTo(3.6, 0.01));
+    expect(macros.fibre, isNull);
   });
 
   testWidgets('a scanned barcode is looked up; the portion fills the box', (
