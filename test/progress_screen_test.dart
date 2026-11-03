@@ -9,14 +9,12 @@ import 'package:lean_streak/models/weight_entry.dart';
 import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
-import 'package:lean_streak/providers/profile_controller.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
 import 'package:lean_streak/providers/weight_log_controller.dart';
 import 'package:lean_streak/screens/progress/progress_screen.dart';
 import 'package:lean_streak/services/weight_log_service.dart';
 import 'package:lean_streak/widgets/app_card.dart';
-import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'adaptive_fixtures.dart';
@@ -38,16 +36,6 @@ class _FakeWeightLogController extends WeightLogController {
   }
 }
 
-class _FakeProfileController extends ProfileController {
-  final List<bool> switched = [];
-
-  @override
-  Future<bool> setAdaptiveOn(UserProfile profile, bool on) async {
-    switched.add(on);
-    return true;
-  }
-}
-
 const _plus = Entitlement(active: true, source: EntitlementSource.manual);
 
 WeightEntry _entry(String day, double kg) => WeightEntry(
@@ -59,7 +47,6 @@ WeightEntry _entry(String day, double kg) => WeightEntry(
 
 void main() {
   late _FakeWeightLogController controller;
-  late _FakeProfileController profileController;
 
   Future<void> pumpScreen(
     WidgetTester tester, {
@@ -67,7 +54,6 @@ void main() {
     Entitlement? entitlement,
   }) async {
     controller = _FakeWeightLogController();
-    profileController = _FakeProfileController();
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     await tester.pumpWidget(
@@ -87,7 +73,6 @@ void main() {
           adaptiveProgressProvider.overrideWith((ref) async => null),
           adaptiveTodayLineProvider.overrideWithValue(null),
           weightLogControllerProvider.overrideWith(() => controller),
-          profileControllerProvider.overrideWith(() => profileController),
         ],
         child: MaterialApp(theme: AppTheme.light, home: const ProgressScreen()),
       ),
@@ -108,7 +93,10 @@ void main() {
     expect(weighIns.barWidth, 0);
   });
 
-  testWidgets('without YumSum Star the Adaptive formula is there, off', (
+  const pitch =
+      'Tunes your target to your own body, from your weigh-ins and meals.';
+
+  testWidgets('without YumSum Star the Adaptive formula is there to unlock', (
     tester,
   ) async {
     await pumpScreen(tester, profile: planProfile());
@@ -123,8 +111,9 @@ void main() {
       ),
       findsOneWidget,
     );
-    expect(find.byType(PlusStar), findsOneWidget);
-    expect(tester.widget<Switch>(find.byType(Switch)).value, isFalse);
+    expect(find.text(pitch), findsOneWidget);
+    expect(find.text('Become a Star to unlock it'), findsOneWidget);
+    expect(find.byType(Switch), findsNothing);
 
     await tester.ensureVisible(find.byTooltip('How it works'));
     await tester.tap(find.byTooltip('How it works'));
@@ -134,21 +123,7 @@ void main() {
     expect(find.text('Remind me each morning'), findsNothing);
   });
 
-  testWidgets('with YumSum Star it shows the sum it makes', (tester) async {
-    await pumpScreen(
-      tester,
-      profile: planProfile(adaptiveKcal: -80),
-      entitlement: _plus,
-    );
-    expect(
-      find.text('1670 from your plan − 80 adaptive = 1590 kcal'),
-      findsOneWidget,
-    );
-    expect(find.byType(PlusStar), findsNothing);
-    expect(tester.widget<Switch>(find.byType(Switch)).value, isTrue);
-  });
-
-  testWidgets('switching it off asks first, as it clears the adjustment', (
+  testWidgets('with YumSum Star it is on, with the sum it makes', (
     tester,
   ) async {
     await pumpScreen(
@@ -156,45 +131,26 @@ void main() {
       profile: planProfile(adaptiveKcal: -80),
       entitlement: _plus,
     );
-    await tester.ensureVisible(find.byType(Switch));
-
-    await tester.tap(find.byType(Switch));
-    await tester.pumpAndSettle();
+    expect(find.text(pitch), findsOneWidget);
+    expect(find.text('On'), findsOneWidget);
     expect(
-      find.text(
-        'Your target goes back to your standard plan, 1670 kcal. If you '
-        'switch it on again, it starts over from there.',
-      ),
+      find.text('1670 from your plan − 80 adaptive = 1590 kcal'),
       findsOneWidget,
     );
-    await tester.tap(find.text('Cancel'));
-    await tester.pumpAndSettle();
-    expect(profileController.switched, isEmpty);
-
-    await tester.tap(find.byType(Switch));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Switch off'));
-    await tester.pumpAndSettle();
-    expect(profileController.switched, [false]);
+    expect(find.text('Become a Star to unlock it'), findsNothing);
+    expect(find.byType(Switch), findsNothing);
   });
 
-  testWidgets('switching it on saves at once', (tester) async {
+  testWidgets('switched off in Plan Settings, it says where to switch it on', (
+    tester,
+  ) async {
     await pumpScreen(
       tester,
       profile: planProfile().copyWith(adaptiveOn: false),
       entitlement: _plus,
     );
-    expect(
-      find.text(
-        'Learns from your weigh-ins and adjusts your target each Monday.',
-      ),
-      findsOneWidget,
-    );
-    await tester.ensureVisible(find.byType(Switch));
-    await tester.tap(find.byType(Switch));
-    await tester.pumpAndSettle();
-    expect(find.byType(AlertDialog), findsNothing);
-    expect(profileController.switched, [true]);
+    expect(find.text('Off'), findsOneWidget);
+    expect(find.text('Off. Switch it on in Plan Settings.'), findsOneWidget);
   });
 
   testWidgets('a weigh-in can be deleted, after asking', (tester) async {

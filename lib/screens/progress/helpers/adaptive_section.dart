@@ -1,65 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/helpers/adaptive_formula.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
-import 'package:lean_streak/providers/profile_controller.dart';
 import 'package:lean_streak/screens/dashboard/helpers/adaptive_dialogs.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
+import 'package:lean_streak/widgets/day_status.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 
-/// The Adaptive formula under the weight chart: its switch, which saves at
-/// once, and for YumSum Star with it on, the sum it makes, how well it knows
-/// you and this week's result. Without YumSum Star the switch opens the
-/// YumSum Star page. Its info button explains it ([showAdaptiveIntro]).
+/// The Adaptive formula under the weight chart: what it does for you, and
+/// with YumSum Star, that it's on, the sum it makes, how well it knows you
+/// and this week's result. Without YumSum Star a tap opens the YumSum Star
+/// page; switched off in Plan Settings, a tap goes there. Its info button
+/// explains it ([showAdaptiveIntro]).
 class AdaptiveSection extends ConsumerWidget {
   const AdaptiveSection({super.key, required this.profile});
 
   final UserProfile profile;
-
-  Future<void> _switch(BuildContext context, WidgetRef ref, bool on) async {
-    // Switching off clears what it has learned, so ask first.
-    if (!on && profile.adaptiveKcal != 0) {
-      final plan = AdaptiveFormula.planOf(
-        profile,
-        adaptiveKcal: 0,
-        now: DateTime.now(),
-      ).dailyCalorieTarget.round();
-      final off = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Switch off the Adaptive formula?'),
-          content: Text(
-            'Your target goes back to your standard plan, $plan kcal. If you '
-            'switch it on again, it starts over from there.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Switch off'),
-            ),
-          ],
-        ),
-      );
-      if (off != true) return;
-    }
-    final saved = await ref
-        .read(profileControllerProvider.notifier)
-        .setAdaptiveOn(profile, on);
-    if (saved || !context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Could not switch it ${on ? 'on' : 'off'}. Try again.'),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -75,7 +37,7 @@ class AdaptiveSection extends ConsumerWidget {
       color: AppColors.textSecondary,
     );
 
-    return Column(
+    final section = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -93,10 +55,6 @@ class AdaptiveSection extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  if (!plus) ...[
-                    const SizedBox(width: 6),
-                    const PlusStar(size: 20),
-                  ],
                   IconButton(
                     tooltip: 'How it works',
                     onPressed: () => showAdaptiveIntro(context, ref),
@@ -107,32 +65,72 @@ class AdaptiveSection extends ConsumerWidget {
                 ],
               ),
             ),
-            Switch(
-              value: on,
-              onChanged: plus
-                  ? (value) => _switch(context, ref, value)
-                  : (_) => showPlusPaywall(context),
-            ),
+            if (plus)
+              StatusPill(
+                label: on ? 'On' : 'Off',
+                color: on ? AppColors.veryGood : AppColors.textSecondary,
+              ),
           ],
         ),
         Text(
-          on
-              ? adaptiveSumLine(
-                  AdaptiveFormula.planOf(profile, now: DateTime.now()),
-                )
-              : 'Learns from your weigh-ins and adjusts your target each '
-                    'Monday.',
-          style: muted,
+          'Tunes your target to your own body, from your weigh-ins and '
+          'meals.',
+          style: TextStyle(
+            fontSize: 14,
+            height: 1.35,
+            color: AppColors.textPrimary,
+          ),
         ),
-        if (progress != null) ...[
-          const SizedBox(height: 4),
-          Text(adaptiveStageLine(progress), style: muted),
-        ],
-        if (week != null) ...[
-          const SizedBox(height: 4),
-          Text(week, style: muted),
+        if (on) ...[
+          const SizedBox(height: 6),
+          Text(
+            adaptiveSumLine(
+              AdaptiveFormula.planOf(profile, now: DateTime.now()),
+            ),
+            style: muted,
+          ),
+          if (progress != null) ...[
+            const SizedBox(height: 4),
+            Text(adaptiveStageLine(progress), style: muted),
+          ],
+          if (week != null) ...[
+            const SizedBox(height: 4),
+            Text(week, style: muted),
+          ],
+        ] else if (plus) ...[
+          const SizedBox(height: 6),
+          Text('Off. Switch it on in Plan Settings.', style: muted),
+        ] else ...[
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              const PlusStar(size: 24),
+              const SizedBox(width: 8),
+              Text(
+                'Become a Star to unlock it',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
         ],
       ],
+    );
+
+    final onTap = switch ((plus, on)) {
+      (false, _) => () => showPlusPaywall(context),
+      // Pages swap, so Back still lands on Home.
+      (true, false) => () => context.pushReplacement(AppRoutes.planSettings),
+      (true, true) => null,
+    };
+    if (onTap == null) return section;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: section,
     );
   }
 }

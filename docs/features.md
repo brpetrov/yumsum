@@ -81,7 +81,7 @@ The paid tier (plan 06; the code says `plus`).
   - `StarBadge` beside the logo in the menu header and beside the name on Home: the star for members, a "Become a Star" chip for everyone else, nothing while the record loads.
   - A card in Account Settings.
   - `PlusPromptCard` on Home.
-  - The dimmed macro rings for free users, and the star on the Adaptive formula's switch.
+  - The dimmed macro rings for free users, and "Become a Star to unlock it" under the weight chart.
 - **Debug tools** (`/debug`, `DebugScreen`), in debug builds and for dev accounts in any build:
   - the User ID to copy;
   - "Pretend to be" (`debugAccountProvider`): free, subscribed, trial, ended or admin, on that device. A pretend account is real enough to change the Adaptive formula on the real plan.
@@ -138,7 +138,7 @@ YumSum Star (plan 08).
   - It prints an "Adaptive: …" debug line plus the window's JSON.
   - `test/adaptive_replay_test.dart` replays that JSON from the gitignored `config/adaptive_replay.json`.
 - **Profile fields** (in `firestore.rules` too):
-  - `adaptiveOn` (on by default: the Plan Settings switch, saved with Save plan, and the one under the weight chart, saved at once by `ProfileController.setAdaptiveOn`)
+  - `adaptiveOn` (the Plan Settings switch, on by default, saved with Save plan)
   - `adaptiveKcal`
   - `adaptiveWeek` and `adaptiveFrom` (yyyy-MM-dd)
   - `adaptiveNote` (the Monday's `AdaptiveNote`; `off` after switching off, a lapse or a reset, which the next run treats as starting fresh)
@@ -152,9 +152,9 @@ YumSum Star (plan 08).
   - Home: that week's result as one line on the target card (`adaptiveTodayLineProvider`).
   - Plan Settings: the switch, the sum (`adaptiveSumLine`) and how well it knows you (`adaptiveStageLine`, from `adaptiveProgressProvider`).
   - Weight & Progress: `AdaptiveSection` (`lib/screens/progress/helpers/adaptive_section.dart`), under the chart in its card.
-    - A switch, with the sum, the stage and this week's line while on.
-    - Switching off an adjustment asks first, as it clears it.
-    - Free users see the star, and the switch opens `/plus`.
+    - No switch: it says what it does for you, then with YumSum Star an "On" pill, the sum, the stage and this week's line.
+    - Free users get "Become a Star to unlock it", and a tap opens `/plus`.
+    - Switched off in Plan Settings, it says so and a tap goes there.
 - **The explainer:** `showAdaptiveIntro` (`lib/screens/dashboard/helpers/adaptive_dialogs.dart`), four short lines to take in at a glance. It is shown once after subscribing, and from Plan Settings and the info button under the chart. For subscribers it can set the weigh-in reminder to every day at 07:30; free users are offered the YumSum Star page.
 - **Tests:** the seeded simulator in `test/adaptive_fixtures.dart`.
 

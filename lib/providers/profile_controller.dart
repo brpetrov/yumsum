@@ -115,25 +115,6 @@ class ProfileController extends AsyncNotifier<void> {
       return false;
     }
   }
-
-  /// The Adaptive formula's switch under the weight chart: saves at once,
-  /// with the rest of the plan as it is.
-  Future<bool> setAdaptiveOn(UserProfile profile, bool on) => saveProfile(
-    currentProfile: profile,
-    name: profile.name,
-    age: profile.age,
-    gender: profile.gender,
-    heightCm: profile.heightCm,
-    currentWeightKg: profile.currentWeightKg,
-    targetWeightKg: profile.targetWeightKg,
-    activityLevel: profile.activityLevel,
-    trainingFrequency: profile.trainingFrequency,
-    weightLossPace: profile.weightLossPace,
-    country: profile.country,
-    usualFood: profile.usualFood,
-    trackProtein: profile.trackProtein,
-    adaptiveOn: on,
-  );
 }
 
 final profileControllerProvider =
