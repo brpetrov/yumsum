@@ -36,7 +36,7 @@ enum AdaptiveNote {
 /// How well it knows you, as Plan Settings says it.
 enum AdaptiveStage { paused, learning, gettingToKnow, fairlyWell, well }
 
-/// What the last 3 to 6 weeks of weigh-ins and logged days say.
+/// What the last 1 to 6 weeks of weigh-ins and logged days say.
 class AdaptiveMeasure {
   const AdaptiveMeasure({
     required this.hold,
@@ -45,6 +45,7 @@ class AdaptiveMeasure {
     required this.daysLogged,
     this.gap = 0,
     this.confidence = 0,
+    this.formulaBurn = 0,
   });
 
   /// Why it can't act yet (paused, learning, too few weigh-ins or logged
@@ -63,6 +64,13 @@ class AdaptiveMeasure {
 
   /// From 0 to 1: weigh-ins × days logged × steadiness × weeks.
   final double confidence;
+
+  /// The formula's burn at the window's average weight, in kcal a day.
+  final double formulaBurn;
+
+  /// What you burn a day as far as it trusts what it has measured: the
+  /// formula's guess, moved towards the measured burn by [confidence].
+  double get burn => formulaBurn + gap * confidence;
 
   AdaptiveStage get stage => switch (hold) {
     AdaptiveNote.paused => AdaptiveStage.paused,
@@ -100,13 +108,13 @@ class AdaptiveFormula {
 
   // The trend's smoothing and the typo rule are in weight_trend.dart.
   static const maxWindowDays = 42;
-  static const minWindowDays = 21;
-  static const newAccountDays = 14;
+  static const minWindowDays = 7;
+  static const newAccountDays = 7;
   static const creatineDays = 28;
   static const halfLoggedShare = 0.6;
   static const breakDays = 3;
-  static const minWeighIns = 8;
-  static const minWeighInSpanDays = 14;
+  static const minWeighIns = 3;
+  static const minWeighInSpanDays = 5;
   static const minWeighInsInWeek = 2;
   static const minLoggedShare = 4 / 7;
   static const minLoggedInWeek = 4;
@@ -114,8 +122,9 @@ class AdaptiveFormula {
   static const fullWeighInsPerWeek = 4;
   static const fullScatter = 0.005;
   static const fullWeeks = 6;
-  static const deadBand = 50;
+  static const deadBand = 20;
   static const stepShare = 0.05;
+  static const fullStepDays = 21;
   static const totalShare = 0.15;
   static const unusualShare = 0.20;
   static const kcalPerKg = 7700;
@@ -198,7 +207,8 @@ class AdaptiveFormula {
     final today = endDay + 1;
 
     // Step 1: the window, never older than 6 weeks, nor a new account's
-    // first 2 weeks, nor before adaptiveFrom or the first day logged.
+    // first week (mostly water and stored carbohydrate), nor before
+    // adaptiveFrom or the first day logged.
     var start = math.max(
       today - maxWindowDays,
       _day(profile.createdAt) + newAccountDays,
@@ -350,7 +360,7 @@ class AdaptiveFormula {
     final w = math.min(1.0, weighIns.length / weeks / fullWeighInsPerWeek);
     final d = counted.length / days;
     final s = scatter == 0 ? 1.0 : math.min(1.0, fullScatter / scatter);
-    final t = math.min(1.0, (weeks - 1) / (fullWeeks - 1));
+    final t = math.min(1.0, weeks / fullWeeks);
 
     return AdaptiveMeasure(
       hold: null,
@@ -359,6 +369,7 @@ class AdaptiveFormula {
       daysLogged: counted.length,
       gap: measuredBurn - formulaBurn,
       confidence: w * d * s * t,
+      formulaBurn: formulaBurn,
     );
   }
 
@@ -401,6 +412,7 @@ class AdaptiveFormula {
           profile.adaptiveWeek == lastMonday &&
           (lastNote == AdaptiveNote.firstSign ||
               lastNote == AdaptiveNote.lowered),
+      stepScale: math.min(1.0, measured.days / fullStepDays),
     );
     return AdaptiveMonday(
       note: decision.note,
@@ -412,12 +424,15 @@ class AdaptiveFormula {
   }
 
   /// Step 8, from the aim (gap × confidence): the limits, the dead band and
-  /// the two Mondays a cut needs. [cutPending] is last Monday wanting one.
+  /// the two Mondays a cut needs. [cutPending] is last Monday wanting one;
+  /// [stepScale] shrinks the step limit while there are under 3 weeks of
+  /// data, so early weeks move the target only a little.
   static ({AdaptiveNote note, int adjustment}) decide({
     required int aim,
     required int current,
     required double planTarget,
     required bool cutPending,
+    double stepScale = 1,
   }) {
     int tens(double kcal) => (kcal / 10).floor() * 10;
     if (aim.abs() > unusualShare * planTarget) {
@@ -428,7 +443,7 @@ class AdaptiveFormula {
     if (wanted.abs() < deadBand) {
       return (note: AdaptiveNote.steady, adjustment: current);
     }
-    final maxStep = tens(stepShare * planTarget);
+    final maxStep = tens(stepShare * stepScale * planTarget);
     final step = wanted.clamp(-maxStep, maxStep);
     if (step > 0) {
       return (note: AdaptiveNote.raised, adjustment: current + step);

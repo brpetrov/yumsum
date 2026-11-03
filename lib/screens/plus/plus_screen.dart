@@ -82,7 +82,7 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
     (
       Icons.tune_rounded,
       'Adaptive Formula',
-      'Weigh in and your target adjusts to you.',
+      'Learns your real burn and tunes your target.',
     ),
     (
       Icons.insights_rounded,

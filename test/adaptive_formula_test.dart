@@ -54,35 +54,30 @@ List<WeightEntry> _upTo(List<WeightEntry> entries, DateTime day) => [
 
 void main() {
   group('your plan, noiseless, daily weigh-ins at 1830', () {
-    test('(a) the formula is right: always steady, adjustment 0', () {
+    test('(a) the formula is right: steady from the first week, at 0', () {
       final run = _yourPlan(0);
-      expect(run.mondays.take(2).map((m) => m.note), everyElement(_learning));
-      for (final monday in run.mondays.skip(2)) {
+      for (final monday in run.mondays) {
         expect(monday.note, _steady);
         expect(monday.adjustment, 0);
       }
     });
 
-    test('(b) burning 225 less: a first sign, then −80, −160, −220', () {
+    test('(b) burning 225 less: a first sign, then small steps to −220', () {
       final run = _yourPlan(-227);
       expect(run.mondays.take(6).map((m) => m.note), [
-        _learning,
-        _learning,
         _firstSign,
-        _lowered,
-        _lowered,
-        _lowered,
+        ...List.filled(5, _lowered),
       ]);
       expect(run.mondays.take(6).map((m) => m.adjustment), [
         0,
-        0,
-        0,
-        -80,
-        -160,
+        -50,
+        -110,
+        -150,
+        -180,
         -220,
       ]);
-      expect(run.on(11, 30).target, closeTo(1568, 2));
-      for (final monday in run.mondays.skip(4)) {
+      expect(run.on(11, 23).target, closeTo(1544, 2));
+      for (final monday in run.mondays.skip(3)) {
         expect(monday.target, 1500);
       }
       final last = run.mondays.last.profile;
@@ -94,11 +89,20 @@ void main() {
       );
     });
 
-    test('(c) burning 215 more: +80, +130, steady, +210', () {
+    test('(c) burning 215 more: small steps from the first week to +210', () {
       final run = _yourPlan(218);
-      final acting = run.mondays.skip(2).take(4).toList();
-      expect(acting.map((m) => m.note), [_raised, _raised, _steady, _raised]);
-      expect(acting.map((m) => m.adjustment), [80, 130, 130, 210]);
+      final acting = run.mondays.take(6).toList();
+      expect(acting.map((m) => m.note), everyElement(_raised));
+      expect(acting.map((m) => m.adjustment), [20, 70, 100, 140, 180, 210]);
+    });
+
+    test('what you burn moves from the formula\'s to the measured', () {
+      final run = _yourPlan(-227);
+      final first = run.mondays.first.result.measure;
+      final sixth = run.mondays[5].result.measure;
+      expect(first.confidence, closeTo(1 / 6, 0.01));
+      expect(first.burn - first.formulaBurn, closeTo(-227 / 6, 2));
+      expect(sixth.burn - sixth.formulaBurn, closeTo(-227, 2));
     });
   });
 
@@ -451,12 +455,26 @@ void main() {
       expect(decide(-400).note, _lowered);
     });
 
-    test('the dead band holds at 49 and moves at 50', () {
-      expect(decide(49).note, _steady);
-      expect(decide(50).note, _raised);
-      expect(decide(50).adjustment, 50);
-      expect(decide(-149, current: -100).note, _steady);
-      expect(decide(-150, current: -100).adjustment, -150);
+    test('the dead band holds at 19 and moves at 20', () {
+      expect(decide(19).note, _steady);
+      expect(decide(20).note, _raised);
+      expect(decide(20).adjustment, 20);
+      expect(decide(-119, current: -100).note, _steady);
+      expect(decide(-120, current: -100).adjustment, -120);
+    });
+
+    test('in the first 3 weeks, steps are smaller', () {
+      // A week in: a third of the usual 5%.
+      expect(
+        AdaptiveFormula.decide(
+          aim: 300,
+          current: 0,
+          planTarget: 2000,
+          cutPending: false,
+          stepScale: 7 / 21,
+        ).adjustment,
+        30,
+      );
     });
   });
 
@@ -500,26 +518,28 @@ void main() {
   group('the window', () {
     final run = _yourPlan(0, weeks: 10);
 
-    test('under 21 days is learning', () {
-      final measured = AdaptiveFormula.measure(
+    test('under a week is learning; a week is enough', () {
+      AdaptiveMeasure upTo(int day) => AdaptiveFormula.measure(
         profile: planProfile(),
         entries: run.entries,
         summaries: run.summaries,
-        end: DateTime(2026, 11, 21),
+        end: DateTime(2026, 11, day),
       );
-      expect(measured.days, 20);
-      expect(measured.hold, _learning);
+      expect(upTo(7).days, 6);
+      expect(upTo(7).hold, _learning);
+      expect(upTo(8).days, 7);
+      expect(upTo(8).hold, isNull);
     });
 
-    test('a new account\'s first 14 days aren\'t used', () {
+    test('a new account\'s first week, mostly water, isn\'t used', () {
       final measured = AdaptiveFormula.measure(
         profile: planProfile(createdAt: DateTime(2026, 11, 2)),
         entries: run.entries,
         summaries: run.summaries,
         end: DateTime(2026, 12, 6),
       );
-      // 16 November to 6 December.
-      expect(measured.days, 21);
+      // 9 November to 6 December.
+      expect(measured.days, 28);
     });
 
     test('nothing older than 42 days is used', () {

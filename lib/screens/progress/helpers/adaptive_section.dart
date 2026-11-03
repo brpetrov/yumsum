@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
-import 'package:lean_streak/helpers/adaptive_formula.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
@@ -13,11 +13,12 @@ import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/widgets/day_status.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 
-/// The Adaptive formula under the weight chart: what it does for you, and
-/// with YumSum Star, that it's on, the sum it makes, how well it knows you
-/// and this week's result. Without YumSum Star a tap opens the YumSum Star
-/// page; switched off in Plan Settings, a tap goes there. Its info button
-/// explains it ([showAdaptiveIntro]).
+/// The Adaptive formula under the weight chart: what it does for you, then
+/// with YumSum Star, what you burn as it has learnt it and the target that
+/// follows, how well it knows you and this week's result. Without YumSum
+/// Star, the formula's guess beside a locked real burn, and a tap opens
+/// the YumSum Star page; switched off in Plan Settings, a tap goes there.
+/// Its info button explains it ([showAdaptiveIntro]).
 class AdaptiveSection extends ConsumerWidget {
   const AdaptiveSection({super.key, required this.profile});
 
@@ -82,15 +83,26 @@ class AdaptiveSection extends ConsumerWidget {
           ),
         ),
         if (on) ...[
-          const SizedBox(height: 6),
-          Text(
-            adaptiveSumLine(
-              AdaptiveFormula.planOf(profile, now: DateTime.now()),
-            ),
-            style: muted,
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: _Stat(
+                  label: 'You burn',
+                  value: '${adaptiveBurn(profile, progress)} kcal',
+                  color: AppColors.veryGood,
+                ),
+              ),
+              Expanded(
+                child: _Stat(
+                  label: 'Your target',
+                  value: '${profile.dailyCalorieTarget.round()} kcal',
+                ),
+              ),
+            ],
           ),
           if (progress != null) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: 10),
             Text(adaptiveStageLine(progress), style: muted),
           ],
           if (week != null) ...[
@@ -101,7 +113,25 @@ class AdaptiveSection extends ConsumerWidget {
           const SizedBox(height: 6),
           Text('Off. Switch it on in Plan Settings.', style: muted),
         ] else ...[
-          const SizedBox(height: 10),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: _Stat(
+                  label: 'Formula\'s guess',
+                  value: '${adaptiveBurn(profile, null)} kcal',
+                ),
+              ),
+              Expanded(
+                child: _Stat(
+                  label: 'Your real burn',
+                  icon: Icons.lock_rounded,
+                  color: AppColors.veryGood,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
           Row(
             children: [
               const PlusStar(size: 24),
@@ -131,6 +161,43 @@ class AdaptiveSection extends ConsumerWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: section,
+    );
+  }
+}
+
+/// A small label over a big number (or a locked one, as [icon]), like the
+/// stats at the top of the page.
+class _Stat extends StatelessWidget {
+  const _Stat({required this.label, this.value, this.icon, this.color});
+
+  final String label;
+  final String? value;
+  final IconData? icon;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = this.color ?? AppColors.textPrimary;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 4),
+        if (value case final value?)
+          Text(
+            value,
+            style: AppTheme.display.copyWith(fontSize: 21, color: color),
+          )
+        else
+          Icon(icon, size: 26, color: color),
+      ],
     );
   }
 }

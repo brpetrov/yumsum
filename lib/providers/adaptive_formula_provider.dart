@@ -321,6 +321,16 @@ String adaptiveSumLine(HealthPlanCalculation preview) {
       '$target kcal$minimum';
 }
 
+/// What you burn a day, to the nearest 10: what it has measured once it
+/// can, before that the burn your target assumes (the formula's, plus any
+/// adjustment).
+int adaptiveBurn(UserProfile profile, AdaptiveMeasure? measure) {
+  final burn = measure != null && measure.hold == null
+      ? measure.burn
+      : AdaptiveFormula.planOf(profile).tdee + profile.adaptiveKcal;
+  return (burn / 10).round() * 10;
+}
+
 /// How well it knows you, in plain stages rather than a percentage.
 String adaptiveStageLine(AdaptiveMeasure measure) {
   String count(int n, String one, String many) => '$n ${n == 1 ? one : many}';

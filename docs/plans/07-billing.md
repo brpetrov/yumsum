@@ -137,7 +137,7 @@ Route `/plus` (`AppRoutes.plus`, `PlusScreen`), pushed on top of the current pag
 - **One line each, with an icon:**
   - "Log a meal from a photo of your plate"
   - "30 AI estimates a day, instead of 10"
-  - "Adaptive formula: after about 3 weeks of weigh-ins, your target adjusts each Monday to how your weight really moves. Needs regular weigh-ins." (Plan 08 has the exact rule.)
+  - "Adaptive Formula: Learns your real burn and tunes your target." (Built on the YumSum Star page; plan 08 has the rules.)
   - "A weekly review in History, written by the AI"
   - "Carbs and fat too, not just calories and protein" (plan 10 settles the wording)
   - "What should I eat?" is added only once it exists.

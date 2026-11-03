@@ -67,7 +67,7 @@ Billing, the paywall and who counts as a subscriber are in `07-billing.md`.
     - get one AI weekly review
     - see the Adaptive formula start learning
 
-    The Adaptive formula needs about 3 weeks of weigh-ins before it first changes your target (plan 08), so the paywall says that plainly. During a 14-day closed test, testers who start fresh will only see it learning.
+    Since 3 November the Adaptive formula learns from the first week (plan 08): what you burn moves after a week, and the target changes in small steps from then on. During a 14-day closed test, testers who weigh in will see it working.
 
 ## Photo logging and the AI allowance
 

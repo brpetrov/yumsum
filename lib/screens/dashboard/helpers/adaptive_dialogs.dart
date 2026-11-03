@@ -42,14 +42,16 @@ Future<void> showAdaptiveIntro(BuildContext context, WidgetRef ref) async {
               ),
               (
                 Icons.calendar_month_outlined,
-                'Adjusts your target a little each Monday.',
+                'Adjusts your target each Monday, from your first week.',
+              ),
+              (
+                Icons.trending_down_rounded,
+                'Helps you keep losing when a fixed target would stall.',
               ),
               (
                 Icons.monitor_weight_outlined,
-                'Weigh in 3 times a week or more. First change in about 3 '
-                    'weeks.',
+                'Weigh in at least twice a week. Daily is best.',
               ),
-              (Icons.shield_outlined, 'Never goes below your safe minimum.'),
             ].indexed) ...[
               if (i > 0) const SizedBox(height: 14),
               Row(

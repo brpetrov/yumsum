@@ -1,14 +1,52 @@
 # Plan 8: Adaptive formula
 
-*Written 2 November 2026. Status: built on 3 November (steps 1 to 7), to try on your phone. A YumSum Star feature (plan 06), with a free weight trend line that can ship first. Every number below is a starting value. It was checked in a simulation of the rules (noisy daily weights, your own plan, and each bad case in the table), and gets tuned with your real data.*
+*Written 2 November 2026. Status: built on 3 November (steps 1 to 7), to try on your phone, and revised the same day to learn from the first week (below). A YumSum Star feature (plan 06), with a free weight trend line that can ship first. Every number below is a starting value. It was checked in a simulation of the rules (noisy daily weights, your own plan, and each bad case in the table), and gets tuned with your real data.*
+
+## Revision, 3 November: from the first week, like MacroFactor
+
+You didn't like waiting 3 weeks (5 for a new account) for anything to happen. MacroFactor, the best-known app with an adaptive target, works the same way underneath. What it does better is this:
+- **It shows its learnt burn from day one.** The number starts moving after about a week.
+- **Its first weekly check-in moves the target by only "a couple of calories"**, and the second by more.
+- **It counts a new diet's early drop as water** rather than waiting.
+
+It's only "much more confident" after 3 to 4 weeks, as this plan is, because a week of weigh-ins can't tell a real 225 kcal gap from noise. So the change is to start small and early, not to trust a week of data more.
+
+What changed:
+- **Learns from week 1:**
+  - The window needs 7 days, not 21.
+  - Weeks (T) grows from the first week: weeks ÷ 6.
+  - The minimum is 3 weigh-ins over 5 days or more, with 2 in the finished week, not 8 over 14 days.
+- **Small steps early:** the step limit is 5% of the plan × days ÷ 21 for the first 3 weeks (about 25 kcal in week 1, 55 in week 2), then 5%.
+- **Small changes show:** the dead band is 20 kcal, not 50.
+- **New accounts:** only the first 7 days are left out (mostly water and stored carbohydrate), not 14.
+- **What you burn on show:** Weight & Progress shows "You burn" beside "Your target" (`AdaptiveMeasure.burn`, the formula's burn moved towards the measured one by the confidence, as `adaptiveBurn`). It's measured up to yesterday, so it moves daily. Free users see the formula's guess beside a locked real burn.
+
+Simulated (60 noisy runs: 0.5 kg weigh-in noise and 250 kcal food noise), the median adjustment by week:
+
+| Week | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Burns 225 less, before | 0 | 0 | 0 | −80 | −80 | −140 |
+| Burns 225 less, now | 0 | 0 | −50 | −80 | −110 | −150 |
+| Burns 215 more, before | 0 | 0 | 70 | 80 | 140 | 160 |
+| Burns 215 more, now | 0 | 50 | 90 | 130 | 160 | 180 |
+| New account burning 225 less, before | 0 | 0 | 0 | 0 | 0 | −80 |
+| New account burning 225 less, now | 0 | 0 | 0 | −40 | −60 | −110 |
+
+- **Noise in week 1:** it moves the target by at most 20 kcal.
+- **When the formula is right:** the adjustment wanders between about −40 and +80, as before, with a median of 0 to 40.
+- **Without a noise floor,** the noiseless paths are now:
+  - burning 225 less: a first sign, then −50, −110, −150, −180, −220;
+  - burning 215 more: +20, +70, +100, +140, +180, +210.
+
+The rest of this plan has the new numbers.
 
 ## The short version
 
 1. **Your target = your plan + a personal adjustment.** The formula stays exactly as it is. The Adaptive formula adds one number, for example −80 kcal a day, learnt from your weigh-ins and the food you log.
-2. **It only changes your target on Mondays.** It looks back over the last 3 to 6 weeks (never older) and asks: given what you actually ate, did your weight do what the formula predicted? If yes, nothing changes. If not, the formula has your burn wrong, so it corrects it. Eating over target isn't punished; it's counted.
-3. **It moves in small, careful steps.** Each move is at most 5% of your plan, and it can never move more than 15% in total. A cut needs two Mondays in a row agreeing; a raise needs one. Your minimum (1,500 kcal for men, 1,200 for women) never changes. At the minimum, your goal date moves later instead.
+2. **It only changes your target on Mondays.** It looks back over the last 1 to 6 weeks (never older) and asks: given what you actually ate, did your weight do what the formula predicted? If yes, nothing changes. If not, the formula has your burn wrong, so it corrects it. Eating over target isn't punished; it's counted.
+3. **It moves in small, careful steps.** Each move is at most 5% of your plan (less in the first 3 weeks), and it can never move more than 15% in total. A cut needs two Mondays in a row agreeing; a raise needs one. Your minimum (1,500 kcal for men, 1,200 for women) never changes. At the minimum, your goal date moves later instead.
 4. **Bad data can't push it around.** One heavy weigh-in is one dot on a line. A typo is set aside. Half-logged days are left out, and so are breaks in logging. With too little data it changes nothing and says why.
-5. **Weigh-ins are the fuel.** It needs at least 3 a week, and daily is best. With weekly weigh-ins it never acts, and it says so.
+5. **Weigh-ins are the fuel.** It needs at least 2 a week, and daily is best. With weekly weigh-ins it never acts, and it says so.
 6. **Free users get the weight trend line** on Weight & Progress. It can ship on its own, first.
 
 ## How a good coach adjusts calories
@@ -27,13 +65,13 @@ The Adaptive formula does each of these, the same way, every Monday:
 
 | A coach… | The Adaptive formula… |
 |---|---|
-| looks at the trend | fits a straight line through 3–6 weeks of weigh-ins |
+| looks at the trend | fits a straight line through 1–6 weeks of weigh-ins |
 | compares it with what you ate | works out your **measured burn** from your logged food and that line |
-| waits for enough data | needs 3 weeks, 8 weigh-ins and 4 logged days a week before it acts |
-| makes small changes | moves at most 5% of your plan a week, and 15% in all |
+| waits for enough data | needs a week, 3 weigh-ins and 4 logged days a week before it acts, and trusts it more each week |
+| makes small changes | moves at most 5% of your plan a week (less in the first 3 weeks), and 15% in all |
 | cuts slowly | needs two Mondays in a row to cut, one to raise |
 | keeps a minimum | never goes below 1,500 (men), 1,200 (women) or 1,350 (other); the goal date moves instead |
-| asks about odd weeks | leaves out half-logged days, breaks in logging, typos, a new account's first 2 weeks and creatine's first 4 |
+| asks about odd weeks | leaves out half-logged days, breaks in logging, typos, a new account's first week and creatine's first 4 |
 | doesn't judge | uses what you actually ate, whatever your target was |
 
 ## The minimums are right
@@ -54,7 +92,7 @@ It runs on the phone: no server, no AI, no cost. All of it is one pure calculato
 
 On Monday it looks at days up to Sunday. The window starts at the **latest** of:
 - 42 days before Monday (6 weeks; nothing older is ever used)
-- 14 days after the account was created (`createdAt`): a new diet loses 1–2 kg of water and stored carbohydrate (glycogen) in its first days, which isn't fat and would look like a huge burn
+- 7 days after the account was created (`createdAt`): a new diet loses 1–2 kg of water and stored carbohydrate (glycogen) in its first days, which isn't fat and would look like a huge burn
 - `adaptiveFrom`, when set (after a change of details in Plan Settings, or turning on the creatine reminder; see the table)
 - the first day with anything logged
 
@@ -108,8 +146,8 @@ Checked in this order. The first that applies is that Monday's result, and the t
 | Check | Needs | Otherwise |
 |---|---|---|
 | Recent weigh-in | a weigh-in in the last 10 days | **Paused** |
-| Enough weeks | L ≥ 21 days (3 weeks) | **Learning** |
-| Enough weigh-ins | 8 or more counted, spanning 14 days or more, and 2 or more in the finished week | **Not enough weigh-ins** |
+| Enough weeks | L ≥ 7 days (1 week) | **Learning** |
+| Enough weigh-ins | 3 or more counted, spanning 5 days or more, and 2 or more in the finished week | **Not enough weigh-ins** |
 | Enough logging | days that count ≥ 4/7 of L (the "logged enough" rule `PeriodReviewService` uses), and 4 or more in the finished week | **Not enough days logged** |
 
 ### Step 7: confidence
@@ -121,19 +159,21 @@ Four marks, each from 0 to 1, multiplied together:
 | **Weigh-ins (W)** | weigh-ins a week ÷ 4, at most 1 | 4 or more a week is full marks; 3 a week 0.75; 2 a week 0.5 |
 | **Days logged (D)** | days that count ÷ L | logging every day is 1; 5 days in 7 is 0.71 |
 | **Steadiness (S)** | 0.5% ÷ scatter, at most 1 | weigh-ins within 0.5% of the line (0.4 kg at 80 kg) are full marks; twice as scattered, half marks |
-| **Weeks (T)** | (L ÷ 7 − 1) ÷ 5 | 3 weeks 0.4, 4 weeks 0.6, 5 weeks 0.8, 6 weeks 1.0 |
+| **Weeks (T)** | L ÷ 7 ÷ 6, at most 1 | 1 week 0.17, 2 weeks 0.33, 3 weeks 0.5, 6 weeks 1.0 |
 
 > **confidence = W × D × S × T**
 
-For example, someone weighing every morning, logging every day, with weigh-ins 0.4 kg either side of the line, scores 0.4 after 3 weeks, 0.6 after 4 and 1.0 after 6. Someone weighing 3 times a week with 2 unlogged days a week scores 0.75 × 0.71 = 0.53 of that. In the simulation, typical real-life scatter put a daily weigher at about 0.4, 0.55, 0.7 and 0.85 in weeks 3 to 6.
+For example, someone weighing every morning, logging every day, with weigh-ins 0.4 kg either side of the line, scores 0.17 after 1 week, 0.5 after 3 and 1.0 after 6. Someone weighing 3 times a week with 2 unlogged days a week scores 0.75 × 0.71 = 0.53 of that.
+
+**What you burn** = formula burn + gap × confidence (`AdaptiveMeasure.burn`). It's the formula's guess moved towards the measured burn as far as it trusts it. Weight & Progress shows it to the nearest 10, measured up to yesterday.
 
 ### Step 8: the Monday decision
 
 1. **Aim** = gap × confidence, rounded towards zero to the nearest 10 kcal. If it's 60% sure, it aims for 60% of the gap. It re-measures every Monday, so the aim grows as confidence does, and it settles gradually.
 2. **Unusual:** if the aim is more than **20% of the plan target**, it doesn't believe the data. The target stays and Today says the numbers look unusual.
 3. **Total limit:** the aim is held within **±15% of the plan target**. The formula is rarely off by more for one person.
-4. **Dead band:** if the aim is within **50 kcal** of the current adjustment, nothing changes.
-5. **Step** = aim − current adjustment, at most **5% of the plan target** (rounded down to 10 kcal: 80 for a 1,670 plan).
+4. **Dead band:** if the aim is within **20 kcal** of the current adjustment, nothing changes.
+5. **Step** = aim − current adjustment, at most **5% of the plan target** (rounded down to 10 kcal: 80 for a 1,670 plan). In the first 3 weeks of data the limit is scaled by L ÷ 21, so a week in it's about 25 kcal.
 6. **Raise** (step above 0): made now.
 7. **Cut** (step below 0): made only if **last Monday also wanted a cut**, meaning last Monday's result was "first sign" or "lowered", 7 days earlier. Otherwise this Monday is the **first sign**: nothing changes, and it checks again next Monday.
 
@@ -159,16 +199,16 @@ Away from the minimum, this is simply **plan target + adjustment**, and the goal
 |---|---|
 | Trend smoothing | 0.9 (10% a day towards each weigh-in) |
 | Typo rule | 3% from the trend, confirmed by the next weigh-in |
-| Window | 21 to 42 days, ending Sunday |
-| New account left out | first 14 days |
+| Window | 7 to 42 days, ending Sunday |
+| New account left out | first 7 days |
 | Creatine left out | 28 days from turning the reminder on |
 | Half-logged day | under 60% of that day's target |
 | Break | 3 or more days in a row with nothing logged |
-| Minimum data | 8 weigh-ins over 14 days, 2 in the finished week; 4/7 of days counting, 4 in the finished week |
+| Minimum data | 3 weigh-ins over 5 days, 2 in the finished week; 4/7 of days counting, 4 in the finished week |
 | Paused | no weigh-in for 10 days |
 | Confidence | W × D × S × T, with full marks at 4 weigh-ins a week, every day logged, 0.5% scatter and 6 weeks |
-| Dead band | 50 kcal |
-| Step limit | 5% of the plan target a week |
+| Dead band | 20 kcal |
+| Step limit | 5% of the plan target a week, × days ÷ 21 in the first 3 weeks |
 | Total limit | 15% of the plan target |
 | Unusual | aim over 20% of the plan target |
 | Cut | two Mondays in a row; raise, one |
@@ -197,7 +237,7 @@ Away from the minimum, this is simply **plan target + adjustment**, and the goal
 | **Ill for a week** (eats little, loses 1.5 kg of water, regains it) | The low days are left out. Simulated: no meaningful change. |
 | **Periods** (about ±0.8 kg of water over the month) | Spread across a 3–6 week line. Simulated: no worse than without. Two Mondays are needed to cut. |
 | **Starting creatine** (extra water in the muscles: about 0.5–1 litre with a loading dose, by the ISSN's figure; over about 4 weeks at 3 g a day) | With the creatine reminder turned on, the next 28 days are left out. Without it, the water looks like slower loss. Simulated: 1 kg over 4 weeks cut step by step to −240 over 3 weeks, then went back over the next 4. 1.5 kg in one loading week cut 80, said "unusual" twice, then went back. The minimum still holds. |
-| **A new diet's first days** (water and glycogen loss) | A new account's first 14 days are left out. Simulated without that rule: a wrong raise of 80 kcal for 5 weeks. |
+| **A new diet's first days** (water and glycogen loss) | A new account's first 7 days are left out. Simulated (1.5 kg of water off over the first 4 days, 60 noisy runs): a median raise of 20–50 kcal, about what noise alone gives. With 14 days left out and the old rules it was 0, but with nothing at all for 4 weeks. |
 | **Beginners gaining muscle while losing fat** (weight flat) | It can't tell muscle from fat, so it reads this as a lower burn and may cut. The caps, two-Monday rule and minimum limit it. The How it works dialog doesn't promise otherwise. |
 | **The formula is right, but weigh-ins bounce** | It wanders a little. Simulated: after 10 weeks, the adjustment sat between about −70 and +90 in 8 runs out of 10 (median 0). 80 kcal is 0.07 kg a week. |
 | **Changing details or activity in Plan Settings** | The adjustment goes back to 0 and learning starts again from that day, so it never double-counts a correction or fights a real change (e.g. starting to train). |
@@ -257,9 +297,11 @@ From 7 December Today says: "Your target is at your minimum, so your goal date i
 
 Eating 1,830 is now on target, and your goal date stays about 5 January.
 
-**On your phone it can start sooner.** You already have weeks of meals. Once you weigh in most mornings, the first Monday that can act is the one where your weigh-ins span 14 days, with 8 or more of them: 16 or 23 November if you start weighing daily now.
+*(This example predates the revision at the top: it now moves from the first week, in smaller steps, as that section's noiseless paths show.)*
 
-**Why "2,000 to 1,500 after one weigh-in" can't happen.** Nothing changes except on a Monday. One weigh-in is one dot among at least 8. It needs 3 weeks of data first. A cut needs two Mondays. Each step is at most 5% (100 kcal for a 2,000 plan). And the total is at most 15%, so the lowest a 2,000 plan can ever go is **1,700**. The fastest path there is 1,900, 1,800, 1,700 on three Mondays in a row, after a first sign, with 6 weeks of consistent data behind it. A 500 kcal drop is beyond the limit, and the minimum stands under all of it.
+**On your phone it can start sooner.** You already have weeks of meals. Once you weigh in most mornings, the first Monday that can act is the first after a week of weigh-ins.
+
+**Why "2,000 to 1,500 after one weigh-in" can't happen.** Nothing changes except on a Monday. One weigh-in is one dot among several. A cut needs two Mondays. In the first 3 weeks a step is smaller still, about 30 kcal a week in, and after that each step is at most 5% (100 kcal for a 2,000 plan). And the total is at most 15%, so the lowest a 2,000 plan can ever go is **1,700**. The fastest path there is 1,900, 1,800, 1,700 on three Mondays in a row, after a first sign, with 6 weeks of consistent data behind it. A 500 kcal drop is beyond the limit, and the minimum stands under all of it.
 
 ## What you see
 
@@ -311,9 +353,11 @@ The preview card's info dialog (`_CalculationInfoDialog`) gets an "Adaptive" lin
 ### How it works (once, after subscribing; again from the link)
 
 A dialog with icon rows, like Day off's (`confirmDayOff`). Title: **How the Adaptive formula works**.
+Four short lines, to take in at a glance:
 - (insights icon) Learns what you really burn from your weigh-ins and meals.
-- (calendar icon) Changes your target on Mondays only, in small steps.
-- (scale icon) Weigh in at least 3 times a week, daily is best, at the same time each morning.
+- (calendar icon) Adjusts your target each Monday, from your first week.
+- (trend icon) Helps you keep losing when a fixed target would stall.
+- (scale icon) Weigh in at least twice a week. Daily is best.
 
 Buttons: **Got it**, and **Remind me each morning** on phones when the weigh-in reminder isn't already daily. That sets the weigh-in reminder to every day at 07:30. Afterwards a snackbar says: "Weigh-in reminder on for 07:30 every day. Change it under Notifications in the menu."
 
@@ -331,13 +375,16 @@ The weekly weigh-in reminder becomes **Weigh-in reminder**. Its day list gains *
 
 ### Paywall (plan 07 writes the screen)
 
-Plan 07's draft line says the target adjusts "after 2 weeks of weigh-ins" and leaves the exact rule to this plan. By the rules above, it's 3 weeks. Suggested line: "Adaptive formula: learns what you really burn and adjusts your target each Monday. It starts after about 3 weeks of weigh-ins."
+The YumSum Star page says: "Adaptive Formula: Learns your real burn and tunes your target." It works from the first week, so there's no wait to warn about.
 
 ### Weight & Progress (free)
 
 - The trend line becomes the chart's green line.
 - The weigh-ins are the dots: hollow when set aside.
-- A caption under the chart: "The line is your trend: your weight without the daily ups and downs."
+- Under the chart, in its card, the Adaptive formula (no switch; it sells itself): "Tunes your target to your own body, from your weigh-ins and meals."
+  - With YumSum Star, "You burn" beside "Your target", then how well it knows you and this week's line.
+  - Free users see "Formula's guess" beside "Your real burn" locked, and "Become a Star to unlock it".
+  - The trend caption that was here is gone.
 
 ## What gets built
 
@@ -499,14 +546,15 @@ Tests never touch Firebase, as the house rule says. The calculator tests use a s
   - a step never exceeds 5% of the plan
   - the total never exceeds 15%
   - an aim over 20% gives `unusual` with no change
-  - the dead band holds at 49 and moves at 50
+  - the dead band holds at 19 and moves at 20
+  - in the first 3 weeks, steps are smaller
 - **Minimum and goal date:**
   - the target is never below `calorieFloor` for each gender
   - when the adjustment takes it there, the goal date is later than with 0
   - away from the minimum, the goal date equals the plain plan's
 - **Windows:**
-  - under 21 days gives `learning`
-  - a new account's first 14 days aren't used
+  - under 7 days gives `learning`; 7 is enough
+  - a new account's first 7 days aren't used
   - nothing older than 42 days is used (changing a 43-day-old weigh-in changes nothing)
   - `adaptiveFrom` is respected
 - **Paused:** the last weigh-in 10 days ago gives `paused` with the adjustment unchanged.
@@ -570,7 +618,7 @@ Skipped unless `config/adaptive_replay.json` exists (add it to `.gitignore`). It
 
 Copy the debug log's JSON into the replay file and run it to see why.
 
-**For the closed test:** in 14 days your testers will only see "Learning". That's honest, and the paywall line says it starts after about 3 weeks.
+**For the closed test:** in 14 days your testers who weigh in will see what they burn move from the first week, and a first small change on the second Monday.
 
 ## Risks
 
@@ -597,7 +645,7 @@ These go beyond what we agreed on 1–2 November, or change it slightly:
 1. **"Unusual" at 20%, limit at 15%.** You said past 15% it doesn't believe the data. In simulation, for someone whose real gap was −225 (your case (b)), a 15% trigger said "unusual" on about 1 Monday in 8 after the learning weeks; at 20%, about 1 in 30. So the adjustment stops at 15%, and only an aim past 20% is called unusual.
 2. **It aims for gap × confidence**, re-measured each Monday, rather than stepping by gap × confidence each week. The first move is the same; later it stays steadier.
 3. **Changing details or activity in Plan Settings restarts learning**, rather than keeping the adjustment. Otherwise the old correction double-counts, or fights a real change such as starting to train.
-4. **The first 14 days of a new account are left out**, and **28 days after turning on the creatine reminder**. A brand-new subscriber's first change is then about 5 weeks in. Plan 06's trial section says it "only starts changing your target after two weeks", and plan 07's paywall draft says "after 2 weeks of weigh-ins". Both should say about 3 weeks of weigh-ins, and 5 for a new account.
+4. **The first 7 days of a new account are left out** (14 before the revision at the top), and **28 days after turning on the creatine reminder**. A brand-new subscriber's first small change is then about 2 weeks in.
 5. **Reset progress and Reset all data put the adjustment back to 0.**
 6. **The lapse notice is a one-time dialog**, as "Today says once" suggests, rather than a line for the 2 weeks.
 7. **Today's wording is "You burn a little less than your plan assumed"**, not "You're losing a little slower than your plan expects". It's adherence-neutral and works in maintain mode.

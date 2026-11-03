@@ -112,6 +112,11 @@ void main() {
       findsOneWidget,
     );
     expect(find.text(pitch), findsOneWidget);
+    // The formula's guess, beside the real burn it would learn, locked.
+    expect(find.text('Formula\'s guess'), findsOneWidget);
+    expect(find.text('2490 kcal'), findsOneWidget);
+    expect(find.text('Your real burn'), findsOneWidget);
+    expect(find.byIcon(Icons.lock_rounded), findsOneWidget);
     expect(find.text('Become a Star to unlock it'), findsOneWidget);
     expect(find.byType(Switch), findsNothing);
 
@@ -123,7 +128,7 @@ void main() {
     expect(find.text('Remind me each morning'), findsNothing);
   });
 
-  testWidgets('with YumSum Star it is on, with the sum it makes', (
+  testWidgets('with YumSum Star it is on: what you burn and your target', (
     tester,
   ) async {
     await pumpScreen(
@@ -133,10 +138,12 @@ void main() {
     );
     expect(find.text(pitch), findsOneWidget);
     expect(find.text('On'), findsOneWidget);
-    expect(
-      find.text('1670 from your plan − 80 adaptive = 1590 kcal'),
-      findsOneWidget,
-    );
+    // Nothing measured yet, so the burn the target assumes: 2495 − 80.
+    expect(find.text('You burn'), findsOneWidget);
+    expect(find.text('2410 kcal'), findsOneWidget);
+    expect(find.text('Your target'), findsOneWidget);
+    expect(find.text('1590 kcal'), findsOneWidget);
+    expect(find.byIcon(Icons.lock_rounded), findsNothing);
     expect(find.text('Become a Star to unlock it'), findsNothing);
     expect(find.byType(Switch), findsNothing);
   });
