@@ -154,6 +154,51 @@ void main() {
     expect(find.text(macrosLine(wrap.macros!)), findsOneWidget);
   });
 
+  testWidgets('a meal\'s nutrition has its protein where a label has it, '
+      'while protein is tracked', (tester) async {
+    final withProtein = Meal(
+      id: 'wrap',
+      date: '2026-11-03',
+      timestamp: DateTime(2026, 11, 3, 12),
+      name: 'Chicken wrap',
+      calories: 500,
+      proteinGrams: 32.4,
+      macros: wrap.macros,
+      createdAt: DateTime(2026, 11, 3, 12),
+      updatedAt: DateTime(2026, 11, 3, 12),
+    );
+    Future<void> open({required bool showProtein}) async {
+      await pumpWidget(
+        tester,
+        MealRow(
+          key: ValueKey(showProtein),
+          meal: withProtein,
+          onEdit: () {},
+          onDelete: () {},
+          showProtein: showProtein,
+          showMacros: true,
+        ),
+      );
+      await tester.tap(find.text('Chicken wrap'));
+      await tester.pump();
+    }
+
+    await open(showProtein: true);
+    expect(
+      find.text(
+        _line(
+          'Fat 18 g · saturates 6 g · carbs 52 g · sugars 5 g · fibre 4 g · '
+          'protein 32 g · salt 2.1 g',
+        ),
+      ),
+      findsOneWidget,
+    );
+
+    await open(showProtein: false);
+    expect(find.text(macrosLine(wrap.macros!)), findsOneWidget);
+    expect(find.textContaining('protein'), findsNothing);
+  });
+
   testWidgets('without YumSum Star a meal row has no macros hint', (
     tester,
   ) async {

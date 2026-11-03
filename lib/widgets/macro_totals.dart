@@ -28,11 +28,15 @@ String _capitalised(String text) =>
 
 /// The known figures in one line, for a meal's row, the recipe page and the
 /// amount sheet: "Fat 18 g · saturates 6 g · carbs 52 g · sugars 5 g ·
-/// fibre 4 g · salt 2.1 g", each figure held together.
-String macrosLine(Nutrients macros) => _capitalised(
+/// fibre 4 g · salt 2.1 g", each figure held together. With [protein], it
+/// goes where a food label has it, between fibre and salt.
+String macrosLine(Nutrients macros, {double? protein}) => _capitalised(
   [
-    for (final (i, value) in _six(macros).indexed)
+    for (final (i, value) in _six(macros).indexed) ...[
+      if (_names[i] == 'salt' && protein != null)
+        'protein$_nb${_grams('protein', protein)}',
       if (value != null) '${_names[i]}$_nb${_grams(_names[i], value)}',
+    ],
   ].join(' · '),
 );
 

@@ -176,7 +176,7 @@ void main() {
     final closedLine = _line('Fat 34 g · carbs 42 g · salt 2.3 g');
     final rowLine = _line(
       'Fat 34 g · saturates 14 g · carbs 42 g · sugars 9 g · fibre 5 g · '
-      'salt 2.3 g',
+      'protein 31 g · salt 2.3 g',
     );
 
     testWidgets('YumSum Star sees the day\'s macros and each meal\'s on a '
