@@ -352,12 +352,11 @@ The preview card's info dialog (`_CalculationInfoDialog`) gets an "Adaptive" lin
 
 ### How it works (once, after subscribing; again from the link)
 
-A dialog with icon rows, like Day off's (`confirmDayOff`). Title: **How the Adaptive formula works**.
-Four short lines, to take in at a glance:
-- (insights icon) Learns what you really burn from your weigh-ins and meals.
-- (calendar icon) Adjusts your target each Monday, from your first week.
-- (trend icon) Helps you keep losing when a fixed target would stall.
-- (scale icon) Weigh in at least twice a week. Daily is best.
+A dialog titled **A target that learns you**. It has four bold promises, each with one short line, and icons in tinted bubbles, to take in at a glance:
+- (insights) **Finds your real burn.** From your own weigh-ins and meals, not a guess.
+- (calendar) **Tunes your target.** A small step each Monday, from your first week.
+- (trend) **Beats plateaus.** Adjusts when a fixed target would leave you stuck.
+- (scale) **Runs on weigh-ins.** At least twice a week. Daily is best.
 
 Buttons: **Got it**, and **Remind me each morning** on phones when the weigh-in reminder isn't already daily. That sets the weigh-in reminder to every day at 07:30. Afterwards a snackbar says: "Weigh-in reminder on for 07:30 every day. Change it under Notifications in the menu."
 

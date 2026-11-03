@@ -7,13 +7,15 @@ import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/reminder_provider.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/services/notification_service.dart';
+import 'package:lean_streak/widgets/icon_bubble.dart';
 
 /// Prefs keys: the How it works dialog shown once after subscribing, and
 /// the end date whose lapse notice was shown.
 const adaptiveIntroShownKey = 'adaptive.intro_shown';
 const adaptiveLapseNoticeKey = 'adaptive.lapse_notice';
 
-/// How the Adaptive formula works: once after subscribing, and from Plan
+/// How the Adaptive formula works ("A target that learns you"): once after
+/// subscribing, and from Plan
 /// Settings and Weight & Progress. With YumSum Star it offers a weigh-in
 /// reminder every morning on phones, unless there already is one; without
 /// it, the YumSum Star page.
@@ -28,38 +30,67 @@ Future<void> showAdaptiveIntro(BuildContext context, WidgetRef ref) async {
   final choice = await showDialog<_IntroChoice>(
     context: context,
     builder: (context) => AlertDialog(
-      title: const Text('How the Adaptive formula works'),
+      // Two even lines, rather than "you" alone on a phone.
+      title: const Text('A target that\nlearns you'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Four short lines, to take in at a glance.
-            for (final (i, (icon, line)) in [
+            // Four bold promises, each with one short line, to take in at
+            // a glance.
+            for (final (i, (icon, headline, line)) in [
               (
                 Icons.insights_rounded,
-                'Learns what you really burn from your weigh-ins and meals.',
+                'Finds your real burn',
+                'From your own weigh-ins and meals, not a guess.',
               ),
               (
                 Icons.calendar_month_outlined,
-                'Adjusts your target each Monday, from your first week.',
+                'Tunes your target',
+                'A small step each Monday, from your first week.',
               ),
               (
                 Icons.trending_down_rounded,
-                'Helps you keep losing when a fixed target would stall.',
+                'Beats plateaus',
+                'Adjusts when a fixed target would leave you stuck.',
               ),
               (
                 Icons.monitor_weight_outlined,
-                'Weigh in at least twice a week. Daily is best.',
+                'Runs on weigh-ins',
+                'At least twice a week. Daily is best.',
               ),
             ].indexed) ...[
-              if (i > 0) const SizedBox(height: 14),
+              if (i > 0) const SizedBox(height: 16),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(icon, size: 20, color: AppColors.primary),
-                  const SizedBox(width: 12),
-                  Expanded(child: Text(line)),
+                  IconBubble(icon, size: 38),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          headline,
+                          style: TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          line,
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            height: 1.35,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ],
