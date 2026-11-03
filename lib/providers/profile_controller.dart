@@ -26,7 +26,6 @@ class ProfileController extends AsyncNotifier<void> {
     required String country,
     required String usualFood,
     required bool trackProtein,
-    required bool adaptiveOn,
   }) async {
     state = const AsyncLoading();
 
@@ -37,9 +36,9 @@ class ProfileController extends AsyncNotifier<void> {
       final now = DateTime.now();
       final today = DateFormat('yyyy-MM-dd').format(now);
 
-      // The Adaptive formula: switching it off goes back to the plain plan;
-      // new details or activity start its learning again from today, so an
-      // old correction never double-counts or fights a real change.
+      // The Adaptive formula: new details or activity start its learning
+      // again from today, so an old correction never double-counts or
+      // fights a real change.
       var adaptiveKcal = currentProfile.adaptiveKcal;
       var adaptiveNote = currentProfile.adaptiveNote;
       var adaptiveFrom = currentProfile.adaptiveFrom;
@@ -56,11 +55,6 @@ class ProfileController extends AsyncNotifier<void> {
           adaptiveFrom = today;
         }
       }
-      if (!adaptiveOn) {
-        adaptiveKcal = 0;
-        adaptiveNote = AdaptiveNote.off.value;
-      }
-
       final plan = HealthCalculator.calculatePlan(
         currentWeightKg: currentWeightKg,
         targetWeightKg: targetWeightKg,
@@ -95,7 +89,6 @@ class ProfileController extends AsyncNotifier<void> {
         dailyCalorieTarget: plan.dailyCalorieTarget,
         goalPaceKgPerWeek: plan.goalPaceKgPerWeek,
         goalPaceLevel: plan.goalPaceLevel,
-        adaptiveOn: adaptiveOn,
         adaptiveKcal: adaptiveKcal,
         adaptiveNote: adaptiveNote,
         adaptiveFrom: adaptiveFrom,

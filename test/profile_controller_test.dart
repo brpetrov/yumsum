@@ -35,7 +35,6 @@ void main() {
     double weightKg = 79.8,
     WeightLossPace pace = WeightLossPace.fast,
     TrainingFrequency training = TrainingFrequency.threeToFour,
-    bool adaptiveOn = true,
   }) async {
     profiles = _FakeProfiles();
     final container = ProviderContainer(
@@ -62,7 +61,6 @@ void main() {
           country: profile.country,
           usualFood: profile.usualFood,
           trackProtein: profile.trackProtein,
-          adaptiveOn: adaptiveOn,
         );
     expect(saved, isTrue);
     return profiles.saved!;
@@ -79,17 +77,6 @@ void main() {
         AdaptiveFormula.planOf(saved, adaptiveKcal: 0).dailyCalorieTarget - 80,
         1e-9,
       ),
-    );
-  });
-
-  test('switching it off goes back to the plain plan', () async {
-    final saved = await save(adaptiveOn: false);
-    expect(saved.adaptiveOn, isFalse);
-    expect(saved.adaptiveKcal, 0);
-    expect(saved.adaptiveNote, 'off');
-    expect(
-      saved.dailyCalorieTarget,
-      AdaptiveFormula.planOf(profile, adaptiveKcal: 0).dailyCalorieTarget,
     );
   });
 

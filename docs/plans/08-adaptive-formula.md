@@ -20,6 +20,7 @@ What changed:
 - **Small changes show:** the dead band is 20 kcal, not 50.
 - **New accounts:** only the first 7 days are left out (mostly water and stored carbohydrate), not 14.
 - **What you burn on show:** Weight & Progress shows "You burn" beside "Your target" (`AdaptiveMeasure.burn`, the formula's burn moved towards the measured one by the confidence, as `adaptiveBurn`). It's measured up to yesterday, so it moves daily. Free users see the formula's guess beside a locked real burn.
+- **No switch** (later the same day): it's on for every YumSum Star member. Someone who doesn't weigh in simply gets no change, so an off switch had no job. `adaptiveOn` went from the profile and the rules; Plan Settings' row keeps the sum, the stage and the restart note. The build notes further down that mention the switch predate this.
 
 Simulated (60 noisy runs: 0.5 kg weigh-in noise and 250 kcal food noise), the median adjustment by week:
 
@@ -246,7 +247,6 @@ Away from the minimum, this is simply **plan target + adjustment**, and the goal
 | **Two phones** | Both compute the same result from the same data. Whichever runs first records the week, and the other sees it's done. |
 | **First open of the week on a phone with an empty offline cache** | It finds too little data, so no change that week. That's the safe side. |
 | **Maintain mode** | Works the same and keeps your weight steady. Simulated: someone burning 200 less than the formula reached −210 and stopped gaining. |
-| **Switching it off, then on** | Off: back to the plain plan at once. On: starts fresh at 0, learning from the recent weeks already logged. |
 | **YumSum Star ends** | Frozen for 2 weeks, then back to the plain plan (see What you see). |
 | **"2,000 to 1,500 after one weigh-in"** | Impossible; see below. |
 
@@ -328,12 +328,12 @@ The amount is the target minus the plan target, so it always matches Plan Settin
 
 ### Plan Settings
 
-A new block under the pace cards, above the "Updated plan" preview: `SectionLabel('PERSONAL ADJUSTMENT')`, then a switch row.
+A new block under the pace cards, above the "Updated plan" preview: `SectionLabel('PERSONAL ADJUSTMENT')`, then a row (no switch since the revision above).
 
 - **Title:** Adaptive formula
 - **Subtitle:** Learns from your weigh-ins and adjusts your target each Monday.
-- **Free users:** the switch shows off, with the "+" mark plan 06 gives the photo button. Tapping the row opens the paywall (`showPlusPaywall(context)`, plan 07).
-- **Subscribers:** on by default. It's part of the form, like Track protein, and is saved with Save plan.
+- **Free users:** the row shows the star. Tapping it opens the paywall (`showPlusPaywall(context)`, plan 07).
+- **Subscribers:** always on.
 
 Under it, for subscribers with it on:
 - **The sum**, from the preview, so it follows the form as you edit:
@@ -352,13 +352,13 @@ The preview card's info dialog (`_CalculationInfoDialog`) gets an "Adaptive" lin
 
 ### How it works (once, after subscribing; again from the link)
 
-A dialog titled **A target that learns from you**. It has four bold promises, each with one short line, and icons in tinted bubbles, to take in at a glance:
+A dialog titled **Adaptive formula**, subtitled *A target that learns from you*. It has four bold promises, each with one short line, and icons in tinted bubbles, to take in at a glance:
 - (insights) **Finds your real burn.** From your own weigh-ins and meals, not a guess.
-- (calendar) **Personalised for you.** Adjusts your target each Monday, from week one.
-- (trend) **Beats plateaus.** Adjusts when a fixed target would leave you stuck.
-- (scale) **Runs on weigh-ins.** At least twice a week. Daily is best.
+- (tune) **Adapts to your body.** A target made for you, not the average person.
+- (trend) **Beats plateaus.** When the scale stops moving, your target does.
+- (scale) **Learns as you go.** The more you weigh in, the smarter it gets. Daily is best.
 
-Buttons: **Got it**, and **Remind me each morning** on phones when the weigh-in reminder isn't already daily. That sets the weigh-in reminder to every day at 07:30. Afterwards a snackbar says: "Weigh-in reminder on for 07:30 every day. Change it under Notifications in the menu."
+Buttons: **Close** and **Log weight now**, which opens the weigh-in dialog (`logWeightWithFeedback`), since weigh-ins are what it learns from.
 
 ### Notifications
 
@@ -369,8 +369,8 @@ The weekly weigh-in reminder becomes **Weigh-in reminder**. Its day list gains *
 - The adjustment stays frozen for **2 weeks** from `Entitlement.endedAt` (plan 07: set when YumSum Star switches off, cleared when it comes back, and falling back to `expiresAt` once that has passed). No Monday steps run meanwhile.
 - Play's grace period for failed payments keeps YumSum Star on, and with it the formula.
 - Today shows a one-time dialog (only if the adjustment isn't 0), titled **Your YumSum Star has ended**: "Your target goes back to your standard plan on 15 November." Button: Got it.
-- On that date the adjustment goes to 0 and the target returns to the formula. The switch shows off with the "+".
-- Your own switch setting is kept, so subscribing again turns it back on, starting fresh.
+- On that date the adjustment goes to 0 and the target returns to the formula.
+- Subscribing again starts it fresh.
 
 ### Paywall (plan 07 writes the screen)
 
@@ -400,7 +400,6 @@ Kept minimal, in the code's own style. In order, each tried on your phone before
 
 | Field | Type, default | Meaning |
 |---|---|---|
-| `adaptiveOn` | bool, `true` | your switch (it only acts with YumSum Star) |
 | `adaptiveKcal` | int, `0` | the adjustment |
 | `adaptiveWeek` | String?, yyyy-MM-dd | the Monday last processed |
 | `adaptiveNote` | String? | that Monday's result: `learning`, `paused`, `few_weigh_ins`, `few_days`, `unusual`, `steady`, `first_sign`, `lowered`, `raised`, `off` |
@@ -581,9 +580,8 @@ A `Fake implements DocumentSnapshot<Map<String, dynamic>>` with `data()` checks:
 These override `plusProvider` both ways and `entitlementProvider` with a ready-made `Entitlement` (as plan 07 describes), plus the providers the existing tests override.
 - **Today:** each line in the table, at 360×640 with nothing overflowing; nothing for free users or while learning.
 - **Plan Settings:**
-  - a free user sees the switch off with "+", and tapping opens the paywall
+  - a free user sees the star, and tapping opens the paywall
   - a subscriber sees the sum and the learning line
-  - switching off and saving passes `adaptiveOn: false`
   - changing training shows "Saving starts it again from your new plan."
 - **Weight & Progress:** a free user sees two line series (dots and trend) and the caption.
 - **Dialogs:** How it works shows once; "Remind me each morning" sets the daily reminder. The lapse dialog shows once.
@@ -595,7 +593,7 @@ Skipped unless `config/adaptive_replay.json` exists (add it to `.gitignore`). It
 ## Trying it on yourself
 
 **Before you start:**
-- Grant yourself YumSum Star (plan 07's manual grant). The switch is on by default.
+- Grant yourself YumSum Star (plan 07's manual grant). It's on from then.
 - Take "Remind me each morning" in the dialog.
 - Weigh in every morning after the toilet, before eating, and log everything as usual.
 

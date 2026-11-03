@@ -15,6 +15,17 @@ Future<WeightLogResult?> showLogWeightDialog(BuildContext context) {
   );
 }
 
+/// The dialog, then a snackbar saying how it went: for Today and the
+/// Adaptive formula's "Log weight now".
+Future<void> logWeightWithFeedback(BuildContext context) async {
+  final result = await showLogWeightDialog(context);
+  if (!context.mounted || result == null) return;
+  final message = result.targetChanged
+      ? 'Weight saved. New target: ${result.newCalorieTarget} kcal.'
+      : 'Weight saved.';
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+}
+
 class _LogWeightDialog extends ConsumerStatefulWidget {
   const _LogWeightDialog();
 

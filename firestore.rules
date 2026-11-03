@@ -112,7 +112,6 @@ service cloud.firestore {
         && text(request.resource.data.get('country', ''), 100)
         && text(request.resource.data.get('usualFood', ''), 500)
         && request.resource.data.get('trackProtein', true) is bool
-        && request.resource.data.get('adaptiveOn', true) is bool
         && request.resource.data.get('adaptiveKcal', 0) is number
         && optionalDateKey(request.resource.data.get('adaptiveWeek', null))
         && optionalDateKey(request.resource.data.get('adaptiveFrom', null))

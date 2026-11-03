@@ -123,9 +123,9 @@ void main() {
     await tester.ensureVisible(find.byTooltip('How it works'));
     await tester.tap(find.byTooltip('How it works'));
     await tester.pumpAndSettle();
-    expect(find.text('A target that\nlearns from you'), findsOneWidget);
-    expect(find.text('See YumSum Star'), findsOneWidget);
-    expect(find.text('Remind me each morning'), findsNothing);
+    expect(find.text('A target that learns from you'), findsOneWidget);
+    expect(find.text('Log weight now'), findsOneWidget);
+    expect(find.text('Close'), findsOneWidget);
   });
 
   testWidgets('with YumSum Star it is on: what you burn and your target', (
@@ -146,18 +146,6 @@ void main() {
     expect(find.byIcon(Icons.lock_rounded), findsNothing);
     expect(find.text('Become a Star to unlock it'), findsNothing);
     expect(find.byType(Switch), findsNothing);
-  });
-
-  testWidgets('switched off in Plan Settings, it says where to switch it on', (
-    tester,
-  ) async {
-    await pumpScreen(
-      tester,
-      profile: planProfile().copyWith(adaptiveOn: false),
-      entitlement: _plus,
-    );
-    expect(find.text('Off'), findsOneWidget);
-    expect(find.text('Off. Switch it on in Plan Settings.'), findsOneWidget);
   });
 
   testWidgets('a weigh-in can be deleted, after asking', (tester) async {

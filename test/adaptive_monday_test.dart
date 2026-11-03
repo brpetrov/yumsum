@@ -139,7 +139,7 @@ void main() {
       expect(profiles.saved, isEmpty);
     });
 
-    test('never run, or switched back on: this Monday only starts', () async {
+    test('never run, or back after a lapse: this Monday only starts', () async {
       for (final profile in [
         planProfile(),
         planProfile(adaptiveWeek: lastWeek, adaptiveNote: 'off'),
@@ -151,14 +151,6 @@ void main() {
         expect(saved.adaptiveKcal, 0);
         expect(summaryService.recomputed, isEmpty);
       }
-    });
-
-    test('switched off, nothing happens', () async {
-      await run(
-        planProfile(adaptiveWeek: lastWeek).copyWith(adaptiveOn: false),
-        entitlement: _plus,
-      );
-      expect(profiles.saved, isEmpty);
     });
 
     test('the owner\'s admin account counts as subscribed', () async {
@@ -196,7 +188,6 @@ void main() {
       final saved = profiles.saved.single;
       expect(saved.adaptiveKcal, 0);
       expect(saved.adaptiveNote, 'off');
-      expect(saved.adaptiveOn, isTrue);
       expect(
         saved.dailyCalorieTarget,
         AdaptiveFormula.planOf(adjusted, adaptiveKcal: 0).dailyCalorieTarget,

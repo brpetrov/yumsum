@@ -33,7 +33,6 @@ void main() {
     final stored = _profile.toFirestore()
       ..removeWhere((key, _) => key.startsWith('adaptive'));
     final profile = UserProfile.fromMap(stored);
-    expect(profile.adaptiveOn, isTrue);
     expect(profile.adaptiveKcal, 0);
     expect(profile.adaptiveWeek, isNull);
     expect(profile.adaptiveNote, isNull);
@@ -43,7 +42,6 @@ void main() {
 
   test('the Adaptive formula\'s fields survive a save and a load', () {
     final adapted = _profile.copyWith(
-      adaptiveOn: false,
       adaptiveKcal: -80,
       adaptiveWeek: '2026-11-30',
       adaptiveNote: 'lowered',
@@ -52,7 +50,6 @@ void main() {
     );
     final stored = adapted.toFirestore();
     final profile = UserProfile.fromMap(stored);
-    expect(profile.adaptiveOn, isFalse);
     expect(profile.adaptiveKcal, -80);
     expect(profile.adaptiveWeek, '2026-11-30');
     expect(profile.adaptiveNote, 'lowered');

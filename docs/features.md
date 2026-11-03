@@ -137,11 +137,11 @@ YumSum Star (plan 08).
 - **Only on Mondays:** `adaptiveMondayProvider` (`lib/providers/adaptive_formula_provider.dart`, watched in `LeanStreakApp`) runs on the first open on or after a Monday, once a week (`adaptiveWeek`), never on a weigh-in.
   - It prints an "Adaptive: …" debug line plus the window's JSON.
   - `test/adaptive_replay_test.dart` replays that JSON from the gitignored `config/adaptive_replay.json`.
+- **Always on with YumSum Star:** there is no switch. Without enough weigh-ins it simply has nothing to say and the plan stands.
 - **Profile fields** (in `firestore.rules` too):
-  - `adaptiveOn` (the Plan Settings switch, on by default, saved with Save plan)
   - `adaptiveKcal`
   - `adaptiveWeek` and `adaptiveFrom` (yyyy-MM-dd)
-  - `adaptiveNote` (the Monday's `AdaptiveNote`; `off` after switching off, a lapse or a reset, which the next run treats as starting fresh)
+  - `adaptiveNote` (the Monday's `AdaptiveNote`; `off` after a lapse or a reset, which the next run treats as starting fresh)
   - `adaptiveChanges` (the last 6 `{week, from, to}`)
 - **Resets and pauses:**
   - Every re-plan passes the adjustment on (weigh-ins, the migration, Plan Settings).
@@ -150,13 +150,11 @@ YumSum Star (plan 08).
   - Without YumSum Star it is frozen for 2 weeks from `Entitlement.endedAt` (a one-time dialog says when), then goes to 0.
 - **Where it shows:**
   - Home: that week's result as one line on the target card (`adaptiveTodayLineProvider`).
-  - Plan Settings: the switch, the sum (`adaptiveSumLine`) and how well it knows you (`adaptiveStageLine`, from `adaptiveProgressProvider`).
-  - Weight & Progress: `AdaptiveSection` (`lib/screens/progress/helpers/adaptive_section.dart`), under the chart in its card.
-    - No switch: it says what it does for you.
+  - Plan Settings: a row with the sum (`adaptiveSumLine`) and how well it knows you (`adaptiveStageLine`, from `adaptiveProgressProvider`); the star for free users, whose tap opens `/plus`.
+  - Weight & Progress: `AdaptiveSection` (`lib/screens/progress/helpers/adaptive_section.dart`), under the chart in its card. It says what it does for you, then:
     - With YumSum Star: an "On" pill, "You burn" (`adaptiveBurn`, measured up to yesterday) beside "Your target", then the stage and this week's line.
     - Free users see "Formula's guess" beside a locked "Your real burn" and "Become a Star to unlock it", and a tap opens `/plus`.
-    - Switched off in Plan Settings, it says so and a tap goes there.
-- **The explainer:** `showAdaptiveIntro` (`lib/screens/dashboard/helpers/adaptive_dialogs.dart`), "A target that learns from you": four bold promises (real burn, personalised for you, beats plateaus, runs on weigh-ins), each with one short line. It is shown once after subscribing, and from Plan Settings and the info button under the chart. For subscribers it can set the weigh-in reminder to every day at 07:30; free users are offered the YumSum Star page.
+- **The explainer:** `showAdaptiveIntro` (`lib/screens/dashboard/helpers/adaptive_dialogs.dart`), titled "Adaptive formula" over "A target that learns from you": four bold promises (finds your real burn, adapts to your body, beats plateaus, learns as you go), each with one short line. "Log weight now" opens the weigh-in dialog (`logWeightWithFeedback`); the other button is Close. It is shown once after subscribing, and from Plan Settings and the info button under the chart.
 - **Tests:** the seeded simulator in `test/adaptive_fixtures.dart`.
 
 ## Days

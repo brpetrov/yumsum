@@ -140,7 +140,6 @@ class UserProfile {
     required this.onboardingCompleted,
     required this.createdAt,
     required this.updatedAt,
-    this.adaptiveOn = true,
     this.adaptiveKcal = 0,
     this.adaptiveWeek,
     this.adaptiveNote,
@@ -192,9 +191,6 @@ class UserProfile {
 
   // The Adaptive formula (docs/plans/08-adaptive-formula.md), a YumSum Star
   // feature: a personal adjustment on top of the plan, changed on Mondays.
-
-  /// The user's switch; it only acts with YumSum Star.
-  final bool adaptiveOn;
 
   /// The adjustment to the formula's burn, in kcal a day.
   final int adaptiveKcal;
@@ -252,7 +248,6 @@ class UserProfile {
       onboardingCompleted: d['onboardingCompleted'] as bool,
       createdAt: (d['createdAt'] as Timestamp).toDate(),
       updatedAt: (d['updatedAt'] as Timestamp).toDate(),
-      adaptiveOn: d['adaptiveOn'] as bool? ?? true,
       adaptiveKcal: (d['adaptiveKcal'] as num?)?.round() ?? 0,
       adaptiveWeek: d['adaptiveWeek'] as String?,
       adaptiveNote: d['adaptiveNote'] as String?,
@@ -295,7 +290,6 @@ class UserProfile {
     'onboardingCompleted': onboardingCompleted,
     'createdAt': Timestamp.fromDate(createdAt),
     'updatedAt': Timestamp.fromDate(updatedAt),
-    'adaptiveOn': adaptiveOn,
     'adaptiveKcal': adaptiveKcal,
     if (adaptiveWeek != null) 'adaptiveWeek': adaptiveWeek,
     if (adaptiveNote != null) 'adaptiveNote': adaptiveNote,
@@ -335,7 +329,6 @@ class UserProfile {
     bool? onboardingCompleted,
     DateTime? createdAt,
     DateTime? updatedAt,
-    bool? adaptiveOn,
     int? adaptiveKcal,
     String? adaptiveWeek,
     String? adaptiveNote,
@@ -370,7 +363,6 @@ class UserProfile {
       onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      adaptiveOn: adaptiveOn ?? this.adaptiveOn,
       adaptiveKcal: adaptiveKcal ?? this.adaptiveKcal,
       adaptiveWeek: adaptiveWeek ?? this.adaptiveWeek,
       adaptiveNote: adaptiveNote ?? this.adaptiveNote,

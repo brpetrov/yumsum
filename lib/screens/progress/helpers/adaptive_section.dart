@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/user_profile.dart';
@@ -13,12 +11,12 @@ import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/widgets/day_status.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 
-/// The Adaptive formula under the weight chart: what it does for you, then
-/// with YumSum Star, what you burn as it has learnt it and the target that
-/// follows, how well it knows you and this week's result. Without YumSum
-/// Star, the formula's guess beside a locked real burn, and a tap opens
-/// the YumSum Star page; switched off in Plan Settings, a tap goes there.
-/// Its info button explains it ([showAdaptiveIntro]).
+/// The Adaptive formula under the weight chart, always on with YumSum Star:
+/// what it does for you, then what you burn as it has learnt it and the
+/// target that follows, how well it knows you and this week's result.
+/// Without YumSum Star, the formula's guess beside a locked real burn, and
+/// a tap opens the YumSum Star page. Its info button explains it
+/// ([showAdaptiveIntro]).
 class AdaptiveSection extends ConsumerWidget {
   const AdaptiveSection({super.key, required this.profile});
 
@@ -27,11 +25,10 @@ class AdaptiveSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final plus = ref.watch(plusProvider);
-    final on = plus && profile.adaptiveOn;
-    final progress = on
+    final progress = plus
         ? ref.watch(adaptiveProgressProvider).valueOrNull
         : null;
-    final week = on ? ref.watch(adaptiveTodayLineProvider) : null;
+    final week = plus ? ref.watch(adaptiveTodayLineProvider) : null;
     final muted = TextStyle(
       fontSize: 13,
       height: 1.35,
@@ -58,7 +55,7 @@ class AdaptiveSection extends ConsumerWidget {
                   ),
                   IconButton(
                     tooltip: 'How it works',
-                    onPressed: () => showAdaptiveIntro(context, ref),
+                    onPressed: () => showAdaptiveIntro(context),
                     icon: const Icon(Icons.info_outline_rounded),
                     iconSize: 18,
                     color: AppColors.textSecondary,
@@ -66,11 +63,7 @@ class AdaptiveSection extends ConsumerWidget {
                 ],
               ),
             ),
-            if (plus)
-              StatusPill(
-                label: on ? 'On' : 'Off',
-                color: on ? AppColors.veryGood : AppColors.textSecondary,
-              ),
+            if (plus) StatusPill(label: 'On', color: AppColors.veryGood),
           ],
         ),
         Text(
@@ -82,7 +75,7 @@ class AdaptiveSection extends ConsumerWidget {
             color: AppColors.textPrimary,
           ),
         ),
-        if (on) ...[
+        if (plus) ...[
           const SizedBox(height: 14),
           Row(
             children: [
@@ -109,9 +102,6 @@ class AdaptiveSection extends ConsumerWidget {
             const SizedBox(height: 4),
             Text(week, style: muted),
           ],
-        ] else if (plus) ...[
-          const SizedBox(height: 6),
-          Text('Off. Switch it on in Plan Settings.', style: muted),
         ] else ...[
           const SizedBox(height: 14),
           Row(
@@ -150,16 +140,10 @@ class AdaptiveSection extends ConsumerWidget {
       ],
     );
 
-    final onTap = switch ((plus, on)) {
-      (false, _) => () => showPlusPaywall(context),
-      // Pages swap, so Back still lands on Home.
-      (true, false) => () => context.pushReplacement(AppRoutes.planSettings),
-      (true, true) => null,
-    };
-    if (onTap == null) return section;
+    if (plus) return section;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: onTap,
+      onTap: () => showPlusPaywall(context),
       child: section,
     );
   }

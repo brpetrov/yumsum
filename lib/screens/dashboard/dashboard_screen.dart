@@ -86,7 +86,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     if (prefs.getBool(adaptiveIntroShownKey) == true) return;
     prefs.setBool(adaptiveIntroShownKey, true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) showAdaptiveIntro(context, ref);
+      if (mounted) showAdaptiveIntro(context);
     });
   }
 
@@ -123,7 +123,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(launchActionProvider.notifier).clear();
-      _showLogWeightWithFeedback(context);
+      logWeightWithFeedback(context);
     });
   }
 
@@ -790,15 +790,6 @@ class _MonthPreviewCard extends ConsumerWidget {
   }
 }
 
-Future<void> _showLogWeightWithFeedback(BuildContext context) async {
-  final result = await showLogWeightDialog(context);
-  if (!context.mounted || result == null) return;
-  final message = result.targetChanged
-      ? 'Weight saved. New target: ${result.newCalorieTarget} kcal.'
-      : 'Weight saved.';
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-}
-
 class _WeightCard extends ConsumerWidget {
   const _WeightCard();
 
@@ -844,7 +835,7 @@ class _WeightCard extends ConsumerWidget {
             ),
           ),
           TextButton(
-            onPressed: () => _showLogWeightWithFeedback(context),
+            onPressed: () => logWeightWithFeedback(context),
             style: TextButton.styleFrom(
               backgroundColor: AppColors.primaryContainer,
               foregroundColor: AppColors.onPrimaryContainer,

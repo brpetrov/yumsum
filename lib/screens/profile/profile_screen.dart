@@ -45,11 +45,6 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
   WeightLossPace _weightLossPace = WeightLossPace.moderate;
   bool _trackProtein = true;
 
-  /// The Adaptive formula's switch. Without YumSum Star it shows off but
-  /// keeps the stored value, so saving neither ends a lapse's 2 weeks early
-  /// nor loses the setting.
-  bool _adaptiveOn = true;
-
   double? get _currentBmi {
     final currentWeight = double.tryParse(_currentWeightCtrl.text);
     final height = double.tryParse(_heightCtrl.text);
@@ -108,9 +103,9 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
       activityLevel: _activityLevel,
       trainingFrequency: _trainingFrequency,
       weightLossPace: _weightLossPace,
-      adaptiveKcal: _adaptiveOn && !_detailsChanged(profile)
-          ? profile.adaptiveKcal.toDouble()
-          : 0,
+      adaptiveKcal: _detailsChanged(profile)
+          ? 0
+          : profile.adaptiveKcal.toDouble(),
     );
   }
 
@@ -129,7 +124,6 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
     _trainingFrequency = profile.trainingFrequency;
     _weightLossPace = profile.weightLossPace;
     _trackProtein = profile.trackProtein;
-    _adaptiveOn = profile.adaptiveOn;
   }
 
   Future<void> _submit(UserProfile profile) async {
@@ -157,7 +151,6 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
           country: _countryCtrl.text,
           usualFood: _foodCtrl.text,
           trackProtein: _trackProtein,
-          adaptiveOn: _adaptiveOn,
         );
 
     if (!mounted) return;
@@ -518,8 +511,6 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                       SizedBox(height: 20),
                       const SectionLabel('PERSONAL ADJUSTMENT'),
                       _AdaptiveSection(
-                        on: _adaptiveOn,
-                        onChanged: (on) => setState(() => _adaptiveOn = on),
                         preview: preview,
                         restarts: _detailsChanged(profile),
                       ),
@@ -575,18 +566,12 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
   }
 }
 
-/// The Adaptive formula's switch, and for a subscriber with it on, the sum
-/// it makes and how well it knows them so far.
+/// The Adaptive formula, always on with YumSum Star: the sum it makes and
+/// how well it knows them so far. Free users see the star, and a tap opens
+/// the YumSum Star page.
 class _AdaptiveSection extends ConsumerWidget {
-  const _AdaptiveSection({
-    required this.on,
-    required this.onChanged,
-    required this.preview,
-    required this.restarts,
-  });
+  const _AdaptiveSection({required this.preview, required this.restarts});
 
-  final bool on;
-  final ValueChanged<bool> onChanged;
   final HealthPlanCalculation? preview;
   final bool restarts;
 
@@ -599,14 +584,14 @@ class _AdaptiveSection extends ConsumerWidget {
       color: AppColors.textSecondary,
     );
     final preview = this.preview;
-    final progress = plus && on
+    final progress = plus
         ? ref.watch(adaptiveProgressProvider).valueOrNull
         : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SwitchListTile(
+        ListTile(
           contentPadding: EdgeInsets.zero,
           title: Row(
             children: [
@@ -620,10 +605,9 @@ class _AdaptiveSection extends ConsumerWidget {
           subtitle: const Text(
             'Learns from your weigh-ins and adjusts your target each Monday.',
           ),
-          value: plus && on,
-          onChanged: plus ? onChanged : (_) => showPlusPaywall(context),
+          onTap: plus ? null : () => showPlusPaywall(context),
         ),
-        if (plus && on) ...[
+        if (plus) ...[
           if (preview != null) Text(adaptiveSumLine(preview), style: muted),
           if (progress != null) ...[
             const SizedBox(height: 4),
@@ -634,7 +618,7 @@ class _AdaptiveSection extends ConsumerWidget {
             Text('Saving starts it again from your new plan.', style: muted),
           ],
           TextButton(
-            onPressed: () => showAdaptiveIntro(context, ref),
+            onPressed: () => showAdaptiveIntro(context),
             style: TextButton.styleFrom(padding: EdgeInsets.zero),
             child: const Text('How it works'),
           ),

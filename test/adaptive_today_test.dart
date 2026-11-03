@@ -20,7 +20,6 @@ import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/recipe_provider.dart';
-import 'package:lean_streak/providers/reminder_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
@@ -42,23 +41,6 @@ class _FakeProfiles extends Fake implements UserProfileRepository {}
 class _FakeSummaries extends Fake implements DailySummaryRepository {}
 
 class _FakeDaysOff extends Fake implements DayOffRepository {}
-
-/// Records what the How it works dialog asks for, without the system.
-class _FakeReminders extends ReminderSettingsNotifier {
-  @override
-  Future<bool> setWeeklyWeight(bool on) async {
-    state = state.copyWith(weeklyWeight: on);
-    return true;
-  }
-
-  @override
-  Future<void> setWeeklySchedule({
-    required int day,
-    required TimeOfDay time,
-  }) async {
-    state = state.copyWith(weeklyDay: day, weeklyTime: time);
-  }
-}
 
 const _plus = Entitlement(active: true, source: EntitlementSource.manual);
 
@@ -124,7 +106,6 @@ void main() {
         aiUsageTodayProvider.overrideWith((ref) => Stream.value(0)),
         recentMealsProvider.overrideWith((ref) async => const []),
         recipesProvider.overrideWith((ref) async => const []),
-        reminderSettingsProvider.overrideWith(_FakeReminders.new),
       ],
     );
     addTearDown(container.dispose);
@@ -262,14 +243,6 @@ void main() {
       );
       expectNoLine();
     });
-
-    testWidgets('nothing when switched off', (tester) async {
-      await pumpToday(
-        tester,
-        profile: adapted('steady').copyWith(adaptiveOn: false),
-      );
-      expectNoLine();
-    });
   });
 
   group('the dialogs', () {
@@ -294,16 +267,16 @@ void main() {
 
     testWidgets('How it works shows after subscribing', (tester) async {
       await pumpToday(tester, profile: adapted('learning'), saved: const {});
-      expect(find.text('A target that\nlearns from you'), findsOneWidget);
+      expect(find.text('A target that learns from you'), findsOneWidget);
       expect(prefs.getBool(adaptiveIntroShownKey), isTrue);
-      await tester.tap(find.text('Got it'));
+      await tester.tap(find.text('Close'));
       await tester.pumpAndSettle();
-      expect(find.text('A target that\nlearns from you'), findsNothing);
+      expect(find.text('A target that learns from you'), findsNothing);
     });
 
     testWidgets('and only once', (tester) async {
       await pumpToday(tester, profile: adapted('learning'));
-      expect(find.text('A target that\nlearns from you'), findsNothing);
+      expect(find.text('A target that learns from you'), findsNothing);
     });
 
     testWidgets('not for free users', (tester) async {
@@ -313,26 +286,14 @@ void main() {
         entitlement: null,
         saved: const {},
       );
-      expect(find.text('A target that\nlearns from you'), findsNothing);
+      expect(find.text('A target that learns from you'), findsNothing);
     });
 
-    testWidgets('"Remind me each morning" sets a daily weigh-in reminder', (
-      tester,
-    ) async {
+    testWidgets('"Log weight now" opens the weigh-in dialog', (tester) async {
       await pumpToday(tester, profile: adapted('learning'), saved: const {});
-      await tester.tap(find.text('Remind me each morning'));
+      await tester.tap(find.text('Log weight now'));
       await tester.pumpAndSettle();
-      final reminders = container.read(reminderSettingsProvider);
-      expect(reminders.weeklyWeight, isTrue);
-      expect(reminders.weeklyDay, ReminderSettings.everyDay);
-      expect(reminders.weeklyTime, const TimeOfDay(hour: 7, minute: 30));
-      expect(
-        find.text(
-          'Weigh-in reminder on for 07:30 every day. Change it under '
-          'Notifications in the menu.',
-        ),
-        findsOneWidget,
-      );
+      expect(find.text('Log your weight'), findsOneWidget);
     });
 
     Future<void> lapse(WidgetTester tester, {required bool shown}) async {

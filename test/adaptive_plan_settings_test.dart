@@ -17,7 +17,7 @@ import 'package:lean_streak/widgets/plus_mark.dart';
 import 'adaptive_fixtures.dart';
 
 class _FakeProfileController extends ProfileController {
-  final saved = <({bool adaptiveOn, TrainingFrequency training})>[];
+  final saved = <TrainingFrequency>[];
 
   @override
   Future<bool> saveProfile({
@@ -34,9 +34,8 @@ class _FakeProfileController extends ProfileController {
     required String country,
     required String usualFood,
     required bool trackProtein,
-    required bool adaptiveOn,
   }) async {
-    saved.add((adaptiveOn: adaptiveOn, training: trainingFrequency));
+    saved.add(trainingFrequency);
     return true;
   }
 }
@@ -95,42 +94,36 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  final adaptiveSwitch = find.widgetWithText(
-    SwitchListTile,
-    'Adaptive formula',
-  );
+  final adaptiveRow = find.widgetWithText(ListTile, 'Adaptive formula');
 
-  Future<void> showSwitch(WidgetTester tester) async {
-    await tester.ensureVisible(adaptiveSwitch);
+  Future<void> showRow(WidgetTester tester) async {
+    await tester.ensureVisible(adaptiveRow);
     await tester.pumpAndSettle();
   }
 
-  testWidgets(
-    'a free user sees it off with the star; a tap opens the paywall',
-    (tester) async {
-      await pumpSettings(tester, entitlement: null, adaptiveKcal: 0);
-      await showSwitch(tester);
-      expect(tester.widget<SwitchListTile>(adaptiveSwitch).value, isFalse);
-      expect(
-        find.descendant(of: adaptiveSwitch, matching: find.byType(PlusStar)),
-        findsOneWidget,
-      );
-      expect(find.textContaining('from your plan'), findsNothing);
+  testWidgets('a free user sees it with the star; a tap opens the paywall', (
+    tester,
+  ) async {
+    await pumpSettings(tester, entitlement: null, adaptiveKcal: 0);
+    await showRow(tester);
+    expect(
+      find.descendant(of: adaptiveRow, matching: find.byType(PlusStar)),
+      findsOneWidget,
+    );
+    expect(find.textContaining('from your plan'), findsNothing);
 
-      await tester.tap(adaptiveSwitch);
-      await tester.pumpAndSettle();
-      expect(find.text('The paywall'), findsOneWidget);
-    },
-  );
+    await tester.tap(adaptiveRow);
+    await tester.pumpAndSettle();
+    expect(find.text('The paywall'), findsOneWidget);
+  });
 
   testWidgets('a subscriber sees the sum and how well it knows them', (
     tester,
   ) async {
     await pumpSettings(tester);
-    await showSwitch(tester);
-    expect(tester.widget<SwitchListTile>(adaptiveSwitch).value, isTrue);
+    await showRow(tester);
     expect(
-      find.descendant(of: adaptiveSwitch, matching: find.byType(PlusStar)),
+      find.descendant(of: adaptiveRow, matching: find.byType(PlusStar)),
       findsNothing,
     );
     expect(
@@ -157,7 +150,7 @@ void main() {
         confidence: 0.55,
       ),
     );
-    await showSwitch(tester);
+    await showRow(tester);
     expect(
       find.text('1670 from your plan − 170 adaptive = 1500 kcal, your minimum'),
       findsOneWidget,
@@ -170,36 +163,13 @@ void main() {
     );
   });
 
-  testWidgets('switching it off and saving passes adaptiveOn: false', (
-    tester,
-  ) async {
-    await pumpSettings(tester);
-    await showSwitch(tester);
-    await tester.tap(adaptiveSwitch);
-    await tester.pumpAndSettle();
-    expect(find.textContaining('from your plan'), findsNothing);
-
-    await tester.ensureVisible(find.text('Save plan'));
-    await tester.tap(find.text('Save plan'));
-    await tester.pumpAndSettle();
-    expect(controller.saved.single.adaptiveOn, isFalse);
-  });
-
-  testWidgets('a free user saving keeps the stored switch', (tester) async {
-    await pumpSettings(tester, entitlement: null);
-    await tester.ensureVisible(find.text('Save plan'));
-    await tester.tap(find.text('Save plan'));
-    await tester.pumpAndSettle();
-    expect(controller.saved.single.adaptiveOn, isTrue);
-  });
-
   testWidgets('changing training says saving starts it again', (tester) async {
     await pumpSettings(tester);
     final training = find.text('5+ sessions/week');
     await tester.ensureVisible(training);
     await tester.tap(training);
     await tester.pumpAndSettle();
-    await showSwitch(tester);
+    await showRow(tester);
     expect(
       find.text('Saving starts it again from your new plan.'),
       findsOneWidget,

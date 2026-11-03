@@ -48,13 +48,11 @@ final adaptiveMondayProvider = FutureProvider.autoDispose<void>((ref) async {
     await summaryService.recomputeForDate(uid, today);
     return;
   }
-  if (!profile.adaptiveOn) return;
-
   final monday = AdaptiveFormula.mondayOf(now);
   final week = AdaptiveFormula.dateKey(monday);
   if (profile.adaptiveWeek == week) return;
-  // Just subscribed, or switched back on: this Monday only starts the
-  // record, so the first change is always on a Monday.
+  // Just subscribed, or back after a lapse or a reset: this Monday only
+  // starts the record, so the first change is always on a Monday.
   if (profile.adaptiveWeek == null ||
       profile.adaptiveNote == AdaptiveNote.off.value) {
     await profiles.createProfile(
@@ -237,14 +235,13 @@ final adaptiveTodayLineProvider = Provider.autoDispose<String?>((ref) {
 
 /// This week's Monday result, from Monday to Sunday, as one short line; a
 /// pause shows as soon as the last weigh-in is 10 days old. Nothing while
-/// learning or switched off. Amounts are the target minus the plan's, so
-/// they match Plan Settings.
+/// learning. Amounts are the target minus the plan's, so they match Plan
+/// Settings.
 String? adaptiveTodayLine(
   UserProfile profile, {
   required DateTime? lastWeighIn,
   required DateTime now,
 }) {
-  if (!profile.adaptiveOn) return null;
   if (lastWeighIn != null &&
       AdaptiveFormula.daysBetween(lastWeighIn, now) >=
           AdaptiveFormula.pausedDays) {

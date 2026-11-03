@@ -1,36 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
-import 'package:lean_streak/providers/plus_provider.dart';
-import 'package:lean_streak/providers/reminder_provider.dart';
-import 'package:lean_streak/screens/plus/plus_screen.dart';
-import 'package:lean_streak/services/notification_service.dart';
+import 'package:lean_streak/screens/progress/helpers/log_weight_dialog.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
 
-/// Prefs keys: the How it works dialog shown once after subscribing, and
-/// the end date whose lapse notice was shown.
+/// Prefs keys: the Adaptive formula dialog shown once after subscribing,
+/// and the end date whose lapse notice was shown.
 const adaptiveIntroShownKey = 'adaptive.intro_shown';
 const adaptiveLapseNoticeKey = 'adaptive.lapse_notice';
 
-/// How the Adaptive formula works ("A target that learns from you"): once
-/// after subscribing, and from Plan Settings and Weight & Progress. With
-/// YumSum Star it offers a weigh-in reminder every morning on phones,
-/// unless there already is one; without it, the YumSum Star page.
-Future<void> showAdaptiveIntro(BuildContext context, WidgetRef ref) async {
-  final plus = ref.read(plusProvider);
-  final settings = ref.read(reminderSettingsProvider);
-  final offerMorning =
-      plus &&
-      NotificationService.isSupported &&
-      !(settings.weeklyWeight &&
-          settings.weeklyDay == ReminderSettings.everyDay);
-  final choice = await showDialog<_IntroChoice>(
+/// Sells the Adaptive formula ("A target that learns from you"): once after
+/// subscribing, and from Plan Settings and Weight & Progress. Its button
+/// opens the weigh-in dialog, since weigh-ins are what it learns from.
+Future<void> showAdaptiveIntro(BuildContext context) async {
+  final logWeight = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
-      // Two even lines on a phone.
-      title: const Text('A target that\nlearns from you'),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Adaptive formula'),
+          const SizedBox(height: 4),
+          Text(
+            'A target that learns from you',
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+              fontSize: 14.5,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -45,19 +46,19 @@ Future<void> showAdaptiveIntro(BuildContext context, WidgetRef ref) async {
                 'From your own weigh-ins and meals, not a guess.',
               ),
               (
-                Icons.calendar_month_outlined,
-                'Personalised for you',
-                'Adjusts your target each Monday, from week one.',
+                Icons.tune_rounded,
+                'Adapts to your body',
+                'A target made for you, not the average person.',
               ),
               (
                 Icons.trending_down_rounded,
                 'Beats plateaus',
-                'Adjusts when a fixed target would leave you stuck.',
+                'When the scale stops moving, your target does.',
               ),
               (
                 Icons.monitor_weight_outlined,
-                'Runs on weigh-ins',
-                'At least twice a week. Daily is best.',
+                'Learns as you go',
+                'The more you weigh in, the smarter it gets. Daily is best.',
               ),
             ].indexed) ...[
               if (i > 0) const SizedBox(height: 16),
@@ -98,49 +99,18 @@ Future<void> showAdaptiveIntro(BuildContext context, WidgetRef ref) async {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(plus ? 'Got it' : 'Close'),
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('Close'),
         ),
-        if (!plus)
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(_IntroChoice.star),
-            child: const Text('See YumSum Star'),
-          ),
-        if (offerMorning)
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(_IntroChoice.morning),
-            child: const Text('Remind me each morning'),
-          ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text('Log weight now'),
+        ),
       ],
     ),
   );
-  if (!context.mounted) return;
-  if (choice == _IntroChoice.star) {
-    await showPlusPaywall(context);
-    return;
-  }
-  final morning = choice == _IntroChoice.morning;
-  if (morning != true || !context.mounted) return;
-  final reminders = ref.read(reminderSettingsProvider.notifier);
-  final on = await reminders.setWeeklyWeight(true);
-  if (on) {
-    await reminders.setWeeklySchedule(
-      day: ReminderSettings.everyDay,
-      time: const TimeOfDay(hour: 7, minute: 30),
-    );
-  }
-  if (!context.mounted) return;
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(
-        on
-            ? 'Weigh-in reminder on for 07:30 every day. Change it under '
-                  'Notifications in the menu.'
-            : 'Allow notifications in your phone\'s Settings, then turn it on '
-                  'under Notifications in the menu.',
-      ),
-    ),
-  );
+  if (logWeight != true || !context.mounted) return;
+  await logWeightWithFeedback(context);
 }
 
 /// Once YumSum Star has ended with an adjustment in place: when the target
@@ -163,5 +133,3 @@ Future<void> showAdaptiveLapse(BuildContext context, DateTime back) {
     ),
   );
 }
-
-enum _IntroChoice { morning, star }
