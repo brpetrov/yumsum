@@ -55,7 +55,7 @@ List<MealSuggestion> suggestionsFor({
         name: recipe.name,
         kcal: recipe.kcalPerPortion,
         protein: recipe.proteinPerPortion,
-        macros: null,
+        macros: recipe.macrosPerPortion,
         fromRecipe: true,
       ),
   ];

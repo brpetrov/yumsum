@@ -15,8 +15,25 @@ Map<String, dynamic> _json({Map<String, dynamic> change = const {}}) => {
   'prepMinutes': 10,
   'kcalPerPortion': 560,
   'proteinPerPortion': 42,
+  'fatPerPortion': 14.5,
+  'saturatesPerPortion': 5.2,
+  'carbsPerPortion': 66,
+  'sugarsPerPortion': 9.8,
+  'fibrePerPortion': 5,
+  'saltPerPortion': 1.4,
   'ingredients': [
-    {'item': 'Beef mince', 'amount': '500 g', 'kcal': 625, 'protein': 105},
+    {
+      'item': 'Beef mince',
+      'amount': '500 g',
+      'kcal': 625,
+      'protein': 105,
+      'fat': 25,
+      'saturates': 11,
+      'carbs': 0,
+      'sugars': 0,
+      'fibre': 0,
+      'salt': 1,
+    },
     {'item': 'Salt', 'amount': 'to taste'},
   ],
   'steps': ['Brown the mince.', 'Simmer.'],
@@ -49,13 +66,27 @@ void main() {
       final recipe = Recipe.fromJson(_json());
       expect(recipe.category, RecipeCategory.dinner);
       expect(recipe.tags, [RecipeTag.highProtein, RecipeTag.quick]);
-      expect(recipe.ingredients.first, (
-        item: 'Beef mince',
-        amount: '500 g',
-        kcal: 625,
-        protein: 105,
-      ));
+      final mince = recipe.ingredients.first;
+      expect(
+        (mince.item, mince.amount, mince.kcal, mince.protein),
+        ('Beef mince', '500 g', 625, 105),
+      );
+      expect(mince.macros?.fat, 25);
+      expect(mince.macros?.salt, 1);
       expect(recipe.ingredients.last.kcal, isNull);
+      expect(recipe.ingredients.last.macros, isNull);
+      final macros = recipe.macrosPerPortion;
+      expect(
+        [
+          macros.fat,
+          macros.saturates,
+          macros.carbs,
+          macros.sugars,
+          macros.fibre,
+          macros.salt,
+        ],
+        [14.5, 5.2, 66, 9.8, 5, 1.4],
+      );
       expect(recipe.steps, hasLength(2));
       expect(recipe.cookMinutes, 30);
       expect(
@@ -82,6 +113,13 @@ void main() {
         'prepMinutes': 41,
         'kcalPerPortion': 20,
         'proteinPerPortion': 200,
+        'fatPerPortion': 151,
+        // More than the fat, and more than the carbs.
+        'saturatesPerPortion': 15,
+        'carbsPerPortion': -1,
+        'sugarsPerPortion': 70,
+        'fibrePerPortion': 81,
+        'saltPerPortion': '1.4',
         'ingredients': <Object>[],
         'steps': [''],
       };
@@ -108,12 +146,30 @@ void main() {
         ),
         throwsFormatException,
       );
+      expect(
+        () => Recipe.fromJson(_json()..remove('saltPerPortion')),
+        throwsFormatException,
+      );
+      expect(
+        () => Recipe.fromJson(
+          _json(
+            change: {
+              'ingredients': [
+                {'item': 'Oil', 'amount': '1 tbsp', 'fat': -1},
+              ],
+            },
+          ),
+        ),
+        throwsFormatException,
+      );
     });
 
     test('portions scale and name the meal', () {
       final recipe = Recipe.fromJson(_json());
       expect(recipe.kcalFor(1.5), 840);
       expect(recipe.proteinFor(0.5), 21);
+      expect(recipe.macrosFor(1.5).fat, 21.75);
+      expect(recipe.macrosFor(1.5).salt, closeTo(2.1, 1e-9));
       expect(recipe.mealName(1), 'Pasta bolognese');
       expect(recipe.mealName(2), 'Pasta bolognese × 2');
       expect(recipe.mealName(1.5), 'Pasta bolognese × 1.5');

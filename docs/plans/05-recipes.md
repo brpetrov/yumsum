@@ -47,6 +47,8 @@
 >
 > **Figures:** for every ingredient, give its kcal and protein for the amount used in the whole recipe, from per-100 g values in the UK government's CoFID tables (McCance and Widdowson's) or Open Food Facts' generic entries. Then per portion = the sum ÷ servings, rounded to whole numbers. The totals are checked, so they must add up.
 >
+> **Macros (plan 10):** also give every ingredient `fat`, `saturates`, `carbs`, `sugars`, `fibre` and `salt` in grams for the amount used, from the same per-100 g source, at most one decimal place: carbs as a UK label gives them, without fibre; salt, not sodium (salt = sodium × 2.5). Each portion's `fatPerPortion`, `saturatesPerPortion`, `carbsPerPortion`, `sugarsPerPortion`, `fibrePerPortion` and `saltPerPortion` is the sum ÷ servings, to one decimal place. Where a step seasons with salt without saying how much, add 0.5 g per portion (a pinch) to `saltPerPortion` only, not to an ingredient. Check every portion: 4 × protein + 4 × carbs + 9 × fat + 2 × fibre should be within 15% of its kcal.
+>
 > **Writing:** metric amounts; common supermarket ingredients; British English; sentence case; no exclamation marks.
 >
 > **Steps:** 3 to 7, each one to three short imperative sentences, so a beginner can cook it without guessing. Start with the prep (what to chop and how). Every cooking step says the heat ("a large frying pan over a medium heat", "220°C (200°C fan)"), how long, written in digits ("5 minutes", "10 to 12 minutes"; the app shows these in bold), and how to tell it's done ("until soft", "no pink in the middle", "until it flakes easily"). Say when to start a second thing ("Meanwhile…", "When the sauce has 15 minutes left…"). The last step splits it into equal portions, so each matches the calories logged, and for dishes that keep, says how long: 2 days in the fridge, cooked rice only until the next day, 3 months frozen for soups, sauces and chilli (Food Standards Agency). Salt, pepper and water may be used without being listed.
@@ -68,7 +70,8 @@
 > | `prepMinutes` | whole number | the chopping and mixing before anything cooks; at most `minutes` (all of it for a dish with no cooking) |
 > | `kcalPerPortion` | whole number | 50–1500 |
 > | `proteinPerPortion` | whole number, grams | 0–150 |
-> | `ingredients` | list | each `{"item": "Lean beef mince, 5% fat", "amount": "500 g", "kcal": 625, "protein": 105}` |
+> | `fatPerPortion`, `saturatesPerPortion`, `carbsPerPortion`, `sugarsPerPortion`, `fibrePerPortion`, `saltPerPortion` | grams, one decimal place | fat 0–150, saturates up to the fat, carbs 0–300, sugars up to the carbs, fibre 0–80, salt 0–15 |
+> | `ingredients` | list | each `{"item": "Lean beef mince, 5% fat", "amount": "500 g", "kcal": 625, "protein": 105, "fat": 25, "saturates": 11, "carbs": 0, "sugars": 0, "fibre": 0, "salt": 1}` |
 > | `steps` | list of text | the method, in order |
 >
 > **Example of one recipe:**
@@ -85,12 +88,18 @@
 >   "prepMinutes": 5,
 >   "kcalPerPortion": 330,
 >   "proteinPerPortion": 30,
+>   "fatPerPortion": 6.2,
+>   "saturatesPerPortion": 1,
+>   "carbsPerPortion": 36.7,
+>   "sugarsPerPortion": 20.9,
+>   "fibrePerPortion": 6.1,
+>   "saltPerPortion": 0.3,
 >   "ingredients": [
->     { "item": "Greek yoghurt, 0% fat", "amount": "250 g", "kcal": 143, "protein": 25 },
->     { "item": "Mixed berries", "amount": "100 g", "kcal": 40, "protein": 1 },
->     { "item": "Rolled oats", "amount": "25 g", "kcal": 93, "protein": 3 },
->     { "item": "Honey", "amount": "1 tsp", "kcal": 22, "protein": 0 },
->     { "item": "Walnuts, chopped", "amount": "5 g", "kcal": 34, "protein": 1 }
+>     { "item": "Greek yoghurt, 0% fat", "amount": "250 g", "kcal": 143, "protein": 25, "fat": 0.5, "saturates": 0.3, "carbs": 9.5, "sugars": 9, "fibre": 0, "salt": 0.3 },
+>     { "item": "Mixed berries", "amount": "100 g", "kcal": 40, "protein": 1, "fat": 0.3, "saturates": 0, "carbs": 6.5, "sugars": 6, "fibre": 3.6, "salt": 0 },
+>     { "item": "Rolled oats", "amount": "25 g", "kcal": 93, "protein": 3, "fat": 2, "saturates": 0.4, "carbs": 15, "sugars": 0.3, "fibre": 2.3, "salt": 0 },
+>     { "item": "Honey", "amount": "1 tsp", "kcal": 22, "protein": 0, "fat": 0, "saturates": 0, "carbs": 5.5, "sugars": 5.5, "fibre": 0, "salt": 0 },
+>     { "item": "Walnuts, chopped", "amount": "5 g", "kcal": 34, "protein": 1, "fat": 3.4, "saturates": 0.3, "carbs": 0.2, "sugars": 0.1, "fibre": 0.2, "salt": 0 }
 >   ],
 >   "steps": [
 >     "Spoon the yoghurt into a bowl and smooth the top.",

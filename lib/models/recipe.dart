@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:lean_streak/models/nutrients.dart';
+
 /// Where the recipe photos are served from. They ship with the website
 /// (`tools/hosting/recipes/`), not the app, so the app stays small.
 const recipePhotoBase = 'https://yumsum.web.app/recipes/';
@@ -25,11 +27,20 @@ enum RecipeTag {
   final String json;
 }
 
-/// One line of the shopping list, for the whole recipe. [kcal] and
-/// [protein] are the ingredient's share, given so the totals can be checked.
-typedef Ingredient = ({String item, String amount, int? kcal, int? protein});
+/// One line of the shopping list, for the whole recipe. [kcal], [protein]
+/// and [macros] are the ingredient's share, given so the totals can be
+/// checked.
+typedef Ingredient = ({
+  String item,
+  String amount,
+  int? kcal,
+  int? protein,
+  Nutrients? macros,
+});
 
 final _idPattern = RegExp(r'^[a-z0-9]+(-[a-z0-9]+)*$');
+
+const _macroKeys = ['fat', 'saturates', 'carbs', 'sugars', 'fibre', 'salt'];
 
 /// A dish from the bundled library (`assets/recipes/recipes.json`). The
 /// nutrition is per portion; the ingredients are for [servings] portions.
@@ -46,6 +57,7 @@ class Recipe {
     required this.prepMinutes,
     required this.kcalPerPortion,
     required this.proteinPerPortion,
+    required this.macrosPerPortion,
     required this.ingredients,
     required this.steps,
   });
@@ -65,6 +77,9 @@ class Recipe {
   final int prepMinutes;
   final int kcalPerPortion;
   final int proteinPerPortion;
+
+  /// All six are known for a library recipe.
+  final Nutrients macrosPerPortion;
   final List<Ingredient> ingredients;
   final List<String> steps;
 
@@ -89,6 +104,13 @@ class Recipe {
       final value = json[field];
       if (value is! int || value < min || value > max) bad(field);
       return value;
+    }
+
+    // Grams, to one decimal place.
+    double grams(String field, double max) {
+      final value = json[field];
+      if (value is! num || value < 0 || value > max) bad(field);
+      return value.toDouble();
     }
 
     if (id is! String || !_idPattern.hasMatch(id)) bad('id');
@@ -116,12 +138,26 @@ class Recipe {
             (entry['item'] as String).trim().isNotEmpty &&
             entry['amount'] is String &&
             (entry['kcal'] == null || entry['kcal'] is int) &&
-            (entry['protein'] == null || entry['protein'] is int))
+            (entry['protein'] == null || entry['protein'] is int) &&
+            _macroKeys.every(
+              (key) =>
+                  entry[key] == null || (entry[key] is num && entry[key] >= 0),
+            ))
           (
             item: (entry['item'] as String).trim(),
             amount: (entry['amount'] as String).trim(),
             kcal: entry['kcal'] as int?,
             protein: entry['protein'] as int?,
+            macros: _macroKeys.any((key) => entry[key] != null)
+                ? Nutrients(
+                    fat: (entry['fat'] as num?)?.toDouble(),
+                    saturates: (entry['saturates'] as num?)?.toDouble(),
+                    carbs: (entry['carbs'] as num?)?.toDouble(),
+                    sugars: (entry['sugars'] as num?)?.toDouble(),
+                    fibre: (entry['fibre'] as num?)?.toDouble(),
+                    salt: (entry['salt'] as num?)?.toDouble(),
+                  )
+                : null,
           )
         else
           bad('ingredients'),
@@ -139,6 +175,8 @@ class Recipe {
 
     final description = text('description', 140, optional: true);
     final minutes = number('minutes', 1, 600);
+    final fat = grams('fatPerPortion', 150);
+    final carbs = grams('carbsPerPortion', 300);
     return Recipe(
       id: id,
       name: text('name', 60),
@@ -151,6 +189,14 @@ class Recipe {
       prepMinutes: number('prepMinutes', 0, minutes),
       kcalPerPortion: number('kcalPerPortion', 50, 1500),
       proteinPerPortion: number('proteinPerPortion', 0, 150),
+      macrosPerPortion: Nutrients(
+        fat: fat,
+        saturates: grams('saturatesPerPortion', fat),
+        carbs: carbs,
+        sugars: grams('sugarsPerPortion', carbs),
+        fibre: grams('fibrePerPortion', 80),
+        salt: grams('saltPerPortion', 15),
+      ),
       ingredients: ingredients,
       steps: steps,
     );
@@ -163,6 +209,7 @@ class Recipe {
 
   int kcalFor(double portions) => (kcalPerPortion * portions).round();
   int proteinFor(double portions) => (proteinPerPortion * portions).round();
+  Nutrients macrosFor(double portions) => macrosPerPortion.scaled(portions);
 
   /// What a logged meal of [portions] is called, so the day's list explains
   /// its calories: "Pasta bolognese", or "Pasta bolognese × 1.5".

@@ -7,8 +7,8 @@ import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/recipes/recipe_portions_sheet.dart';
 
 /// Asks how many portions of [recipe] were eaten and logs them as today's
-/// meal, with the recipe's own protein (so no AI estimate is needed). Says
-/// how it went in a snackbar.
+/// meal, with the recipe's own protein and macros (so no AI estimate is
+/// needed). Says how it went in a snackbar.
 Future<void> logRecipePortion(
   BuildContext context,
   WidgetRef ref,
@@ -27,6 +27,7 @@ Future<void> logRecipePortion(
         name: recipe.mealName(portions),
         calories: recipe.kcalFor(portions).toDouble(),
         proteinGrams: recipe.proteinFor(portions).toDouble(),
+        macros: recipe.macrosFor(portions),
       );
   if (!context.mounted) return;
   final failed = ref.read(logMealControllerProvider).hasError;

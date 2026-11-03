@@ -28,6 +28,7 @@ class _FakeLogMealController extends LogMealController {
 
   final bool fails;
   final saved = <({String? name, double calories, double? protein})>[];
+  final savedMacros = <Nutrients?>[];
 
   @override
   Future<void> submit({
@@ -45,6 +46,7 @@ class _FakeLogMealController extends LogMealController {
       return;
     }
     saved.add((name: name, calories: calories, protein: proteinGrams));
+    savedMacros.add(macros);
   }
 }
 
@@ -315,6 +317,9 @@ void main() {
       expect(controller.saved, [
         (name: 'Pasta bolognese × 0.5', calories: 280.0, protein: 21.0),
       ]);
+      // Half the recipe's macros, so no AI is needed for them.
+      expect(controller.savedMacros.single?.fat, 7);
+      expect(controller.savedMacros.single?.salt, closeTo(0.7, 1e-9));
     });
 
     testWidgets('says so when logging fails', (tester) async {

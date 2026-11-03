@@ -932,6 +932,7 @@ void main() {
     expect(controller.saved, [
       (name: 'Pasta bolognese', calories: 560.0, protein: 42.0),
     ]);
+    expect(controller.savedMacros.single?.fat, 14);
   });
 
   testWidgets('the mic records a note and the AI fills the box from it', (
