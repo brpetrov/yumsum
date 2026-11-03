@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:lean_streak/helpers/adaptive_formula.dart';
+import 'package:lean_streak/helpers/health_calculator.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/models/weight_entry.dart';
@@ -307,3 +308,31 @@ final adaptiveLapseProvider = Provider.autoDispose<DateTime?>((ref) {
   if (!AdaptiveFormula.frozen(endedAt: ended, now: now)) return null;
   return AdaptiveFormula.lapseEnd(ended!);
 });
+
+/// The sum the Adaptive formula makes: "1670 from your plan − 80 adaptive =
+/// 1590 kcal", for Plan Settings and Weight & Progress.
+String adaptiveSumLine(HealthPlanCalculation preview) {
+  final plan = preview.planCalorieTarget.round();
+  final target = preview.dailyCalorieTarget.round();
+  final amount = target - plan;
+  final sign = amount < 0 ? '−' : '+';
+  final minimum = preview.calorieTargetClamped ? ', your minimum' : '';
+  return '$plan from your plan $sign ${amount.abs()} adaptive = '
+      '$target kcal$minimum';
+}
+
+/// How well it knows you, in plain stages rather than a percentage.
+String adaptiveStageLine(AdaptiveMeasure measure) {
+  String count(int n, String one, String many) => '$n ${n == 1 ? one : many}';
+  final weighIns = count(measure.weighIns, 'weigh-in', 'weigh-ins');
+  final days = '${count(measure.daysLogged, 'day', 'days')} logged';
+  final weeks = count(measure.days ~/ 7, 'week', 'weeks');
+  final known = '$weighIns and $days in $weeks';
+  return switch (measure.stage) {
+    AdaptiveStage.paused => 'Paused: no weigh-in for 10 days.',
+    AdaptiveStage.learning => 'Learning: $weighIns, $days',
+    AdaptiveStage.gettingToKnow => 'Getting to know you: $known',
+    AdaptiveStage.fairlyWell => 'Knows you fairly well: $known',
+    AdaptiveStage.well => 'Knows you well: $known',
+  };
+}

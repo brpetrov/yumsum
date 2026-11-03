@@ -7,8 +7,8 @@ import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/widgets/macro_totals.dart';
 
 /// One meal as a plain row: name and time, calories and protein, and a menu
-/// with Edit and Delete. With [showMacros] (YumSum Star), a tap on the row
-/// shows the meal's macros under it.
+/// with Edit and Delete. With [showMacros] (YumSum Star), a meal that has
+/// macros says so beside its time, and a tap on the row shows them under it.
 class MealRow extends StatefulWidget {
   const MealRow({
     super.key,
@@ -38,6 +38,11 @@ class _MealRowState extends State<MealRow> {
     final name = (meal.name?.trim().isNotEmpty ?? false)
         ? meal.name!.trim()
         : 'Unnamed meal';
+    final macros = widget.showMacros ? meal.macros : null;
+    final time = Text(
+      DateFormat('HH:mm').format(meal.timestamp),
+      style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+    );
 
     final row = Row(
       children: [
@@ -54,10 +59,31 @@ class _MealRowState extends State<MealRow> {
                 ),
               ),
               const SizedBox(height: 3),
-              Text(
-                DateFormat('HH:mm').format(meal.timestamp),
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-              ),
+              if (macros == null)
+                time
+              else
+                // Says the row opens, like a link.
+                Row(
+                  children: [
+                    time,
+                    const SizedBox(width: 10),
+                    Text(
+                      'Macros',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    Icon(
+                      _open
+                          ? Icons.expand_less_rounded
+                          : Icons.expand_more_rounded,
+                      size: 16,
+                      color: AppColors.primary,
+                    ),
+                  ],
+                ),
             ],
           ),
         ),
@@ -93,7 +119,7 @@ class _MealRowState extends State<MealRow> {
         ),
       ],
     );
-    if (!widget.showMacros) {
+    if (macros == null) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 11),
         child: row,
@@ -114,9 +140,7 @@ class _MealRowState extends State<MealRow> {
               Padding(
                 padding: const EdgeInsets.only(top: 6, right: 14),
                 child: Text(
-                  meal.macros == null
-                      ? 'No macro info for this meal.'
-                      : macrosLine(meal.macros!),
+                  macrosLine(macros),
                   style: TextStyle(
                     fontSize: 12.5,
                     color: AppColors.textSecondary,

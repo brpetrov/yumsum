@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/nutrients.dart';
+import 'package:lean_streak/widgets/macro_guide.dart';
 
 const _names = ['fat', 'saturates', 'carbs', 'sugars', 'fibre', 'salt'];
 
@@ -37,9 +38,10 @@ String macrosLine(Nutrients macros) => _capitalised(
 
 /// A day's macros, for YumSum Star: one muted line with fat, carbs and salt
 /// (four figures don't fit a 360dp phone, and salt is the one with a
-/// limit), which opens on a tap to all six with the UK guides for fibre and
-/// salt. Plain totals: no bars, no colours, no targets. Hidden with nothing
-/// logged; [noneNote] when no meal has macros.
+/// limit), which opens on a tap to all six. Its info button explains each
+/// one and the UK's guides ([showMacroGuide]). Plain totals: no bars, no
+/// colours, no targets. Hidden with nothing logged; [noneNote] when no meal
+/// has macros.
 class MacroTotals extends StatefulWidget {
   const MacroTotals({
     super.key,
@@ -67,11 +69,24 @@ class _MacroTotalsState extends State<MacroTotals> {
 
     final total = Nutrients.total(counted)!;
     final uncounted = meals.length - counted.length;
-    final chevron = Icon(
-      _open ? Icons.expand_less_rounded : Icons.expand_more_rounded,
-      size: 20,
-      color: AppColors.textSecondary,
-    );
+    // The info button, then the chevron, at the end of the last line.
+    final ends = [
+      IconButton(
+        tooltip: 'About macros',
+        onPressed: () => showMacroGuide(context, total),
+        icon: const Icon(Icons.info_outline_rounded),
+        iconSize: 18,
+        color: AppColors.textSecondary,
+        visualDensity: VisualDensity.compact,
+        constraints: const BoxConstraints(minWidth: 36, minHeight: 32),
+        padding: EdgeInsets.zero,
+      ),
+      Icon(
+        _open ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+        size: 20,
+        color: AppColors.textSecondary,
+      ),
+    ];
 
     final Widget child;
     if (!_open) {
@@ -86,7 +101,7 @@ class _MacroTotalsState extends State<MacroTotals> {
               style: muted,
             ),
           ),
-          chevron,
+          ...ends,
         ],
       );
     } else {
@@ -128,23 +143,18 @@ class _MacroTotalsState extends State<MacroTotals> {
                 ],
               ),
             ),
-          const SizedBox(height: 4),
-          Text(
-            'Aim for 30 g of fibre a day, and no more than 6 g of salt.',
-            style: muted,
-          ),
-          if (uncounted > 0)
-            Text(
-              '$uncounted ${uncounted == 1 ? 'meal' : 'meals'} not counted '
-              '(no macro info)',
-              style: muted,
-            ),
           Row(
             children: [
               Expanded(
-                child: Text('Tap a meal to see its macros.', style: muted),
+                child: uncounted > 0
+                    ? Text(
+                        '$uncounted ${uncounted == 1 ? 'meal' : 'meals'} not '
+                        'counted (no macro info)',
+                        style: muted,
+                      )
+                    : const SizedBox.shrink(),
               ),
-              chevron,
+              ...ends,
             ],
           ),
         ],

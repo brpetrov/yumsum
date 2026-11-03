@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/nutrients.dart';
+import 'package:lean_streak/models/user_profile.dart';
+import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/widgets/macro_totals.dart';
+import 'package:lean_streak/widgets/meal_row.dart';
 
 /// A macros line as the app shows it, each figure held together.
 String _line(String text) => text.replaceAllMapped(
@@ -23,12 +27,23 @@ Meal _meal(String name, Nutrients? macros) => Meal(
 );
 
 void main() {
-  Future<void> pump(WidgetTester tester, List<Meal> meals) => tester.pumpWidget(
-    MaterialApp(
-      theme: AppTheme.light,
-      home: Scaffold(body: MacroTotals(meals: meals)),
-    ),
-  );
+  Future<void> pumpWidget(WidgetTester tester, Widget child) =>
+      tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            userProfileProvider.overrideWith(
+              (ref) => Stream<UserProfile?>.value(null),
+            ),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.light,
+            home: Scaffold(body: child),
+          ),
+        ),
+      );
+
+  Future<void> pump(WidgetTester tester, List<Meal> meals) =>
+      pumpWidget(tester, MacroTotals(meals: meals));
 
   final wrap = _meal(
     'Chicken wrap',
@@ -90,16 +105,64 @@ void main() {
     // The crisps don't say, so the fibre is a floor.
     expect(find.text('at least 4\u00A0g'), findsOneWidget);
     expect(find.text('2.5\u00A0g'), findsOneWidget);
-    expect(
-      find.text('Aim for 30 g of fibre a day, and no more than 6 g of salt.'),
-      findsOneWidget,
-    );
     expect(find.text('1 meal not counted (no macro info)'), findsOneWidget);
-    expect(find.text('Tap a meal to see its macros.'), findsOneWidget);
 
     await tester.tap(find.byType(MacroTotals));
     await tester.pump();
     expect(find.text('Saturates'), findsNothing);
+  });
+
+  testWidgets('the info button explains each macro and its guide', (
+    tester,
+  ) async {
+    await pump(tester, [wrap, crisps]);
+    await tester.tap(find.byTooltip('About macros'));
+    await tester.pumpAndSettle();
+    expect(find.text('About your macros'), findsOneWidget);
+    expect(find.text('Salt'), findsOneWidget);
+    expect(find.text('2.5 g'), findsOneWidget);
+    expect(
+      find.textContaining('30 g a day for men, 20 g for women'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('at least 30 g a day'), findsOneWidget);
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    expect(find.text('About your macros'), findsNothing);
+  });
+
+  testWidgets('a meal with macros says so beside its time, and opens', (
+    tester,
+  ) async {
+    await pumpWidget(
+      tester,
+      Column(
+        children: [
+          MealRow(meal: wrap, onEdit: () {}, onDelete: () {}, showMacros: true),
+          MealRow(
+            meal: _meal('Toast', null),
+            onEdit: () {},
+            onDelete: () {},
+            showMacros: true,
+          ),
+        ],
+      ),
+    );
+    // Only the wrap has macros to show.
+    expect(find.text('Macros'), findsOneWidget);
+    await tester.tap(find.text('Chicken wrap'));
+    await tester.pump();
+    expect(find.text(macrosLine(wrap.macros!)), findsOneWidget);
+  });
+
+  testWidgets('without YumSum Star a meal row has no macros hint', (
+    tester,
+  ) async {
+    await pumpWidget(
+      tester,
+      MealRow(meal: wrap, onEdit: () {}, onDelete: () {}),
+    );
+    expect(find.text('Macros'), findsNothing);
   });
 
   testWidgets('every meal counted needs no note', (tester) async {

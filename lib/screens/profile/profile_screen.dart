@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
-import 'package:lean_streak/helpers/adaptive_formula.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/adaptive_formula_provider.dart';
@@ -625,10 +624,10 @@ class _AdaptiveSection extends ConsumerWidget {
           onChanged: plus ? onChanged : (_) => showPlusPaywall(context),
         ),
         if (plus && on) ...[
-          if (preview != null) Text(_sum(preview), style: muted),
+          if (preview != null) Text(adaptiveSumLine(preview), style: muted),
           if (progress != null) ...[
             const SizedBox(height: 4),
-            Text(_stage(progress), style: muted),
+            Text(adaptiveStageLine(progress), style: muted),
           ],
           if (restarts) ...[
             const SizedBox(height: 4),
@@ -642,33 +641,6 @@ class _AdaptiveSection extends ConsumerWidget {
         ],
       ],
     );
-  }
-
-  /// "1670 from your plan − 80 adaptive = 1590 kcal".
-  static String _sum(HealthPlanCalculation preview) {
-    final plan = preview.planCalorieTarget.round();
-    final target = preview.dailyCalorieTarget.round();
-    final amount = target - plan;
-    final sign = amount < 0 ? '−' : '+';
-    final minimum = preview.calorieTargetClamped ? ', your minimum' : '';
-    return '$plan from your plan $sign ${amount.abs()} adaptive = '
-        '$target kcal$minimum';
-  }
-
-  /// How well it knows you, in plain stages rather than a percentage.
-  static String _stage(AdaptiveMeasure measure) {
-    String count(int n, String one, String many) => '$n ${n == 1 ? one : many}';
-    final weighIns = count(measure.weighIns, 'weigh-in', 'weigh-ins');
-    final days = '${count(measure.daysLogged, 'day', 'days')} logged';
-    final weeks = count(measure.days ~/ 7, 'week', 'weeks');
-    final known = '$weighIns and $days in $weeks';
-    return switch (measure.stage) {
-      AdaptiveStage.paused => 'Paused: no weigh-in for 10 days.',
-      AdaptiveStage.learning => 'Learning: $weighIns, $days',
-      AdaptiveStage.gettingToKnow => 'Getting to know you: $known',
-      AdaptiveStage.fairlyWell => 'Knows you fairly well: $known',
-      AdaptiveStage.well => 'Knows you well: $known',
-    };
   }
 }
 

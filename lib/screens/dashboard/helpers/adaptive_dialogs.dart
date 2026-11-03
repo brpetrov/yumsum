@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/reminder_provider.dart';
+import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/services/notification_service.dart';
 
 /// Prefs keys: the How it works dialog shown once after subscribing, and
@@ -11,62 +13,108 @@ import 'package:lean_streak/services/notification_service.dart';
 const adaptiveIntroShownKey = 'adaptive.intro_shown';
 const adaptiveLapseNoticeKey = 'adaptive.lapse_notice';
 
-/// How the Adaptive formula works, once after subscribing and again from
-/// Plan Settings. On phones it offers a weigh-in reminder every morning,
-/// unless there already is one.
+/// How the Adaptive formula works: once after subscribing, and from Plan
+/// Settings and Weight & Progress. With YumSum Star it offers a weigh-in
+/// reminder every morning on phones, unless there already is one; without
+/// it, the YumSum Star page.
 Future<void> showAdaptiveIntro(BuildContext context, WidgetRef ref) async {
+  final plus = ref.read(plusProvider);
   final settings = ref.read(reminderSettingsProvider);
   final offerMorning =
+      plus &&
       NotificationService.isSupported &&
       !(settings.weeklyWeight &&
           settings.weeklyDay == ReminderSettings.everyDay);
-  final morning = await showDialog<bool>(
+  final muted = TextStyle(
+    fontSize: 13.5,
+    height: 1.4,
+    color: AppColors.textSecondary,
+  );
+  final choice = await showDialog<_IntroChoice>(
     context: context,
     builder: (context) => AlertDialog(
       title: const Text('How the Adaptive formula works'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (final (icon, line) in [
-            (
-              Icons.insights_rounded,
-              'Learns what you really burn from your weigh-ins and meals.',
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Your plan starts from a formula, a good guess at what you '
+              'burn. Everyone is a little different, so the Adaptive formula '
+              'learns your real number and adjusts your target to it.',
             ),
-            (
-              Icons.calendar_month_outlined,
-              'Changes your target on Mondays only, in small steps.',
-            ),
-            (
-              Icons.monitor_weight_outlined,
-              'Weigh in at least 3 times a week, daily is best, at the same '
-                  'time each morning.',
-            ),
-          ]) ...[
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Icon(icon, size: 20, color: AppColors.primary),
-                const SizedBox(width: 12),
-                Expanded(child: Text(line)),
-              ],
-            ),
+            for (final (icon, line) in [
+              (
+                Icons.insights_rounded,
+                'It compares what you log with how your weight trend moves. '
+                    'Eating 1,800 kcal a day and losing 0.4 kg a week means '
+                    'you burn about 2,240.',
+              ),
+              (
+                Icons.calendar_month_outlined,
+                'Each Monday it moves your target a small step towards that: '
+                    'at most 5% a week and 15% in all. It only lowers it once '
+                    'two Mondays in a row agree.',
+              ),
+              (
+                Icons.shield_outlined,
+                'It never goes below your safe minimum, and never plans a '
+                    'faster loss than the pace you chose.',
+              ),
+              (
+                Icons.monitor_weight_outlined,
+                'Its first change comes after about 3 weeks of weigh-ins, '
+                    'with at least 4 days a week logged. Weigh in at least 3 '
+                    'times a week, first thing in the morning. More often '
+                    'helps it learn faster.',
+              ),
+              (
+                Icons.water_drop_outlined,
+                'Water weight from salt, a big meal or your period is '
+                    'smoothed out by the trend, and a weigh-in that looks '
+                    'like a typo is set aside.',
+              ),
+            ]) ...[
+              const SizedBox(height: 14),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(icon, size: 20, color: AppColors.primary),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(line, style: muted)),
+                ],
+              ),
+            ],
+            const SizedBox(height: 14),
+            const Text('The longer you use it, the better it knows you.'),
           ],
-        ],
+        ),
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('Got it'),
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(plus ? 'Got it' : 'Close'),
         ),
+        if (!plus)
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(_IntroChoice.star),
+            child: const Text('See YumSum Star'),
+          ),
         if (offerMorning)
           FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => Navigator.of(context).pop(_IntroChoice.morning),
             child: const Text('Remind me each morning'),
           ),
       ],
     ),
   );
+  if (!context.mounted) return;
+  if (choice == _IntroChoice.star) {
+    await showPlusPaywall(context);
+    return;
+  }
+  final morning = choice == _IntroChoice.morning;
   if (morning != true || !context.mounted) return;
   final reminders = ref.read(reminderSettingsProvider.notifier);
   final on = await reminders.setWeeklyWeight(true);
@@ -110,3 +158,5 @@ Future<void> showAdaptiveLapse(BuildContext context, DateTime back) {
     ),
   );
 }
+
+enum _IntroChoice { morning, star }

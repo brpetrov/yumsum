@@ -14,6 +14,7 @@ import 'package:lean_streak/models/weight_entry.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
 import 'package:lean_streak/providers/weight_log_controller.dart';
+import 'package:lean_streak/screens/progress/helpers/adaptive_card.dart';
 import 'package:lean_streak/screens/progress/helpers/log_weight_dialog.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/app_logo_mark.dart';
@@ -72,6 +73,10 @@ class ProgressScreen extends ConsumerWidget {
                     _StatsHeader(entries: entries, profile: profile),
                     const SizedBox(height: 18),
                     _WeightChartCard(entries: entries, profile: profile),
+                    if (profile != null) ...[
+                      const SizedBox(height: 18),
+                      AdaptiveCard(profile: profile),
+                    ],
                     const SizedBox(height: 22),
                     _HistorySection(
                       entries: entries,

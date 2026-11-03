@@ -3,13 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/models/weight_entry.dart';
+import 'package:lean_streak/providers/adaptive_formula_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
+import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
 import 'package:lean_streak/providers/weight_log_controller.dart';
 import 'package:lean_streak/screens/progress/progress_screen.dart';
 import 'package:lean_streak/services/weight_log_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'adaptive_fixtures.dart';
 
 class _FakeWeightLogController extends WeightLogController {
   int resets = 0;
@@ -38,11 +45,18 @@ WeightEntry _entry(String day, double kg) => WeightEntry(
 void main() {
   late _FakeWeightLogController controller;
 
-  Future<void> pumpScreen(WidgetTester tester) async {
+  Future<void> pumpScreen(
+    WidgetTester tester, {
+    UserProfile? profile,
+    Entitlement? entitlement,
+  }) async {
     controller = _FakeWeightLogController();
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
           weightEntriesProvider.overrideWith(
             (ref) => Stream.value([
               _entry('2026-10-01', 86.0),
@@ -50,8 +64,11 @@ void main() {
             ]),
           ),
           userProfileProvider.overrideWith(
-            (ref) => Stream<UserProfile?>.value(null),
+            (ref) => Stream<UserProfile?>.value(profile),
           ),
+          entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
+          adaptiveProgressProvider.overrideWith((ref) async => null),
+          adaptiveTodayLineProvider.overrideWithValue(null),
           weightLogControllerProvider.overrideWith(() => controller),
         ],
         child: MaterialApp(theme: AppTheme.light, home: const ProgressScreen()),
@@ -77,6 +94,36 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('without YumSum Star the Adaptive formula is there, dimmed', (
+    tester,
+  ) async {
+    await pumpScreen(tester, profile: planProfile());
+    await tester.ensureVisible(find.text('Become a Star to switch it on'));
+    expect(find.text('Adaptive formula'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('How it works'));
+    await tester.pumpAndSettle();
+    expect(find.text('How the Adaptive formula works'), findsOneWidget);
+    expect(find.text('See YumSum Star'), findsOneWidget);
+    expect(find.text('Remind me each morning'), findsNothing);
+  });
+
+  testWidgets('with YumSum Star it shows the sum it makes', (tester) async {
+    await pumpScreen(
+      tester,
+      profile: planProfile(adaptiveKcal: -80),
+      entitlement: const Entitlement(
+        active: true,
+        source: EntitlementSource.manual,
+      ),
+    );
+    expect(
+      find.text('1670 from your plan − 80 adaptive = 1590 kcal'),
+      findsOneWidget,
+    );
+    expect(find.text('Become a Star to switch it on'), findsNothing);
   });
 
   testWidgets('a weigh-in can be deleted, after asking', (tester) async {
