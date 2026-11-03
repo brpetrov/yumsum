@@ -118,6 +118,8 @@ Future<void> showMacroGuide(
   return showDialog<void>(
     context: context,
     builder: (context) => AlertDialog(
+      // 150 shorter than the usual full height on a phone; the rest scrolls.
+      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 99),
       title: Text(withCalories ? 'Your targets' : 'Your macros'),
       content: SingleChildScrollView(
         child: Column(
