@@ -14,7 +14,7 @@ import 'package:lean_streak/models/weight_entry.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
 import 'package:lean_streak/providers/weight_log_controller.dart';
-import 'package:lean_streak/screens/progress/helpers/adaptive_card.dart';
+import 'package:lean_streak/screens/progress/helpers/adaptive_section.dart';
 import 'package:lean_streak/screens/progress/helpers/log_weight_dialog.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/app_logo_mark.dart';
@@ -73,10 +73,6 @@ class ProgressScreen extends ConsumerWidget {
                     _StatsHeader(entries: entries, profile: profile),
                     const SizedBox(height: 18),
                     _WeightChartCard(entries: entries, profile: profile),
-                    if (profile != null) ...[
-                      const SizedBox(height: 18),
-                      AdaptiveCard(profile: profile),
-                    ],
                     const SizedBox(height: 22),
                     _HistorySection(
                       entries: entries,
@@ -492,20 +488,17 @@ class _WeightChartCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Text(
-              'The line is your trend: your weight without the daily ups '
-              'and downs.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 12.5,
-                height: 1.35,
-                color: AppColors.textSecondary,
-              ),
+          if (profile != null) ...[
+            const SizedBox(height: 12),
+            // In line with the card's other edge, past the room the axis
+            // labels need.
+            Divider(height: 1, indent: 10, color: AppColors.divider),
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: AdaptiveSection(profile: profile!),
             ),
-          ),
+          ],
         ],
       ),
     );

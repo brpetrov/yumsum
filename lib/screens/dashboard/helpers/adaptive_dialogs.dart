@@ -25,11 +25,6 @@ Future<void> showAdaptiveIntro(BuildContext context, WidgetRef ref) async {
       NotificationService.isSupported &&
       !(settings.weeklyWeight &&
           settings.weeklyDay == ReminderSettings.everyDay);
-  final muted = TextStyle(
-    fontSize: 13.5,
-    height: 1.4,
-    color: AppColors.textSecondary,
-  );
   final choice = await showDialog<_IntroChoice>(
     context: context,
     builder: (context) => AlertDialog(
@@ -39,55 +34,33 @@ Future<void> showAdaptiveIntro(BuildContext context, WidgetRef ref) async {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Your plan starts from a formula, a good guess at what you '
-              'burn. Everyone is a little different, so the Adaptive formula '
-              'learns your real number and adjusts your target to it.',
-            ),
-            for (final (icon, line) in [
+            // Four short lines, to take in at a glance.
+            for (final (i, (icon, line)) in [
               (
                 Icons.insights_rounded,
-                'It compares what you log with how your weight trend moves. '
-                    'Eating 1,800 kcal a day and losing 0.4 kg a week means '
-                    'you burn about 2,240.',
+                'Learns what you really burn from your weigh-ins and meals.',
               ),
               (
                 Icons.calendar_month_outlined,
-                'Each Monday it moves your target a small step towards that: '
-                    'at most 5% a week and 15% in all. It only lowers it once '
-                    'two Mondays in a row agree.',
-              ),
-              (
-                Icons.shield_outlined,
-                'It never goes below your safe minimum, and never plans a '
-                    'faster loss than the pace you chose.',
+                'Adjusts your target a little each Monday.',
               ),
               (
                 Icons.monitor_weight_outlined,
-                'Its first change comes after about 3 weeks of weigh-ins, '
-                    'with at least 4 days a week logged. Weigh in at least 3 '
-                    'times a week, first thing in the morning. More often '
-                    'helps it learn faster.',
+                'Weigh in 3 times a week or more. First change in about 3 '
+                    'weeks.',
               ),
-              (
-                Icons.water_drop_outlined,
-                'Water weight from salt, a big meal or your period is '
-                    'smoothed out by the trend, and a weigh-in that looks '
-                    'like a typo is set aside.',
-              ),
-            ]) ...[
-              const SizedBox(height: 14),
+              (Icons.shield_outlined, 'Never goes below your safe minimum.'),
+            ].indexed) ...[
+              if (i > 0) const SizedBox(height: 14),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(icon, size: 20, color: AppColors.primary),
                   const SizedBox(width: 12),
-                  Expanded(child: Text(line, style: muted)),
+                  Expanded(child: Text(line)),
                 ],
               ),
             ],
-            const SizedBox(height: 14),
-            const Text('The longer you use it, the better it knows you.'),
           ],
         ),
       ),
