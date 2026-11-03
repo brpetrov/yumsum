@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/account/account_settings_screen.dart';
 import 'package:lean_streak/screens/auth/auth_screen.dart';
@@ -135,11 +136,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.plus,
         builder: (context, state) => const PlusScreen(),
       ),
-      if (kDebugMode)
-        GoRoute(
-          path: AppRoutes.debug,
-          builder: (context, state) => const DebugScreen(),
-        ),
+      GoRoute(
+        path: AppRoutes.debug,
+        // Only where the menu offers it: debug builds and dev accounts.
+        redirect: (context, state) =>
+            ref.read(debugToolsProvider) ? null : AppRoutes.dashboard,
+        builder: (context, state) => const DebugScreen(),
+      ),
     ],
   );
 

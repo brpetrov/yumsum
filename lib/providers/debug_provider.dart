@@ -1,10 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 
-/// Who a debug build pretends the account is, to try each YumSum Star state
+/// Who Debug tools pretend the account is, to try each YumSum Star state
 /// without touching Firestore.
 enum DebugAccount {
   real('Your real account'),
@@ -48,14 +47,13 @@ enum DebugAccount {
   };
 }
 
-/// The debug tools' "Pretend to be", kept on the phone. Release builds
-/// always see the real account.
+/// The debug tools' "Pretend to be", kept on the device. It only counts
+/// where Debug tools are on offer (`debugToolsProvider`).
 class DebugAccountNotifier extends Notifier<DebugAccount> {
   static const _key = 'debug.account';
 
   @override
   DebugAccount build() {
-    if (!kDebugMode) return DebugAccount.real;
     final saved = ref.watch(sharedPreferencesProvider).getString(_key);
     return DebugAccount.values.firstWhere(
       (account) => account.name == saved,

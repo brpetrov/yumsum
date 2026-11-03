@@ -22,7 +22,7 @@ enum EntitlementSource {
 /// only the server writes (the rules give the app read access alone), or
 /// the owner by hand: a hand-typed grant may hold just `active`, `source`
 /// and `expiresAt`, so every other field is optional. The owner's own
-/// account also carries `admin`.
+/// account also carries `admin` or `dev`.
 class Entitlement {
   const Entitlement({
     required this.active,
@@ -30,9 +30,11 @@ class Entitlement {
     this.expiresAt,
     this.inTrial = false,
     this.state,
-    this.admin = false,
+    bool admin = false,
+    this.dev = false,
     DateTime? endedAt,
-  }) : _endedAt = endedAt;
+  }) : _admin = admin,
+       _endedAt = endedAt;
 
   final bool active;
   final EntitlementSource source;
@@ -46,7 +48,12 @@ class Entitlement {
   final String? state;
 
   /// The owner: YumSum Star for good, and no daily AI or past-day limits.
-  final bool admin;
+  bool get admin => _admin || dev;
+  final bool _admin;
+
+  /// A developer: everything [admin] has, plus Debug tools in every build,
+  /// the Play app and the website included.
+  final bool dev;
   final DateTime? _endedAt;
 
   factory Entitlement.fromFirestore(
@@ -62,6 +69,7 @@ class Entitlement {
       inTrial: data['inTrial'] == true,
       state: data['state'] as String?,
       admin: data['admin'] == true,
+      dev: data['dev'] == true,
       endedAt: date('endedAt'),
     );
   }

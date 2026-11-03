@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +6,7 @@ import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/theme_controller.dart';
 import 'package:lean_streak/widgets/app_logo_mark.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
@@ -197,7 +197,7 @@ class AppDrawer extends ConsumerWidget {
                       onTap: () => _open(context, page.route),
                     ),
                   _PlusMenuItem(onTap: openPlus),
-                  if (kDebugMode)
+                  if (ref.watch(debugToolsProvider))
                     _MenuItem(
                       icon: Icons.bug_report_outlined,
                       label: 'Debug tools',

@@ -42,8 +42,8 @@ class DebugScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Only in debug builds. What you pick here is kept on this '
-                  'phone, not in your account.',
+                  'In debug builds, and for dev accounts. What you pick here '
+                  'is kept on this device, not in your account.',
                   style: muted,
                 ),
                 const SizedBox(height: 24),

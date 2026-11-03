@@ -100,6 +100,15 @@ void main() {
     expect(managedInPlay(admin, _now), isFalse);
   });
 
+  test('dev is everything admin is, and only a record saying so is dev', () {
+    final dev = Entitlement.fromMap({'dev': true});
+    expect(dev.dev, isTrue);
+    expect(dev.admin, isTrue);
+    expect(dev.isPlusAt(_later), isTrue);
+    expect(Entitlement.fromMap({'admin': true}).dev, isFalse);
+    expect(DebugAccount.admin.entitlementAt(_now)!.dev, isFalse);
+  });
+
   test('each pretend account in the debug tools is what it says', () {
     expect(DebugAccount.real.entitlementAt(_now), isNull);
     expect(DebugAccount.free.entitlementAt(_now), isNull);

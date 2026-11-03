@@ -18,6 +18,7 @@ void main() {
     WidgetTester tester,
     String location, {
     Entitlement? entitlement,
+    bool debugTools = true,
   }) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
@@ -49,6 +50,7 @@ void main() {
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
           entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
+          debugToolsProvider.overrideWithValue(debugTools),
         ],
         child: MaterialApp.router(theme: AppTheme.light, routerConfig: router),
       ),
@@ -84,6 +86,20 @@ void main() {
     router.pop();
     await tester.pumpAndSettle();
     expect(location(), AppRoutes.dashboard);
+  });
+
+  testWidgets('Debug tools are in the menu only where they are on offer', (
+    tester,
+  ) async {
+    await pumpAt(tester, AppRoutes.dashboard);
+    await tester.tap(find.byTooltip('Open navigation menu'));
+    await tester.pumpAndSettle();
+    expect(find.text('Debug tools', skipOffstage: false), findsOneWidget);
+
+    await pumpAt(tester, AppRoutes.dashboard, debugTools: false);
+    await tester.tap(find.byTooltip('Open navigation menu'));
+    await tester.pumpAndSettle();
+    expect(find.text('Debug tools', skipOffstage: false), findsNothing);
   });
 
   testWidgets('the menu lists Recipes', (tester) async {
