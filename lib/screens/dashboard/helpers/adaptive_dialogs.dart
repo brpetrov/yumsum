@@ -14,11 +14,10 @@ import 'package:lean_streak/widgets/icon_bubble.dart';
 const adaptiveIntroShownKey = 'adaptive.intro_shown';
 const adaptiveLapseNoticeKey = 'adaptive.lapse_notice';
 
-/// How the Adaptive formula works ("A target that learns you"): once after
-/// subscribing, and from Plan
-/// Settings and Weight & Progress. With YumSum Star it offers a weigh-in
-/// reminder every morning on phones, unless there already is one; without
-/// it, the YumSum Star page.
+/// How the Adaptive formula works ("A target that learns from you"): once
+/// after subscribing, and from Plan Settings and Weight & Progress. With
+/// YumSum Star it offers a weigh-in reminder every morning on phones,
+/// unless there already is one; without it, the YumSum Star page.
 Future<void> showAdaptiveIntro(BuildContext context, WidgetRef ref) async {
   final plus = ref.read(plusProvider);
   final settings = ref.read(reminderSettingsProvider);
@@ -30,8 +29,8 @@ Future<void> showAdaptiveIntro(BuildContext context, WidgetRef ref) async {
   final choice = await showDialog<_IntroChoice>(
     context: context,
     builder: (context) => AlertDialog(
-      // Two even lines, rather than "you" alone on a phone.
-      title: const Text('A target that\nlearns you'),
+      // Two even lines on a phone.
+      title: const Text('A target that\nlearns from you'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -47,8 +46,8 @@ Future<void> showAdaptiveIntro(BuildContext context, WidgetRef ref) async {
               ),
               (
                 Icons.calendar_month_outlined,
-                'Tunes your target',
-                'A small step each Monday, from your first week.',
+                'Personalised for you',
+                'Adjusts your target each Monday, from week one.',
               ),
               (
                 Icons.trending_down_rounded,

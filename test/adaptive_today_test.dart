@@ -294,16 +294,16 @@ void main() {
 
     testWidgets('How it works shows after subscribing', (tester) async {
       await pumpToday(tester, profile: adapted('learning'), saved: const {});
-      expect(find.text('A target that\nlearns you'), findsOneWidget);
+      expect(find.text('A target that\nlearns from you'), findsOneWidget);
       expect(prefs.getBool(adaptiveIntroShownKey), isTrue);
       await tester.tap(find.text('Got it'));
       await tester.pumpAndSettle();
-      expect(find.text('A target that\nlearns you'), findsNothing);
+      expect(find.text('A target that\nlearns from you'), findsNothing);
     });
 
     testWidgets('and only once', (tester) async {
       await pumpToday(tester, profile: adapted('learning'));
-      expect(find.text('A target that\nlearns you'), findsNothing);
+      expect(find.text('A target that\nlearns from you'), findsNothing);
     });
 
     testWidgets('not for free users', (tester) async {
@@ -313,7 +313,7 @@ void main() {
         entitlement: null,
         saved: const {},
       );
-      expect(find.text('A target that\nlearns you'), findsNothing);
+      expect(find.text('A target that\nlearns from you'), findsNothing);
     });
 
     testWidgets('"Remind me each morning" sets a daily weigh-in reminder', (

@@ -156,7 +156,7 @@ YumSum Star (plan 08).
     - With YumSum Star: an "On" pill, "You burn" (`adaptiveBurn`, measured up to yesterday) beside "Your target", then the stage and this week's line.
     - Free users see "Formula's guess" beside a locked "Your real burn" and "Become a Star to unlock it", and a tap opens `/plus`.
     - Switched off in Plan Settings, it says so and a tap goes there.
-- **The explainer:** `showAdaptiveIntro` (`lib/screens/dashboard/helpers/adaptive_dialogs.dart`), "A target that learns you": four bold promises (real burn, tunes your target, beats plateaus, runs on weigh-ins), each with one short line. It is shown once after subscribing, and from Plan Settings and the info button under the chart. For subscribers it can set the weigh-in reminder to every day at 07:30; free users are offered the YumSum Star page.
+- **The explainer:** `showAdaptiveIntro` (`lib/screens/dashboard/helpers/adaptive_dialogs.dart`), "A target that learns from you": four bold promises (real burn, personalised for you, beats plateaus, runs on weigh-ins), each with one short line. It is shown once after subscribing, and from Plan Settings and the info button under the chart. For subscribers it can set the weigh-in reminder to every day at 07:30; free users are offered the YumSum Star page.
 - **Tests:** the seeded simulator in `test/adaptive_fixtures.dart`.
 
 ## Days

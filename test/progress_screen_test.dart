@@ -123,7 +123,7 @@ void main() {
     await tester.ensureVisible(find.byTooltip('How it works'));
     await tester.tap(find.byTooltip('How it works'));
     await tester.pumpAndSettle();
-    expect(find.text('A target that\nlearns you'), findsOneWidget);
+    expect(find.text('A target that\nlearns from you'), findsOneWidget);
     expect(find.text('See YumSum Star'), findsOneWidget);
     expect(find.text('Remind me each morning'), findsNothing);
   });

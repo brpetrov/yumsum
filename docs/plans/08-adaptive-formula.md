@@ -352,9 +352,9 @@ The preview card's info dialog (`_CalculationInfoDialog`) gets an "Adaptive" lin
 
 ### How it works (once, after subscribing; again from the link)
 
-A dialog titled **A target that learns you**. It has four bold promises, each with one short line, and icons in tinted bubbles, to take in at a glance:
+A dialog titled **A target that learns from you**. It has four bold promises, each with one short line, and icons in tinted bubbles, to take in at a glance:
 - (insights) **Finds your real burn.** From your own weigh-ins and meals, not a guess.
-- (calendar) **Tunes your target.** A small step each Monday, from your first week.
+- (calendar) **Personalised for you.** Adjusts your target each Monday, from week one.
 - (trend) **Beats plateaus.** Adjusts when a fixed target would leave you stuck.
 - (scale) **Runs on weigh-ins.** At least twice a week. Daily is best.
 
