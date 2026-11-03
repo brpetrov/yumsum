@@ -121,7 +121,7 @@ void main() {
     );
     expect(find.text(pitch), findsNothing);
     expect(find.textContaining('kcal'), findsNothing);
-    expect(find.text('Become a Star to unlock it'), findsOneWidget);
+    expect(find.text('Unlock with YumSum Star'), findsOneWidget);
     expect(find.byType(Switch), findsNothing);
 
     await tester.ensureVisible(find.byTooltip('How it works'));
@@ -147,7 +147,7 @@ void main() {
     expect(find.text('2410 kcal'), findsOneWidget);
     expect(find.text('Your target'), findsOneWidget);
     expect(find.text('1590 kcal'), findsOneWidget);
-    expect(find.text('Become a Star to unlock it'), findsNothing);
+    expect(find.text('Unlock with YumSum Star'), findsNothing);
     expect(find.byType(Switch), findsNothing);
   });
 

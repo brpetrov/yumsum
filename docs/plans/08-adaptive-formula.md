@@ -382,7 +382,7 @@ The YumSum Star page says: "Adaptive Formula: Learns your real burn and tunes yo
 - The weigh-ins are the dots: hollow when set aside.
 - Under the chart, in its card, the Adaptive formula (no switch; it sells itself): "Tunes your target to your own body, from your weigh-ins and meals."
   - With YumSum Star, "You burn" beside "Your target", then how well it knows you and this week's line.
-  - Free users see "Want a formula tailored just for you? It adapts with time and your weigh-ins." and "Become a Star to unlock it".
+  - Free users see "Want a formula tailored just for you? It adapts with time and your weigh-ins." and an "Unlock with YumSum Star" button with the star.
   - The trend caption that was here is gone.
 
 ## What gets built

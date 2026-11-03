@@ -81,7 +81,7 @@ The paid tier (plan 06; the code says `plus`).
   - `StarBadge` beside the logo in the menu header and beside the name on Home: the star for members, a "Become a Star" chip for everyone else, nothing while the record loads.
   - A card in Account Settings.
   - `PlusPromptCard` on Home.
-  - The dimmed macro rings for free users, and "Become a Star to unlock it" under the weight chart.
+  - The dimmed macro rings for free users, and the "Unlock with YumSum Star" button under the weight chart.
 - **Debug tools** (`/debug`, `DebugScreen`), in debug builds and for dev accounts in any build:
   - the User ID to copy;
   - "Pretend to be" (`debugAccountProvider`): free, subscribed, trial, ended or admin, on that device. A pretend account is real enough to change the Adaptive formula on the real plan.
@@ -153,7 +153,7 @@ YumSum Star (plan 08).
   - Plan Settings: a row with the sum (`adaptiveSumLine`) and how well it knows you (`adaptiveStageLine`, from `adaptiveProgressProvider`); the star for free users, whose tap opens `/plus`.
   - Weight & Progress: `AdaptiveSection` (`lib/screens/progress/helpers/adaptive_section.dart`), under the chart in its card. It says what it does for you, then:
     - With YumSum Star: an "On" pill, "You burn" (`adaptiveBurn`, measured up to yesterday) beside "Your target", then the stage and this week's line.
-    - Free users see a question instead ("Want a formula tailored just for you? It adapts with time and your weigh-ins.") and "Become a Star to unlock it", and a tap opens `/plus`. No numbers, so it invites rather than knocks the standard plan.
+    - Free users see a question instead ("Want a formula tailored just for you? It adapts with time and your weigh-ins.") and an "Unlock with YumSum Star" button (a bigger "Become a Star" chip, with the star), and a tap opens `/plus`. No numbers, so it invites rather than knocks the standard plan.
 - **The explainer:** `showAdaptiveIntro` (`lib/screens/dashboard/helpers/adaptive_dialogs.dart`), titled "Adaptive formula" over "A target that learns from you": four bold promises (finds your real burn, adapts to your body, beats plateaus, learns as you go), each with one short line. "Log weight now" opens the weigh-in dialog (`logWeightWithFeedback`); the other button is Close. It is shown once after subscribing, and from Plan Settings and the info button under the chart.
 - **Tests:** the seeded simulator in `test/adaptive_fixtures.dart`.
 

@@ -107,20 +107,34 @@ class AdaptiveSection extends ConsumerWidget {
             Text(week, style: muted),
           ],
         ] else ...[
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const PlusStar(size: 24),
-              const SizedBox(width: 8),
-              Text(
-                'Become a Star to unlock it',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
+          const SizedBox(height: 14),
+          // A bigger "Become a Star" chip: the star says it's a Star feature.
+          Material(
+            color: AppColors.primaryContainer,
+            shape: const StadiumBorder(),
+            child: InkWell(
+              customBorder: const StadiumBorder(),
+              onTap: () => showPlusPaywall(context),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 8, 20, 8),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const PlusStar(size: 30),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        'Unlock with YumSum Star',
+                        style: AppTheme.display.copyWith(
+                          fontSize: 16,
+                          color: AppColors.onPrimaryContainer,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ],
       ],
