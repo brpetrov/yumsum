@@ -7,13 +7,14 @@ import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 
 /// The reminders, each a switch with its time: the evening meal reminder,
-/// the weekly weigh-in and the daily creatine reminder. Turning one on asks
+/// the weigh-in (weekly, or every day) and the daily creatine reminder. Turning one on asks
 /// the system for permission; if that is refused it stays off.
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
 
+  /// By weekday number; 0 is [ReminderSettings.everyDay].
   static const _dayNames = [
-    '',
+    'Every day',
     'Monday',
     'Tuesday',
     'Wednesday',
@@ -68,10 +69,12 @@ class NotificationsScreen extends ConsumerWidget {
                 ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Weekly weigh-in reminder'),
+                  title: const Text('Weigh-in reminder'),
                   subtitle: Text(
-                    '${_dayNames[settings.weeklyDay]}s at '
-                    '${clockLabel(settings.weeklyTime)}',
+                    settings.weeklyDay == ReminderSettings.everyDay
+                        ? 'Every day at ${clockLabel(settings.weeklyTime)}'
+                        : '${_dayNames[settings.weeklyDay]}s at '
+                              '${clockLabel(settings.weeklyTime)}',
                   ),
                   value: settings.weeklyWeight,
                   onChanged: (on) => apply(() => notifier.setWeeklyWeight(on)),
@@ -84,7 +87,7 @@ class NotificationsScreen extends ConsumerWidget {
                         underline: const SizedBox.shrink(),
                         items: [
                           for (
-                            var day = DateTime.monday;
+                            var day = ReminderSettings.everyDay;
                             day <= DateTime.sunday;
                             day++
                           )

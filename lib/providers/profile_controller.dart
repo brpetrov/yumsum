@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:lean_streak/helpers/adaptive_formula.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
@@ -25,12 +26,40 @@ class ProfileController extends AsyncNotifier<void> {
     required String country,
     required String usualFood,
     required bool trackProtein,
+    required bool adaptiveOn,
   }) async {
     state = const AsyncLoading();
 
     try {
       final uid = ref.read(currentUidProvider);
       if (uid == null) throw Exception('Not authenticated');
+
+      final now = DateTime.now();
+      final today = DateFormat('yyyy-MM-dd').format(now);
+
+      // The Adaptive formula: switching it off goes back to the plain plan;
+      // new details or activity start its learning again from today, so an
+      // old correction never double-counts or fights a real change.
+      var adaptiveKcal = currentProfile.adaptiveKcal;
+      var adaptiveNote = currentProfile.adaptiveNote;
+      var adaptiveFrom = currentProfile.adaptiveFrom;
+      final detailsChanged =
+          age != currentProfile.age ||
+          gender != currentProfile.gender ||
+          heightCm != currentProfile.heightCm ||
+          activityLevel != currentProfile.activityLevel ||
+          trainingFrequency != currentProfile.trainingFrequency;
+      if (detailsChanged) {
+        adaptiveKcal = 0;
+        adaptiveNote = AdaptiveNote.learning.value;
+        if (adaptiveFrom == null || adaptiveFrom.compareTo(today) < 0) {
+          adaptiveFrom = today;
+        }
+      }
+      if (!adaptiveOn) {
+        adaptiveKcal = 0;
+        adaptiveNote = AdaptiveNote.off.value;
+      }
 
       final plan = HealthCalculator.calculatePlan(
         currentWeightKg: currentWeightKg,
@@ -41,6 +70,7 @@ class ProfileController extends AsyncNotifier<void> {
         activityLevel: activityLevel,
         trainingFrequency: trainingFrequency,
         weightLossPace: weightLossPace,
+        adaptiveKcal: adaptiveKcal.toDouble(),
       );
 
       final updatedProfile = currentProfile.copyWith(
@@ -65,14 +95,17 @@ class ProfileController extends AsyncNotifier<void> {
         dailyCalorieTarget: plan.dailyCalorieTarget,
         goalPaceKgPerWeek: plan.goalPaceKgPerWeek,
         goalPaceLevel: plan.goalPaceLevel,
-        updatedAt: DateTime.now(),
+        adaptiveOn: adaptiveOn,
+        adaptiveKcal: adaptiveKcal,
+        adaptiveNote: adaptiveNote,
+        adaptiveFrom: adaptiveFrom,
+        updatedAt: now,
       );
 
       await ref
           .read(userProfileRepositoryProvider)
           .createProfile(updatedProfile);
 
-      final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
       await ref.read(dailySummaryServiceProvider).recomputeForDate(uid, today);
 
       state = const AsyncData(null);

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/providers/account_provider.dart';
+import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
@@ -128,6 +129,7 @@ class AccountController extends AsyncNotifier<void> {
     try {
       final user = await _reauthenticate(password);
       await ref.read(accountRepositoryProvider).resetAllData(user.uid);
+      await resetAdaptive(ref, user.uid);
       refreshHistory(ref);
       ref.invalidate(recentMealsProvider);
       state = const AsyncData(null);

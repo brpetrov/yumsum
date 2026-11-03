@@ -50,6 +50,9 @@ lib/core/config/api_keys.dart
 # Open Food Facts app account (copy config/off_account.example.json)
 config/off_account.json
 
+# Your own data for test/adaptive_replay_test.dart, from the debug log
+config/adaptive_replay.json
+
 # Firebase CLI deploy cache
 .firebase/
 

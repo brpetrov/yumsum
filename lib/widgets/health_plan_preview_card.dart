@@ -158,16 +158,25 @@ class _CalculationInfoDialog extends StatelessWidget {
   final Color color;
 
   double get _dailyDeficit {
-    return (preview.tdee - preview.dailyCalorieTarget)
+    return (preview.tdee + preview.adaptiveKcal - preview.dailyCalorieTarget)
         .clamp(0, double.infinity)
         .toDouble();
   }
 
   @override
   Widget build(BuildContext context) {
+    final adaptive = preview.adaptiveKcal.round();
+    final sign = adaptive < 0 ? '-' : '+';
+    // The Adaptive formula corrects the burn, before the deficit.
+    final burn = adaptive == 0
+        ? '${preview.tdee.round()}'
+        : '${preview.tdee.round()} $sign ${adaptive.abs()}';
+    final target = preview.dailyCalorieTarget.round();
     final targetFormula = preview.isMaintaining
-        ? '${preview.tdee.round()} = ${preview.dailyCalorieTarget.round()} kcal/day'
-        : '${preview.tdee.round()} - ${_dailyDeficit.round()} = ${preview.dailyCalorieTarget.round()} kcal/day';
+        ? preview.calorieTargetClamped
+              ? '$target kcal/day, your minimum'
+              : '$burn = $target kcal/day'
+        : '$burn - ${_dailyDeficit.round()} = $target kcal/day';
 
     return AlertDialog(
       title: Row(
@@ -217,8 +226,13 @@ class _CalculationInfoDialog extends StatelessWidget {
               value:
                   '${preview.bmr.round()} x ${preview.activityMultiplier.toStringAsFixed(2)} = ${preview.tdee.round()} kcal/day',
             ),
+            if (adaptive != 0)
+              _InfoLine(
+                label: 'Adaptive',
+                value: '$sign${adaptive.abs()} kcal/day',
+              ),
             _InfoLine(label: 'Target', value: targetFormula),
-            if (preview.calorieTargetClamped) ...[
+            if (preview.calorieTargetClamped && !preview.isMaintaining) ...[
               const SizedBox(height: 10),
               Text(
                 'This pace would go below the minimum, so your target stays at the minimum and the goal date moves later.',

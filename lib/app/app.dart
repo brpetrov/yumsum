@@ -6,6 +6,7 @@ import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/providers/activity_scale_migration_provider.dart';
+import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/reminder_provider.dart';
 import 'package:lean_streak/providers/theme_controller.dart';
 
@@ -15,6 +16,7 @@ class LeanStreakApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(activityScaleMigrationProvider);
+    ref.watch(adaptiveMondayProvider);
     ref.watch(reminderSyncProvider);
     final router = ref.watch(goRouterProvider);
     final mode = ref.watch(themeControllerProvider);

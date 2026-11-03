@@ -3,6 +3,19 @@ import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/helpers/weight_reminder.dart';
 
 void main() {
+  group('nextDailyAt', () {
+    test('today until the time has passed, then tomorrow', () {
+      expect(
+        nextDailyAt(hour: 7, minute: 30, now: DateTime(2026, 10, 31, 7, 29)),
+        DateTime(2026, 10, 31, 7, 30),
+      );
+      expect(
+        nextDailyAt(hour: 7, minute: 30, now: DateTime(2026, 10, 31, 7, 30)),
+        DateTime(2026, 11, 1, 7, 30),
+      );
+    });
+  });
+
   group('nextWeekdayAt', () {
     // 14 October 2026 is a Wednesday.
     test('finds the coming Saturday at the given time', () {

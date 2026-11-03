@@ -15,3 +15,15 @@ DateTime nextWeekdayAt({
   }
   return due;
 }
+
+/// The next [hour]:[minute] local time strictly after [now]: today, or
+/// tomorrow once it has passed.
+DateTime nextDailyAt({
+  required int hour,
+  required int minute,
+  required DateTime now,
+}) {
+  final today = DateTime(now.year, now.month, now.day, hour, minute);
+  if (today.isAfter(now)) return today;
+  return DateTime(now.year, now.month, now.day + 1, hour, minute);
+}
