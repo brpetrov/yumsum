@@ -11,9 +11,9 @@ import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/repositories/ai_usage_repository.dart';
 
 /// Whether every estimate asks for the macros, or only YumSum Star ones.
-/// Off until the owner has measured what they add to a call on the phone
-/// (plan 10): 15% or less of a typed estimate's cost turns it on.
-const macrosForEveryone = false;
+/// On since 4 November 2026, the owner's call: free users' meals keep their
+/// macros too, so upgrading shows a full history (plan 10).
+const macrosForEveryone = true;
 
 /// One component of an AI estimate; [grams] is the weight the AI assumed
 /// (ml for drinks), null when it gave none.
@@ -385,17 +385,17 @@ class CalorieEstimateService {
       'null>, "fiber": <number or null>, "salt": <number or null>}}\n'
       'Do not include any other text.';
 
-  // The fill-in on saving asks for macros only for YumSum Star: no call is
-  // made for figures a free user can't see.
+  // The fill-in on saving asks for macros on the same terms as the
+  // estimates: [macrosForEveryone], or YumSum Star.
   String get _nutrientsPromptTemplate =>
       '$_context'
       'The user logged a meal by name with its calories. Assuming the '
       'calories are right, estimate how many grams of protein it contains.\n'
-      '${_macros(_plus)}'
+      '${_macros(_askMacros)}'
       'If the name gives no clue what the food was (e.g. "Lunch" or "Snack"), '
-      'return null${_plus ? ' for each' : ''}.\n'
+      'return null${_askMacros ? ' for each' : ''}.\n'
       'Respond with ONLY a JSON object: {"protein_g": <integer or null>'
-      '${_macrosJson(_plus, orNull: true)}}\n'
+      '${_macrosJson(_askMacros, orNull: true)}}\n'
       'Do not include any other text.\n\n'
       'Meal: {name}\nCalories: {kcal}';
 
@@ -573,8 +573,8 @@ class CalorieEstimateService {
     }
   }
 
-  /// Protein, and for YumSum Star the macros, for a meal logged by name and
-  /// calories; null when the name says nothing about the food (e.g.
+  /// Protein and the macros (see [macrosForEveryone]) for a meal logged by
+  /// name and calories; null when the name says nothing about the food (e.g.
   /// "Lunch"). This doesn't count towards the daily AI limit: it costs a
   /// fraction of an estimate, comes with saving a meal, and counting it
   /// would use up the allowance unasked.

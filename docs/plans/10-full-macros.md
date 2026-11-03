@@ -1,6 +1,6 @@
 # Plan 10: Full macros
 
-*Written 2 November 2026. Status: steps 1–5 built on 3 November 2026. `macrosForEveryone` is `false` until you have measured the cost (Steps for you, 2), and the rules need deploying with the release.*
+*Written 2 November 2026. Status: steps 1–5 built on 3 November 2026. `macrosForEveryone` is `true` since 4 November (your call: free users' meals keep their macros too, so upgrading shows a full history; measuring the cost is now only for knowing it), and the rules need deploying with the release.*
 
 ## The short version
 
@@ -385,7 +385,7 @@ Play's Data safety form needs no change: these are more details of the same meal
 - [x] (Claude) Step 3: the recipe data job and parser (3 November; no calories, protein or ingredients changed)
 - [ ] (you) look over a few recipes
 - [x] (Claude) Step 4: the AI (3 November)
-- [ ] (you) measure; (Claude) set `macrosForEveryone`
+- [x] `macrosForEveryone` set to `true` on 4 November without measuring: the owner wants every meal to keep its macros, whatever the cost
 - [x] (Claude) Step 5: Today, meal rows, day sheet, recipe page, amount sheet (3 November). The paywall already lists Detailed Macros ("The full label: fat, carbs, sugars, fibre, salt."), so its line was left as you tuned it
 - [ ] (you) Phone checklist, then publish the privacy page with the release
 
