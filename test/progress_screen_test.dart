@@ -111,12 +111,16 @@ void main() {
       ),
       findsOneWidget,
     );
-    expect(find.text(pitch), findsOneWidget);
-    // The formula's guess, beside the real burn it would learn, locked.
-    expect(find.text('Formula\'s guess'), findsOneWidget);
-    expect(find.text('2490 kcal'), findsOneWidget);
-    expect(find.text('Your real burn'), findsOneWidget);
-    expect(find.byIcon(Icons.lock_rounded), findsOneWidget);
+    // A question that invites them in, with no numbers that knock the plan.
+    expect(
+      find.text(
+        'Want a formula tailored just for you? It adapts with time and your '
+        'weigh-ins.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text(pitch), findsNothing);
+    expect(find.textContaining('kcal'), findsNothing);
     expect(find.text('Become a Star to unlock it'), findsOneWidget);
     expect(find.byType(Switch), findsNothing);
 
@@ -143,7 +147,6 @@ void main() {
     expect(find.text('2410 kcal'), findsOneWidget);
     expect(find.text('Your target'), findsOneWidget);
     expect(find.text('1590 kcal'), findsOneWidget);
-    expect(find.byIcon(Icons.lock_rounded), findsNothing);
     expect(find.text('Become a Star to unlock it'), findsNothing);
     expect(find.byType(Switch), findsNothing);
   });

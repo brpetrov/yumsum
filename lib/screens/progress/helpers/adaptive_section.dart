@@ -14,9 +14,8 @@ import 'package:lean_streak/widgets/plus_mark.dart';
 /// The Adaptive formula under the weight chart, always on with YumSum Star:
 /// what it does for you, then what you burn as it has learnt it and the
 /// target that follows, how well it knows you and this week's result.
-/// Without YumSum Star, the formula's guess beside a locked real burn, and
-/// a tap opens the YumSum Star page. Its info button explains it
-/// ([showAdaptiveIntro]).
+/// Without YumSum Star, a question that invites them in, and a tap opens
+/// the YumSum Star page. Its info button explains it ([showAdaptiveIntro]).
 class AdaptiveSection extends ConsumerWidget {
   const AdaptiveSection({super.key, required this.profile});
 
@@ -67,8 +66,13 @@ class AdaptiveSection extends ConsumerWidget {
           ],
         ),
         Text(
-          'Tunes your target to your own body, from your weigh-ins and '
-          'meals.',
+          plus
+              ? 'Tunes your target to your own body, from your weigh-ins and '
+                    'meals.'
+              // Invites rather than knocks the standard plan, which is a
+              // good start for everyone.
+              : 'Want a formula tailored just for you? It adapts with time '
+                    'and your weigh-ins.',
           style: TextStyle(
             fontSize: 14,
             height: 1.35,
@@ -103,24 +107,6 @@ class AdaptiveSection extends ConsumerWidget {
             Text(week, style: muted),
           ],
         ] else ...[
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: _Stat(
-                  label: 'Formula\'s guess',
-                  value: '${adaptiveBurn(profile, null)} kcal',
-                ),
-              ),
-              Expanded(
-                child: _Stat(
-                  label: 'Your real burn',
-                  icon: Icons.lock_rounded,
-                  color: AppColors.veryGood,
-                ),
-              ),
-            ],
-          ),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -149,19 +135,16 @@ class AdaptiveSection extends ConsumerWidget {
   }
 }
 
-/// A small label over a big number (or a locked one, as [icon]), like the
-/// stats at the top of the page.
+/// A small label over a big number, like the stats at the top of the page.
 class _Stat extends StatelessWidget {
-  const _Stat({required this.label, this.value, this.icon, this.color});
+  const _Stat({required this.label, required this.value, this.color});
 
   final String label;
-  final String? value;
-  final IconData? icon;
+  final String value;
   final Color? color;
 
   @override
   Widget build(BuildContext context) {
-    final color = this.color ?? AppColors.textPrimary;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -174,13 +157,13 @@ class _Stat extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        if (value case final value?)
-          Text(
-            value,
-            style: AppTheme.display.copyWith(fontSize: 21, color: color),
-          )
-        else
-          Icon(icon, size: 26, color: color),
+        Text(
+          value,
+          style: AppTheme.display.copyWith(
+            fontSize: 21,
+            color: color ?? AppColors.textPrimary,
+          ),
+        ),
       ],
     );
   }

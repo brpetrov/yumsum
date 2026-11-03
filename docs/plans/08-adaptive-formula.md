@@ -19,7 +19,7 @@ What changed:
 - **Small steps early:** the step limit is 5% of the plan × days ÷ 21 for the first 3 weeks (about 25 kcal in week 1, 55 in week 2), then 5%.
 - **Small changes show:** the dead band is 20 kcal, not 50.
 - **New accounts:** only the first 7 days are left out (mostly water and stored carbohydrate), not 14.
-- **What you burn on show:** Weight & Progress shows "You burn" beside "Your target" (`AdaptiveMeasure.burn`, the formula's burn moved towards the measured one by the confidence, as `adaptiveBurn`). It's measured up to yesterday, so it moves daily. Free users see the formula's guess beside a locked real burn.
+- **What you burn on show:** Weight & Progress shows "You burn" beside "Your target" (`AdaptiveMeasure.burn`, the formula's burn moved towards the measured one by the confidence, as `adaptiveBurn`). It's measured up to yesterday, so it moves daily. Free users see a question that invites them in ("Want a formula tailored just for you? It adapts with time and your weigh-ins."), with no numbers. An earlier draft set "Formula's guess" beside a locked "Your real burn", but that knocked the standard plan and left people unsure which number was which.
 - **No switch** (later the same day): it's on for every YumSum Star member. Someone who doesn't weigh in simply gets no change, so an off switch had no job. `adaptiveOn` went from the profile and the rules; Plan Settings' row keeps the sum, the stage and the restart note. The build notes further down that mention the switch predate this.
 
 Simulated (60 noisy runs: 0.5 kg weigh-in noise and 250 kcal food noise), the median adjustment by week:
@@ -382,7 +382,7 @@ The YumSum Star page says: "Adaptive Formula: Learns your real burn and tunes yo
 - The weigh-ins are the dots: hollow when set aside.
 - Under the chart, in its card, the Adaptive formula (no switch; it sells itself): "Tunes your target to your own body, from your weigh-ins and meals."
   - With YumSum Star, "You burn" beside "Your target", then how well it knows you and this week's line.
-  - Free users see "Formula's guess" beside "Your real burn" locked, and "Become a Star to unlock it".
+  - Free users see "Want a formula tailored just for you? It adapts with time and your weigh-ins." and "Become a Star to unlock it".
   - The trend caption that was here is gone.
 
 ## What gets built
