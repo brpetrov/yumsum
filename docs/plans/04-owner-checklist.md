@@ -7,9 +7,9 @@
 - [ ] **Put the 30 October changes live** (new quick-log bar, optional protein, launch screen, web loading page)
   - [ ] `firebase deploy --only hosting:app,firestore:rules` (the rules now check the new `trackProtein` field), then Ctrl+F5 on the website
   - [ ] Run the app on the phone again from VS Code. Then close it fully and open it from the home screen: the launch screen should show the bowl alone on cream, and the app's splash should carry on from it
-  - [ ] Try the bar: photo, barcode and mic buttons; tap the box and watch them slide away for the sparkle button; type a name (it lights up), add calories (it becomes a tick)
-  - [ ] Plan Settings → Track protein too? → No, Save: no protein on Today, in the bar, on meals or in History
-  - [ ] Weight & Progress: delete a weigh-in with the bin on its card. Deleting the newest one puts your target back to the one before
+  - [x] Try the bar: photo, barcode and mic buttons; tap the box and watch them slide away for the sparkle button; type a name (it lights up), add calories (it becomes a tick)
+  - [x] Plan Settings → Track protein too? → No, Save: no protein on Today, in the bar, on meals or in History
+  - [x] Weight & Progress: delete a weigh-in with the bin on its card. Deleting the newest one puts your target back to the one before
 - [x] **Open Food Facts account** (30 October 2026): made on the real server with help.yumsum, in `config/off_account.json`, login checked; API usage form sent. The test server was down all day, so testing goes straight to the real one
   - [ ] Try both flows safely first: run "YumSum (Android, contribute dry run)" and scan the two test barcodes Claude put on screen (3809990001236 is unknown, 5010251434573 is listed without calories). Nothing is sent; the AI reading still counts towards the 20 a day
   - [ ] Then for real with "YumSum (Android)": scan a packet Open Food Facts doesn't know, or one it has without calories, contribute it, then check its page at world.openfoodfacts.org/product/ followed by the barcode
