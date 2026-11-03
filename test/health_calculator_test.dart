@@ -352,4 +352,41 @@ void main() {
       expect(target(TrainingFrequency.fivePlus), 150);
     });
   });
+
+  group('macro targets', () {
+    test('follow the calories and protein of the plan', () {
+      final t = HealthCalculator.macroTargets(
+        calories: 1670,
+        proteinGrams: 131,
+      );
+      expect(t.fat, 56); // 30% of 1670 kcal is 501 kcal
+      expect(t.carbs, 161); // (1670 - 131 × 4 - 501) / 4
+      expect(t.saturates, 19); // 10% of the calories
+      expect(t.sugars, 75); // 18%, the label guide's 90 g in 2,000 kcal
+      expect(t.fibre, 30);
+      expect(t.salt, 6);
+    });
+
+    test('a bigger plan gets bigger targets, fibre and salt stay', () {
+      final small = HealthCalculator.macroTargets(
+        calories: 1500,
+        proteinGrams: 100,
+      );
+      final big = HealthCalculator.macroTargets(
+        calories: 2500,
+        proteinGrams: 100,
+      );
+      expect(big.fat, greaterThan(small.fat));
+      expect(big.carbs, greaterThan(small.carbs));
+      expect(big.saturates, greaterThan(small.saturates));
+      expect((big.fibre, big.salt), (small.fibre, small.salt));
+    });
+
+    test('carbs never go below nothing', () {
+      expect(
+        HealthCalculator.macroTargets(calories: 900, proteinGrams: 200).carbs,
+        0,
+      );
+    });
+  });
 }

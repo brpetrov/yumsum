@@ -82,6 +82,25 @@ class HealthCalculator {
     return (targetWeightKg * gramsPerKg).round();
   }
 
+  /// The day's macro targets, from the plan's [calories] and protein, so they
+  /// follow weight, height, age, gender and activity with it: fat about 30%
+  /// of the calories, carbs the rest after protein and fat, saturates no
+  /// more than 10% (the UK's advice) and all sugars no more than 18% (the
+  /// food-label guide, 90 g in 2,000 kcal). Fibre (at least 30 g) and salt
+  /// (no more than 6 g) are the same for every adult.
+  static ({int fat, int carbs, int saturates, int sugars, int fibre, int salt})
+  macroTargets({required int calories, required int proteinGrams}) {
+    final fat = calories * 0.30 / 9;
+    return (
+      fat: fat.round(),
+      carbs: math.max(0, (calories - proteinGrams * 4 - fat * 9) / 4).round(),
+      saturates: (calories * 0.10 / 9).round(),
+      sugars: (calories * 0.18 / 4).round(),
+      fibre: 30,
+      salt: 6,
+    );
+  }
+
   /// Converts the user's chosen weight-loss pace to kg/week.
   static double goalPaceFromWeightLossPace(WeightLossPace pace) {
     return switch (pace) {

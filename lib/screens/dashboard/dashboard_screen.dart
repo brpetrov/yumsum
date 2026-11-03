@@ -37,7 +37,7 @@ import 'package:lean_streak/widgets/bowl_note.dart';
 import 'package:lean_streak/widgets/calorie_bars.dart';
 import 'package:lean_streak/widgets/day_status.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
-import 'package:lean_streak/widgets/macro_totals.dart';
+import 'package:lean_streak/widgets/macro_rings.dart';
 import 'package:lean_streak/widgets/meal_row.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
@@ -419,7 +419,8 @@ class _TodayCard extends StatelessWidget {
   final int proteinTarget;
   final int mealsWithoutProtein;
 
-  /// The meals whose macros are totalled; null when they aren't shown.
+  /// The meals whose macros the rings show (YumSum Star); null shows the
+  /// dimmed rings that open the YumSum Star page.
   final List<Meal>? macroMeals;
 
   /// This week's Adaptive formula result, if there is one to show.
@@ -506,7 +507,16 @@ class _TodayCard extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           _ProgressBar(value: calorieProgress, color: barColor, height: 14),
-          if (trackProtein) ...[
+          // With YumSum Star, protein is the first of the macro rings.
+          if (macroMeals case final meals?) ...[
+            const SizedBox(height: 22),
+            MacroRings(
+              meals: meals,
+              calorieTarget: summary.targetCalories,
+              proteinTarget: proteinTarget,
+              trackProtein: trackProtein,
+            ),
+          ] else if (trackProtein) ...[
             const SizedBox(height: 22),
             Row(
               children: [
@@ -549,9 +559,9 @@ class _TodayCard extends StatelessWidget {
               style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
           ],
-          if (macroMeals case final meals? when meals.isNotEmpty) ...[
-            const SizedBox(height: 14),
-            MacroTotals(meals: meals),
+          if (macroMeals == null) ...[
+            const SizedBox(height: 20),
+            MacroRingsTeaser(onTap: () => showPlusPaywall(context)),
           ],
         ],
       ),

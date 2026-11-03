@@ -121,11 +121,11 @@ void main() {
     expect(find.text('About your macros'), findsOneWidget);
     expect(find.text('Salt'), findsOneWidget);
     expect(find.text('2.5 g'), findsOneWidget);
+    expect(find.textContaining('a tenth of your calories'), findsOneWidget);
     expect(
-      find.textContaining('30 g a day for men, 20 g for women'),
+      find.textContaining('At least 30 g a day for every adult'),
       findsOneWidget,
     );
-    expect(find.textContaining('at least 30 g a day'), findsOneWidget);
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
     expect(find.text('About your macros'), findsNothing);

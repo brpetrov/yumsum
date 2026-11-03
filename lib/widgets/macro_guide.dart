@@ -3,62 +3,99 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/helpers/health_calculator.dart';
 import 'package:lean_streak/models/nutrients.dart';
-import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 
-/// What each macro is for and the UK's daily guide for adults, beside the
-/// day's [total]: the info button on the macros summary. The saturates guide follows
-/// the profile's gender.
-Future<void> showMacroGuide(BuildContext context, Nutrients total) {
+/// What each macro is for and how its target is set, beside the day's
+/// [total] and [protein] (null when protein isn't tracked): the info button
+/// on the macros. Targets come from the profile's plan
+/// ([HealthCalculator.macroTargets]).
+Future<void> showMacroGuide(
+  BuildContext context,
+  Nutrients? total, {
+  double? protein,
+}) {
   return showDialog<void>(
     context: context,
     builder: (context) => Consumer(
       builder: (context, ref, _) {
-        final gender = ref.watch(userProfileProvider).valueOrNull?.gender;
-        final saturates = switch (gender) {
-          Gender.male => 'No more than 30 g a day for men.',
-          Gender.female => 'No more than 20 g a day for women.',
-          _ => 'No more than 30 g a day for men, 20 g for women.',
-        };
+        final profile = ref.watch(userProfileProvider).valueOrNull;
+        final proteinTarget = profile == null
+            ? null
+            : HealthCalculator.proteinTargetGrams(
+                targetWeightKg: profile.targetWeightKg,
+                trainingFrequency: profile.trainingFrequency,
+              );
+        final targets = profile == null
+            ? null
+            : HealthCalculator.macroTargets(
+                calories: profile.dailyCalorieTarget.round(),
+                proteinGrams: proteinTarget!,
+              );
         final rows = [
+          if (protein != null)
+            (
+              'Protein',
+              protein,
+              proteinTarget,
+              false,
+              'Keeps you full and holds on to muscle while you lose fat. '
+                  'Your target comes from your goal weight and how often you '
+                  'train.',
+            ),
           (
             'Fat',
-            total.fat,
-            'Energy, and it helps you take in some vitamins. Food labels '
-                'use 70 g a day as a guide for an adult.',
-          ),
-          (
-            'Saturates',
-            total.saturates,
-            'The fat to watch for your heart: butter, cheese, fatty meat, '
-                'pastry and cakes. $saturates',
+            total?.fat,
+            targets?.fat,
+            false,
+            'Energy, and it helps you take in some vitamins. Your target is '
+                'about 30% of your calories.',
           ),
           (
             'Carbs',
-            total.carbs,
+            total?.carbs,
+            targets?.carbs,
+            false,
             'Your body\'s main fuel: bread, rice, pasta, potatoes and fruit. '
-                'Food labels use 260 g a day as a guide.',
+                'Your target is what\'s left of your calories after protein '
+                'and fat.',
+          ),
+          (
+            'Saturates',
+            total?.saturates,
+            targets?.saturates,
+            true,
+            'The fat to watch for your heart: butter, cheese, fatty meat, '
+                'pastry and cakes. UK advice is no more than a tenth of your '
+                'calories.',
           ),
           (
             'Sugars',
-            total.sugars,
-            'All sugars, the ones in fruit and milk too. Of the added kind '
-                '(sweets, fizzy drinks, honey, juice), no more than 30 g a '
-                'day.',
+            total?.sugars,
+            targets?.sugars,
+            true,
+            'All sugars, the ones in fruit and milk too: the food-label '
+                'guide, for your calories. Of the added kind (sweets, fizzy '
+                'drinks, honey, juice), keep to under 30 g.',
           ),
           (
             'Fibre',
-            total.fibre,
+            total?.fibre,
+            targets?.fibre,
+            false,
             'Keeps you full and your gut healthy: wholegrains, beans, '
-                'lentils, vegetables and fruit. Aim for at least 30 g a day.',
+                'lentils, vegetables and fruit. At least 30 g a day for every '
+                'adult.',
           ),
           (
             'Salt',
-            total.salt,
+            total?.salt,
+            targets?.salt,
+            true,
             'Too much raises your blood pressure. No more than 6 g a day, '
-                'about a teaspoon. Most of it is already in bread, cheese, '
-                'ready meals and sauces.',
+                'about a teaspoon, for every adult. Most of it is already in '
+                'bread, cheese, ready meals and sauces.',
           ),
         ];
         final muted = TextStyle(
@@ -67,6 +104,14 @@ Future<void> showMacroGuide(BuildContext context, Nutrients total) {
           color: AppColors.textSecondary,
         );
 
+        String figure(String name, double grams, int? target, bool limit) {
+          final eaten = name == 'Salt'
+              ? grams.toStringAsFixed(1)
+              : '${grams.round()}';
+          if (target == null) return '$eaten g';
+          return limit ? '$eaten g, max $target g' : '$eaten of $target g';
+        }
+
         return AlertDialog(
           title: const Text('About your macros'),
           content: SingleChildScrollView(
@@ -74,7 +119,7 @@ Future<void> showMacroGuide(BuildContext context, Nutrients total) {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (final (name, grams, about) in rows) ...[
+                for (final (name, grams, target, limit, about) in rows) ...[
                   Row(
                     children: [
                       Expanded(
@@ -88,7 +133,7 @@ Future<void> showMacroGuide(BuildContext context, Nutrients total) {
                       ),
                       if (grams != null)
                         Text(
-                          '${name == 'Salt' ? grams.toStringAsFixed(1) : grams.round()} g',
+                          figure(name, grams, target, limit),
                           style: TextStyle(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w700,
@@ -102,8 +147,10 @@ Future<void> showMacroGuide(BuildContext context, Nutrients total) {
                   const SizedBox(height: 14),
                 ],
                 Text(
-                  'The UK\'s guides for adults, not personal targets. The '
-                  'figures count only the meals with macro info.',
+                  'Fat, carbs, saturates and sugars follow your daily '
+                  'calories, so they adjust with your plan. Guides from UK '
+                  'advice for adults, not medical advice. The figures count '
+                  'only the meals with macro info.',
                   style: muted.copyWith(fontSize: 12.5),
                 ),
               ],
