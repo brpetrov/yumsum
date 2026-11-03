@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:lean_streak/models/meal.dart';
+import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
@@ -17,7 +18,8 @@ class LogMealController extends AsyncNotifier<void> {
   Future<void> build() async {}
 
   /// Saves a new meal, or [existingMeal] with new values. New meals go on
-  /// [date] (yyyy-MM-dd), today by default. Changing a past day uses one of
+  /// [date] (yyyy-MM-dd), today by default. An edit given no [macros] keeps
+  /// the meal's own ([macrosAfterEdit]). Changing a past day uses one of
   /// the month's past-day changes; the state errors with
   /// [EditLimitExceededException] once they are used up.
   Future<void> submit({
@@ -26,6 +28,7 @@ class LogMealController extends AsyncNotifier<void> {
     String? name,
     required double calories,
     double? proteinGrams,
+    Nutrients? macros,
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
@@ -56,6 +59,11 @@ class LogMealController extends AsyncNotifier<void> {
         name: mealName,
         calories: calories,
         proteinGrams: protein,
+        macros:
+            macros ??
+            (existingMeal == null
+                ? null
+                : macrosAfterEdit(existingMeal, mealName, calories)),
         createdAt: existingMeal?.createdAt ?? now,
         updatedAt: now,
       );
@@ -127,6 +135,16 @@ class LogMealController extends AsyncNotifier<void> {
       ref.invalidate(recentMealsProvider);
     });
   }
+}
+
+/// What [meal] keeps of its macros when it is saved as [name] with
+/// [calories] and nothing new for them: its own, scaled to the calories,
+/// unless it was renamed, since figures for a different food are worse than
+/// none.
+Nutrients? macrosAfterEdit(Meal meal, String? name, double calories) {
+  final macros = meal.macros;
+  if (macros == null || name != meal.name?.trim()) return null;
+  return meal.calories > 0 ? macros.scaled(calories / meal.calories) : macros;
 }
 
 final logMealControllerProvider =

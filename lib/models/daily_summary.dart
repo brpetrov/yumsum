@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:lean_streak/models/nutrients.dart';
+
 enum DailyStatus {
   green('green', 'On track'),
   yellow('yellow', 'Close'),
@@ -23,6 +25,7 @@ class DailySummary {
     required this.calorieDelta,
     required this.mealCount,
     this.proteinGrams,
+    this.macros,
     required this.status,
     this.dayOff = false,
     required this.updatedAt,
@@ -36,6 +39,9 @@ class DailySummary {
 
   /// Null when no meal that day had protein data.
   final int? proteinGrams;
+
+  /// Totals over the meals that have them; null when none has any.
+  final Nutrients? macros;
   final DailyStatus status;
 
   /// Taken off (a holiday, a birthday): logged, but not judged.
@@ -59,6 +65,7 @@ class DailySummary {
       calorieDelta: (data['calorieDelta'] as num).round(),
       mealCount: data['mealCount'] as int,
       proteinGrams: (data['proteinGrams'] as num?)?.round(),
+      macros: Nutrients.fromFields(data),
       status: _statusFromFirestore(data),
       dayOff: data['dayOff'] == true,
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
@@ -73,6 +80,7 @@ class DailySummary {
       'calorieDelta': calorieDelta,
       'mealCount': mealCount,
       if (proteinGrams != null) 'proteinGrams': proteinGrams,
+      ...?macros?.toFields(),
       'status': status.value,
       if (dayOff) 'dayOff': true,
       'updatedAt': Timestamp.fromDate(updatedAt),

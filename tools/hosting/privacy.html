@@ -34,7 +34,7 @@
   <ul>
     <li><strong>Account:</strong> your email address and name. Passwords are handled by Google Firebase Authentication; we never see them. If you sign in with Google, we receive the email address and name of your Google account instead.</li>
     <li><strong>Profile:</strong> age, gender, height, current and target weight, activity level, training frequency and goal pace. These are used to calculate your calorie target.</li>
-    <li><strong>What you log:</strong> meals (names, calories, protein and the time you logged them) and weigh-ins.</li>
+    <li><strong>What you log:</strong> meals (names, calories, protein, the time you logged them and, where known, fat, saturates, carbohydrate, sugars, fibre and salt) and weigh-ins.</li>
     <li><strong>AI usage counts:</strong> how many AI estimates you have used each day, to apply the daily limit.</li>
     <li><strong>Technical data:</strong> Firebase records basic technical information such as IP address and device type for security and to operate the service.</li>
     <li><strong>Genuine-app checks:</strong> to stop others abusing the AI feature, every AI request carries a token from Google's App Check, which confirms it comes from a real copy of the app. On Android this uses Google Play Integrity; on the web it uses reCAPTCHA Enterprise, which looks at device and browser signals and may set cookies. Google runs these checks and tells us only whether the request is genuine. The <a href="https://policies.google.com/privacy">Google Privacy Policy</a> and <a href="https://policies.google.com/terms">Terms of Service</a> apply to them.</li>
@@ -47,7 +47,7 @@
 
   <h2>How your meal descriptions, photos and voice notes are processed</h2>
   <div class="box">
-    <p>When you ask for an estimate, the text you typed, the photo you took or the voice note you recorded is sent to Google's Gemini API, which returns the calories, protein and a breakdown. When you contribute a product, its two photos are sent the same way so the label can be read for you. We keep only the resulting meal entry; we do not store your photos or recordings.</p>
+    <p>When you ask for an estimate, the text you typed, the photo you took or the voice note you recorded is sent to Google's Gemini API, which returns the calories, protein, other nutrients and a breakdown. When you contribute a product, its two photos are sent the same way so the label can be read for you. We keep only the resulting meal entry; we do not store your photos or recordings.</p>
     <p>Google processes this content under its own terms. On the Gemini API tier YumSum uses, Google may use the content you send to improve its products. Please don't include personal details in meal descriptions, photos or recordings that you wouldn't want processed in that way.</p>
   </div>
 

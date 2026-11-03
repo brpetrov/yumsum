@@ -7,6 +7,7 @@ import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/meal.dart';
+import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
@@ -35,6 +36,7 @@ class _FakeLogMealController extends LogMealController {
     String? name,
     required double calories,
     double? proteinGrams,
+    Nutrients? macros,
   }) async {
     // Let build() finish first, or it would wipe the error below.
     await future;

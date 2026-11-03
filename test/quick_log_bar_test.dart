@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/models/meal.dart';
+import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
@@ -39,6 +40,7 @@ class _FakeLogMealController extends LogMealController {
     String? name,
     required double calories,
     double? proteinGrams,
+    Nutrients? macros,
   }) async {
     saved.add((name: name, calories: calories, protein: proteinGrams));
   }

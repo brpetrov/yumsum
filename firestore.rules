@@ -26,15 +26,29 @@ service cloud.firestore {
     // The documents below are written whole (set, not update), so each lists
     // every field it may have. A new field in a model needs adding here too.
 
+    // Fat, saturates, carbs, sugars, fibre and salt, in grams, on meals and
+    // daily summaries.
+    function optionalMacros(d) {
+      return optionalNumber(d.get('fatGrams', null))
+        && optionalNumber(d.get('saturatesGrams', null))
+        && optionalNumber(d.get('carbsGrams', null))
+        && optionalNumber(d.get('sugarsGrams', null))
+        && optionalNumber(d.get('fibreGrams', null))
+        && optionalNumber(d.get('saltGrams', null));
+    }
+
     function validMeal(d) {
       return d.keys().hasOnly(['id', 'date', 'timestamp', 'name', 'calories',
-                               'proteinGrams', 'createdAt', 'updatedAt'])
+                               'proteinGrams', 'createdAt', 'updatedAt',
+                               'fatGrams', 'saturatesGrams', 'carbsGrams',
+                               'sugarsGrams', 'fibreGrams', 'saltGrams'])
         && text(d.id, 100)
         && dateKey(d.date)
         && d.timestamp is timestamp
         && optionalText(d.get('name', null), 500)
         && d.calories is number
         && optionalNumber(d.get('proteinGrams', null))
+        && optionalMacros(d)
         && d.createdAt is timestamp
         && d.updatedAt is timestamp;
     }
@@ -42,13 +56,16 @@ service cloud.firestore {
     function validSummary(d) {
       return d.keys().hasOnly(['date', 'totalCalories', 'targetCalories',
                                'calorieDelta', 'mealCount', 'proteinGrams',
-                               'status', 'dayOff', 'updatedAt'])
+                               'status', 'dayOff', 'updatedAt',
+                               'fatGrams', 'saturatesGrams', 'carbsGrams',
+                               'sugarsGrams', 'fibreGrams', 'saltGrams'])
         && dateKey(d.date)
         && d.totalCalories is number
         && d.targetCalories is number
         && d.calorieDelta is number
         && d.mealCount is number
         && optionalNumber(d.get('proteinGrams', null))
+        && optionalMacros(d)
         && d.status in ['green', 'yellow', 'red']
         && d.get('dayOff', false) is bool
         && d.updatedAt is timestamp;

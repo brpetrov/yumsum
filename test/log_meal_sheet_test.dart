@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/models/meal.dart';
+import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
@@ -18,6 +19,7 @@ class _FakeLogMealController extends LogMealController {
     String? name,
     required double calories,
     double? proteinGrams,
+    Nutrients? macros,
   }) async {
     saved.add((
       date: date,

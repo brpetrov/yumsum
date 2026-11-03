@@ -1,5 +1,6 @@
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/meal.dart';
+import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/repositories/daily_summary_repository.dart';
 import 'package:lean_streak/repositories/day_off_repository.dart';
 import 'package:lean_streak/repositories/meal_repository.dart';
@@ -75,6 +76,7 @@ class DailySummaryService {
       calorieDelta: calorieDelta,
       mealCount: meals.length,
       proteinGrams: proteinGrams,
+      macros: Nutrients.total(meals.map((meal) => meal.macros)),
       status: _statusForCalories(
         totalCalories: totalCalories,
         targetCalories: targetCalories,
