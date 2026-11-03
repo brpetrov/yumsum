@@ -121,7 +121,7 @@ YumSum Star only (plan 10). `macrosForEveryone` in `calorie_estimate_service.dar
   - Free users see the protein ring live and the rest dimmed and part-filled, with no figures, under an "Unlock full macros" chip; a tap anywhere there opens `/plus`.
 - **Elsewhere:**
   - History's day sheet uses `MacroTotals` (`lib/widgets/macro_totals.dart`): one line of fat, carbs and salt that opens to all six, with "at least" where some meals lack a figure.
-  - A `MealRow` with macros shows an orange "Macros" hint beside its time, and a tap shows its `macrosLine`.
+  - A `MealRow` with macros shows an orange "Nutrition" hint beside its time, and a tap shows its `macrosLine`.
   - There's one line on the recipe page and the amount sheet.
   - Macros aren't shown on recipe tiles, the AI breakdown, the month graph or the period review.
 - **The guide** (`showMacroGuide`, `lib/widgets/macro_guide.dart`), from the rings, Home's card and the day sheet: from the card, first a short calories item (what you burn less a set amount for your pace, never below the minimum); then the macros in three groups that match the ring colours (aim for, keep in balance, keep under), each with one line on why it matters and one on how its target is set. No figures; the rings have those.

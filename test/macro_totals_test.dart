@@ -148,7 +148,7 @@ void main() {
       ),
     );
     // Only the wrap has macros to show.
-    expect(find.text('Macros'), findsOneWidget);
+    expect(find.text('Nutrition'), findsOneWidget);
     await tester.tap(find.text('Chicken wrap'));
     await tester.pump();
     expect(find.text(macrosLine(wrap.macros!)), findsOneWidget);
@@ -161,7 +161,7 @@ void main() {
       tester,
       MealRow(meal: wrap, onEdit: () {}, onDelete: () {}),
     );
-    expect(find.text('Macros'), findsNothing);
+    expect(find.text('Nutrition'), findsNothing);
   });
 
   testWidgets('every meal counted needs no note', (tester) async {

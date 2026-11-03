@@ -68,7 +68,7 @@ class _MealRowState extends State<MealRow> {
                     time,
                     const SizedBox(width: 10),
                     Text(
-                      'Macros',
+                      'Nutrition',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
