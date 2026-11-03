@@ -10,14 +10,20 @@ import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/widgets/macro_guide.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 
-/// One ring: what's eaten against the target, and whether the target is a
-/// most (saturates, sugars, salt), whose ring turns amber once it's passed.
-typedef _Ring = ({String name, double? grams, int target, bool limit});
+/// How a ring reads its target: one to reach (protein, fibre), where more
+/// is fine; a guide from the calories (carbs, fat), judged like the calorie
+/// bar; or a most (sugars, saturates, salt).
+enum _Kind { aim, guide, limit }
 
-/// Today's macros for YumSum Star, as rings in the bars' green: protein
-/// (when tracked), fat and carbs first, then saturates, sugars, fibre and
-/// salt to scroll to. Targets follow the plan ([HealthCalculator
-/// .macroTargets]); the info button explains them ([showMacroGuide]).
+typedef _Ring = ({String name, double? grams, int target, _Kind kind});
+
+/// Today's protein and macros as rings in the bars' green, protein first,
+/// then carbs, fat and fibre, then the limits: sugars, saturates and salt,
+/// scrolling to the right. Targets follow the plan ([HealthCalculator
+/// .macroTargets]); a tap on a ring or the info button explains them
+/// ([showMacroGuide]). Without YumSum Star ([full] false) protein is the
+/// only live ring, and the rest are dimmed under a chip that calls
+/// [onUnlock].
 class MacroRings extends StatelessWidget {
   const MacroRings({
     super.key,
@@ -25,17 +31,21 @@ class MacroRings extends StatelessWidget {
     required this.calorieTarget,
     required this.proteinTarget,
     required this.trackProtein,
+    required this.full,
+    required this.onUnlock,
   });
 
   final List<Meal> meals;
   final int calorieTarget;
   final int proteinTarget;
   final bool trackProtein;
+  final bool full;
+  final VoidCallback onUnlock;
 
   @override
   Widget build(BuildContext context) {
     final counted = [for (final meal in meals) ?meal.macros];
-    final total = Nutrients.total(counted);
+    final total = full ? Nutrients.total(counted) : null;
     final protein = meals.fold<double>(
       0,
       (sum, meal) => sum + (meal.proteinGrams ?? 0),
@@ -48,266 +58,285 @@ class MacroRings extends StatelessWidget {
     double? eaten(double? Function(Nutrients n) of) =>
         meals.isEmpty ? 0 : (total == null ? null : of(total) ?? 0);
 
-    final List<_Ring> rings = [
-      if (trackProtein)
-        (name: 'Protein', grams: protein, target: proteinTarget, limit: false),
-      (
-        name: 'Fat',
-        grams: eaten((n) => n.fat),
-        target: targets.fat,
-        limit: false,
-      ),
+    final _Ring proteinRing = (
+      name: 'Protein',
+      grams: protein,
+      target: proteinTarget,
+      kind: _Kind.aim,
+    );
+    final List<_Ring> macros = [
       (
         name: 'Carbs',
         grams: eaten((n) => n.carbs),
         target: targets.carbs,
-        limit: false,
+        kind: _Kind.guide,
       ),
       (
-        name: 'Saturates',
-        grams: eaten((n) => n.saturates),
-        target: targets.saturates,
-        limit: true,
-      ),
-      (
-        name: 'Sugars',
-        grams: eaten((n) => n.sugars),
-        target: targets.sugars,
-        limit: true,
+        name: 'Fat',
+        grams: eaten((n) => n.fat),
+        target: targets.fat,
+        kind: _Kind.guide,
       ),
       (
         name: 'Fibre',
         grams: eaten((n) => n.fibre),
         target: targets.fibre,
-        limit: false,
+        kind: _Kind.aim,
+      ),
+      (
+        name: 'Sugars',
+        grams: eaten((n) => n.sugars),
+        target: targets.sugars,
+        kind: _Kind.limit,
+      ),
+      (
+        name: 'Saturates',
+        grams: eaten((n) => n.saturates),
+        target: targets.saturates,
+        kind: _Kind.limit,
       ),
       (
         name: 'Salt',
         grams: eaten((n) => n.salt),
         target: targets.salt,
-        limit: true,
+        kind: _Kind.limit,
       ),
     ];
+
+    void explain() =>
+        showMacroGuide(context, total, protein: trackProtein ? protein : null);
+    Widget row(List<_Ring> rings, {bool preview = false}) => Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final (i, ring) in rings.indexed) ...[
+          if (i > 0) const SizedBox(width: 10),
+          _RingTile(
+            ring: ring,
+            preview: preview ? _previewFills[i % _previewFills.length] : null,
+            onTap: explain,
+          ),
+        ],
+      ],
+    );
+
     final notes = [
       if (trackProtein)
         _count(
           meals.where((meal) => meal.proteinGrams == null).length,
           'protein',
         ),
-      _count(meals.length - counted.length, 'macro'),
+      if (full) _count(meals.length - counted.length, 'macro'),
     ].nonNulls;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _Header(
-          info: IconButton(
-            tooltip: 'About macros',
-            onPressed: () => showMacroGuide(
-              context,
-              total,
-              protein: trackProtein ? protein : null,
-            ),
-            icon: const Icon(Icons.info_outline_rounded),
-            iconSize: 20,
-            color: AppColors.textSecondary,
-            visualDensity: VisualDensity.compact,
+        if (full)
+          // A row, not a list, so it is as tall as its text, whatever its
+          // size; the fourth ring peeks in to say it scrolls.
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: row([if (trackProtein) proteinRing, ...macros]),
+          )
+        else
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (trackProtein) ...[
+                _RingTile(ring: proteinRing, onTap: explain),
+                const SizedBox(width: 10),
+              ],
+              Expanded(
+                child: _Locked(
+                  onUnlock: onUnlock,
+                  child: row(macros, preview: true),
+                ),
+              ),
+            ],
           ),
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final note in notes)
+                    Text(
+                      note,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            IconButton(
+              tooltip: 'About macros',
+              onPressed: explain,
+              icon: const Icon(Icons.info_outline_rounded),
+              iconSize: 20,
+              color: AppColors.textSecondary,
+              visualDensity: VisualDensity.compact,
+            ),
+          ],
         ),
-        const SizedBox(height: 10),
-        _RingRow(rings: rings),
-        for (final note in notes)
-          Padding(
-            padding: const EdgeInsets.only(top: 6),
-            child: Text(
-              note,
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-            ),
-          ),
       ],
     );
   }
+
+  static const _previewFills = [0.7, 0.5, 0.35, 0.6, 0.45, 0.55];
 
   static String? _count(int meals, String what) => meals == 0
       ? null
       : '$meals ${meals == 1 ? 'meal' : 'meals'} not counted (no $what info)';
 }
 
-/// The rings dimmed, for an account without YumSum Star: a tap opens
-/// [onTap] (the YumSum Star page).
-class MacroRingsTeaser extends StatelessWidget {
-  const MacroRingsTeaser({super.key, required this.onTap});
+/// The macros a free account doesn't have yet: dimmed, part-filled rings
+/// with no figures, under a chip, and a tap anywhere calls [onUnlock].
+class _Locked extends StatelessWidget {
+  const _Locked({required this.onUnlock, required this.child});
 
-  final VoidCallback onTap;
+  final VoidCallback onUnlock;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: 'Macros with YumSum Star',
+      label: 'Unlock full macros with YumSum Star',
+      excludeSemantics: true,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        onTap: onUnlock,
+        child: Stack(
           children: [
-            _Header(
-              info: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const PlusStar(size: 22),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Become a Star',
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
+            Opacity(
+              opacity: 0.4,
+              child: IgnorePointer(
+                // Cut off at the edge rather than scrolled.
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: child,
+                ),
               ),
             ),
-            const SizedBox(height: 10),
-            // There to see, not to use.
-            Opacity(
-              opacity: 0.45,
-              child: IgnorePointer(
-                child: _RingRow(
-                  preview: true,
-                  rings: [
-                    for (final name in ['Fat', 'Carbs', 'Fibre', 'Salt'])
-                      (name: name, grams: null, target: 0, limit: false),
-                  ],
+            // Level with the middle of the rings.
+            Positioned.fill(
+              child: Align(
+                alignment: const Alignment(0, -0.42),
+                child: Material(
+                  color: AppColors.primaryContainer,
+                  shape: const StadiumBorder(),
+                  elevation: 2,
+                  shadowColor: AppColors.primary.withValues(alpha: 0.3),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 6, 14, 6),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const PlusStar(size: 20),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Unlock full macros',
+                          style: AppTheme.display.copyWith(
+                            fontSize: 14,
+                            color: AppColors.onPrimaryContainer,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header({required this.info});
-
-  final Widget info;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          'Macros',
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const Spacer(),
-        info,
-      ],
-    );
-  }
-}
-
-/// The rings side by side; past the first three they scroll, and the next
-/// one peeks in to say so.
-class _RingRow extends StatelessWidget {
-  const _RingRow({required this.rings, this.preview = false});
-
-  final List<_Ring> rings;
-
-  /// Part-filled rings with no figures, to show what YumSum Star adds.
-  final bool preview;
-
-  static const _previewFills = [0.7, 0.5, 0.35, 0.6];
-
-  @override
-  Widget build(BuildContext context) {
-    // A row, not a list, so it is as tall as its text, whatever its size.
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (final (i, ring) in rings.indexed) ...[
-            if (i > 0) const SizedBox(width: 10),
-            _RingTile(
-              ring: ring,
-              preview: preview ? _previewFills[i % _previewFills.length] : null,
-            ),
-          ],
-        ],
       ),
     );
   }
 }
 
 class _RingTile extends StatelessWidget {
-  const _RingTile({required this.ring, this.preview});
+  const _RingTile({required this.ring, required this.onTap, this.preview});
 
   final _Ring ring;
+  final VoidCallback onTap;
 
   /// A made-up fill, shown without a figure.
   final double? preview;
 
+  /// Green while on course; amber, then red, past a most or well past a
+  /// guide, the way the calorie bar turns.
+  Color get _color {
+    final grams = ring.grams;
+    if (grams == null || ring.target <= 0 || ring.kind == _Kind.aim) {
+      return AppColors.veryGood;
+    }
+    final share = grams / ring.target;
+    final greenUpTo = ring.kind == _Kind.limit ? 1.0 : 1.1;
+    if (share <= greenUpTo) return AppColors.veryGood;
+    return share <= 1.2 ? AppColors.bad : AppColors.veryBad;
+  }
+
   @override
   Widget build(BuildContext context) {
     final grams = ring.grams;
-    final over = ring.limit && grams != null && grams > ring.target;
     final figure = switch (grams) {
       _ when preview != null => '',
       null => '–',
       final g when ring.name == 'Salt' => '${g.toStringAsFixed(1)} g',
       final g => '${g.round()} g',
     };
-    return SizedBox(
-      width: 72,
-      child: Column(
-        children: [
-          SizedBox.square(
-            dimension: 60,
-            child: CustomPaint(
-              painter: _RingPainter(
-                value:
-                    preview ??
-                    (grams == null || ring.target <= 0
-                        ? 0
-                        : grams / ring.target),
-                color: over ? AppColors.bad : AppColors.veryGood,
-                track: AppColors.isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.white.withValues(alpha: 0.85),
-              ),
-              child: Center(
-                child: Text(
-                  figure,
-                  style: AppTheme.display.copyWith(
-                    fontSize: 14,
-                    color: AppColors.textPrimary,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: SizedBox(
+        width: 72,
+        child: Column(
+          children: [
+            SizedBox.square(
+              dimension: 60,
+              child: CustomPaint(
+                painter: _RingPainter(
+                  value:
+                      preview ??
+                      (grams == null || ring.target <= 0
+                          ? 0
+                          : grams / ring.target),
+                  color: _color,
+                  track: AppColors.isDark
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : Colors.white.withValues(alpha: 0.85),
+                ),
+                child: Center(
+                  child: Text(
+                    figure,
+                    style: AppTheme.display.copyWith(
+                      fontSize: 14,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            ring.name,
-            style: TextStyle(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          if (ring.target > 0)
+            const SizedBox(height: 6),
             Text(
-              '${ring.limit ? 'max' : 'of'} ${ring.target} g',
-              style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+              ring.name,
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
             ),
-        ],
+            if (preview == null && ring.target > 0)
+              Text(
+                '${ring.kind == _Kind.limit ? 'max' : 'of'} ${ring.target} g',
+                style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+              ),
+          ],
+        ),
       ),
     );
   }

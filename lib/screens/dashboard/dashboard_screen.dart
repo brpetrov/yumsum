@@ -312,10 +312,6 @@ class _DashboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final proteinLogged = meals
-        .fold<double>(0, (sum, meal) => sum + (meal.proteinGrams ?? 0))
-        .round();
-
     return ListView(
       padding: EdgeInsets.zero,
       // Scrolling the page lets go of the quick-log bar's box too.
@@ -329,16 +325,13 @@ class _DashboardContent extends StatelessWidget {
             children: [
               _TodayCard(
                 summary: summary,
+                meals: meals,
                 trackProtein: profile.trackProtein,
-                proteinLogged: proteinLogged,
                 proteinTarget: HealthCalculator.proteinTargetGrams(
                   targetWeightKg: profile.targetWeightKg,
                   trainingFrequency: profile.trainingFrequency,
                 ),
-                mealsWithoutProtein: meals
-                    .where((meal) => meal.proteinGrams == null)
-                    .length,
-                macroMeals: showMacros ? meals : null,
+                showMacros: showMacros,
                 adaptiveLine: adaptiveLine,
               ),
               const SizedBox(height: 18),
@@ -400,28 +393,25 @@ class _DayOffButton extends ConsumerWidget {
   }
 }
 
-/// Calories left for the day, then daily protein (when tracked) and, for
-/// YumSum Star, the day's macros, in one card.
+/// Calories left for the day, then the protein and macro rings, in one
+/// card.
 class _TodayCard extends StatelessWidget {
   const _TodayCard({
     required this.summary,
+    required this.meals,
     required this.trackProtein,
-    required this.proteinLogged,
     required this.proteinTarget,
-    required this.mealsWithoutProtein,
-    this.macroMeals,
+    required this.showMacros,
     required this.adaptiveLine,
   });
 
   final DailySummary summary;
+  final List<Meal> meals;
   final bool trackProtein;
-  final int proteinLogged;
   final int proteinTarget;
-  final int mealsWithoutProtein;
 
-  /// The meals whose macros the rings show (YumSum Star); null shows the
-  /// dimmed rings that open the YumSum Star page.
-  final List<Meal>? macroMeals;
+  /// YumSum Star: every ring. Otherwise protein, and the rest dimmed.
+  final bool showMacros;
 
   /// This week's Adaptive formula result, if there is one to show.
   final String? adaptiveLine;
@@ -507,51 +497,6 @@ class _TodayCard extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           _ProgressBar(value: calorieProgress, color: barColor, height: 14),
-          // With YumSum Star, protein is the first of the macro rings.
-          if (macroMeals case final meals?) ...[
-            const SizedBox(height: 22),
-            MacroRings(
-              meals: meals,
-              calorieTarget: summary.targetCalories,
-              proteinTarget: proteinTarget,
-              trackProtein: trackProtein,
-            ),
-          ] else if (trackProtein) ...[
-            const SizedBox(height: 22),
-            Row(
-              children: [
-                Text(
-                  'Daily protein',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  '$proteinLogged / $proteinTarget g',
-                  style: AppTheme.display.copyWith(
-                    fontSize: 17,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            _ProgressBar(
-              value: proteinTarget <= 0 ? 0 : proteinLogged / proteinTarget,
-              color: AppColors.veryGood,
-            ),
-            if (mealsWithoutProtein > 0) ...[
-              const SizedBox(height: 10),
-              Text(
-                '$mealsWithoutProtein ${mealsWithoutProtein == 1 ? 'meal' : 'meals'} '
-                'not counted (no protein info)',
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-              ),
-            ],
-          ],
           if (adaptiveLine case final line?) ...[
             const SizedBox(height: 10),
             Text(
@@ -559,10 +504,15 @@ class _TodayCard extends StatelessWidget {
               style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
           ],
-          if (macroMeals == null) ...[
-            const SizedBox(height: 20),
-            MacroRingsTeaser(onTap: () => showPlusPaywall(context)),
-          ],
+          const SizedBox(height: 20),
+          MacroRings(
+            meals: meals,
+            calorieTarget: summary.targetCalories,
+            proteinTarget: proteinTarget,
+            trackProtein: trackProtein,
+            full: showMacros,
+            onUnlock: () => showPlusPaywall(context),
+          ),
         ],
       ),
     );

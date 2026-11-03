@@ -5,7 +5,7 @@ How each part of the app works, for when you're working on it. `CLAUDE.md` has t
 ## Screens and navigation
 
 **Home** (`DashboardScreen`, called Today in the code; titled with the user's first name, the date under it):
-- Calories, then protein (a bar for free users, the macro rings for YumSum Star), the day's meals, a month graph and weight.
+- Calories, then the protein and macro rings, the day's meals, a month graph and weight.
 - The umbrella at the top right takes the day off (see Days).
 - `PlusPromptCard` for free users; its cross hides it for 14 days.
 
@@ -97,7 +97,7 @@ The paid tier (plan 06; the code says `plus`).
 ## Protein
 
 `UserProfile.trackProtein` (default true, read through `trackProteinProvider`), asked in onboarding and switchable in Plan Settings.
-- Off hides protein everywhere: Home's bar or ring, the quick-log box, the meal form, meal rows, the day sheet, the breakdown, the portion sheets, the bar tooltips and the recipes.
+- Off hides protein everywhere: Home's ring, the quick-log box, the meal form, meal rows, the day sheet, the breakdown, the portion sheets, the bar tooltips and the recipes.
 - Off also stops `LogMealController`'s automatic protein estimate. Protein the AI returns anyway is still saved, so switching back on loses nothing.
 
 ## Macros
@@ -112,10 +112,12 @@ YumSum Star only (plan 10). `macrosForEveryone` in `calorie_estimate_service.dar
   - Chips (`MealSuggestion.macros`).
   - The AI, for YumSum Star only: estimates ask for six whole-meal totals, with no per-item macros. `parseNutrients` drops a set with saturates above fat or sugars above carbs. `LogMealController`'s fill-in on saving (`estimateNutrients`, uncounted) adds them to a named meal that has none.
 - **Keeping them right:** the quick-log bar and the meal form keep macros with the calories they came with and scale them to the calories saved; a new name, Clear or the mic drops them. An edit given none keeps the meal's own, scaled to its new calories, unless it was renamed (`macrosAfterEdit`).
-- **Home:** `MacroRings` (`lib/widgets/macro_rings.dart`) replaces the protein bar for YumSum Star.
-  - Rings in the bars' green: protein (when tracked), fat and carbs, then saturates, sugars, fibre and salt scrolling to the right.
-  - Each is against a target from the plan (`HealthCalculator.macroTargets`): fat 30% of the calories, carbs the rest after protein and fat, saturates at most 10%, all sugars at most 18%, fibre at least 30 g, salt at most 6 g. A ring past a maximum turns amber.
-  - Free users keep the protein bar and get `MacroRingsTeaser`, dimmed part-filled rings that open `/plus`.
+- **Home:** `MacroRings` (`lib/widgets/macro_rings.dart`), under the calorie bar, with no heading.
+  - Rings in the bars' green: protein (when tracked), then carbs, fat and fibre, then the limits: sugars, saturates and salt, scrolling to the right.
+  - Each is against a target from the plan (`HealthCalculator.macroTargets`): fat 30% of the calories, carbs the rest after protein and fat, saturates at most 10%, all sugars at most 18%, fibre at least 30 g, salt at most 6 g.
+  - Colours: protein and fibre stay green however far over. Carbs and fat are judged like the calorie bar: green up to 10% over, amber up to 20%, red past that. Sugars, saturates and salt turn amber past their limit and red past 20% over.
+  - A tap on a ring, or the info button under them, opens the guide.
+  - Free users see the protein ring live and the rest dimmed and part-filled, with no figures, under an "Unlock full macros" chip; a tap anywhere there opens `/plus`.
 - **Elsewhere:**
   - History's day sheet uses `MacroTotals` (`lib/widgets/macro_totals.dart`): one line of fat, carbs and salt that opens to all six, with "at least" where some meals lack a figure.
   - A `MealRow` with macros shows an orange "Macros" hint beside its time, and a tap shows its `macrosLine`.
