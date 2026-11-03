@@ -174,6 +174,40 @@ void main() {
       expect(result.targetChanged, isTrue);
     });
 
+    test("keeps the Adaptive formula's adjustment and applies it", () async {
+      final profile = _profile().copyWith(
+        adaptiveKcal: -80,
+        adaptiveWeek: '2026-06-01',
+        adaptiveNote: 'lowered',
+      );
+      await service.logWeight(
+        profile: profile,
+        weightKg: 85,
+        source: WeightSource.manual,
+        at: DateTime(2026, 6, 7),
+      );
+
+      final plain = HealthCalculator.calculatePlan(
+        currentWeightKg: 85,
+        targetWeightKg: 80,
+        heightCm: 180,
+        age: 30,
+        gender: Gender.male,
+        activityLevel: ActivityLevel.lightlyActive,
+        trainingFrequency: TrainingFrequency.oneToTwo,
+        weightLossPace: WeightLossPace.moderate,
+        now: DateTime(2026, 6, 7),
+      );
+      final saved = profileRepo.saved!;
+      expect(saved.adaptiveKcal, -80);
+      expect(saved.adaptiveWeek, '2026-06-01');
+      expect(saved.adaptiveNote, 'lowered');
+      expect(
+        saved.dailyCalorieTarget,
+        closeTo(plain.dailyCalorieTarget - 80, 1e-9),
+      );
+    });
+
     group('deleting a weigh-in', () {
       final entries = [_entry('2026-06-01', 85), _entry('2026-06-07', 90)];
 

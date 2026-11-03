@@ -85,7 +85,8 @@ class WeightLogService {
     final dateKey = DateFormat('yyyy-MM-dd').format(now);
 
     // Recalculate the plan from the new weight, keeping every other input
-    // (height, age, gender, activity, pace) as the user last set it.
+    // (height, age, gender, activity, pace, the Adaptive formula's
+    // adjustment) as it was.
     final plan = HealthCalculator.calculatePlan(
       currentWeightKg: weightKg,
       targetWeightKg: profile.targetWeightKg,
@@ -95,6 +96,7 @@ class WeightLogService {
       activityLevel: profile.activityLevel,
       trainingFrequency: profile.trainingFrequency,
       weightLossPace: profile.weightLossPace,
+      adaptiveKcal: profile.adaptiveKcal.toDouble(),
       now: now,
     );
 

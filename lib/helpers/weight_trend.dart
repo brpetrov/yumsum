@@ -30,7 +30,8 @@ List<TrendPoint> weightTrend(List<WeightEntry> entries) {
     if (t == null) {
       trend = entry.weightKg;
     } else {
-      final days = entry.date.difference(last!).inDays;
+      // Rounded, as a day the clocks go forward is 23 hours long.
+      final days = (entry.date.difference(last!).inHours / 24).round();
       trend = t + (1 - math.pow(trendSmoothing, days)) * (entry.weightKg - t);
     }
     last = entry.date;

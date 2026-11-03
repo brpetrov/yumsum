@@ -108,6 +108,10 @@ enum GoalPaceLevel {
 const defaultCountry = 'United Kingdom';
 const legacyUsualFood = 'Bulgarian home cooking';
 
+/// One change the Adaptive formula made: the Monday (yyyy-MM-dd) and the
+/// target before and after.
+typedef AdaptiveChange = ({String week, int from, int to});
+
 class UserProfile {
   const UserProfile({
     required this.uid,
@@ -136,6 +140,12 @@ class UserProfile {
     required this.onboardingCompleted,
     required this.createdAt,
     required this.updatedAt,
+    this.adaptiveOn = true,
+    this.adaptiveKcal = 0,
+    this.adaptiveWeek,
+    this.adaptiveNote,
+    this.adaptiveFrom,
+    this.adaptiveChanges = const [],
   });
 
   final String uid;
@@ -180,12 +190,34 @@ class UserProfile {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  // The Adaptive formula (docs/plans/08-adaptive-formula.md), a YumSum Star
+  // feature: a personal adjustment on top of the plan, changed on Mondays.
+
+  /// The user's switch; it only acts with YumSum Star.
+  final bool adaptiveOn;
+
+  /// The adjustment to the formula's burn, in kcal a day.
+  final int adaptiveKcal;
+
+  /// The Monday last processed (yyyy-MM-dd).
+  final String? adaptiveWeek;
+
+  /// That Monday's result, an `AdaptiveNote` value.
+  final String? adaptiveNote;
+
+  /// Learn nothing from before this day (yyyy-MM-dd).
+  final String? adaptiveFrom;
+
+  /// The last changes, newest last, at most 6.
+  final List<AdaptiveChange> adaptiveChanges;
+
   // ── Serialisation ──────────────────────────────────────────────────────
 
   factory UserProfile.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> doc,
-  ) {
-    final d = doc.data()!;
+  ) => UserProfile.fromMap(doc.data()!);
+
+  factory UserProfile.fromMap(Map<String, dynamic> d) {
     final activityLevel = ActivityLevel.fromString(
       d['activityLevel'] as String,
     );
@@ -220,6 +252,19 @@ class UserProfile {
       onboardingCompleted: d['onboardingCompleted'] as bool,
       createdAt: (d['createdAt'] as Timestamp).toDate(),
       updatedAt: (d['updatedAt'] as Timestamp).toDate(),
+      adaptiveOn: d['adaptiveOn'] as bool? ?? true,
+      adaptiveKcal: (d['adaptiveKcal'] as num?)?.round() ?? 0,
+      adaptiveWeek: d['adaptiveWeek'] as String?,
+      adaptiveNote: d['adaptiveNote'] as String?,
+      adaptiveFrom: d['adaptiveFrom'] as String?,
+      adaptiveChanges: [
+        for (final change in d['adaptiveChanges'] as List? ?? const [])
+          (
+            week: change['week'] as String,
+            from: (change['from'] as num).round(),
+            to: (change['to'] as num).round(),
+          ),
+      ],
     );
   }
 
@@ -250,6 +295,15 @@ class UserProfile {
     'onboardingCompleted': onboardingCompleted,
     'createdAt': Timestamp.fromDate(createdAt),
     'updatedAt': Timestamp.fromDate(updatedAt),
+    'adaptiveOn': adaptiveOn,
+    'adaptiveKcal': adaptiveKcal,
+    if (adaptiveWeek != null) 'adaptiveWeek': adaptiveWeek,
+    if (adaptiveNote != null) 'adaptiveNote': adaptiveNote,
+    if (adaptiveFrom != null) 'adaptiveFrom': adaptiveFrom,
+    'adaptiveChanges': [
+      for (final change in adaptiveChanges)
+        {'week': change.week, 'from': change.from, 'to': change.to},
+    ],
   };
 
   // ── copyWith ───────────────────────────────────────────────────────────
@@ -281,6 +335,12 @@ class UserProfile {
     bool? onboardingCompleted,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? adaptiveOn,
+    int? adaptiveKcal,
+    String? adaptiveWeek,
+    String? adaptiveNote,
+    String? adaptiveFrom,
+    List<AdaptiveChange>? adaptiveChanges,
   }) {
     return UserProfile(
       uid: uid ?? this.uid,
@@ -310,6 +370,12 @@ class UserProfile {
       onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      adaptiveOn: adaptiveOn ?? this.adaptiveOn,
+      adaptiveKcal: adaptiveKcal ?? this.adaptiveKcal,
+      adaptiveWeek: adaptiveWeek ?? this.adaptiveWeek,
+      adaptiveNote: adaptiveNote ?? this.adaptiveNote,
+      adaptiveFrom: adaptiveFrom ?? this.adaptiveFrom,
+      adaptiveChanges: adaptiveChanges ?? this.adaptiveChanges,
     );
   }
 }

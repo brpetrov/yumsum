@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:lean_streak/models/user_profile.dart';
 
 /// Pure functions for health and calorie calculations.
@@ -161,6 +163,10 @@ class HealthCalculator {
     return dailyDeficit / 1100;
   }
 
+  /// [adaptiveKcal] is the Adaptive formula's correction to the formula's
+  /// burn (docs/plans/08-adaptive-formula.md, step 9). It goes in before the
+  /// minimum, so away from it the target moves by the same amount and the
+  /// goal date stays; at the minimum the pace drops and the date moves later.
   static HealthPlanCalculation calculatePlan({
     required double currentWeightKg,
     required double? targetWeightKg,
@@ -170,6 +176,7 @@ class HealthCalculator {
     required ActivityLevel activityLevel,
     required TrainingFrequency trainingFrequency,
     required WeightLossPace weightLossPace,
+    double adaptiveKcal = 0,
     DateTime? now,
   }) {
     final anchor = now ?? DateTime.now();
@@ -179,22 +186,29 @@ class HealthCalculator {
     final trainingBonus = trainingMultiplierBonus(trainingFrequency);
     final multiplier = activityMultiplier(activityLevel, trainingFrequency);
     final calcTdee = tdee(calcBmr, activityLevel, trainingFrequency);
+    final burn = calcTdee + adaptiveKcal;
     final isMaintaining = weightLossPace == WeightLossPace.maintain;
     final resolvedTargetWeight = isMaintaining
         ? currentWeightKg
         : (targetWeightKg ?? currentWeightKg);
     final requestedPace = goalPaceFromWeightLossPace(weightLossPace);
+    // A cut never takes maintenance below the minimum (or below the plain
+    // maintenance, when that is already under it).
+    final maintainFloor = math.min(calorieFloor(gender), calcTdee);
     final calorieResult = isMaintaining
-        ? (calories: maintenanceCalories(calcTdee), clamped: false)
+        ? (
+            calories: math.max(maintenanceCalories(burn), maintainFloor),
+            clamped: burn < maintainFloor,
+          )
         : dailyCalorieTargetFromPace(
-            tdee: calcTdee,
+            tdee: burn,
             paceKgPerWeek: requestedPace,
             gender: gender,
           );
     final effectivePace = isMaintaining
         ? 0.0
         : effectivePaceKgPerWeek(
-            tdee: calcTdee,
+            tdee: burn,
             dailyCalorieTarget: calorieResult.calories,
           );
     final calcTargetDate = isMaintaining
@@ -210,6 +224,15 @@ class HealthCalculator {
         : calorieResult.clamped
         ? GoalPaceLevel.warning
         : goalPaceLevel(requestedPace);
+    final planCalorieTarget = adaptiveKcal == 0
+        ? calorieResult.calories
+        : isMaintaining
+        ? calcTdee
+        : dailyCalorieTargetFromPace(
+            tdee: calcTdee,
+            paceKgPerWeek: requestedPace,
+            gender: gender,
+          ).calories;
 
     return HealthPlanCalculation(
       bmi: calcBmi,
@@ -218,6 +241,8 @@ class HealthCalculator {
       trainingMultiplierBonus: trainingBonus,
       activityMultiplier: multiplier,
       tdee: calcTdee,
+      adaptiveKcal: adaptiveKcal,
+      planCalorieTarget: planCalorieTarget,
       dailyCalorieTarget: calorieResult.calories,
       calorieTargetClamped: calorieResult.clamped,
       goalPaceKgPerWeek: effectivePace,
@@ -237,6 +262,8 @@ class HealthPlanCalculation {
     required this.trainingMultiplierBonus,
     required this.activityMultiplier,
     required this.tdee,
+    this.adaptiveKcal = 0,
+    required this.planCalorieTarget,
     required this.dailyCalorieTarget,
     required this.calorieTargetClamped,
     required this.goalPaceKgPerWeek,
@@ -251,7 +278,15 @@ class HealthPlanCalculation {
   final double lifestyleMultiplier;
   final double trainingMultiplierBonus;
   final double activityMultiplier;
+
+  /// The formula's maintenance, without the Adaptive formula.
   final double tdee;
+
+  /// The Adaptive formula's correction to [tdee], in kcal a day.
+  final double adaptiveKcal;
+
+  /// The target the formula alone gives (with [adaptiveKcal] 0).
+  final double planCalorieTarget;
   final double dailyCalorieTarget;
   final bool calorieTargetClamped;
   final double goalPaceKgPerWeek;

@@ -235,6 +235,109 @@ void main() {
     });
   });
 
+  group("the Adaptive formula's adjustment", () {
+    HealthPlanCalculation plan({
+      double weightKg = 80,
+      Gender gender = Gender.male,
+      WeightLossPace pace = WeightLossPace.moderate,
+      double? adaptiveKcal,
+    }) => HealthCalculator.calculatePlan(
+      currentWeightKg: weightKg,
+      targetWeightKg: 70,
+      heightCm: 175,
+      age: 35,
+      gender: gender,
+      activityLevel: ActivityLevel.lightlyActive,
+      trainingFrequency: TrainingFrequency.oneToTwo,
+      weightLossPace: pace,
+      adaptiveKcal: adaptiveKcal ?? 0,
+      now: DateTime(2026, 11, 2),
+    );
+
+    test('0 gives the same plan as before', () {
+      for (final gender in Gender.values) {
+        for (final pace in WeightLossPace.values) {
+          for (final weightKg in [55.0, 80.0, 120.0]) {
+            final before = HealthCalculator.calculatePlan(
+              currentWeightKg: weightKg,
+              targetWeightKg: 50,
+              heightCm: 175,
+              age: 35,
+              gender: gender,
+              activityLevel: ActivityLevel.lightlyActive,
+              trainingFrequency: TrainingFrequency.oneToTwo,
+              weightLossPace: pace,
+              now: DateTime(2026, 11, 2),
+            );
+            final zero = HealthCalculator.calculatePlan(
+              currentWeightKg: weightKg,
+              targetWeightKg: 50,
+              heightCm: 175,
+              age: 35,
+              gender: gender,
+              activityLevel: ActivityLevel.lightlyActive,
+              trainingFrequency: TrainingFrequency.oneToTwo,
+              weightLossPace: pace,
+              adaptiveKcal: 0,
+              now: DateTime(2026, 11, 2),
+            );
+            expect(zero.dailyCalorieTarget, before.dailyCalorieTarget);
+            expect(zero.planCalorieTarget, before.dailyCalorieTarget);
+            expect(zero.calorieTargetClamped, before.calorieTargetClamped);
+            expect(zero.goalPaceKgPerWeek, before.goalPaceKgPerWeek);
+            expect(zero.targetDate, before.targetDate);
+            expect(zero.tdee, before.tdee);
+          }
+        }
+      }
+    });
+
+    test('−80 lowers the target by 80 and keeps the goal date', () {
+      final plain = plan();
+      final adjusted = plan(adaptiveKcal: -80);
+      expect(
+        adjusted.dailyCalorieTarget,
+        closeTo(plain.dailyCalorieTarget - 80, 1e-9),
+      );
+      expect(adjusted.planCalorieTarget, plain.dailyCalorieTarget);
+      expect(adjusted.tdee, plain.tdee);
+      expect(adjusted.goalPaceKgPerWeek, closeTo(0.5, 1e-9));
+      expect(adjusted.targetDate, plain.targetDate);
+    });
+
+    test('at the minimum it is clamped and the date is later', () {
+      final plain = plan(pace: WeightLossPace.fast);
+      final adjusted = plan(pace: WeightLossPace.fast, adaptiveKcal: -400);
+      expect(adjusted.dailyCalorieTarget, 1500);
+      expect(adjusted.calorieTargetClamped, isTrue);
+      expect(adjusted.goalPaceKgPerWeek, lessThan(0.75));
+      expect(adjusted.targetDate.isAfter(plain.targetDate), isTrue);
+    });
+
+    test('in maintain mode, −100 never goes below the minimum', () {
+      // Maintenance of about 1260, 60 above a woman's minimum.
+      HealthPlanCalculation maintain(double adaptiveKcal) =>
+          HealthCalculator.calculatePlan(
+            currentWeightKg: 45,
+            targetWeightKg: null,
+            heightCm: 155,
+            age: 50,
+            gender: Gender.female,
+            activityLevel: ActivityLevel.sedentary,
+            trainingFrequency: TrainingFrequency.none,
+            weightLossPace: WeightLossPace.maintain,
+            adaptiveKcal: adaptiveKcal,
+          );
+      expect(maintain(0).dailyCalorieTarget, closeTo(1259.7, 0.1));
+      expect(maintain(-100).dailyCalorieTarget, 1200);
+      expect(maintain(-100).planCalorieTarget, maintain(0).dailyCalorieTarget);
+      expect(
+        maintain(100).dailyCalorieTarget,
+        closeTo(maintain(0).dailyCalorieTarget + 100, 1e-9),
+      );
+    });
+  });
+
   group('protein target', () {
     test('scales goal weight by training frequency', () {
       int target(TrainingFrequency frequency) =>
