@@ -51,7 +51,7 @@ void main() {
       expect(parseNutrients({'saturates': 8})?.saturates, 8);
     });
 
-    test('every prompt asks for the macros, free or YumSum Star', () {
+    test('the prompts mention macros only when asked', () {
       CalorieEstimateService service({required bool plus}) =>
           CalorieEstimateService(
             _NoUsage(),
@@ -60,12 +60,14 @@ void main() {
             plus: plus,
           );
 
-      expect(macrosForEveryone, isTrue);
-      for (final plus in [true, false]) {
-        for (final prompt in service(plus: plus).prompts) {
-          expect(prompt, contains('fat, saturates, carbohydrate, sugars'));
-          expect(prompt, contains('"macros": {"fat": <number>'));
-        }
+      expect(macrosForEveryone, isFalse);
+      for (final prompt in service(plus: true).prompts) {
+        expect(prompt, contains('fat, saturates, carbohydrate, sugars'));
+        expect(prompt, contains('"macros": {"fat": <number>'));
+      }
+      for (final prompt in service(plus: false).prompts) {
+        expect(prompt, isNot(contains('macros')));
+        expect(prompt, isNot(contains('saturates')));
       }
     });
   });

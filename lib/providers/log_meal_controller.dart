@@ -12,7 +12,6 @@ import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/repositories/day_edit_repository.dart';
-import 'package:lean_streak/services/calorie_estimate_service.dart';
 
 class LogMealController extends AsyncNotifier<void> {
   @override
@@ -52,12 +51,10 @@ class LogMealController extends AsyncNotifier<void> {
               ? null
               : macrosAfterEdit(existingMeal, mealName, calories));
       // Only named meals get the AI's figures: protein while it is tracked,
-      // and macros for everyone (or YumSum Star alone, if switched back).
-      // Calorie-only entries stay uncounted.
+      // and macros for YumSum Star. Calorie-only entries stay uncounted.
       if (mealName != null &&
           ((protein == null && ref.read(trackProteinProvider)) ||
-              (mealMacros == null &&
-                  (macrosForEveryone || ref.read(plusProvider))))) {
+              (mealMacros == null && ref.read(plusProvider)))) {
         final filled = await _estimateNutrients(mealName, calories);
         // Protein it returns while protein is off is still saved.
         protein ??= filled.protein?.toDouble();

@@ -1,6 +1,6 @@
 # Plan 10: Full macros
 
-*Written 2 November 2026. Status: steps 1–5 built on 3 November 2026. `macrosForEveryone` is `true` since 4 November (your call: free users' meals keep their macros too, so upgrading shows a full history; measuring the cost is now only for knowing it), and the rules need deploying with the release.*
+*Written 2 November 2026. Status: steps 1–5 built on 3 November 2026. `macrosForEveryone` stays `false` for good (your decision, 4 November: macros are a YumSum Star feature whatever they cost), and the rules need deploying with the release.*
 
 ## The short version
 
@@ -338,10 +338,10 @@ Tests override `plusProvider` both ways, as plan 06's do.
    ```
 
    An app that writes the new fields under the old rules can't save those meals ("Could not save meal").
-2. **Measure the cost after step 4,** in a debug build on the phone, with `macrosForEveryone` still `false`.
+2. **Optional: measure the cost after step 4,** in a debug build on the phone. Since 4 November it no longer decides anything (macros stay YumSum Star only); it only tells you what they add, for plan 03's figures.
    - Type the same 10 everyday meals and tap the sparkle for each: once signed in without YumSum Star, then once with your manual grant.
    - Send me the "AI tokens: in …, out …, thinking …" lines from the debug console.
-   - Each call costs in × $0.30 + (out + thinking) × $2.50 per million tokens. I'll compare the averages, set the switch, and update plan 03's figures from the same lines (its token check is still open).
+   - Each call costs in × $0.30 + (out + thinking) × $2.50 per million tokens. I'll compare the averages and update plan 03's figures from the same lines (its token check is still open).
 3. **Look over a few recipes** after the data job. Check the fat and salt look right for the dish.
 4. **Publish the privacy page** with the app release: `tools/build_hosting.ps1`, then `firebase deploy --only hosting:app`.
 5. **Try it on the phone:**
@@ -385,7 +385,7 @@ Play's Data safety form needs no change: these are more details of the same meal
 - [x] (Claude) Step 3: the recipe data job and parser (3 November; no calories, protein or ingredients changed)
 - [ ] (you) look over a few recipes
 - [x] (Claude) Step 4: the AI (3 November)
-- [x] `macrosForEveryone` set to `true` on 4 November without measuring: the owner wants every meal to keep its macros, whatever the cost
+- [x] `macrosForEveryone` stays `false` for good (4 November): macros are a YumSum Star feature whatever they cost, so no measuring is needed to decide it
 - [x] (Claude) Step 5: Today, meal rows, day sheet, recipe page, amount sheet (3 November). The paywall already lists Detailed Macros ("The full label: fat, carbs, sugars, fibre, salt."), so its line was left as you tuned it
 - [ ] (you) Phone checklist, then publish the privacy page with the release
 
