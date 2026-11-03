@@ -112,23 +112,22 @@ void main() {
     expect(find.text('Saturates'), findsNothing);
   });
 
-  testWidgets('the info button explains each macro and its guide', (
+  testWidgets('the info button explains each macro and its target', (
     tester,
   ) async {
     await pump(tester, [wrap, crisps]);
     await tester.tap(find.byTooltip('About macros'));
     await tester.pumpAndSettle();
-    expect(find.text('About your macros'), findsOneWidget);
+    expect(find.text('Your macros'), findsOneWidget);
+    expect(find.text('AIM FOR'), findsOneWidget);
+    expect(find.text('KEEP UNDER'), findsOneWidget);
     expect(find.text('Salt'), findsOneWidget);
-    expect(find.text('2.5 g'), findsOneWidget);
-    expect(find.textContaining('a tenth of your calories'), findsOneWidget);
-    expect(
-      find.textContaining('At least 30 g a day for every adult'),
-      findsOneWidget,
-    );
+    // The day sheet has no protein, so neither does its guide; no figures.
+    expect(find.text('Protein'), findsNothing);
+    expect(find.text('2.5 g'), findsNothing);
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
-    expect(find.text('About your macros'), findsNothing);
+    expect(find.text('Your macros'), findsNothing);
   });
 
   testWidgets('a meal with macros says so beside its time, and opens', (

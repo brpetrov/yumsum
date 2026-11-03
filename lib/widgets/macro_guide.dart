@@ -1,169 +1,160 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
-import 'package:lean_streak/helpers/health_calculator.dart';
-import 'package:lean_streak/models/nutrients.dart';
-import 'package:lean_streak/providers/user_profile_provider.dart';
 
-/// What each macro is for and how its target is set, beside the day's
-/// [total] and [protein] (null when protein isn't tracked): the info button
-/// on the macros. Targets come from the profile's plan
-/// ([HealthCalculator.macroTargets]).
-Future<void> showMacroGuide(
-  BuildContext context,
-  Nutrients? total, {
-  double? protein,
-}) {
+/// What each macro does for you and how its target is set, in three groups
+/// that match how the rings are judged: aim for, keep in balance and keep
+/// under. No figures: the rings have those. [withProtein] leaves protein
+/// out where it isn't shown.
+Future<void> showMacroGuide(BuildContext context, {bool withProtein = true}) {
+  final groups = [
+    (
+      'Aim for',
+      AppColors.veryGood,
+      [
+        if (withProtein)
+          (
+            'Protein',
+            'Keeps you full and protects your muscle while you lose fat.',
+            '1.2 to 2 g per kg of your goal weight, more the more you train.',
+          ),
+        (
+          'Fibre',
+          'Keeps you full and your gut healthy.',
+          'At least 30 g a day, the UK advice for adults.',
+        ),
+      ],
+    ),
+    (
+      'Keep in balance',
+      AppColors.primary,
+      [
+        (
+          'Carbs',
+          'Your body\'s main fuel: bread, rice, pasta, potatoes and fruit.',
+          'What\'s left of your calories after protein and fat.',
+        ),
+        (
+          'Fat',
+          'Energy, and it helps you absorb vitamins A, D, E and K.',
+          'About 30% of your calories.',
+        ),
+      ],
+    ),
+    (
+      'Keep under',
+      AppColors.bad,
+      [
+        (
+          'Sugars',
+          'Added sugar brings calories without filling you up, and harms '
+              'your teeth.',
+          'At most 18% of your calories, the food-label guide. Keep added '
+              'sugar under 30 g.',
+        ),
+        (
+          'Saturates',
+          'Too much raises your cholesterol: butter, cheese, fatty meat and '
+              'cakes.',
+          'At most 10% of your calories, the UK advice.',
+        ),
+        (
+          'Salt',
+          'Too much raises your blood pressure. Most is already in bread, '
+              'cheese and ready meals.',
+          'At most 6 g a day, about a teaspoon.',
+        ),
+      ],
+    ),
+  ];
+  final body = TextStyle(
+    fontSize: 13.5,
+    height: 1.35,
+    color: AppColors.textSecondary,
+  );
+
   return showDialog<void>(
     context: context,
-    builder: (context) => Consumer(
-      builder: (context, ref, _) {
-        final profile = ref.watch(userProfileProvider).valueOrNull;
-        final proteinTarget = profile == null
-            ? null
-            : HealthCalculator.proteinTargetGrams(
-                targetWeightKg: profile.targetWeightKg,
-                trainingFrequency: profile.trainingFrequency,
-              );
-        final targets = profile == null
-            ? null
-            : HealthCalculator.macroTargets(
-                calories: profile.dailyCalorieTarget.round(),
-                proteinGrams: proteinTarget!,
-              );
-        final rows = [
-          if (protein != null)
-            (
-              'Protein',
-              protein,
-              proteinTarget,
-              false,
-              'Keeps you full and holds on to muscle while you lose fat. '
-                  'Your target comes from your goal weight and how often you '
-                  'train.',
+    builder: (context) => AlertDialog(
+      title: const Text('Your macros'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Your targets come from your plan, so they change with it.',
+              style: body,
             ),
-          (
-            'Fat',
-            total?.fat,
-            targets?.fat,
-            false,
-            'Energy, and it helps you take in some vitamins. Your target is '
-                'about 30% of your calories.',
-          ),
-          (
-            'Carbs',
-            total?.carbs,
-            targets?.carbs,
-            false,
-            'Your body\'s main fuel: bread, rice, pasta, potatoes and fruit. '
-                'Your target is what\'s left of your calories after protein '
-                'and fat.',
-          ),
-          (
-            'Saturates',
-            total?.saturates,
-            targets?.saturates,
-            true,
-            'The fat to watch for your heart: butter, cheese, fatty meat, '
-                'pastry and cakes. UK advice is no more than a tenth of your '
-                'calories.',
-          ),
-          (
-            'Sugars',
-            total?.sugars,
-            targets?.sugars,
-            true,
-            'All sugars, the ones in fruit and milk too: the food-label '
-                'guide, for your calories. Of the added kind (sweets, fizzy '
-                'drinks, honey, juice), keep to under 30 g.',
-          ),
-          (
-            'Fibre',
-            total?.fibre,
-            targets?.fibre,
-            false,
-            'Keeps you full and your gut healthy: wholegrains, beans, '
-                'lentils, vegetables and fruit. At least 30 g a day for every '
-                'adult.',
-          ),
-          (
-            'Salt',
-            total?.salt,
-            targets?.salt,
-            true,
-            'Too much raises your blood pressure. No more than 6 g a day, '
-                'about a teaspoon, for every adult. Most of it is already in '
-                'bread, cheese, ready meals and sauces.',
-          ),
-        ];
-        final muted = TextStyle(
-          fontSize: 13.5,
-          height: 1.4,
-          color: AppColors.textSecondary,
-        );
-
-        String figure(String name, double grams, int? target, bool limit) {
-          final eaten = name == 'Salt'
-              ? grams.toStringAsFixed(1)
-              : '${grams.round()}';
-          if (target == null) return '$eaten g';
-          return limit ? '$eaten g, max $target g' : '$eaten of $target g';
-        }
-
-        return AlertDialog(
-          title: const Text('About your macros'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (final (name, grams, target, limit, about) in rows) ...[
-                  Row(
+            for (final (group, color, items) in groups) ...[
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    group.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.8,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+              for (final (name, why, target) in items) ...[
+                const SizedBox(height: 10),
+                Text(
+                  name,
+                  style: AppTheme.display.copyWith(
+                    fontSize: 16,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(why, style: body),
+                Text.rich(
+                  TextSpan(
                     children: [
-                      Expanded(
-                        child: Text(
-                          name,
-                          style: AppTheme.display.copyWith(
-                            fontSize: 16,
-                            color: AppColors.textPrimary,
-                          ),
+                      TextSpan(
+                        text: 'Target: ',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
                         ),
                       ),
-                      if (grams != null)
-                        Text(
-                          figure(name, grams, target, limit),
-                          style: TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
+                      TextSpan(text: target),
                     ],
                   ),
-                  const SizedBox(height: 2),
-                  Text(about, style: muted),
-                  const SizedBox(height: 14),
-                ],
-                Text(
-                  'Fat, carbs, saturates and sugars follow your daily '
-                  'calories, so they adjust with your plan. Guides from UK '
-                  'advice for adults, not medical advice. The figures count '
-                  'only the meals with macro info.',
-                  style: muted.copyWith(fontSize: 12.5),
+                  style: body,
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
+            ],
+            const SizedBox(height: 18),
+            Text(
+              'A ring turns amber, then red, when you go well over a balance '
+              'target or past a limit. General guidance for adults, not '
+              'medical advice.',
+              style: body.copyWith(fontSize: 12.5),
             ),
           ],
-        );
-      },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('OK'),
+        ),
+      ],
     ),
   );
 }

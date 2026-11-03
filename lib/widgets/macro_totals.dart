@@ -73,7 +73,7 @@ class _MacroTotalsState extends State<MacroTotals> {
     final ends = [
       IconButton(
         tooltip: 'About macros',
-        onPressed: () => showMacroGuide(context, total),
+        onPressed: () => showMacroGuide(context, withProtein: false),
         icon: const Icon(Icons.info_outline_rounded),
         iconSize: 18,
         color: AppColors.textSecondary,

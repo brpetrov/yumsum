@@ -504,7 +504,7 @@ class _TodayCard extends StatelessWidget {
               style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
           ],
-          const SizedBox(height: 20),
+          const SizedBox(height: 4),
           MacroRings(
             meals: meals,
             calorieTarget: summary.targetCalories,

@@ -103,8 +103,7 @@ class MacroRings extends StatelessWidget {
       ),
     ];
 
-    void explain() =>
-        showMacroGuide(context, total, protein: trackProtein ? protein : null);
+    void explain() => showMacroGuide(context, withProtein: trackProtein);
     Widget row(List<_Ring> rings, {bool preview = false}) => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -128,18 +127,14 @@ class MacroRings extends StatelessWidget {
       if (full) _count(meals.length - counted.length, 'macro'),
     ].nonNulls;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (full)
-          // A row, not a list, so it is as tall as its text, whatever its
-          // size; the fourth ring peeks in to say it scrolls.
-          SingleChildScrollView(
+    final Widget rings = full
+        // A row, not a list, so it is as tall as its text, whatever its
+        // size; the fourth ring peeks in to say it scrolls.
+        ? SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: row([if (trackProtein) proteinRing, ...macros]),
           )
-        else
-          Row(
+        : Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (trackProtein) ...[
@@ -153,34 +148,40 @@ class MacroRings extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-        Row(
+          );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // The info button sits in the space above the rings' top right
+        // corner rather than on a line of its own.
+        Stack(
+          clipBehavior: Clip.none,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (final note in notes)
-                    Text(
-                      note,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                ],
+            Padding(padding: const EdgeInsets.only(top: 22), child: rings),
+            // The icon's right edge in line with the end of the calorie bar,
+            // in the gap above the rings; the tap area is the usual 48.
+            Positioned(
+              top: -12,
+              right: -15,
+              child: IconButton(
+                tooltip: 'About macros',
+                onPressed: explain,
+                icon: const Icon(Icons.info_outline_rounded),
+                iconSize: 18,
+                color: AppColors.textSecondary,
               ),
-            ),
-            IconButton(
-              tooltip: 'About macros',
-              onPressed: explain,
-              icon: const Icon(Icons.info_outline_rounded),
-              iconSize: 20,
-              color: AppColors.textSecondary,
-              visualDensity: VisualDensity.compact,
             ),
           ],
         ),
+        for (final note in notes)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(
+              note,
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            ),
+          ),
       ],
     );
   }

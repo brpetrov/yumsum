@@ -141,13 +141,13 @@ void main() {
     await pump(tester, [_wrap]);
     await tester.tap(find.text('Fat'));
     await tester.pumpAndSettle();
-    expect(find.text('About your macros'), findsOneWidget);
+    expect(find.text('Your macros'), findsOneWidget);
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byTooltip('About macros'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('about 30% of your calories'), findsOneWidget);
+    expect(find.textContaining('About 30% of your calories'), findsOneWidget);
   });
 
   testWidgets('without YumSum Star, protein alone is live', (tester) async {
