@@ -1,6 +1,6 @@
 # Plan 8: Adaptive formula
 
-*Written 2 November 2026. Status: planned, not built. A YumSum Star feature (plan 06), with a free weight trend line that can ship first. Every number below is a starting value. It was checked in a simulation of the rules (noisy daily weights, your own plan, and each bad case in the table), and gets tuned with your real data.*
+*Written 2 November 2026. Status: built on 3 November (steps 1 to 7), to try on your phone. A YumSum Star feature (plan 06), with a free weight trend line that can ship first. Every number below is a starting value. It was checked in a simulation of the rules (noisy daily weights, your own plan, and each bad case in the table), and gets tuned with your real data.*
 
 ## The short version
 
@@ -605,9 +605,9 @@ These go beyond what we agreed on 1–2 November, or change it slightly:
 ## Checklist
 
 - [ ] (you) Agree the decisions above, or change them
-- [ ] (Claude) Step 1, the trend line (built 2 November); (you) try it on the phone
-- [ ] (Claude) Steps 2–3 with their tests; deploy the rules
-- [ ] (Claude) Steps 4–7 and the widget tests
+- [x] (Claude) Step 1, the trend line (built 2 November); (you) try it on the phone
+- [x] (Claude) Steps 2–3 with their tests (3 November); (you) deploy the rules
+- [x] (Claude) Steps 4–7 and the widget tests (3 November)
 - [ ] (you) Grant yourself YumSum Star, switch on the morning reminder, weigh in daily for 6 weeks
 - [ ] (you) Each Monday, check the line, the sum and the debug log; copy the JSON into the replay file once a fortnight
 - [ ] (Claude) Tune the starting values from the replay, then update this plan and CLAUDE.md
