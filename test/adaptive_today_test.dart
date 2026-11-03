@@ -273,6 +273,25 @@ void main() {
   });
 
   group('the dialogs', () {
+    testWidgets('the card\'s info button explains calories, then macros', (
+      tester,
+    ) async {
+      await pumpToday(tester, profile: adapted('learning'));
+      await tester.tap(find.byTooltip('About your targets'));
+      await tester.pumpAndSettle();
+      expect(find.text('Your targets'), findsOneWidget);
+      double top(String text) => tester
+          .getTopLeft(
+            find.descendant(
+              of: find.byType(AlertDialog),
+              matching: find.text(text),
+            ),
+          )
+          .dy;
+      expect(top('Calories'), lessThan(top('Protein')));
+      expect(find.textContaining('Never below a safe minimum'), findsOneWidget);
+    });
+
     testWidgets('How it works shows after subscribing', (tester) async {
       await pumpToday(tester, profile: adapted('learning'), saved: const {});
       expect(find.text('How the Adaptive formula works'), findsOneWidget);

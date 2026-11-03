@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -119,6 +121,38 @@ void main() {
     expect(ringColor(tester, '200 g'), AppColors.veryBad);
   });
 
+  testWidgets('a ring just under its target stops short of the top', (
+    tester,
+  ) async {
+    await pump(tester, [_withCarbs(158)]);
+    late Rect rect;
+    late double start, sweep, stroke;
+    // The track first, then the share eaten.
+    expect(
+      find
+          .ancestor(of: find.text('158 g'), matching: find.byType(CustomPaint))
+          .first,
+      paints
+        ..arc()
+        ..something((method, args) {
+          if (method != #drawArc) return false;
+          rect = args[0] as Rect;
+          start = args[1] as double;
+          sweep = args[2] as double;
+          stroke = (args[4] as Paint).strokeWidth;
+          return true;
+        }),
+    );
+    // The rounded ends reach half the stroke past each end of the arc.
+    final cap = stroke / 2 / (rect.width / 2);
+    const top = -math.pi / 2;
+    expect(start - cap, greaterThanOrEqualTo(top - 1e-9));
+    expect(
+      start + sweep + cap,
+      lessThanOrEqualTo(top + 2 * math.pi * 158 / 161 + 1e-9),
+    );
+  });
+
   testWidgets('more protein than the target stays green', (tester) async {
     await pump(tester, [_meal('Steak', 160, null)]);
     expect(ringColor(tester, '160 g'), AppColors.veryGood);
@@ -137,16 +171,11 @@ void main() {
     expect(find.textContaining('not counted'), findsNothing);
   });
 
-  testWidgets('a ring or the info button explains them', (tester) async {
+  testWidgets('a ring explains them', (tester) async {
     await pump(tester, [_wrap]);
     await tester.tap(find.text('Fat'));
     await tester.pumpAndSettle();
     expect(find.text('Your macros'), findsOneWidget);
-    await tester.tap(find.text('OK'));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byTooltip('About macros'));
-    await tester.pumpAndSettle();
     expect(find.textContaining('About 30% of your calories'), findsOneWidget);
   });
 

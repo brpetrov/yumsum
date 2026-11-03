@@ -37,6 +37,7 @@ import 'package:lean_streak/widgets/bowl_note.dart';
 import 'package:lean_streak/widgets/calorie_bars.dart';
 import 'package:lean_streak/widgets/day_status.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
+import 'package:lean_streak/widgets/macro_guide.dart';
 import 'package:lean_streak/widgets/macro_rings.dart';
 import 'package:lean_streak/widgets/meal_row.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
@@ -457,14 +458,14 @@ class _TodayCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Stack(
+            clipBehavior: Clip.none,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text.rich(
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text.rich(
                       TextSpan(
                         children: [
                           TextSpan(text: '${remaining.abs()}'),
@@ -479,21 +480,42 @@ class _TodayCard extends StatelessWidget {
                       ),
                       style: number,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${summary.totalCalories} of ${summary.targetCalories} kcal eaten',
-                      style: TextStyle(
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
+                  ),
+                  if (pillLabel != null)
+                    StatusPill(label: pillLabel, color: barColor),
+                  // Room for the info button.
+                  const SizedBox(width: 26),
+                ],
+              ),
+              // The icon's right edge in line with the end of the calorie
+              // bar, level with the status pill; the tap area is the usual
+              // 48.
+              Positioned(
+                top: -10,
+                right: -15,
+                child: IconButton(
+                  tooltip: 'About your targets',
+                  onPressed: () => showMacroGuide(
+                    context,
+                    withProtein: trackProtein,
+                    withCalories: true,
+                  ),
+                  icon: const Icon(Icons.info_outline_rounded),
+                  iconSize: 18,
+                  color: AppColors.textSecondary,
                 ),
               ),
-              if (pillLabel != null)
-                StatusPill(label: pillLabel, color: barColor),
             ],
+          ),
+          const SizedBox(height: 4),
+          // Below the pill and the button, so it has the card's width.
+          Text(
+            '${summary.totalCalories} of ${summary.targetCalories} kcal eaten',
+            style: TextStyle(
+              fontSize: 14.5,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
+            ),
           ),
           const SizedBox(height: 18),
           _ProgressBar(value: calorieProgress, color: barColor, height: 14),

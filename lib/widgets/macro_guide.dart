@@ -6,8 +6,19 @@ import 'package:lean_streak/core/theme/app_theme.dart';
 /// What each macro does for you and how its target is set, in three groups
 /// that match how the rings are judged: aim for, keep in balance and keep
 /// under. No figures: the rings have those. [withProtein] leaves protein
-/// out where it isn't shown.
-Future<void> showMacroGuide(BuildContext context, {bool withProtein = true}) {
+/// out where it isn't shown; [withCalories] starts with the calorie target,
+/// for Today's card.
+Future<void> showMacroGuide(
+  BuildContext context, {
+  bool withProtein = true,
+  bool withCalories = false,
+}) {
+  const calories = (
+    'Calories',
+    'The energy in food. Eat less than you burn and you lose weight.',
+    'What you burn in a day, from your age, height, weight and activity, '
+        'less a set amount for your pace. Never below a safe minimum.',
+  );
   final groups = [
     (
       'Aim for',
@@ -73,11 +84,41 @@ Future<void> showMacroGuide(BuildContext context, {bool withProtein = true}) {
     height: 1.35,
     color: AppColors.textSecondary,
   );
+  List<Widget> item((String, String, String) entry) {
+    final (name, why, target) = entry;
+    return [
+      const SizedBox(height: 10),
+      Text(
+        name,
+        style: AppTheme.display.copyWith(
+          fontSize: 16,
+          color: AppColors.textPrimary,
+        ),
+      ),
+      const SizedBox(height: 2),
+      Text(why, style: body),
+      Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: 'Target: ',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            TextSpan(text: target),
+          ],
+        ),
+        style: body,
+      ),
+    ];
+  }
 
   return showDialog<void>(
     context: context,
     builder: (context) => AlertDialog(
-      title: const Text('Your macros'),
+      title: Text(withCalories ? 'Your targets' : 'Your macros'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -87,6 +128,7 @@ Future<void> showMacroGuide(BuildContext context, {bool withProtein = true}) {
               'Your targets come from your plan, so they change with it.',
               style: body,
             ),
+            if (withCalories) ...item(calories),
             for (final (group, color, items) in groups) ...[
               const SizedBox(height: 18),
               Row(
@@ -111,39 +153,11 @@ Future<void> showMacroGuide(BuildContext context, {bool withProtein = true}) {
                   ),
                 ],
               ),
-              for (final (name, why, target) in items) ...[
-                const SizedBox(height: 10),
-                Text(
-                  name,
-                  style: AppTheme.display.copyWith(
-                    fontSize: 16,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(why, style: body),
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Target: ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      TextSpan(text: target),
-                    ],
-                  ),
-                  style: body,
-                ),
-              ],
+              for (final entry in items) ...item(entry),
             ],
             const SizedBox(height: 18),
             Text(
-              'A ring turns amber, then red, when you go well over a balance '
-              'target or past a limit. General guidance for adults, not '
-              'medical advice.',
+              'General guidance for adults, not medical advice.',
               style: body.copyWith(fontSize: 12.5),
             ),
           ],

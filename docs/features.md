@@ -116,14 +116,15 @@ YumSum Star only (plan 10). `macrosForEveryone` in `calorie_estimate_service.dar
   - Rings in the bars' green: protein (when tracked), then carbs, fat and fibre, then the limits: sugars, saturates and salt, scrolling to the right.
   - Each is against a target from the plan (`HealthCalculator.macroTargets`): fat 30% of the calories, carbs the rest after protein and fat, saturates at most 10%, all sugars at most 18%, fibre at least 30 g, salt at most 6 g.
   - Colours: protein and fibre stay green however far over. Carbs and fat are judged like the calorie bar: green up to 10% over, amber up to 20%, red past that. Sugars, saturates and salt turn amber past their limit and red past 20% over.
-  - A tap on a ring, or the info button left of the first ring, near its top, opens the guide.
+  - A tap on a ring opens the guide. The card's info button, at its top right beside the status pill, opens it with calories first ("Your targets").
+  - A ring's round ends are allowed for, so a ring just under its target stops short of the top and a full one's ends meet there.
   - Free users see the protein ring live and the rest dimmed and part-filled, with no figures, under an "Unlock full macros" chip; a tap anywhere there opens `/plus`.
 - **Elsewhere:**
   - History's day sheet uses `MacroTotals` (`lib/widgets/macro_totals.dart`): one line of fat, carbs and salt that opens to all six, with "at least" where some meals lack a figure.
   - A `MealRow` with macros shows an orange "Macros" hint beside its time, and a tap shows its `macrosLine`.
   - There's one line on the recipe page and the amount sheet.
   - Macros aren't shown on recipe tiles, the AI breakdown, the month graph or the period review.
-- **The guide** (`showMacroGuide`, `lib/widgets/macro_guide.dart`), from the rings and the day sheet: the macros in three groups that match the ring colours (aim for, keep in balance, keep under), each with one line on why it matters and one on how its target is set. No figures; the rings have those.
+- **The guide** (`showMacroGuide`, `lib/widgets/macro_guide.dart`), from the rings, Home's card and the day sheet: from the card, first a short calories item (what you burn less a set amount for your pace, never below the minimum); then the macros in three groups that match the ring colours (aim for, keep in balance, keep under), each with one line on why it matters and one on how its target is set. No figures; the rings have those.
 
 ## Adaptive formula
 

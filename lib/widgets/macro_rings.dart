@@ -20,10 +20,9 @@ typedef _Ring = ({String name, double? grams, int target, _Kind kind});
 /// Today's protein and macros as rings in the bars' green, protein first,
 /// then carbs, fat and fibre, then the limits: sugars, saturates and salt,
 /// scrolling to the right. Targets follow the plan ([HealthCalculator
-/// .macroTargets]); a tap on a ring or the info button explains them
-/// ([showMacroGuide]). Without YumSum Star ([full] false) protein is the
-/// only live ring, and the rest are dimmed under a chip that calls
-/// [onUnlock].
+/// .macroTargets]); a tap on a ring explains them ([showMacroGuide]).
+/// Without YumSum Star ([full] false) protein is the only live ring, and
+/// the rest are dimmed under a chip that calls [onUnlock].
 class MacroRings extends StatelessWidget {
   const MacroRings({
     super.key,
@@ -153,27 +152,7 @@ class MacroRings extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // The info button sits left of the first ring rather than on a line
-        // of its own.
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Padding(padding: const EdgeInsets.only(left: 12), child: rings),
-            // The icon just left of the start of the calorie bar, near the
-            // top of the ring; the tap area is the usual 48.
-            Positioned(
-              top: -15,
-              left: -20,
-              child: IconButton(
-                tooltip: 'About macros',
-                onPressed: explain,
-                icon: const Icon(Icons.info_outline_rounded),
-                iconSize: 18,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
+        rings,
         for (final note in notes)
           Padding(
             padding: const EdgeInsets.only(top: 6),
@@ -367,17 +346,21 @@ class _RingPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = _stroke,
     );
-    final sweep = 2 * math.pi * value.clamp(0.0, 1.0);
-    if (sweep <= 0) return;
+    final share = 2 * math.pi * value.clamp(0.0, 1.0);
+    if (share <= 0) return;
+    // The round ends reach half the stroke past each end of the arc, so it
+    // is drawn that much shorter at both: with its ends it covers the share
+    // eaten, and a full ring's ends meet at the top rather than overlap.
+    final cap = _stroke / 2 / (rect.width / 2);
     canvas.drawArc(
       rect,
-      -math.pi / 2,
-      sweep,
+      -math.pi / 2 + cap,
+      math.max(share - 2 * cap, 0.001),
       false,
       Paint()
         ..shader = SweepGradient(
           startAngle: 0,
-          endAngle: sweep,
+          endAngle: share,
           colors: [Color.lerp(color, Colors.white, 0.3)!, color],
           transform: const GradientRotation(-math.pi / 2),
         ).createShader(rect)
