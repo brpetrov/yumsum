@@ -159,12 +159,11 @@ class MacroRings extends StatelessWidget {
           clipBehavior: Clip.none,
           children: [
             Padding(padding: const EdgeInsets.only(left: 12), child: rings),
-            // The icon's left edge in line with the start of the calorie
-            // bar, a little above the ring's middle; the tap area is the
-            // usual 48.
+            // The icon just left of the start of the calorie bar, near the
+            // top of the ring; the tap area is the usual 48.
             Positioned(
-              top: -12,
-              left: -15,
+              top: -15,
+              left: -20,
               child: IconButton(
                 tooltip: 'About macros',
                 onPressed: explain,
