@@ -75,6 +75,7 @@ void main() {
     ]);
     expect(found.last.kcal, 560);
     expect(found.last.protein, 42);
+    expect(found.last.macros?.fat, 14);
   });
 
   test('a chip carries its meal\'s macros', () {

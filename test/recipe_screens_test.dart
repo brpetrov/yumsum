@@ -14,6 +14,7 @@ import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/recipe_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
@@ -22,6 +23,12 @@ import 'package:lean_streak/screens/recipes/recipes_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'recipe_fixtures.dart';
+
+/// A macros line as the app shows it, each figure held together.
+String _line(String text) => text.replaceAllMapped(
+  RegExp(r'(\w+) ([\d.]+) g'),
+  (m) => '${m[1]}\u00A0${m[2]}\u00A0g',
+);
 
 class _FakeLogMealController extends LogMealController {
   _FakeLogMealController({this.fails = false});
@@ -117,6 +124,7 @@ void main() {
     List<Meal> recent = const [],
     bool trackProtein = true,
     bool failing = false,
+    bool plus = false,
   }) async {
     // Tall enough for every meal's section to be built.
     tester.view.physicalSize = const Size(800, 2000);
@@ -158,6 +166,7 @@ void main() {
           ),
           logMealControllerProvider.overrideWith(() => controller),
           sharedPreferencesProvider.overrideWithValue(prefs),
+          plusProvider.overrideWithValue(plus),
         ],
         child: MaterialApp.router(theme: AppTheme.light, routerConfig: router),
       ),
@@ -320,6 +329,18 @@ void main() {
       // Half the recipe's macros, so no AI is needed for them.
       expect(controller.savedMacros.single?.fat, 7);
       expect(controller.savedMacros.single?.salt, closeTo(0.7, 1e-9));
+    });
+
+    testWidgets('YumSum Star sees the macros per portion', (tester) async {
+      final line = _line(
+        'Fat 14 g · saturates 5 g · carbs 60 g · sugars 9 g · fibre 5 g · '
+        'salt 1.4 g',
+      );
+      await pump(tester, at: '/recipes/pasta-bolognese');
+      expect(find.text(line), findsNothing);
+
+      await pump(tester, at: '/recipes/pasta-bolognese', plus: true);
+      expect(find.text(line), findsOneWidget);
     });
 
     testWidgets('says so when logging fails', (tester) async {

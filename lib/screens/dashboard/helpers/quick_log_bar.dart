@@ -556,6 +556,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       context,
       food,
       showProtein: ref.read(trackProteinProvider),
+      showMacros: ref.read(showMacrosProvider),
     );
     if (portion == null || !mounted) return;
     _fill(portion.name, portion.kcal, portion.protein, macros: portion.macros);

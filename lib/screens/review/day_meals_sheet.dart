@@ -15,6 +15,7 @@ import 'package:lean_streak/repositories/day_edit_repository.dart';
 import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
 import 'package:lean_streak/widgets/bowl_note.dart';
 import 'package:lean_streak/widgets/day_status.dart';
+import 'package:lean_streak/widgets/macro_totals.dart';
 import 'package:lean_streak/widgets/meal_row.dart';
 
 /// Opens one day's meals so they can be added to, edited or deleted.
@@ -82,6 +83,7 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
         .watch(dailySummaryForDateProvider(_dateKey))
         .valueOrNull;
     final showProtein = ref.watch(trackProteinProvider);
+    final showMacros = ref.watch(showMacrosProvider);
     // From the meals rather than the summary, so days logged before protein
     // existed still show it once any meal has a value.
     final proteinMeals = meals?.where((meal) => meal.proteinGrams != null);
@@ -155,6 +157,16 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
                 ],
               ),
             ),
+            if (showMacros && meals != null && meals.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: MacroTotals(
+                  meals: meals,
+                  noneNote: 'No macro info for this day\'s meals',
+                ),
+              ),
+            ],
             if (changesLeft != null) ...[
               const SizedBox(height: 6),
               Text(
@@ -187,6 +199,7 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
                     return MealRow(
                       meal: meal,
                       showProtein: showProtein,
+                      showMacros: showMacros,
                       onEdit: canChange
                           ? () => showLogMealSheet(context, existingMeal: meal)
                           : () => setState(

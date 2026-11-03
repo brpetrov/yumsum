@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
+import 'package:lean_streak/widgets/macro_totals.dart';
 import 'package:lean_streak/widgets/pack_photo.dart';
 
 typedef Portion = ({String name, int kcal, int? protein, Nutrients? macros});
@@ -25,18 +26,28 @@ Future<Portion?> showPortionSheet(
   BuildContext context,
   PackagedFood food, {
   bool showProtein = true,
+  bool showMacros = false,
 }) => showModalBottomSheet<Portion>(
   context: context,
   isScrollControlled: true,
   backgroundColor: AppColors.surface,
-  builder: (_) => _PortionSheet(food: food, showProtein: showProtein),
+  builder: (_) => _PortionSheet(
+    food: food,
+    showProtein: showProtein,
+    showMacros: showMacros,
+  ),
 );
 
 class _PortionSheet extends StatefulWidget {
-  const _PortionSheet({required this.food, required this.showProtein});
+  const _PortionSheet({
+    required this.food,
+    required this.showProtein,
+    required this.showMacros,
+  });
 
   final PackagedFood food;
   final bool showProtein;
+  final bool showMacros;
 
   @override
   State<_PortionSheet> createState() => _PortionSheetState();
@@ -148,6 +159,11 @@ class _PortionSheetState extends State<_PortionSheet> {
                 ),
               ],
             ),
+            if (widget.showMacros && _amount > 0)
+              if (portion.macros case final macros?) ...[
+                const SizedBox(height: 10),
+                Text(macrosLine(macros), style: muted.copyWith(fontSize: 13)),
+              ],
             const SizedBox(height: 20),
             FilledButton(
               onPressed: _amount > 0 ? _use : null,

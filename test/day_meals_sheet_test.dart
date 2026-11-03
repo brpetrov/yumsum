@@ -3,13 +3,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/meal.dart';
+import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/past_day_edit_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/review/day_meals_sheet.dart';
 import 'package:lean_streak/widgets/day_status.dart';
 import 'package:intl/intl.dart';
+
+/// A macros line as the app shows it, each figure held together.
+String _line(String text) => text.replaceAllMapped(
+  RegExp(r'(\w+) ([\d.]+) g'),
+  (m) => '${m[1]}\u00A0${m[2]}\u00A0g',
+);
 
 void main() {
   group('isPastDay', () {
@@ -82,6 +90,14 @@ void main() {
       name: 'Musaka',
       calories: 640,
       proteinGrams: 31,
+      macros: const Nutrients(
+        fat: 34,
+        saturates: 14,
+        carbs: 42,
+        sugars: 9,
+        fibre: 5,
+        salt: 2.3,
+      ),
       createdAt: DateTime(2020, 3, 10, 19, 5),
       updatedAt: DateTime(2020, 3, 10, 19, 5),
     );
@@ -95,10 +111,15 @@ void main() {
       updatedAt: DateTime(2020, 3, 10),
     );
 
-    Future<void> pumpSheet(WidgetTester tester, {required int changesUsed}) {
+    Future<void> pumpSheet(
+      WidgetTester tester, {
+      int changesUsed = 0,
+      bool plus = false,
+    }) {
       return tester.pumpWidget(
         ProviderScope(
           overrides: [
+            plusProvider.overrideWithValue(plus),
             mealsForDateProvider.overrideWith(
               (ref, date) => Stream.value([meal]),
             ),
@@ -150,6 +171,34 @@ void main() {
         find.widgetWithText(ElevatedButton, 'Add meal'),
       );
       expect(addMeal.onPressed, isNull);
+    });
+
+    final closedLine = _line('Fat 34 g · carbs 42 g · salt 2.3 g');
+    final rowLine = _line(
+      'Fat 34 g · saturates 14 g · carbs 42 g · sugars 9 g · fibre 5 g · '
+      'salt 2.3 g',
+    );
+
+    testWidgets('YumSum Star sees the day\'s macros and each meal\'s on a '
+        'tap', (tester) async {
+      await pumpSheet(tester, plus: true);
+      await tester.pump();
+
+      expect(find.text(closedLine), findsOneWidget);
+      expect(find.text(rowLine), findsNothing);
+      await tester.tap(find.text('Musaka'));
+      await tester.pump();
+      expect(find.text(rowLine), findsOneWidget);
+    });
+
+    testWidgets('a free account sees no macros', (tester) async {
+      await pumpSheet(tester);
+      await tester.pump();
+
+      expect(find.text(closedLine), findsNothing);
+      await tester.tap(find.text('Musaka'));
+      await tester.pump();
+      expect(find.text(rowLine), findsNothing);
     });
   });
 }

@@ -9,6 +9,7 @@ import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/recipes/log_recipe_portion.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
+import 'package:lean_streak/widgets/macro_totals.dart';
 import 'package:lean_streak/widgets/recipe_photo.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 
@@ -80,6 +81,7 @@ class _RecipeBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final showProtein = ref.watch(trackProteinProvider);
+    final showMacros = ref.watch(showMacrosProvider);
     final fits = fitsRemaining(
       recipe,
       ref.watch(remainingCaloriesTodayProvider),
@@ -114,6 +116,10 @@ class _RecipeBody extends ConsumerWidget {
             color: AppColors.textPrimary,
           ),
         ),
+        if (showMacros) ...[
+          const SizedBox(height: 2),
+          Text(macrosLine(recipe.macrosPerPortion), style: muted),
+        ],
         if (fits) ...[
           const SizedBox(height: 2),
           Text(

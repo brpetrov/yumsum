@@ -33,6 +33,7 @@ import 'package:lean_streak/widgets/bowl_note.dart';
 import 'package:lean_streak/widgets/calorie_bars.dart';
 import 'package:lean_streak/widgets/day_status.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
+import 'package:lean_streak/widgets/macro_totals.dart';
 import 'package:lean_streak/widgets/meal_row.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
@@ -185,6 +186,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 profile: profile,
                 meals: meals,
                 summary: summary,
+                showMacros: ref.watch(showMacrosProvider),
                 onOpenReview: () => context.push(AppRoutes.review),
                 onEditMeal: (meal) =>
                     showLogMealSheet(context, existingMeal: meal),
@@ -259,6 +261,7 @@ class _DashboardContent extends StatelessWidget {
     required this.profile,
     required this.meals,
     required this.summary,
+    required this.showMacros,
     required this.onOpenReview,
     required this.onEditMeal,
     required this.onDeleteMeal,
@@ -268,6 +271,7 @@ class _DashboardContent extends StatelessWidget {
   final UserProfile profile;
   final List<Meal> meals;
   final DailySummary summary;
+  final bool showMacros;
   final VoidCallback onOpenReview;
   final ValueChanged<Meal> onEditMeal;
   final Future<void> Function(Meal meal) onDeleteMeal;
@@ -300,11 +304,13 @@ class _DashboardContent extends StatelessWidget {
                 mealsWithoutProtein: meals
                     .where((meal) => meal.proteinGrams == null)
                     .length,
+                macroMeals: showMacros ? meals : null,
               ),
               const SizedBox(height: 18),
               _MealsCard(
                 meals: meals,
                 showProtein: profile.trackProtein,
+                showMacros: showMacros,
                 onEditMeal: onEditMeal,
                 onDeleteMeal: onDeleteMeal,
               ),
@@ -359,8 +365,8 @@ class _DayOffButton extends ConsumerWidget {
   }
 }
 
-/// Calories left for the day, then daily protein (when tracked), in one
-/// card.
+/// Calories left for the day, then daily protein (when tracked) and, for
+/// YumSum Star, the day's macros, in one card.
 class _TodayCard extends StatelessWidget {
   const _TodayCard({
     required this.summary,
@@ -368,6 +374,7 @@ class _TodayCard extends StatelessWidget {
     required this.proteinLogged,
     required this.proteinTarget,
     required this.mealsWithoutProtein,
+    this.macroMeals,
   });
 
   final DailySummary summary;
@@ -375,6 +382,9 @@ class _TodayCard extends StatelessWidget {
   final int proteinLogged;
   final int proteinTarget;
   final int mealsWithoutProtein;
+
+  /// The meals whose macros are totalled; null when they aren't shown.
+  final List<Meal>? macroMeals;
 
   @override
   Widget build(BuildContext context) {
@@ -493,6 +503,10 @@ class _TodayCard extends StatelessWidget {
               ),
             ],
           ],
+          if (macroMeals case final meals? when meals.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            MacroTotals(meals: meals),
+          ],
         ],
       ),
     );
@@ -544,12 +558,14 @@ class _MealsCard extends StatelessWidget {
   const _MealsCard({
     required this.meals,
     required this.showProtein,
+    required this.showMacros,
     required this.onEditMeal,
     required this.onDeleteMeal,
   });
 
   final List<Meal> meals;
   final bool showProtein;
+  final bool showMacros;
   final ValueChanged<Meal> onEditMeal;
   final Future<void> Function(Meal meal) onDeleteMeal;
 
@@ -592,6 +608,7 @@ class _MealsCard extends StatelessWidget {
               MealRow(
                 meal: meals[index],
                 showProtein: showProtein,
+                showMacros: showMacros,
                 onEdit: () => onEditMeal(meals[index]),
                 onDelete: () => onDeleteMeal(meals[index]),
               ),

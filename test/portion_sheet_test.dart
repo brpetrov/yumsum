@@ -5,6 +5,12 @@ import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/screens/dashboard/helpers/portion_sheet.dart';
 import 'package:lean_streak/widgets/pack_photo.dart';
 
+/// A macros line as the app shows it, each figure held together.
+String _line(String text) => text.replaceAllMapped(
+  RegExp(r'(\w+) ([\d.]+) g'),
+  (m) => '${m[1]}\u00A0${m[2]}\u00A0g',
+);
+
 const _wrap = (
   name: 'Chicken Tikka Wrap',
   brand: 'Tesco',
@@ -86,6 +92,47 @@ void main() {
       ('Chicken Tikka Wrap', 323, 14),
     );
     expect(result?.macros?.fat, 12);
+  });
+
+  testWidgets('the macros for the amount show for YumSum Star only', (
+    tester,
+  ) async {
+    Future<void> open({required bool showMacros}) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () =>
+                    showPortionSheet(context, _wrap, showMacros: showMacros),
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+    }
+
+    await open(showMacros: true);
+    // 220 g of the wrap.
+    expect(
+      find.text(_line('Fat 18 g · carbs 53 g · salt 2.0 g')),
+      findsOneWidget,
+    );
+    await tester.enterText(find.byType(TextField), '100');
+    await tester.pump();
+    expect(
+      find.text(_line('Fat 8 g · carbs 24 g · salt 0.9 g')),
+      findsOneWidget,
+    );
+
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pumpAndSettle();
+    await open(showMacros: false);
+    expect(find.textContaining('Fat'), findsNothing);
   });
 
   testWidgets('the sheet shows the pack photo when there is one', (
