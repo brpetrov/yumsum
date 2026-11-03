@@ -32,6 +32,7 @@ import 'recipe_fixtures.dart';
 
 class _FakeLogMealController extends LogMealController {
   final saved = <({String? name, double calories, double? protein})>[];
+  final savedMacros = <Nutrients?>[];
 
   @override
   Future<void> submit({
@@ -43,6 +44,7 @@ class _FakeLogMealController extends LogMealController {
     Nutrients? macros,
   }) async {
     saved.add((name: name, calories: calories, protein: proteinGrams));
+    savedMacros.add(macros);
   }
 }
 
@@ -141,6 +143,7 @@ class _FakeFoodLookup implements FoodLookupService {
     brand: 'Tesco',
     kcalPer100g: 215,
     proteinPer100g: 9,
+    macrosPer100g: const Nutrients(fat: 8, carbs: 24, salt: 0.9),
     servingGrams: 220,
     imageUrl: null,
   );
@@ -224,7 +227,13 @@ final _noProteinProfile = UserProfile(
 );
 
 /// A meal logged at this time of day [daysAgo] days ago.
-Meal _recent(String name, double kcal, double? protein, {int daysAgo = 1}) {
+Meal _recent(
+  String name,
+  double kcal,
+  double? protein, {
+  int daysAgo = 1,
+  Nutrients? macros,
+}) {
   final at = DateTime.now().subtract(Duration(days: daysAgo));
   return Meal(
     id: '$name $daysAgo',
@@ -233,6 +242,7 @@ Meal _recent(String name, double kcal, double? protein, {int daysAgo = 1}) {
     name: name,
     calories: kcal,
     proteinGrams: protein,
+    macros: macros,
     createdAt: at,
     updatedAt: at,
   );
@@ -478,6 +488,50 @@ void main() {
     expect(estimateService.photoCalls, 0);
   });
 
+  testWidgets('a packet\'s macros are saved with it, scaled to calories '
+      'typed over', (tester) async {
+    await pumpCard(tester, barcode: '5000112637922');
+    await tester.tap(find.byTooltip('Scan a barcode'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byWidgetPredicate(
+        (widget) => widget is TextField && widget.controller?.text == '220',
+      ),
+      '150',
+    );
+    await tester.pump();
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+
+    // 150 g, then typed up from 323 to 646 kcal: twice the packet's figures.
+    await tester.enterText(kcalBox, '646');
+    await tester.pump();
+    await tester.tap(find.byTooltip('Save'));
+    await tester.pump();
+    final macros = controller.savedMacros.single!;
+    expect(macros.fat, closeTo(24, 0.01));
+    expect(macros.carbs, closeTo(72, 0.01));
+    expect(macros.salt, closeTo(2.7, 0.01));
+    expect(macros.fibre, isNull);
+  });
+
+  testWidgets('a new name drops the macros the box was filled with', (
+    tester,
+  ) async {
+    await pumpCard(tester, barcode: '5000112637922');
+    await tester.tap(find.byTooltip('Scan a barcode'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(nameBox, 'Tuna wrap');
+    await tester.pump();
+    await tester.tap(find.byTooltip('Save'));
+    await tester.pump();
+    expect(controller.saved.single.name, 'Tuna wrap');
+    expect(controller.savedMacros.single, isNull);
+  });
+
   testWidgets('a meal photo goes to the AI', (tester) async {
     await pumpCard(tester);
     await tester.tap(find.byTooltip('Take a photo'));
@@ -509,6 +563,11 @@ void main() {
       find.byKey(const ValueKey('contribute-proteins')),
       '2,4',
     );
+    await tester.enterText(find.byKey(const ValueKey('contribute-fat')), '5');
+    await tester.enterText(
+      find.byKey(const ValueKey('contribute-salt')),
+      '1.5',
+    );
     await tester.ensureVisible(find.widgetWithText(FilledButton, 'Contribute'));
     await tester.tap(find.widgetWithText(FilledButton, 'Contribute'));
     await tester.pumpAndSettle();
@@ -519,7 +578,12 @@ void main() {
     expect(sent.lang, 'bg');
     expect(sent.barcode, '3800000000017');
     expect(sent.brand, 'Първа преса');
-    expect(sent.per100g, {'energy-kcal': 95.0, 'proteins': 2.4});
+    expect(sent.per100g, {
+      'energy-kcal': 95.0,
+      'proteins': 2.4,
+      'fat': 5.0,
+      'salt': 1.5,
+    });
     expect(find.text('Thank you!'), findsOneWidget);
 
     await tester.tap(find.text('Log it'));
@@ -529,6 +593,12 @@ void main() {
     await tester.pumpAndSettle();
     expect(boxes(tester), ['Лютеница', '247', '5']);
     expect(find.textContaining('isn\'t on Open Food Facts'), findsNothing);
+
+    // Logged with the label's macros too.
+    await tester.tap(find.byTooltip('Save'));
+    await tester.pump();
+    expect(controller.savedMacros.single?.fat, closeTo(13, 0.1));
+    expect(controller.savedMacros.single?.salt, closeTo(3.9, 0.1));
   });
 
   testWidgets('a listed product without calories gets only its nutrition '
@@ -794,7 +864,13 @@ void main() {
         _recent('Ham sandwich', 500, 20),
         _recent('Musaka', 640, 28),
         _recent('Ham sandwich', 480, 20, daysAgo: 2),
-        _recent('Chicken wrap', 450, 30, daysAgo: 2),
+        _recent(
+          'Chicken wrap',
+          450,
+          30,
+          daysAgo: 2,
+          macros: const Nutrients(fat: 15, salt: 1.8),
+        ),
         _recent('Ham sandwich', 480, 20, daysAgo: 3),
       ],
     );
@@ -822,6 +898,8 @@ void main() {
     expect(controller.saved, [
       (name: 'Chicken wrap', calories: 450.0, protein: 30.0),
     ]);
+    expect(controller.savedMacros.single?.fat, 15);
+    expect(controller.savedMacros.single?.salt, 1.8);
   });
 
   testWidgets('a typed recipe name offers a portion of it', (tester) async {

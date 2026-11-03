@@ -91,6 +91,7 @@ void main() {
     expect(foods.map((food) => food.brand), ['Myprotein', 'Daily Delight']);
     expect(foods.first.servingGrams, 175);
     expect(foods.first.proteinPer100g, 12);
+    expect(foods.first.macrosPer100g, isNull);
     expect(foods.first.imageUrl, 'https://images.openfoodfacts.org/w.200.jpg');
     expect(foods.last.imageUrl, isNull);
   });
@@ -137,6 +138,41 @@ void main() {
       expect(food!.kcalPer100g, 368);
       expect(food.proteinPer100g, 11);
       expect(food.servingGrams, isNull);
+    });
+
+    test('reads the macros from the nutriments, numbers or strings', () {
+      final food = parsePackagedFood(
+        _reply('''
+        {"product": {"product_name": "Chicken Tikka Wrap",
+          "nutriments": {"energy-kcal_100g": 215, "fat_100g": 8.1,
+            "saturated-fat_100g": "2.4", "carbohydrates_100g": 24,
+            "sugars_100g": 2.9, "fiber_100g": 2.2, "salt_100g": 0.95}}}'''),
+      );
+
+      final macros = food!.macrosPer100g!;
+      expect(macros.fat, 8.1);
+      expect(macros.saturates, 2.4);
+      expect(macros.carbs, 24);
+      expect(macros.sugars, 2.9);
+      expect(macros.fibre, 2.2);
+      expect(macros.salt, 0.95);
+    });
+
+    test('salt comes from sodium when it is missing, and none is null', () {
+      final salty = parsePackagedFood(
+        _reply('''
+        {"product": {"product_name": "Crisps",
+          "nutriments": {"energy-kcal_100g": 530, "sodium_100g": 0.6}}}'''),
+      );
+      expect(salty!.macrosPer100g!.salt, closeTo(1.5, 1e-9));
+      expect(salty.macrosPer100g!.fibre, isNull);
+
+      final bare = parsePackagedFood(
+        _reply('''
+        {"product": {"product_name": "Oats",
+          "nutriments": {"energy-kcal_100g": 375}}}'''),
+      );
+      expect(bare!.macrosPer100g, isNull);
     });
 
     test('is null for unknown products or ones without calories', () {

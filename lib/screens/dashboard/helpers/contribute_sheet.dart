@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
@@ -318,6 +319,9 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
       brand: _listed == null ? _text(_brand) : _listed!.brand,
       kcalPer100g: _figure('energy-kcal')!.round(),
       proteinPer100g: protein?.round(),
+      macrosPer100g: nutrientsFromOff({
+        for (final id in labelNutrientIds) id: _figure(id),
+      }),
       servingGrams: gramsIn(_servingSize) ?? gramsIn(_packSize),
       imageUrl: _listed?.imageUrl,
     );

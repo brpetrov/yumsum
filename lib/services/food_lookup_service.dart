@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:lean_streak/core/constants/app_info.dart';
+import 'package:lean_streak/models/nutrients.dart';
 
 /// A packaged food as Open Food Facts describes it, per 100 g.
 typedef PackagedFood = ({
@@ -11,6 +12,9 @@ typedef PackagedFood = ({
   String? brand,
   int kcalPer100g,
   int? proteinPer100g,
+
+  /// Not rounded like the calories: 0.4 g of salt per 100 g matters.
+  Nutrients? macrosPer100g,
   int? servingGrams,
 
   /// A small photo of the front of the pack, when one has been uploaded.
@@ -174,6 +178,7 @@ PackagedFood? parsePackagedFood(Map<String, dynamic> json) {
         : null,
     kcalPer100g: kcal.round(),
     proteinPer100g: _number(n['proteins_100g'])?.round(),
+    macrosPer100g: nutrientsFromOff(n, suffix: '_100g'),
     servingGrams:
         gramsIn(_text(product['serving_size'])) ??
         gramsIn(_text(product['quantity'])),

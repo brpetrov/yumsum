@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
 import 'package:lean_streak/widgets/pack_photo.dart';
 
-typedef Portion = ({String name, int kcal, int? protein});
+typedef Portion = ({String name, int kcal, int? protein, Nutrients? macros});
 
-/// Calories and protein for [grams] of [food].
+/// Calories, protein and macros for [grams] of [food].
 Portion portionFor(PackagedFood food, int grams) => (
   name: food.name,
   kcal: (food.kcalPer100g * grams / 100).round(),
@@ -15,6 +16,7 @@ Portion portionFor(PackagedFood food, int grams) => (
     null => null,
     final per100 => (per100 * grams / 100).round(),
   },
+  macros: food.macrosPer100g?.scaled(grams / 100),
 );
 
 /// Asks how much of [food] was eaten; resolves to the portion, or null if

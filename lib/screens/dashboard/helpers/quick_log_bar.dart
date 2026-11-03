@@ -12,6 +12,7 @@ import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/helpers/meal_suggestions.dart';
 import 'package:lean_streak/helpers/wav.dart';
 import 'package:lean_streak/models/meal.dart';
+import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
@@ -91,6 +92,11 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   bool _working = false;
   List<EstimateItem> _aiItems = const [];
   String? _error;
+
+  // The bar has no boxes for macros: they are kept with the calories they
+  // came with, and scaled to the calories saved.
+  Nutrients? _macros;
+  int? _macrosKcal;
 
   _Entry get _entry {
     final name = _name.text.trim();
@@ -211,15 +217,31 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     }
   }
 
-  /// A weight corrected in the breakdown: the boxes follow the items.
+  /// A weight corrected in the breakdown: the boxes follow the items, and
+  /// the macros scale with the calories.
   void _itemsChanged(List<EstimateItem> items) {
     final total = totalOf(items);
-    _fill(_name.text, total.kcal, total.protein);
+    _fill(
+      _name.text,
+      total.kcal,
+      total.protein,
+      macros: _macrosFor(total.kcal),
+    );
     setState(() => _aiItems = items);
   }
 
-  /// Puts a meal in the boxes, as an AI result, a chip or a barcode does.
-  void _fill(String name, int? kcal, int? protein) {
+  /// The macros the boxes were filled with, scaled to [kcal]. Rough: more
+  /// rice should mean more carbs, not more fat.
+  Nutrients? _macrosFor(int kcal) => switch ((_macros, _macrosKcal)) {
+    (final macros?, final from?) when from > 0 => macros.scaled(kcal / from),
+    _ => null,
+  };
+
+  /// Puts a meal in the boxes, as an AI result, a chip or a barcode does,
+  /// with the [macros] that go with [kcal].
+  void _fill(String name, int? kcal, int? protein, {Nutrients? macros}) {
+    _macros = macros;
+    _macrosKcal = kcal;
     for (final (box, text) in [
       (_name, name),
       (_kcal, kcal?.toString() ?? ''),
@@ -236,6 +258,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     for (final box in [_name, _kcal, _protein]) {
       box.clear();
     }
+    _macros = null;
     setState(() {
       _aiItems = const [];
       _error = null;
@@ -261,6 +284,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
           name: entry.name,
           calories: entry.kcal!.toDouble(),
           proteinGrams: entry.protein?.toDouble(),
+          macros: _macrosFor(entry.kcal!),
         );
     if (!mounted) return;
 
@@ -534,7 +558,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       showProtein: ref.read(trackProteinProvider),
     );
     if (portion == null || !mounted) return;
-    _fill(portion.name, portion.kcal, portion.protein);
+    _fill(portion.name, portion.kcal, portion.protein, macros: portion.macros);
     setState(() => _aiItems = const []);
   }
 
@@ -687,7 +711,12 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                               readOnly: _working || _listening,
                               textCapitalization: TextCapitalization.sentences,
                               textInputAction: TextInputAction.done,
-                              onChanged: (_) => _edited(),
+                              // Macros belong to the food named, so a new
+                              // name drops them.
+                              onChanged: (_) {
+                                _macros = null;
+                                _edited();
+                              },
                               onSubmitted: (_) => _submit(),
                               style: TextStyle(
                                 fontSize: 16,
@@ -847,7 +876,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
         chip(
           '${meal.name} · ${meal.kcal} kcal',
           () {
-            _fill(meal.name, meal.kcal, meal.protein);
+            _fill(meal.name, meal.kcal, meal.protein, macros: meal.macros);
             _focusNode.requestFocus();
             setState(() {
               _aiItems = const [];

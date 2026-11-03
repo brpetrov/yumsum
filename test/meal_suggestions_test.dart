@@ -2,12 +2,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:lean_streak/helpers/meal_suggestions.dart';
 import 'package:lean_streak/models/meal.dart';
+import 'package:lean_streak/models/nutrients.dart';
 
 import 'recipe_fixtures.dart';
 
 final _now = DateTime(2026, 10, 31, 13);
 
-Meal _meal(String name, {int daysAgo = 1, double kcal = 400}) {
+Meal _meal(
+  String name, {
+  int daysAgo = 1,
+  double kcal = 400,
+  Nutrients? macros,
+}) {
   final at = _now.subtract(Duration(days: daysAgo));
   return Meal(
     id: '$name $daysAgo',
@@ -15,6 +21,7 @@ Meal _meal(String name, {int daysAgo = 1, double kcal = 400}) {
     timestamp: at,
     name: name,
     calories: kcal,
+    macros: macros,
     createdAt: at,
     updatedAt: at,
   );
@@ -68,6 +75,21 @@ void main() {
     ]);
     expect(found.last.kcal, 560);
     expect(found.last.protein, 42);
+  });
+
+  test('a chip carries its meal\'s macros', () {
+    final found = suggestionsFor(
+      recents: [
+        _meal('Pasta salad', macros: const Nutrients(fat: 14, salt: 1.1)),
+        _meal('Pasta bake'),
+      ],
+      recipes: const [],
+      query: 'pasta',
+      now: _now,
+    );
+    expect(found.first.macros?.fat, 14);
+    expect(found.first.macros?.salt, 1.1);
+    expect(found.last.macros, isNull);
   });
 
   test('without a matching recipe, up to three own meals', () {

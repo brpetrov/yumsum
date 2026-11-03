@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/screens/dashboard/helpers/portion_sheet.dart';
 import 'package:lean_streak/widgets/pack_photo.dart';
 
@@ -9,17 +10,22 @@ const _wrap = (
   brand: 'Tesco',
   kcalPer100g: 215,
   proteinPer100g: 9,
+  macrosPer100g: Nutrients(fat: 8, carbs: 24, salt: 0.9),
   servingGrams: 220,
   imageUrl: null,
 );
 
 void main() {
   test('portionFor scales per-100 g figures and rounds', () {
-    expect(portionFor(_wrap, 150), (
-      name: 'Chicken Tikka Wrap',
-      kcal: 323,
-      protein: 14,
-    ));
+    final portion = portionFor(_wrap, 150);
+    expect(
+      (portion.name, portion.kcal, portion.protein),
+      ('Chicken Tikka Wrap', 323, 14),
+    );
+    expect(portion.macros!.fat, 12);
+    expect(portion.macros!.carbs, 36);
+    expect(portion.macros!.salt, closeTo(1.35, 1e-9));
+    expect(portion.macros!.fibre, isNull);
     expect(portionFor(_wrap, 100).kcal, 215);
 
     const noProtein = (
@@ -27,6 +33,7 @@ void main() {
       brand: null,
       kcalPer100g: 42,
       proteinPer100g: null,
+      macrosPer100g: null,
       servingGrams: 330,
       imageUrl: null,
     );
@@ -34,6 +41,7 @@ void main() {
       name: 'Cola',
       kcal: 139,
       protein: null,
+      macros: null,
     ));
   });
 
@@ -73,7 +81,11 @@ void main() {
 
     await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
-    expect(result, (name: 'Chicken Tikka Wrap', kcal: 323, protein: 14));
+    expect(
+      (result?.name, result?.kcal, result?.protein),
+      ('Chicken Tikka Wrap', 323, 14),
+    );
+    expect(result?.macros?.fat, 12);
   });
 
   testWidgets('the sheet shows the pack photo when there is one', (
@@ -84,6 +96,7 @@ void main() {
       brand: 'Tesco',
       kcalPer100g: 215,
       proteinPer100g: 9,
+      macrosPer100g: null,
       servingGrams: 220,
       imageUrl: 'https://images.openfoodfacts.org/w.200.jpg',
     );

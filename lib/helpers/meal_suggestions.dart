@@ -1,4 +1,5 @@
 import 'package:lean_streak/models/meal.dart';
+import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/recipe_provider.dart';
@@ -9,6 +10,7 @@ typedef MealSuggestion = ({
   String name,
   int kcal,
   int? protein,
+  Nutrients? macros,
   bool fromRecipe,
 });
 
@@ -27,6 +29,7 @@ List<MealSuggestion> suggestionsFor({
     name: meal.name!,
     kcal: meal.calories.round(),
     protein: meal.proteinGrams?.round(),
+    macros: meal.macros,
     fromRecipe: false,
   );
 
@@ -52,6 +55,7 @@ List<MealSuggestion> suggestionsFor({
         name: recipe.name,
         kcal: recipe.kcalPerPortion,
         protein: recipe.proteinPerPortion,
+        macros: null,
         fromRecipe: true,
       ),
   ];
