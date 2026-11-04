@@ -38,6 +38,26 @@ class MealRepository {
     });
   }
 
+  /// Meals on the days from [startDate] to [endDate] (yyyy-MM-dd), in date
+  /// order and each day's in the order they were logged.
+  Future<List<Meal>> fetchMealsInRange(
+    String uid, {
+    required String startDate,
+    required String endDate,
+  }) async {
+    final snapshot = await _meals(uid)
+        .where('date', isGreaterThanOrEqualTo: startDate)
+        .where('date', isLessThanOrEqualTo: endDate)
+        .orderBy('date')
+        .get();
+    final meals = snapshot.docs.map((doc) => Meal.fromFirestore(doc)).toList();
+    meals.sort((a, b) {
+      final byDate = a.date.compareTo(b.date);
+      return byDate != 0 ? byDate : a.timestamp.compareTo(b.timestamp);
+    });
+    return meals;
+  }
+
   /// The latest [limit] meals logged, newest first.
   Future<List<Meal>> fetchRecentMeals(String uid, {int limit = 120}) async {
     final snapshot = await _meals(
