@@ -4,7 +4,7 @@
 
 ## The short version
 
-1. **Every Monday, a YumSum Star user gets the AI Coach's notes in History:** at most 3 short notes on the finished Monday–Sunday week. It shows in the week view, above the existing review card.
+1. **Every Monday, a YumSum Star user gets the AI Coach's notes in History:** 4 to 6 short notes on the finished Monday–Sunday week (at most 3 until 4 November, when you found 2 too few). It shows in the week view, above the existing review card.
 2. **The app works out every fact and the AI only writes.** Averages, weekdays against the weekend, protein, fibre, salt, sugars and saturates against the UK guides, the biggest day and the ideas for a tip are all worked out in Dart. The AI gets those facts as plain lines and turns a few of them into sentences. A note that uses a number not in the facts is thrown away before anyone sees it.
 3. **It's written when someone opens the week, then kept.** The notes are saved in `weekly_reviews/{Monday}` along with the facts they were written from. If the facts change (a meal edited, a day taken off), they're written again the next time the week is opened. Nothing is written for a week still in progress, or for a week with fewer than 4 logged days.
 4. **It costs about 0.1p a week per subscriber** (one Gemini 3.5 Flash-Lite call). It doesn't use the user's daily AI allowance.
@@ -36,8 +36,6 @@
 │  •  Salt averaged 7.4 g against the 6 g     │
 │     guide. Most came from "Ham and cheese   │
 │     toastie", 5.2 g over 3 meals.           │
-│                                             │
-│  Written by AI from what you logged.        │
 └─────────────────────────────────────────────┘
 ```
 
@@ -55,7 +53,7 @@
 | Finished week with enough logged, free | **The AI Coach button** and its line (below). Tapping either opens the AI Coach dialog; its Enable opens the paywall (plan 07). |
 | YumSum Star, loading | The title, a small spinner and "Looking over your week" |
 | YumSum Star, failed | "Could not get this week's notes. Try again." with a **Try again** text button, which reloads the notes |
-| YumSum Star, done | Up to 3 notes and the footer |
+| YumSum Star, done | Up to 6 notes; the footer went on 4 November, as the title already says AI |
 
 - **Why 4 days:** with fewer, any "pattern" is mostly chance. The model tends to read too much into thin data, and the call would cost money to say very little. The existing review already treats about 4 days in 7 as a week's minimum (`_buildGuidance` in `PeriodReviewService`). Days off don't count towards the 4, because they aren't judged.
 - **Every failure shows the same line:** busy, paused, offline or a bad answer. `aiErrorMessage` talks about estimates ("Could not estimate calories", "type the calories yourself"), which is wrong here. The detail goes to the debug log.
@@ -81,20 +79,20 @@ Decided at first: **yes, one line, for YumSum Star users only.** History opens i
 
 The Adaptive formula's pattern, since it works:
 
-- **History, both the Week and Month tabs, always (changed 4 November: you want AI Coach in both tabs, as the notes for Star members or this prompt for everyone else):** the free Adaptive formula's shining orange pill, shared rather than copied, reading "AI Coach" with the arrow. Under it (changed 4 November): "See what's working, what's holding you back, and ways to improve next week." Tapping either opens the dialog. The notes themselves stay weekly.
+- **History, both the Week and Month tabs, always (changed 4 November: you want AI Coach in both tabs, as the notes for Star members or this prompt for everyone else):** the free Adaptive formula's shining orange pill, shared rather than copied, reading "AI Coach" with the arrow. Under it (changed 4 November): "See what's working, what's holding you back, and get personal tips on how to improve." Tapping either opens the dialog. The notes themselves stay weekly.
 - **The dialog,** `showCoachIntro(context, {plus = true})`, laid out like `showAdaptiveIntro` (title with subtitle, four promise rows with an `IconBubble`):
   - Title "AI Coach", subtitle "Your week, read for you"
 
     | Headline | Line |
     |---|---|
-    | Spots your patterns | Like weekends running higher, or a light breakfast. |
-    | Looks past calories | Protein, fibre, salt and sugar, against the UK guides. |
-    | Ways to improve | Like more fibre or less salt, with ideas from our recipes. |
-    | Ready every Monday | 3 short notes on the week just gone. |
+    | Spots your patterns | Sees what's quietly holding you back, so you can fix it. |
+    | Looks past calories | Checks your protein, fibre, salt and sugar, not just calories. |
+    | Tips written for you | Personal advice from your own meals, with recipes that help. |
+    | Fresh every Monday | A new read on every week, so you keep getting better. |
 
-  - The third row was "One easy tip" until 4 November, when you decided the notes should give several ways to improve, not one tip (see The instruction).
+  - Rewritten on 4 November: each line now sells the feature in a full sentence, instead of finishing its headline ("3 short notes on the week just gone"). The third row was "One easy tip" before the notes gave several ways to improve (see The instruction).
   - Free: Close and Enable with the star, which opens the paywall. YumSum Star: Close only.
-- **The YumSum Star page** says "AI Coach" with "What's holding you back, and ways to improve." (changed 4 November from "Spots your patterns every Monday."; it stays one line so the buy button stays in view on a phone) instead of "AI Assisted Coach" and "Weekly and monthly reviews, with advice." Monthly reviews are only a Later idea.
+- **The YumSum Star page** says "AI Coach" with "Reads your week and tells you how to do better." (changed 4 November from "Spots your patterns every Monday."; it stays one line so the buy button stays in view on a phone) instead of "AI Assisted Coach" and "Weekly and monthly reviews, with advice." Monthly reviews are only a Later idea.
 - **No pop-up on Today** for free users.
 
 ## The facts
@@ -200,13 +198,13 @@ The service shares the plumbing it needs from `calorie_estimate_service.dart`. W
 
 ### The instruction
 
-Changed on 4 November: the notes were a pattern, at most one tip and something that went well. You decided they should give several ways to improve (closer to the target, more protein or fibre, less salt), so the second paragraph below is new and the prompt version is 2.
+Changed on 4 November: the notes were a pattern, at most one tip and something that went well. You decided they should give several ways to improve (closer to the target, more protein or fibre, less salt), so the second paragraph below is new (prompt version 2). Later that day you found 2 notes too few, so it asks for 4 to 6 (version 3), and a recipe named in a note became an orange link to its page, without the quotes.
 
 Sent as a system instruction (`Content.system`, which `firebase_ai` 2.3.0 supports through `generativeModel(systemInstruction: …)`). The facts lines are the user message. It's a new constant, `weeklyReviewInstruction`. It doesn't open with `nutritionContext`: there are no dish names to read, and tips may only come from the facts.
 
 > You write "What I noticed", a short review of the user's last week in YumSum, a calorie and protein tracker. The app has already worked out every fact about the week; you only put a few of them into words.
 >
-> Write at most 3 notes, most useful first. Most of them are ways the user can improve, each tied to a fact and specific: getting closer to the daily target, more protein, more fibre, less salt, sugars or saturates, or a pattern such as weekends running higher or a usual big day. Where the facts give a meal or recipe that helps, name it. Add something that went well when the facts show it; if the week went well all round, say so rather than inventing a change. If the facts include an Adaptive formula change, one of the notes says how the daily target changed and that it follows the user's weigh-ins and logged food.
+> Write 4 to 6 notes, most useful first. Most of them are ways the user can improve, each tied to a fact and specific: getting closer to the daily target, more protein, more fibre, less salt, sugars or saturates, or a pattern such as weekends running higher or a usual big day. Where the facts give a meal or recipe that helps, name it. Add something that went well when the facts show it; if the week went well all round, say so rather than inventing a change. If the facts include an Adaptive formula change, one of the notes says how the daily target changed and that it follows the user's weigh-ins and logged food.
 >
 > How to write: each note is one or two short sentences, at most 140 characters. British English, plain words, talking to the user as "you". Warm and matter-of-fact. No emoji, no exclamation marks. The card already shows the days on track, the days logged and the average, so don't repeat those on their own.
 >
@@ -244,7 +242,7 @@ GenerationConfig(
 
 ### Checking the answer
 
-`parseReviewPoints(Object? raw, {required String facts})` is a pure function in the same file. It goes through the notes in order and keeps at most 3:
+`parseReviewPoints(Object? raw, {required String facts})` is a pure function in the same file. It goes through the notes in order and keeps at most 6:
 
 1. Drop anything that isn't a non-empty string once trimmed.
 2. **Drop notes over 160 characters.** The instruction asks for 140; the extra 20 means a note isn't lost for being slightly long.

@@ -9,12 +9,16 @@ import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
+import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
+import 'package:lean_streak/providers/recipe_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/weekly_review_provider.dart';
 import 'package:lean_streak/screens/review/weekly_notes.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'recipe_fixtures.dart';
 
 const _plus = Entitlement(active: true, source: EntitlementSource.manual);
 
@@ -32,13 +36,14 @@ void main() {
 
   /// [notes] is what each read of the notes gives, in turn; a [Completer]
   /// keeps it loading and an [Exception] fails it. The week has
-  /// [judgedDays] logged.
+  /// [judgedDays] logged, and [recipes] is the library.
   Future<void> pump(
     WidgetTester tester,
     Widget child, {
     Entitlement? entitlement = _plus,
     List<Object> notes = const [_notes],
     int judgedDays = 6,
+    List<Recipe> recipes = const [],
     bool settle = true,
   }) async {
     tester.view.physicalSize = const Size(360, 800);
@@ -52,6 +57,7 @@ void main() {
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
           entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
+          recipesProvider.overrideWith((ref) async => recipes),
           weeklyReviewProvider.overrideWith((ref, monday) async {
             final result = notes[reads++ % notes.length];
             return switch (result) {
@@ -92,6 +98,12 @@ void main() {
                 path: AppRoutes.plus,
                 builder: (_, _) => const Scaffold(body: Text('The paywall')),
               ),
+              GoRoute(
+                path: AppRoutes.recipe,
+                builder: (_, state) => Scaffold(
+                  body: Text('Recipe ${state.pathParameters['id']}'),
+                ),
+              ),
             ],
           ),
         ),
@@ -106,7 +118,7 @@ void main() {
       WeeklyNotesCard(monday: _monday, named: named);
 
   group('with YumSum Star', () {
-    testWidgets('the notes and the footer', (tester) async {
+    testWidgets('the notes', (tester) async {
       await pump(tester, card());
       expect(find.text('AI Coach'), findsOneWidget);
       // Each number keeps its unit on its line.
@@ -128,8 +140,30 @@ void main() {
         find.text('Salt averaged 7.4\u00A0g against the 6\u00A0g guide.'),
         findsOneWidget,
       );
-      expect(find.text('Written by AI from what you logged.'), findsOneWidget);
       expect(reads, 1);
+    });
+
+    testWidgets('a recipe in a note is a link to it, without the quotes', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        card(),
+        recipes: [testRecipe('Greek yoghurt berry bowl')],
+      );
+      expect(
+        find.text(
+          'Your first meal of the day averaged 14 g of protein. A '
+          'Greek yoghurt berry bowl gives 30 g for 332 kcal.',
+        ),
+        findsOneWidget,
+      );
+
+      await tester.tapOnText(
+        find.textRange.ofSubstring('Greek yoghurt berry bowl'),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Recipe greek-yoghurt-berry-bowl'), findsOneWidget);
     });
 
     testWidgets('the info button explains it, with Close only', (tester) async {
@@ -138,7 +172,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Your week, read for you'), findsOneWidget);
       expect(find.text('Spots your patterns'), findsOneWidget);
-      expect(find.text('Ready every Monday'), findsOneWidget);
+      expect(find.text('Fresh every Monday'), findsOneWidget);
       expect(find.text('Close'), findsOneWidget);
       expect(find.text('Enable'), findsNothing);
     });
@@ -208,8 +242,8 @@ void main() {
       await pump(tester, card(), entitlement: null);
       expect(
         find.text(
-          'See what\'s working, what\'s holding you back, and ways to improve '
-          'next\u00A0week.',
+          'See what\'s working, what\'s holding you back, and get personal '
+          'tips on how to\u00A0improve.',
         ),
         findsOneWidget,
       );

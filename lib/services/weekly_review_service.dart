@@ -7,7 +7,7 @@ import 'package:lean_streak/services/calorie_estimate_service.dart';
 
 /// Raise whenever the instruction or the facts change: it is the first line
 /// of each cached review's `basis`, so the notes are written again.
-const weeklyReviewPromptVersion = 2;
+const weeklyReviewPromptVersion = 3;
 
 /// The AI Coach's instruction (plan 09), sent as the system instruction with
 /// the week's facts as the message. It doesn't open with `nutritionContext`:
@@ -16,7 +16,7 @@ const weeklyReviewInstruction =
     'You write "What I noticed", a short review of the user\'s last week in '
     'YumSum, a calorie and protein tracker. The app has already worked out '
     'every fact about the week; you only put a few of them into words.\n\n'
-    'Write at most 3 notes, most useful first. Most of them are ways the '
+    'Write 4 to 6 notes, most useful first. Most of them are ways the '
     'user can improve, each tied to a fact and specific: getting closer to '
     'the daily target, more protein, more fibre, less salt, sugars or '
     'saturates, or a pattern such as weekends running higher or a usual big '
@@ -78,7 +78,7 @@ Set<double> _numbersIn(String text) => {
     double.parse(match[0]!),
 };
 
-/// The notes worth showing from the AI's `points`, at most 3, in order:
+/// The notes worth showing from the AI's `points`, at most 6, in order:
 /// non-empty strings of at most 160 characters (140 asked for), whose every
 /// number is in [facts], without a shaming word. Throws
 /// [WeeklyReviewException] when none is left.
@@ -94,7 +94,7 @@ List<String> parseReviewPoints(Object? raw, {required String facts}) {
                   _numbersIn(note).every(known.contains) &&
                   !_shaming.hasMatch(note))
             note,
-  ].take(3).toList();
+  ].take(6).toList();
   if (points.isEmpty) throw const WeeklyReviewException();
   return points;
 }
@@ -115,7 +115,7 @@ class WeeklyReviewService {
               responseMimeType: 'application/json',
               responseSchema: Schema.object(
                 properties: {
-                  'points': Schema.array(items: Schema.string(), maxItems: 3),
+                  'points': Schema.array(items: Schema.string(), maxItems: 6),
                 },
               ),
             ),

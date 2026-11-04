@@ -100,7 +100,7 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
     (
       Icons.insights_rounded,
       'AI Coach',
-      'What\'s holding you back, and ways to improve.',
+      'Reads your week and tells you how to do better.',
     ),
     (
       Icons.pie_chart_outline_rounded,

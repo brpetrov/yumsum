@@ -1,11 +1,16 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/week_facts.dart';
+import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
+import 'package:lean_streak/providers/recipe_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/weekly_review_provider.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
@@ -20,6 +25,43 @@ String _keepUnits(String note) => note.replaceAllMapped(
   (match) => '${match[1]}\u00A0${match[2]}',
 );
 
+/// The note as spans, with every library recipe it names a [link] that
+/// [open]s it, shedding the quotes the AI puts round names. Longer names
+/// first, so one that contains another wins.
+List<InlineSpan> _noteSpans(
+  String note,
+  List<Recipe> recipes, {
+  required TextStyle link,
+  required void Function(Recipe) open,
+}) {
+  if (recipes.isEmpty) return [TextSpan(text: note)];
+  final names = recipes.map((recipe) => recipe.name).toList()
+    ..sort((a, b) => b.length.compareTo(a.length));
+  final pattern = RegExp(
+    '["\u201C\u201D]?(${names.map(RegExp.escape).join('|')})["\u201C\u201D]?',
+    caseSensitive: false,
+  );
+  final spans = <InlineSpan>[];
+  var at = 0;
+  for (final match in pattern.allMatches(note)) {
+    final name = match[1]!;
+    final recipe = recipes.firstWhere(
+      (recipe) => recipe.name.toLowerCase() == name.toLowerCase(),
+    );
+    spans.add(TextSpan(text: note.substring(at, match.start)));
+    spans.add(
+      TextSpan(
+        text: name,
+        style: link,
+        recognizer: TapGestureRecognizer()..onTap = () => open(recipe),
+      ),
+    );
+    at = match.end;
+  }
+  spans.add(TextSpan(text: note.substring(at)));
+  return spans;
+}
+
 /// What AI Coach does (plan 09): from the card's info button, and from the
 /// free users' button, where Enable opens the YumSum Star page.
 Future<void> showCoachIntro(BuildContext context, {bool plus = true}) async {
@@ -32,22 +74,22 @@ Future<void> showCoachIntro(BuildContext context, {bool plus = true}) async {
         (
           Icons.query_stats_rounded,
           'Spots your patterns',
-          'Like weekends running higher, or a light breakfast.',
+          'Sees what\'s quietly holding you back, so you can fix\u00A0it.',
         ),
         (
           Icons.eco_rounded,
           'Looks past calories',
-          'Protein, fibre, salt and sugar, against the UK\u00A0guides.',
+          'Checks your protein, fibre, salt and sugar, not just\u00A0calories.',
         ),
         (
           Icons.lightbulb_outline_rounded,
-          'Ways to improve',
-          'Like more fibre or less salt, with ideas from our\u00A0recipes.',
+          'Tips written for you',
+          'Personal advice from your own meals, with recipes that\u00A0help.',
         ),
         (
           Icons.event_available_rounded,
-          'Ready every Monday',
-          '3 short notes on the week just gone.',
+          'Fresh every Monday',
+          'A new read on every week, so you keep getting\u00A0better.',
         ),
       ],
       actions: [
@@ -161,6 +203,7 @@ class WeeklyNotesCard extends ConsumerWidget {
           ),
           data: (points) {
             if (points.isEmpty) return const SizedBox.shrink();
+            final recipes = ref.watch(recipesProvider).valueOrNull ?? const [];
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -180,26 +223,31 @@ class WeeklyNotesCard extends ConsumerWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Text(
-                          _keepUnits(point),
-                          style: TextStyle(
-                            fontSize: 14.5,
-                            height: 1.4,
-                            color: AppColors.textPrimary,
+                        child: Text.rich(
+                          TextSpan(
+                            style: TextStyle(
+                              fontSize: 14.5,
+                              height: 1.4,
+                              color: AppColors.textPrimary,
+                            ),
+                            children: _noteSpans(
+                              _keepUnits(point),
+                              recipes,
+                              link: TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w800,
+                              ),
+                              open: (recipe) => context.push(
+                                AppRoutes.recipePath(recipe.id),
+                                extra: recipe,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
                 ],
-                const SizedBox(height: 16),
-                Text(
-                  'Written by AI from what you logged.',
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
               ],
             );
           },
@@ -227,8 +275,8 @@ class CoachPrompt extends StatelessWidget {
             TryButton(label: 'AI Coach', onTap: open),
             const SizedBox(height: 12),
             Text(
-              'See what\'s working, what\'s holding you back, and ways to '
-              'improve next week.',
+              'See what\'s working, what\'s holding you back, and get '
+              'personal tips on how to improve.',
               style: TextStyle(
                 fontSize: 14,
                 height: 1.35,

@@ -11,12 +11,9 @@ const _facts =
 List<String> _parse(Object? raw) => parseReviewPoints(raw, facts: _facts);
 
 void main() {
-  test('keeps at most 3 notes, in order', () {
-    expect(_parse(['One.', 'Two.', 'Three.', 'Four.']), [
-      'One.',
-      'Two.',
-      'Three.',
-    ]);
+  test('keeps at most 6 notes, in order', () {
+    final notes = ['One.', 'Two.', 'Three.', 'Four.', 'Five.', 'Six.'];
+    expect(_parse([...notes, 'Seven.']), notes);
   });
 
   test('drops a note over 160 characters', () {
