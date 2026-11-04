@@ -4,11 +4,12 @@
 
 ## The short version
 
-1. **Every Monday, a YumSum Star user gets "What I noticed" in History:** at most 3 short notes on the finished Monday–Sunday week. It shows in the week view, above the existing review card.
+1. **Every Monday, a YumSum Star user gets the AI Coach's notes in History:** at most 3 short notes on the finished Monday–Sunday week. It shows in the week view, above the existing review card.
 2. **The app works out every fact and the AI only writes.** Averages, weekdays against the weekend, protein, fibre, salt, sugars and saturates against the UK guides, the biggest day and the ideas for a tip are all worked out in Dart. The AI gets those facts as plain lines and turns a few of them into sentences. A note that uses a number not in the facts is thrown away before anyone sees it.
 3. **It's written when someone opens the week, then kept.** The notes are saved in `weekly_reviews/{Monday}` along with the facts they were written from. If the facts change (a meal edited, a day taken off), they're written again the next time the week is opened. Nothing is written for a week still in progress, or for a week with fewer than 4 logged days.
 4. **It costs about 0.1p a week per subscriber** (one Gemini 3.5 Flash-Lite call). It doesn't use the user's daily AI allowance.
-5. **Free users see a locked line** on finished weeks that would have notes. Tapping it opens the paywall.
+5. **Free users see a shining "AI Coach" button** on finished weeks that would have notes, like the free Adaptive formula button. Tapping it opens a dialog that sells it, with Enable.
+6. **It's called AI Coach** everywhere a user sees it (decided 4 November). "What I noticed" is only how the AI talks about the week.
 
 ## What the user sees
 
@@ -23,7 +24,7 @@
 
 ```
 ┌────────────────────────────────────────────┐
-│  (✦)  What I noticed                        │
+│  (✦)  AI Coach                         (i)  │
 │                                             │
 │  •  Weekdays were steady at about 1,890     │
 │     kcal, but the weekend averaged 2,580.   │
@@ -40,7 +41,7 @@
 └─────────────────────────────────────────────┘
 ```
 
-- An `AppCard`. Title in the display font with `IconBubble(Icons.auto_awesome_rounded)`, the sparkle the bar's Estimate button already uses.
+- An `AppCard`. Title "AI Coach" in the display font with `IconBubble(Icons.auto_awesome_rounded)`, the sparkle the bar's Estimate button already uses, and an info button on the right ('How it works') that opens the AI Coach dialog with Close only.
 - Each note is a row with a small orange dot and body text (14.5, line height 1.4).
 - The muted footer is there so nobody mistakes the notes for advice from a person.
 
@@ -51,20 +52,20 @@
 | Month view, or the week isn't finished | Nothing new |
 | Finished week, fewer than 4 days logged that aren't days off, YumSum Star | The card with one muted line: "Not enough logged this week for notes. They need 4 days logged, not counting days off." No AI call. |
 | Same, free | Nothing |
-| Finished week with enough logged, free | **Locked card:** the title with a small "+" mark like plan 06's photo button, and "Short notes on your week every Monday, with YumSum Star." Tapping anywhere opens the paywall (plan 07). |
+| Finished week with enough logged, free | **The AI Coach button** and its line (below). Tapping either opens the AI Coach dialog; its Enable opens the paywall (plan 07). |
 | YumSum Star, loading | The title, a small spinner and "Looking over your week" |
 | YumSum Star, failed | "Could not get this week's notes. Try again." with a **Try again** text button, which reloads the notes |
 | YumSum Star, done | Up to 3 notes and the footer |
 
 - **Why 4 days:** with fewer, any "pattern" is mostly chance. The model tends to read too much into thin data, and the call would cost money to say very little. The existing review already treats about 4 days in 7 as a week's minimum (`_buildGuidance` in `PeriodReviewService`). Days off don't count towards the 4, because they aren't judged.
 - **Every failure shows the same line:** busy, paused, offline or a bad answer. `aiErrorMessage` talks about estimates ("Could not estimate calories", "type the calories yourself"), which is wrong here. The detail goes to the debug log.
-- **When a subscription ends,** the locked card replaces the notes, including notes written earlier. They stay saved, so they come back if the person resubscribes.
+- **When a subscription ends,** the AI Coach button replaces the notes, including notes written earlier. They stay saved, so they come back if the person resubscribes.
 
 ### On Today
 
 Decided: **yes, one line, for YumSum Star users only.** History opens in the month view, so without a pointer most people would never find the week view, and your testers would only get one or two Mondays to notice it.
 
-- **What:** a slim tappable `AppCard` above the month card: the sparkle bubble, "What I noticed last week" and a chevron. It opens History in the week view on last week.
+- **What:** a slim tappable `AppCard` above the month card: the sparkle bubble, "AI Coach" in bold over "Your notes on last week" and a chevron. It opens History in the week view on last week.
 - **When:**
   - the user has YumSum Star
   - last week had at least 4 logged days that aren't days off
@@ -72,7 +73,26 @@ Decided: **yes, one line, for YumSum Star users only.** History opens in the mon
   
   So it appears on Monday and stays until the notes have been read or the week is over.
 - **"Seen"** is a device setting, `weekly_review.seen` (the Monday's date), written when History shows that week's notes.
-- **Free users don't get the line.** A weekly upsell on Today is the kind of pressure YumSum avoids. They meet the locked card in History.
+- **Free users don't get the line.** A weekly upsell on Today is the kind of pressure YumSum avoids. They meet the AI Coach button in History.
+
+### How free users meet it (decided 4 November)
+
+The Adaptive formula's pattern, since it works:
+
+- **History, week view, a finished week with at least 4 judged days:** the free Adaptive formula's shining orange pill, shared rather than copied, reading "AI Coach" with the arrow. Under it: "Notes on your week every Monday: your patterns, your salt and fibre, and one easy tip." Tapping either opens the dialog.
+- **The dialog,** `showCoachIntro(context, {plus = true})`, laid out like `showAdaptiveIntro` (title with subtitle, four promise rows with an `IconBubble`):
+  - Title "AI Coach", subtitle "Your week, read for you"
+
+    | Headline | Line |
+    |---|---|
+    | Spots your patterns | Like weekends running higher, or a light breakfast. |
+    | Looks past calories | Protein, fibre, salt and sugar, against the UK guides. |
+    | One easy tip | From your own meals or our recipes. |
+    | Ready every Monday | 3 short notes on the week just gone. |
+
+  - Free: Close and Enable with the star, which opens the paywall. YumSum Star: Close only.
+- **The YumSum Star page** says "AI Coach" with "Spots your patterns every Monday." instead of "AI Assisted Coach" and "Weekly and monthly reviews, with advice." Monthly reviews are only a Later idea.
+- **No pop-up on Today** for free users.
 
 ## The facts
 
@@ -283,7 +303,8 @@ If nothing is left, the call counts as failed. The card shows the error and noth
 | `lib/repositories/meal_repository.dart` | `fetchMealsInRange(uid, {startDate, endDate})`, the same `date` range query as `fetchSummariesInRange` (one field, so no new index) |
 | `lib/providers/weekly_review_provider.dart` (new) | `weeklyReviewServiceProvider`, `weeklyReviewRepositoryProvider`, and `weeklyReviewProvider`, a `FutureProvider.autoDispose.family<List<String>, DateTime>` keyed by the Monday. It runs facts, then the cache, then the AI only when needed, as described above. |
 | `lib/providers/review_provider.dart` | `refreshHistory` also invalidates `weeklyReviewProvider` |
-| `lib/screens/review/weekly_notes.dart` (new) | `WeeklyNotesCard` (all the states above, the locked card, writing `weekly_review.seen`) and `WeeklyNotesLine` (Today's line). A file of their own so they can be tested without pumping Today. |
+| `lib/screens/review/weekly_notes.dart` (new) | `WeeklyNotesCard` (all the states above, the free AI Coach button, writing `weekly_review.seen`), `WeeklyNotesLine` (Today's line) and `showCoachIntro`. A file of their own so they can be tested without pumping Today. |
+| `lib/screens/progress/helpers/adaptive_section.dart` | `_TryButton` moves to a shared widget with the label as a parameter, so AI Coach uses the same button. No change in how the Adaptive formula looks. |
 | `lib/screens/review/review_screen.dart` | `_PeriodReviewCard` puts `WeeklyNotesCard` first in its column in the week view when all 7 days are finished, passing the Monday and `loggedDays − daysOff`. `ReviewScreen({this.initialWeek})` opens in the week view on that week. |
 | `lib/app/router.dart` | The review route passes `state.extra` as `initialWeek`, the way the recipe route passes a `Recipe` |
 | `lib/screens/dashboard/dashboard_screen.dart` | `WeeklyNotesLine` above `_MonthPreviewCard` |
@@ -324,7 +345,7 @@ Then check that the Play Data safety answers still match (plan 04).
 ### CLAUDE.md lines to update
 
 - **Screens:**
-  - History: "for finished weeks in the week view, YumSum Star users get What I noticed (`WeeklyNotesCard`, plan 09)"
+  - History: "for finished weeks in the week view, YumSum Star users get the AI Coach's notes (`WeeklyNotesCard`, plan 09)"
   - Today: "`WeeklyNotesLine` above the month card until last week's notes have been seen"
   - `ReviewScreen` takes an optional `initialWeek` as `extra`
 - **Device settings:** add `weekly_review.seen`.
@@ -367,7 +388,7 @@ Then check that the Play Data safety answers still match (plan 04).
   - The instruction mentions the minimum, medical advice and days off.
 - **`test/weekly_notes_test.dart` (new, widgets):**
   - With YumSum Star, the notes and footer show.
-  - A free user gets the locked card, and a tap opens the paywall.
+  - A free user gets the AI Coach button; a tap opens the dialog, and Enable opens the paywall. A member's info button opens it with Close only.
   - A thin week shows the line, and `weeklyReviewProvider` is never read (count the calls in the override).
   - An error shows the copy, and Try again reads again.
   - Today's line: shown with YumSum Star and 4 judged days last week, hidden once `weekly_review.seen` is last Monday, hidden for free users.
