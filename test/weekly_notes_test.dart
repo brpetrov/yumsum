@@ -6,9 +6,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
+import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/weekly_review_provider.dart';
 import 'package:lean_streak/screens/review/weekly_notes.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
@@ -29,12 +31,14 @@ void main() {
   late int reads;
 
   /// [notes] is what each read of the notes gives, in turn; a [Completer]
-  /// keeps it loading and an [Exception] fails it.
+  /// keeps it loading and an [Exception] fails it. The week has
+  /// [judgedDays] logged.
   Future<void> pump(
     WidgetTester tester,
     Widget child, {
     Entitlement? entitlement = _plus,
     List<Object> notes = const [_notes],
+    int judgedDays = 6,
     bool settle = true,
   }) async {
     tester.view.physicalSize = const Size(360, 800);
@@ -56,6 +60,20 @@ void main() {
               _ => result as List<String>,
             };
           }),
+          reviewSummariesProvider.overrideWith(
+            (ref, range) async => {
+              for (var day = 0; day < judgedDays; day++)
+                '2026-10-${26 + day}': DailySummary(
+                  date: '2026-10-${26 + day}',
+                  totalCalories: 1900,
+                  targetCalories: 1900,
+                  calorieDelta: 0,
+                  mealCount: 3,
+                  status: DailyStatus.green,
+                  updatedAt: DateTime(2026, 11, 2),
+                ),
+            },
+          ),
         ],
         child: MaterialApp.router(
           theme: AppTheme.light,
@@ -84,8 +102,8 @@ void main() {
     await tester.pump();
   }
 
-  Widget card({int judgedDays = 6}) =>
-      WeeklyNotesCard(monday: _monday, judgedDays: judgedDays);
+  Widget card({bool named = false}) =>
+      WeeklyNotesCard(monday: _monday, named: named);
 
   group('with YumSum Star', () {
     testWidgets('the notes and the footer', (tester) async {
@@ -128,7 +146,7 @@ void main() {
     testWidgets('a thin week says why, and never asks for notes', (
       tester,
     ) async {
-      await pump(tester, card(judgedDays: 3));
+      await pump(tester, card(), judgedDays: 3);
       expect(
         find.text(
           'Not enough logged this week for notes. They need 4 days logged, '
@@ -137,6 +155,27 @@ void main() {
         findsOneWidget,
       );
       expect(reads, 0);
+    });
+
+    testWidgets('a week still going says when its notes come', (tester) async {
+      final now = DateTime.now();
+      final thisMonday = DateTime(
+        now.year,
+        now.month,
+        now.day - now.weekday + 1,
+      );
+      await pump(tester, WeeklyNotesCard(monday: thisMonday));
+      expect(
+        find.text('Your notes on this week come on Monday.'),
+        findsOneWidget,
+      );
+      expect(reads, 0);
+    });
+
+    testWidgets('in the month view it says which week', (tester) async {
+      await pump(tester, card(named: true));
+      expect(find.text('Week of 26 October'), findsOneWidget);
+      expect(find.textContaining('Weekdays were steady'), findsOneWidget);
     });
 
     testWidgets('while it writes: Looking over your week', (tester) async {
@@ -193,9 +232,9 @@ void main() {
       expect(find.text('Your week, read for you'), findsOneWidget);
     });
 
-    testWidgets('nothing for a thin week', (tester) async {
-      await pump(tester, card(judgedDays: 3), entitlement: null);
-      expect(find.text('AI Coach'), findsNothing);
+    testWidgets('there for a thin week too', (tester) async {
+      await pump(tester, card(), entitlement: null, judgedDays: 0);
+      expect(find.text('AI Coach'), findsOneWidget);
     });
   });
 }

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
-import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/period_review_provider.dart';
@@ -21,27 +20,9 @@ const _plus = Entitlement(active: true, source: EntitlementSource.manual);
 
 final _lastMonth = DateTime(DateTime.now().year, DateTime.now().month - 1);
 
-/// Four days logged at the start of last month.
-final _fourDays = [
-  for (var day = 1; day <= 4; day++)
-    DailySummary(
-      date: DateFormat(
-        'yyyy-MM-dd',
-      ).format(DateTime(_lastMonth.year, _lastMonth.month, day)),
-      totalCalories: 1900,
-      targetCalories: 1900,
-      calorieDelta: 0,
-      mealCount: 3,
-      status: DailyStatus.green,
-      updatedAt: DateTime.now(),
-    ),
-];
-
-/// [summaries] are what every period's review counts.
 Future<Widget> _app(
   DateTime? firstDay, {
   Entitlement? entitlement = _plus,
-  List<DailySummary> summaries = const [],
 }) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
@@ -57,7 +38,7 @@ Future<Widget> _app(
         (ref, range) async => PeriodReviewService().buildReview(
           startDate: range.startDate,
           endDate: range.endDate,
-          summaries: summaries,
+          summaries: const [],
         ),
       ),
       weeklyReviewProvider.overrideWith(
@@ -114,36 +95,45 @@ void main() {
     expect(keyTop - lastRow.dy, 16);
   });
 
-  testWidgets('no AI Coach in the month view, or for the week in progress', (
-    tester,
-  ) async {
-    await tester.pumpWidget(await _app(null));
+  testWidgets('with Star, AI Coach in both views', (tester) async {
+    await tester.pumpWidget(await _app(_lastMonth));
     await tester.pumpAndSettle();
-    expect(find.byType(WeeklyNotesCard), findsNothing);
+    await tester.tap(find.byTooltip('Previous'));
+    await tester.pumpAndSettle();
 
+    // Last month shows its latest week that ended in it.
+    final now = DateTime.now();
+    final lastDay = DateTime(now.year, now.month, 0);
+    final monday = DateTime(
+      lastDay.year,
+      lastDay.month,
+      lastDay.day - lastDay.weekday % 7 - 6,
+    );
+    final card = tester.widget<WeeklyNotesCard>(find.byType(WeeklyNotesCard));
+    expect(card.monday, monday);
+    expect(
+      find.text('Week of ${DateFormat('d MMMM').format(monday)}'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('Today'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Week'));
     await tester.pumpAndSettle();
-    expect(find.byType(WeeklyNotesCard), findsNothing);
-  });
-
-  testWidgets('with Star, a month with 4 days logged has no prompt', (
-    tester,
-  ) async {
-    await tester.pumpWidget(await _app(_lastMonth, summaries: _fourDays));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Previous'));
-    await tester.pumpAndSettle();
-    expect(find.byType(CoachPrompt), findsNothing);
-  });
-
-  testWidgets('without Star, a month with 4 days logged has the prompt', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      await _app(_lastMonth, entitlement: null, summaries: _fourDays),
+    expect(
+      find.text('Your notes on this week come on Monday.'),
+      findsOneWidget,
     );
+  });
+
+  testWidgets('without Star, the AI Coach prompt in both views', (
+    tester,
+  ) async {
+    await tester.pumpWidget(await _app(null, entitlement: null));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Previous'));
+    expect(find.byType(CoachPrompt), findsOneWidget);
+
+    await tester.tap(find.text('Week'));
     await tester.pumpAndSettle();
     expect(find.byType(CoachPrompt), findsOneWidget);
   });

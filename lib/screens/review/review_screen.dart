@@ -8,7 +8,6 @@ import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/period_review.dart';
 import 'package:lean_streak/providers/period_review_provider.dart';
-import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/review/day_meals_sheet.dart';
@@ -126,6 +125,13 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                 ),
               ),
               const SizedBox(height: 18),
+              // The notes are weekly, so a month shows its latest week's.
+              WeeklyNotesCard(
+                monday: _mode == _ReviewMode.week
+                    ? start
+                    : _coachWeek(start, reviewEnd),
+                named: _mode == _ReviewMode.month,
+              ),
               if (reviewEnd.isBefore(start))
                 const AppCard(
                   child: BowlNote(
@@ -427,17 +433,6 @@ class _PeriodReviewCard extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // AI Coach, once all seven days of the week are over. Its notes are
-        // weekly, so a month shows only the prompt to people without Star.
-        if (!isMonth && days.length == 7)
-          WeeklyNotesCard(
-            monday: days.first,
-            judgedDays: review.loggedDays - review.daysOff,
-          )
-        else if (isMonth &&
-            !ref.watch(plusProvider) &&
-            review.loggedDays - review.daysOff >= 4)
-          const CoachPrompt(),
         AppCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -566,6 +561,19 @@ class _ReviewHeadline extends StatelessWidget {
 DateTime _dateOnly(DateTime date) => DateTime(date.year, date.month, date.day);
 
 String _dateKey(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
+
+/// The Monday of the latest week that ended in the month starting
+/// [monthStart], by [lastDay]; or of the week [lastDay] is in, when none has.
+DateTime _coachWeek(DateTime monthStart, DateTime lastDay) {
+  final sunday = DateTime(
+    lastDay.year,
+    lastDay.month,
+    lastDay.day - lastDay.weekday % 7,
+  );
+  return sunday.isBefore(monthStart)
+      ? DateTime(lastDay.year, lastDay.month, lastDay.day - lastDay.weekday + 1)
+      : DateTime(sunday.year, sunday.month, sunday.day - 6);
+}
 
 DateTime _periodStart(DateTime date, _ReviewMode mode) {
   final day = _dateOnly(date);

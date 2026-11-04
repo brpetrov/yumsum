@@ -81,7 +81,7 @@ Decided at first: **yes, one line, for YumSum Star users only.** History opens i
 
 The Adaptive formula's pattern, since it works:
 
-- **History, a finished week with at least 4 judged days, and (changed 4 November) a month with at least 4:** the free Adaptive formula's shining orange pill, shared rather than copied, reading "AI Coach" with the arrow. Under it (changed 4 November): "See what's working, what's holding you back, and ways to improve next week." Tapping either opens the dialog. The notes themselves stay weekly.
+- **History, both the Week and Month tabs, always (changed 4 November: you want AI Coach in both tabs, as the notes for Star members or this prompt for everyone else):** the free Adaptive formula's shining orange pill, shared rather than copied, reading "AI Coach" with the arrow. Under it (changed 4 November): "See what's working, what's holding you back, and ways to improve next week." Tapping either opens the dialog. The notes themselves stay weekly.
 - **The dialog,** `showCoachIntro(context, {plus = true})`, laid out like `showAdaptiveIntro` (title with subtitle, four promise rows with an `IconBubble`):
   - Title "AI Coach", subtitle "Your week, read for you"
 
@@ -310,7 +310,7 @@ If nothing is left, the call counts as failed. The card shows the error and noth
 | `lib/providers/review_provider.dart` | `refreshHistory` also invalidates `weeklyReviewProvider` |
 | `lib/screens/review/weekly_notes.dart` (new) | `WeeklyNotesCard` (all the states above, the free AI Coach button, writing `weekly_review.seen`), `WeeklyNotesLine` (Today's line) and `showCoachIntro`. A file of their own so they can be tested without pumping Today. |
 | `lib/screens/progress/helpers/adaptive_section.dart` | `_TryButton` moves to a shared widget with the label as a parameter, so AI Coach uses the same button. No change in how the Adaptive formula looks. |
-| `lib/screens/review/review_screen.dart` | `_PeriodReviewCard` puts `WeeklyNotesCard` first in its column in the week view when all 7 days are finished, passing the Monday and `loggedDays − daysOff`. `ReviewScreen({this.initialWeek})` opens in the week view on that week. |
+| `lib/screens/review/review_screen.dart` | `WeeklyNotesCard` under the calendar in both views (changed 4 November): the week view's week, or in the month view the latest week that ended in it (`_coachWeek`), named. The card counts the judged days itself and, for a week still going, says the notes come on Monday. |
 | `lib/app/router.dart` | The review route passes `state.extra` as `initialWeek`, the way the recipe route passes a `Recipe` |
 | `lib/screens/dashboard/dashboard_screen.dart` | `WeeklyNotesLine` above `_MonthPreviewCard` |
 | `firestore.rules` | The block below |

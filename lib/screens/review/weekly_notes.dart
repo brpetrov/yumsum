@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/helpers/week_facts.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
+import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/weekly_review_provider.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/widgets/app_card.dart';
@@ -64,36 +67,51 @@ Future<void> showCoachIntro(BuildContext context, {bool plus = true}) async {
   if (enable == true && context.mounted) await showPlusPaywall(context);
 }
 
-/// AI Coach on a finished week in History, above the week's review. With
-/// YumSum Star: up to 3 notes the AI wrote from the week's facts, or why
-/// there are none. Without: [CoachPrompt], when the week has enough logged
-/// for notes. [judgedDays] are the logged days that weren't
-/// days off; notes need 4.
+/// AI Coach in History, under the calendar in both views, on the week
+/// starting [monday]. With YumSum Star: up to 3 notes the AI wrote from the
+/// week's facts, or why there are none yet; notes need the week over and 4
+/// judged days (logged, not days off). Without: [CoachPrompt]. [named] adds
+/// the week's date, for the month view.
 class WeeklyNotesCard extends ConsumerWidget {
-  const WeeklyNotesCard({
-    super.key,
-    required this.monday,
-    required this.judgedDays,
-  });
+  const WeeklyNotesCard({super.key, required this.monday, this.named = false});
 
   final DateTime monday;
-  final int judgedDays;
+  final bool named;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final plus = ref.watch(plusProvider);
-    if (!plus) {
-      return judgedDays < 4 ? const SizedBox.shrink() : const CoachPrompt();
-    }
+    if (!ref.watch(plusProvider)) return const CoachPrompt();
 
+    final week = named
+        ? 'Week of ${DateFormat('d MMMM').format(monday)}'
+        : null;
     final muted = TextStyle(
       fontSize: 13.5,
       height: 1.4,
       color: AppColors.textSecondary,
     );
-    if (judgedDays < 4) {
+    final sunday = DateTime(monday.year, monday.month, monday.day + 6);
+    final now = DateTime.now();
+    if (!sunday.isBefore(DateTime(now.year, now.month, now.day))) {
       return _Spaced(
         _CoachCard(
+          week: week,
+          child: Text('Your notes on this week come on Monday.', style: muted),
+        ),
+      );
+    }
+
+    final summaries = ref
+        .watch(
+          reviewSummariesProvider(
+            ReviewRange(startDate: monday, endDate: sunday),
+          ),
+        )
+        .valueOrNull;
+    if (summaries != null && summaries.values.where(isJudgedDay).length < 4) {
+      return _Spaced(
+        _CoachCard(
+          week: week,
           child: Text(
             'Not enough logged this week for notes. They need 4 days '
             'logged, not counting days off.',
@@ -103,9 +121,12 @@ class WeeklyNotesCard extends ConsumerWidget {
       );
     }
 
-    final notes = ref.watch(weeklyReviewProvider(monday));
+    final notes = summaries == null
+        ? const AsyncLoading<List<String>>()
+        : ref.watch(weeklyReviewProvider(monday));
     return _Spaced(
       _CoachCard(
+        week: week,
         child: notes.when(
           loading: () => Row(
             children: [
@@ -221,11 +242,13 @@ class CoachPrompt extends StatelessWidget {
   }
 }
 
-/// The card with its title, the sparkle and the info button.
+/// The card with its title, the sparkle and the info button, and the
+/// [week] under the title when given.
 class _CoachCard extends StatelessWidget {
-  const _CoachCard({required this.child});
+  const _CoachCard({required this.child, this.week});
 
   final Widget child;
+  final String? week;
 
   @override
   Widget build(BuildContext context) {
@@ -239,12 +262,25 @@ class _CoachCard extends StatelessWidget {
               const IconBubble(Icons.auto_awesome_rounded, size: 36),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  'AI Coach',
-                  style: AppTheme.display.copyWith(
-                    fontSize: 19,
-                    color: AppColors.textPrimary,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'AI Coach',
+                      style: AppTheme.display.copyWith(
+                        fontSize: 19,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    if (week case final week?)
+                      Text(
+                        week,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                  ],
                 ),
               ),
               IconButton(

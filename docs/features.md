@@ -23,7 +23,7 @@ How each part of the app works, for when you're working on it. `CLAUDE.md` has t
 - The top-left menu (`AppDrawer` in `lib/widgets/app_frame.dart`, on every page) lists Home, History, Recipes, Weight & Progress, Plan Settings, Notifications and Account Settings, then YumSum Star, and Debug tools where they're on offer. There are no bottom tabs.
 - Home is the root and every other page sits one level above it: picking a page from inside another swaps it (`pushReplacement`), so Back always returns Home. YumSum Star opens over the current page instead.
 - History (`ReviewScreen`, `/review`): a week/month calendar with the period review; tapping a day opens `showDayMealsSheet` (`lib/screens/review/day_meals_sheet.dart`) to add, edit or delete its meals.
-  - For finished weeks in the week view, YumSum Star users get the AI Coach's notes (`WeeklyNotesCard`, plan 09) above the review. Free users get its prompt (`CoachPrompt`) there and on months.
+  - AI Coach (`WeeklyNotesCard`, plan 09) sits under the calendar in both views: the week's notes in the week view, and in the month view the latest week that ended in that month, named ("Week of 26 October"). Free users get its prompt (`CoachPrompt`) in both.
 - Plan Settings is `PlanSettingsScreen` in `lib/screens/profile/profile_screen.dart`; Account Settings is `AccountSettingsScreen` on `/profile`.
 - Routing: `goRouterProvider` listens to `authStateProvider` and `userProfileProvider` and enforces Splash → Auth → Onboarding → Home; a profile that fails to load goes to `ProfileLoadErrorScreen`.
 
@@ -185,8 +185,8 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
   - `weeklyReviewProvider` rebuilds the facts each time and keeps the notes in `weekly_reviews/{Monday}` with `basis`: `weeklyReviewPromptVersion` and the facts as sent. The AI is asked again only when `basis` changes, so raise the version whenever the instruction or the facts change.
   - `refreshHistory` invalidates it.
 - **Where it shows** (`lib/screens/review/weekly_notes.dart`):
-  - `WeeklyNotesCard`, first in a finished week's review: the notes and "Written by AI from what you logged.", or why there are none for a thin week, a spinner, or "Could not get this week's notes. Try again." with Try again. Numbers keep their units on one line. The info button opens `showCoachIntro`.
-  - Free users get `CoachPrompt`: the shining AI Coach button (`TryButton`) and "See what's working, what's holding you back, and ways to improve next week.", on weeks that would have notes and on months with 4 judged days, and nothing on thin ones. Either opens `showCoachIntro(plus: false)`, whose Enable opens `/plus`.
+  - `WeeklyNotesCard`, under the calendar: for a week still going, "Your notes on this week come on Monday."; then the notes and "Written by AI from what you logged.", or why there are none for a thin week, a spinner, or "Could not get this week's notes. Try again." with Try again. Numbers keep their units on one line. The info button opens `showCoachIntro`.
+  - Free users get `CoachPrompt`: the shining AI Coach button (`TryButton`) and "See what's working, what's holding you back, and ways to improve next week.", in both views whatever was logged. Either opens `showCoachIntro(plus: false)`, whose Enable opens `/plus`.
   - Nothing on Home: the notes are only in History.
 
 ## Days
