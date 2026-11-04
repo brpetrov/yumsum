@@ -263,7 +263,7 @@ If nothing is left, the call counts as failed. The card shows the error and noth
 - **Who can call it:** YumSum Star is checked on the phone (`plusProvider`), like the photo button in plan 06. A modified app could ask for notes without paying. The cost is a tenth of a penny a week, and App Check and the rate limit cap it.
 - **Cost:** about 1,200 input tokens (the instruction about 600, the facts 400–650, the schema about 30) and about 300 output tokens, including minimal thinking.
   - That's about $0.0003 in and $0.0008 out, about **0.1p a week with VAT**.
-  - About **0.5p a month per subscriber**, counting the odd rewrite after an edit, against the £1.06–£2.12 they leave you.
+  - About **0.5p a month per subscriber**, counting the odd rewrite after an edit, against the £1.53–£2.83 they leave you.
   - Your 12 testers over 2 weeks: about 3p.
   - The figures use plan 03's prices. The token log on your phone will confirm them.
 

@@ -6,14 +6,14 @@
 
 1. **YumSum Star is sold only in the Android app, through Google Play Billing** (the official `in_app_purchase` plugin), and checked by three small Cloud Functions of our own. No RevenueCat, so Google's 15% is the only fee. This replaces plan 03's RevenueCat recommendation; RevenueCat stays the fallback if the server side proves too much.
 2. **Whether someone has YumSum Star lives in one document per account that only the server writes**, `entitlements/{uid}`. The app reads it through `plusProvider`, so it works on the website (and a future iPhone app) for anyone who subscribed on Android. You can also write that document yourself in the Firebase console (a **manual grant**), so every YumSum Star feature can be built and tested before billing works.
-3. **The paywall is short and honest:** what you get, £2.99 a month or £17.99 a year, 7 days free once per Google account, "Cancel any time in Google Play".
+3. **The paywall is short and honest:** what you get, £3.99 a month or £25.99 a year (priced 4 November, `11-pricing.md`), 7 days free once per Google account, "Cancel any time in Google Play".
 4. **Testers get YumSum Star by manual grant.** Play's test subscriptions renew every few minutes and stop after six renewals (about half an hour for monthly), so they can't cover a 14-day closed test. Testers try a purchase once; the grant covers the rest.
 5. **Your steps start once Google approves your ID and the app exists:** payments profile (your address goes public), the subscription, a Pub/Sub topic, one deploy, access for the functions' service account, licence testers. Running costs stay inside Google's free allowances at this size.
 
 ## Decided (1–2 November 2026)
 
 - **YumSum Star** (`plus` in code) contains: photo logging, 30 AI estimates a day instead of 10, the Adaptive formula (`08-adaptive-formula.md`), the AI weekly review (`09-ai-weekly-review.md`), full macros (`10-full-macros.md`), and later "What should I eat?" (`05-recipes.md`). The gates are in `06-yumsum-plus.md`; this plan gives them `plusProvider` to read and a paywall to open.
-- **One subscription, `yumsum_plus`**, with two auto-renewing base plans, `monthly` (£2.99) and `annual` (£17.99), each with a 7-day free trial offer.
+- **One subscription, `yumsum_plus`**, with two auto-renewing base plans, `monthly` (£3.99) and `annual` (£25.99), each with a 7-day free trial offer.
 - **Bought only in the Android app.** The website's paywall says to subscribe in the Android app.
 - **Google Play Billing with our own functions; no RevenueCat**, to keep third-party fees at zero.
 - **When YumSum Star ends,** the Adaptive formula keeps its last value for 2 more weeks with a notice, then switches off (plan 08). The entitlement records when it ended. Play's grace period for failed payments keeps everything on meanwhile.
@@ -110,7 +110,7 @@ final plusProvider = StreamProvider.autoDispose<bool>((ref) {
 
 ### Buying
 
-1. **Load the plans:** `queryProductDetails({'yumsum_plus'})`. The plugin returns one entry per base plan and per offer the person is eligible for. An offer whose first pricing phase is free is the trial. Prices come from Play already formatted (`£2.99` in the UK, euros in Bulgaria), so nothing is hard-coded.
+1. **Load the plans:** `queryProductDetails({'yumsum_plus'})`. The plugin returns one entry per base plan and per offer the person is eligible for. An offer whose first pricing phase is free is the trial. Prices come from Play already formatted (`£3.99` in the UK, euros in Bulgaria), so nothing is hard-coded.
 2. **Buy:** `buyNonConsumable` with a `GooglePlayPurchaseParam` for the chosen plan or trial offer, and `applicationUserName` set to the SHA-256 of the user's uid (64 characters, Play's limit). Play uses it to spot fraud, and Google asks for a hash rather than a raw account ID.
 3. **Listen:** `plusPurchaseControllerProvider` listens to `purchaseStream` for the whole life of the app (Android only), started from `LeanStreakApp` beside `reminderSyncProvider`, as the plugin asks.
    - `purchased` or `restored`: show "Checking with Google Play", send the token (`verificationData.serverVerificationData`) to `verifyPurchase`, then call `completePurchase`. The server has already acknowledged by then; the app ignores the plugin's answer, because I couldn't confirm what Play says to a second acknowledgement.
@@ -127,7 +127,7 @@ final plusProvider = StreamProvider.autoDispose<bool>((ref) {
 
 ### The paywall
 
-*Built 2 November as a one-screen promo* (`lib/screens/plus/plus_screen.dart`): the smiling bowl with its star, "YumSum Star" and "Shine bright with these smart perks.", the five features (Smart Snap, Triple the AI estimates, Adaptive Formula, AI Assisted Coach, Detailed Macros) with a line each, Yearly (£17.99 as the big number, a "Save 50%" badge and "£1.50 a month" in small type) and Monthly (£2.99) tiles, the "Start 7 days free" button with the terms under it, and Restore purchase, Terms and Privacy. Until billing exists the prices are written in and the buttons show "Coming soon"; step C below loads Play's prices and starts the purchase. A screen under 800 px tall gets a smaller bowl and tighter rows, so it still fits without scrolling. The plan as first written follows.
+*Built 2 November as a one-screen promo* (`lib/screens/plus/plus_screen.dart`): the smiling bowl with its star, "YumSum Star" and "Shine bright with these smart perks.", the five features (Smart Snap, Triple the AI estimates, Adaptive Formula, AI Assisted Coach, Detailed Macros) with a line each, Yearly (the yearly price as the big number, with a "Save N%" badge and "£X a month" worked out from Play's prices: "Save 46%" and "£2.17 a month" at £25.99 and £3.99) and Monthly tiles, the "Start 7 days free" button with the terms under it, and Restore purchase, Terms and Privacy. Until billing exists the prices are written in and the buttons show "Coming soon"; step C below loads Play's prices and starts the purchase. A screen under 800 px tall gets a smaller bowl and tighter rows, so it still fits without scrolling. The plan as first written follows.
 
 Route `/plus` (`AppRoutes.plus`, `PlusScreen`), pushed on top of the current page, so Back returns to it. Copy follows CLAUDE.md: British English, sentence case, no "Please", no exclamation marks.
 
@@ -141,9 +141,9 @@ Route `/plus` (`AppRoutes.plus`, `PlusScreen`), pushed on top of the current pag
   - "A weekly review in History, written by the AI"
   - "Carbs and fat too, not just calories and protein" (plan 10 settles the wording)
   - "What should I eat?" is added only once it exists.
-- **Two plans:** "Yearly: £17.99 a year" (with "Half the monthly price" in small type) and "Monthly: £2.99 a month". Play's subscriptions policy counts an annual plan shown mainly as a monthly cost as misleading, so the yearly price is the big number.
+- **Two plans:** "Yearly: £25.99 a year" (with the saving in small type) and "Monthly: £3.99 a month". Play's subscriptions policy counts an annual plan shown mainly as a monthly cost as misleading, so the yearly price is the big number.
 - **Button:** "Start 7 days free" when the trial is offered, otherwise "Subscribe".
-- **Under the button, in readable type:** "Free until 9 November, then £17.99 a year. Renews every year until you cancel. Cancel any time in Google Play; cancel before 9 November and you pay nothing." Without a trial: "£2.99 a month. Renews every month until you cancel. Cancel any time in Google Play."
+- **Under the button, in readable type:** "Free until 9 November, then £25.99 a year. Renews every year until you cancel. Cancel any time in Google Play; cancel before 9 November and you pay nothing." Without a trial: "£3.99 a month. Renews every month until you cancel. Cancel any time in Google Play."
 - **At the bottom:** "Restore purchase", "Terms of use", "Privacy policy" (`LegalLinks`).
 - **Already on YumSum Star:** the status from Account Settings, below, instead of the plans.
 
@@ -252,7 +252,7 @@ App Check enforced, signed-in only. Deletes `entitlements/{uid}` and the caller'
 | Pub/Sub | About 2 KB per notification (Google's figure), well inside its free allowance |
 | Container images (Artifact Registry) | A few pence a month at most. Say yes when the first deploy offers a cleanup policy (it deletes old images after a day). |
 | Google Play Developer API | No charge |
-| Google Play's fee | 15%. £2.99 a month leaves about £2.12 after VAT and the fee; £17.99 a year about £12.74 |
+| Google Play's fee | 15%, as a 10% service fee plus a 5% billing fee, taken after VAT (plan 11). £3.99 a month leaves about £2.83; £25.99 a year about £18.41 |
 
 ## Protection
 
@@ -293,7 +293,7 @@ App Check enforced, signed-in only. Deletes `entitlements/{uid}` and the caller'
 4. **Upload a build with billing** to Internal testing (Test and release → Testing → Internal testing), with just you as a tester. I'll build it; the plugin adds the billing permission. Play only lets you create subscriptions once a build with billing is uploaded.
 5. **Create the subscription:** Monetize with Play → Products → Subscriptions → Create subscription.
    - Product ID `yumsum_plus` (it can never be changed or reused), name "YumSum Star", and its benefits (photo logging, 30 AI estimates a day, Adaptive formula, AI weekly review).
-   - Base plan `monthly`: auto-renewing, 1 month, £2.99. Base plan `annual`: auto-renewing, 1 year, £17.99. Let Play convert the other countries' prices, then check Bulgaria's in euros and round it to a tidy figure if you like.
+   - Base plan `monthly`: auto-renewing, 1 month, £3.99. Base plan `annual`: auto-renewing, 1 year, £25.99. Let Play convert the other countries' prices, then set Bulgaria's to €3.99 and €25.99 (plan 11).
    - On each base plan: **grace period 7 days**, account hold left at Play's automatic length (60 days minus the grace period), resubscribe on.
    - On each base plan, Add offer: `monthly-trial` and `annual-trial`, eligibility **New customer acquisition → Never had this subscription**, one phase: **Free trial, 7 days**.
    - Activate the base plans and offers.

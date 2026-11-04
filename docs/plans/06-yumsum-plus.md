@@ -4,7 +4,7 @@
 
 ## The short version
 
-1. **YumSum Star** is the paid tier: **£2.99 a month or £17.99 a year**, with a **7-day free trial** of everything.
+1. **YumSum Star** is the paid tier: **£3.99 a month or £25.99 a year** (priced 4 November, `11-pricing.md`), with a **7-day free trial** of everything.
 2. It pays for what costs money each time, or does thinking for you over weeks:
    - photo logging
    - more AI estimates
@@ -53,12 +53,12 @@ Billing, the paywall and who counts as a subscriber are in `07-billing.md`.
 
 ## Price and trial
 
-- **£2.99 a month or £17.99 a year**, as plan 03 recommends.
-  - The year is half the monthly price over 12 months.
-  - Both are a third to a quarter of what the big apps charge: MacroFactor is about £60–70 a year, MyFitnessPal Premium about £65–80, Yazio PRO about £35–60.
+- **£3.99 a month or £25.99 a year**, decided on 4 November 2026 from the research in `11-pricing.md` (£2.99 and £17.99 before that).
+  - The year is 6.5 months' worth, 46% off.
+  - Both are about a quarter of what the big apps charge: MyFitnessPal £15.99 a month or £64.99 a year, MacroFactor £10.99 or £62.99, Cronometer £9.99 or £59.99; Yazio's year is £35.90.
 - **What you keep after Play's 15% fee and 20% VAT:**
-  - about **£2.12** from a monthly subscriber
-  - about **£12.74 a year (£1.06 a month)** from a yearly one
+  - about **£2.83** from a monthly subscriber
+  - about **£18.41 a year (£1.53 a month)** from a yearly one
 - **The trial:**
   - **7 days of everything**, once per Google account. Play enforces that.
   - It turns into the chosen plan unless cancelled.
@@ -88,8 +88,8 @@ Billing, the paywall and who counts as a subscriber are in `07-billing.md`.
 ### Why 30, not 50
 
 The limit has to cover the worst case, someone who uses every estimate every day:
-- At 30 photos a day for a month, that's about **90p** with VAT. That is under the £1.06 a month a yearly subscriber leaves you.
-- At 50 it would be about £1.50, which loses money on yearly subscribers.
+- At 30 photos a day for a month, that's about **90p** with VAT, or about £1.20 at the photo's real size of 1,120 tokens (plan 11). Either is under the £1.53 a month a yearly subscriber leaves you.
+- At 50 it would be about £1.50–£2.00, which can lose money on yearly subscribers.
 - Real use is far lower. Even a heavy logger needs about 8–12 estimates a day, about 25–35p a month.
 
 ### What doesn't count
@@ -143,7 +143,7 @@ Then the closed test. Each tester gets YumSum Star by a **manual grant** for the
 
 After launch, check once a month:
 - **Trials started and converted** (Play Console → Monetise → Subscriptions). Plan 03 says about 1 in 30 daily users on YumSum Star covers everyone's AI. A typical freemium app converts about 2% of downloads.
-- **AI cost per subscriber** on <https://aistudio.google.com/billing>, against the £1.06–£2.12 they leave you.
+- **AI cost per subscriber** on <https://aistudio.google.com/billing>, against the £1.53–£2.83 they leave you.
 - **Cancellation reasons.** Play asks people who cancel and shows the answers.
 - **Weigh-ins.** How many subscribers weigh in at least 3 times a week, since the Adaptive formula depends on it.
 

@@ -77,7 +77,7 @@ With all of that, **100 daily users cost about £5–£7 a month**, and nothing 
 What's fair to users:
 - **Free for ever:** typing meals and numbers, barcode scanning, food search, recent and usual meals, history, weight, reminders, Day off, contributing to Open Food Facts.
 - **Metered, because each use costs money:** AI estimates (typed, voice, photo). Everyone gets a **free daily allowance**, for example 10 a day, plenty for normal use.
-- **YumSum Star, for people who want more:** decided on 2 November 2026; see `06-yumsum-plus.md`. Photo logging, 30 AI estimates a day, the Adaptive formula, the AI weekly review and full macros, at £2.99 a month or £17.99 a year with a 7-day trial.
+- **YumSum Star, for people who want more:** decided on 2 November 2026; see `06-yumsum-plus.md`. Photo logging, 30 AI estimates a day, the Adaptive formula, the AI weekly review and full macros, at £3.99 a month or £25.99 a year with a 7-day trial (priced on 4 November 2026, `11-pricing.md`).
 
 Nothing a free user relies on is ever taken away or hidden behind a paywall later. That's the difference from the apps people complain about: MyFitnessPal moved its barcode scanner behind Premium in 2022.
 
@@ -85,7 +85,7 @@ Nothing a free user relies on is ever taken away or hidden behind a paywall late
 
 | Option | What it earns | Verdict |
 |---|---|---|
-| **YumSum Star subscription** at about **£2.99 a month or £17.99 a year** | You keep 85% after Play's fee, and Google handles VAT. So £2.99 a month is about **£2.12** to you, enough to pay for about 30 daily users' AI at 3 calls a day. | **Recommended.** Competitors charge £10.99–£15.99 a month; a cheap, honest YumSum Star stands out. |
+| **YumSum Star subscription** at **£3.99 a month or £25.99 a year** (plan 11; £2.99 and £17.99 when this was written) | You keep 85% after Play's fee, and Google handles VAT. So £3.99 a month is about **£2.83** to you, enough to pay for about 40 daily users' AI at 3 calls a day. | **Recommended.** Competitors charge £7.49–£15.99 a month; an honest YumSum Star at a quarter of that stands out. |
 | **Rewarded ad, opt-in** ("watch a short ad for 5 more AI estimates today") | About 0.4–0.8p per view, enough for 4–9 AI calls | **Optional extra** for free users who run out. Never forced. |
 | **Banner ads** | About $0.04–$0.15 per daily user a month | **Not recommended.** It barely covers AI, ads are the top complaint in calorie-app reviews, Play forbids ads where people usually tap (next to the log bar), and it needs a consent pop-up and extra Data safety entries. |
 | **Interstitial (full-screen) ads** | More money | **No.** It interrupts logging, which is exactly what people hate. |
@@ -97,7 +97,7 @@ Nothing a free user relies on is ever taken away or hidden behind a paywall late
 
 *Changed 2 November 2026:* YumSum Star goes into the first closed test, so the testers can try it (`06-yumsum-plus.md`). Until it does, you pay the AI yourself (Step A keeps it to a few pounds).
 
-To cover everyone's AI, roughly **1 in 30 daily users (about 3%)** needs to be on YumSum Star at £2.99, if they all use AI three times a day; fewer if many just type numbers or scan. A typical freemium app converts about 2% of downloads (RevenueCat's 2025 median), so this is realistic but not guaranteed. Adjusting the free allowance (say 10 down to 7 a day) is the lever if it isn't.
+To cover everyone's AI, roughly **1 in 40 daily users (about 2.5%)** needs to be on YumSum Star at £3.99, if they all use AI three times a day; fewer if many just type numbers or scan. A typical freemium app converts about 2% of downloads (RevenueCat's 2025 median), so this is realistic but not guaranteed. Adjusting the free allowance (say 10 down to 7 a day) is the lever if it isn't.
 
 ### Building YumSum Star
 

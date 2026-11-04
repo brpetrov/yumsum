@@ -168,7 +168,7 @@ For drinks or bowls, swap "plated on a plain matte cream ceramic plate" for "in 
 ## Later: "What should I eat?" (YumSum Star)
 
 - One AI call returns three dishes that fit what's left today (calories and protein), in the same format as the library, so they open on the same recipe page and log the same way. An optional one-line wish box: "something with chicken", "vegetarian", "quick".
-- About 0.25p a call. A daily user would cost about 8p a month, against the £2.12 kept from a £2.99 YumSum Star month.
+- About 0.25p a call. A daily user would cost about 8p a month, against the £2.83 kept from a £3.99 YumSum Star month.
 - Hidden until YumSum Star exists, so nothing is given away and taken back later. Billing goes through Play billing with our own Cloud Functions and no other services, to keep fees down (`07-billing.md`).
 - In the code: the recipe page already accepts a recipe that isn't in the library, and a missing photo already shows the plain box.
 - Other YumSum Star ideas, not planned: **Plan my week** (seven dinners from the library that fit the target, with a shopping list, and no AI cost), Save for later, a restaurant-menu photo. (The weekly check-in idea became the Adaptive formula and the AI weekly review, plans 08 and 09.)
