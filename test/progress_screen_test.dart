@@ -15,6 +15,7 @@ import 'package:lean_streak/providers/weight_log_controller.dart';
 import 'package:lean_streak/screens/progress/progress_screen.dart';
 import 'package:lean_streak/services/weight_log_service.dart';
 import 'package:lean_streak/widgets/app_card.dart';
+import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'adaptive_fixtures.dart';
@@ -93,14 +94,16 @@ void main() {
     expect(weighIns.barWidth, 0);
   });
 
-  const pitch =
-      'Tunes your target to your own body, from your weigh-ins and meals.';
-
-  testWidgets('without YumSum Star the Adaptive formula is there to unlock', (
+  testWidgets('without YumSum Star it is a Star button that offers it', (
     tester,
   ) async {
     await pumpScreen(tester, profile: planProfile());
-    // In the chart's card, under the chart.
+    // In the chart's card, under the chart: the button is the name itself,
+    // with the star.
+    final button = find.ancestor(
+      of: find.text('Adaptive formula'),
+      matching: find.byType(InkWell),
+    );
     expect(
       find.descendant(
         of: find.ancestor(
@@ -111,25 +114,29 @@ void main() {
       ),
       findsOneWidget,
     );
-    // A question that invites them in, with no numbers that knock the plan.
+    expect(
+      find.descendant(of: button.first, matching: find.byType(PlusStar)),
+      findsOneWidget,
+    );
     expect(
       find.text(
-        'Want a formula tailored just for you? It adapts with time and your '
-        'weigh-ins.',
+        'A customised formula tailored just for you. Adapting with time and '
+        'your weigh-ins.',
       ),
       findsOneWidget,
     );
-    expect(find.text(pitch), findsNothing);
+    // No numbers that knock the plan, and no info button.
     expect(find.textContaining('kcal'), findsNothing);
-    expect(find.text('Unlock with YumSum Star'), findsOneWidget);
+    expect(find.byTooltip('How it works'), findsNothing);
     expect(find.byType(Switch), findsNothing);
 
-    await tester.ensureVisible(find.byTooltip('How it works'));
-    await tester.tap(find.byTooltip('How it works'));
+    await tester.ensureVisible(find.text('Adaptive formula'));
+    await tester.tap(find.text('Adaptive formula'));
     await tester.pumpAndSettle();
     expect(find.text('A target that learns from you'), findsOneWidget);
-    expect(find.text('Log weight now'), findsOneWidget);
+    expect(find.text('Enable'), findsOneWidget);
     expect(find.text('Close'), findsOneWidget);
+    expect(find.text('Log weight now'), findsNothing);
   });
 
   testWidgets('with YumSum Star it is on: what you burn and your target', (
@@ -140,15 +147,30 @@ void main() {
       profile: planProfile(adaptiveKcal: -80),
       entitlement: _plus,
     );
-    expect(find.text(pitch), findsOneWidget);
     expect(find.text('On'), findsOneWidget);
-    // Nothing measured yet, so the burn the target assumes: 2495 − 80.
-    expect(find.text('You burn'), findsOneWidget);
-    expect(find.text('2410 kcal'), findsOneWidget);
-    expect(find.text('Your target'), findsOneWidget);
-    expect(find.text('1590 kcal'), findsOneWidget);
-    expect(find.text('Unlock with YumSum Star'), findsNothing);
+    // Nothing measured right now, so the burn the target assumes: 2495 − 80,
+    // learnt before.
+    expect(find.text('You burn 2410 kcal a day'), findsOneWidget);
+    expect(find.text('Learnt from your weigh-ins and meals.'), findsOneWidget);
+    expect(find.text('Your target is 1590 kcal a day'), findsOneWidget);
+    expect(find.text('To lose 0.75 kg a week.'), findsOneWidget);
+    expect(find.byType(PlusStar), findsNothing);
     expect(find.byType(Switch), findsNothing);
+
+    await tester.ensureVisible(find.byTooltip('How it works'));
+    await tester.tap(find.byTooltip('How it works'));
+    await tester.pumpAndSettle();
+    expect(find.text('Log weight now'), findsOneWidget);
+    expect(find.text('Enable'), findsNothing);
+  });
+
+  testWidgets('a new member\'s burn is a first estimate', (tester) async {
+    await pumpScreen(tester, profile: planProfile(), entitlement: _plus);
+    expect(find.text('You burn 2490 kcal a day'), findsOneWidget);
+    expect(
+      find.text('A first estimate. It learns as you weigh in.'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('a weigh-in can be deleted, after asking', (tester) async {

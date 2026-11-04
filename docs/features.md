@@ -81,7 +81,7 @@ The paid tier (plan 06; the code says `plus`).
   - `StarBadge` beside the logo in the menu header and beside the name on Home: the star for members, a "Become a Star" chip for everyone else, nothing while the record loads.
   - A card in Account Settings.
   - `PlusPromptCard` on Home.
-  - The dimmed macro rings for free users, and the "Unlock with YumSum Star" button under the weight chart.
+  - The dimmed macro rings for free users, and the starred Adaptive formula button under the weight chart.
 - **Debug tools** (`/debug`, `DebugScreen`), in debug builds and for dev accounts in any build:
   - the User ID to copy;
   - "Pretend to be" (`debugAccountProvider`): free, subscribed, trial, ended or admin, on that device. A pretend account is real enough to change the Adaptive formula on the real plan.
@@ -151,10 +151,10 @@ YumSum Star (plan 08).
 - **Where it shows:**
   - Home: that week's result as one line on the target card (`adaptiveTodayLineProvider`).
   - Plan Settings: a row with the sum (`adaptiveSumLine`) and how well it knows you (`adaptiveStageLine`, from `adaptiveProgressProvider`); the star for free users, whose tap opens `/plus`.
-  - Weight & Progress: `AdaptiveSection` (`lib/screens/progress/helpers/adaptive_section.dart`), under the chart in its card. It says what it does for you, then:
-    - With YumSum Star: an "On" pill, "You burn" (`adaptiveBurn`, measured up to yesterday) beside "Your target", then the stage and this week's line.
-    - Free users see a question instead ("Want a formula tailored just for you? It adapts with time and your weigh-ins.") and an "Unlock with YumSum Star" button (a bigger "Become a Star" chip, with the star), and a tap opens `/plus`. No numbers, so it invites rather than knocks the standard plan.
-- **The explainer:** `showAdaptiveIntro` (`lib/screens/dashboard/helpers/adaptive_dialogs.dart`), titled "Adaptive formula" over "A target that learns from you": four bold promises (finds your real burn, adapts to your body, beats plateaus, learns as you go), each with one short line. "Log weight now" opens the weigh-in dialog (`logWeightWithFeedback`); the other button is Close. It is shown once after subscribing, and from Plan Settings and the info button under the chart.
+  - Weight & Progress: `AdaptiveSection` (`lib/screens/progress/helpers/adaptive_section.dart`), under the chart in its card.
+    - With YumSum Star: the title, a solid green "✨ On" chip whose white glint sweeps across three times when it appears (none when the phone asks for less motion), and the info button on the right. Then two plain lines, each with an icon and a note: "You burn 2440 kcal a day" (`adaptiveBurn`, measured up to yesterday; "Learnt from your weigh-ins and meals." or, before it has learnt anything, "A first estimate. It learns as you weigh in.") and "Your target is 1620 kcal a day" ("To lose 0.75 kg a week." or "To keep your weight steady."). Then the stage and this week's line.
+    - Free users: the name itself is the button, a bigger "Become a Star" chip with the star, over "A customised formula tailored just for you. Adapting with time and your weigh-ins." No info button and no numbers, so it invites rather than knocks the standard plan. A tap opens the dialog, which offers Enable.
+- **The explainer:** `showAdaptiveIntro` (`lib/screens/dashboard/helpers/adaptive_dialogs.dart`), titled "Adaptive formula" over "A target that learns from you": four bold promises (finds your real burn, adapts to your body, beats plateaus, learns as you go), each with one short line. With YumSum Star, "Log weight now" opens the weigh-in dialog (`logWeightWithFeedback`); without it (`plus: false`), "Enable" with the star opens `/plus`. The other button is Close. It is shown once after subscribing, from Plan Settings and the info button under the chart, and from the free users' button.
 - **Tests:** the seeded simulator in `test/adaptive_fixtures.dart`.
 
 ## Days

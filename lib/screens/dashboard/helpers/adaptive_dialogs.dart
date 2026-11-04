@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/screens/progress/helpers/log_weight_dialog.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
+import 'package:lean_streak/widgets/plus_mark.dart';
 
 /// Prefs keys: the Adaptive formula dialog shown once after subscribing,
 /// and the end date whose lapse notice was shown.
@@ -11,10 +13,11 @@ const adaptiveIntroShownKey = 'adaptive.intro_shown';
 const adaptiveLapseNoticeKey = 'adaptive.lapse_notice';
 
 /// Sells the Adaptive formula ("A target that learns from you"): once after
-/// subscribing, and from Plan Settings and Weight & Progress. Its button
-/// opens the weigh-in dialog, since weigh-ins are what it learns from.
-Future<void> showAdaptiveIntro(BuildContext context) async {
-  final logWeight = await showDialog<bool>(
+/// subscribing, and from Plan Settings and Weight & Progress. With YumSum
+/// Star ([plus]) its button opens the weigh-in dialog, since weigh-ins are
+/// what it learns from; without, Enable opens the YumSum Star page.
+Future<void> showAdaptiveIntro(BuildContext context, {bool plus = true}) async {
+  final go = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
       title: Column(
@@ -102,15 +105,26 @@ Future<void> showAdaptiveIntro(BuildContext context) async {
           onPressed: () => Navigator.of(context).pop(false),
           child: const Text('Close'),
         ),
-        FilledButton(
-          onPressed: () => Navigator.of(context).pop(true),
-          child: const Text('Log weight now'),
-        ),
+        if (plus)
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Log weight now'),
+          )
+        else
+          FilledButton.icon(
+            onPressed: () => Navigator.of(context).pop(true),
+            icon: const PlusStar(size: 24),
+            label: const Text('Enable'),
+          ),
       ],
     ),
   );
-  if (logWeight != true || !context.mounted) return;
-  await logWeightWithFeedback(context);
+  if (go != true || !context.mounted) return;
+  if (plus) {
+    await logWeightWithFeedback(context);
+  } else {
+    await showPlusPaywall(context);
+  }
 }
 
 /// Once YumSum Star has ended with an adjustment in place: when the target
