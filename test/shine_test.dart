@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/widgets/shine.dart';
 
@@ -21,6 +22,43 @@ void main() {
     await tester.pump(const Duration(milliseconds: 1800));
     await tester.pump();
     expect(tester.binding.hasScheduledFrame, isFalse);
+  });
+
+  testWidgets('rests with no glint when the last frame comes late', (
+    tester,
+  ) async {
+    final boundary = GlobalKey();
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: Center(
+          child: RepaintBoundary(
+            key: boundary,
+            child: const Shine(
+              child: ColoredBox(
+                color: Colors.black,
+                child: SizedBox(width: 40, height: 20),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    // A slow frame, such as a dialog opening, lands 540 ms after the third
+    // sweep ends: a third of the way into a fourth, glint mid-box.
+    await tester.pump(const Duration(milliseconds: 1800 * 3 + 540));
+    expect(tester.binding.hasScheduledFrame, isFalse);
+
+    final middle = await tester.runAsync(() async {
+      final image =
+          await (boundary.currentContext!.findRenderObject()!
+                  as RenderRepaintBoundary)
+              .toImage();
+      final bytes = (await image.toByteData())!;
+      return bytes.getUint8((10 * image.width + 20) * 4);
+    });
+    expect(middle, 0);
   });
 
   testWidgets('shines again when a page on top goes, not after a dialog', (

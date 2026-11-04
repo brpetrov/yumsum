@@ -83,8 +83,13 @@ class _ShineState extends State<Shine> with SingleTickerProviderStateMixin {
             Colors.white.withValues(alpha: 0),
           ],
           stops: const [0.3, 0.5, 0.7],
-          // From off the left edge to off the right.
-          transform: _Slide(_sweep.value * 2 - 1),
+          // From off the left edge to off the right, and back off the left
+          // at rest: the controller stops on whatever frame ends the last
+          // sweep, which lands mid-box when a frame comes late (a dialog
+          // opening on a slow phone).
+          transform: _Slide(
+            _controller.isAnimating ? _sweep.value * 2 - 1 : -1,
+          ),
         ).createShader(bounds),
         child: child,
       ),
