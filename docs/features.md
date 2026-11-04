@@ -8,6 +8,7 @@ How each part of the app works, for when you're working on it. `CLAUDE.md` has t
 - Calories, then the protein and macro rings, the day's meals, a month graph and weight.
 - The umbrella at the top right takes the day off (see Days).
 - `PlusPromptCard` for free users; its cross hides it for 14 days.
+- `WeeklyNotesLine` above the month card, for YumSum Star, until last week's AI Coach notes have been seen (see AI Coach).
 
 **The quick-log bar** (`QuickLogBar`, `lib/screens/dashboard/helpers/quick_log_bar.dart`), pinned at the bottom of Home:
 - Type the meal; the calories and protein go in two plain number boxes that appear under it once the bar is in use. The boxes have keys `quick-log-name`, `-kcal` and `-protein`.
@@ -23,6 +24,8 @@ How each part of the app works, for when you're working on it. `CLAUDE.md` has t
 - The top-left menu (`AppDrawer` in `lib/widgets/app_frame.dart`, on every page) lists Home, History, Recipes, Weight & Progress, Plan Settings, Notifications and Account Settings, then YumSum Star, and Debug tools where they're on offer. There are no bottom tabs.
 - Home is the root and every other page sits one level above it: picking a page from inside another swaps it (`pushReplacement`), so Back always returns Home. YumSum Star opens over the current page instead.
 - History (`ReviewScreen`, `/review`): a week/month calendar with the period review; tapping a day opens `showDayMealsSheet` (`lib/screens/review/day_meals_sheet.dart`) to add, edit or delete its meals.
+  - For finished weeks in the week view, YumSum Star users get the AI Coach's notes (`WeeklyNotesCard`, plan 09) above the review.
+  - It takes an optional `initialWeek` as `extra`, which opens it in the week view on that week.
 - Plan Settings is `PlanSettingsScreen` in `lib/screens/profile/profile_screen.dart`; Account Settings is `AccountSettingsScreen` on `/profile`.
 - Routing: `goRouterProvider` listens to `authStateProvider` and `userProfileProvider` and enforces Splash → Auth → Onboarding → Home; a profile that fails to load goes to `ProfileLoadErrorScreen`.
 
@@ -47,14 +50,15 @@ SharedPreferences through `sharedPreferencesProvider` (`lib/providers/preference
 - `feedback.sent_day`, `feedback.sent_count` (3 feedback messages a day)
 - `plus.prompt_hidden_until`
 - `adaptive.intro_shown`, `adaptive.lapse_notice` (the Adaptive formula's one-time dialogs)
+- `weekly_review.seen` (the Monday of the latest week whose AI Coach notes History has shown)
 - `debug.account` (Debug tools' pretend account)
 
 ## Firestore data and resets
 
-- The profile is `/users/{uid}`; everything else is in subcollections: `meals`, `daily_summaries` and `weight_entries` (both keyed by date), `ai_usage/{yyyy-MM-dd}`, `day_edits/{yyyy-MM}` and `days_off/{yyyy-MM-dd}`.
-- Period reviews are computed, never stored. Legacy `check_ins` and `check_in_prompt_status` documents are only deleted with the account.
+- The profile is `/users/{uid}`; everything else is in subcollections: `meals`, `daily_summaries` and `weight_entries` (both keyed by date), `ai_usage/{yyyy-MM-dd}`, `day_edits/{yyyy-MM}`, `days_off/{yyyy-MM-dd}` and `weekly_reviews/{yyyy-MM-dd}`.
+- Period reviews are computed, never stored; only the AI Coach's notes are cached, in `weekly_reviews`, with the facts they were written from. Legacy `check_ins` and `check_in_prompt_status` documents are only deleted with the account.
 - Repositories in `lib/repositories/` do the reads and writes; `AccountRepository` does the bulk deletes.
-- Reset progress (Weight & Progress) clears `weight_entries` only. Reset all data (Account Settings, `AccountRepository.resetAllData`) clears meals, summaries, weigh-ins and days off, but keeps the profile and the AI and past-day counters.
+- Reset progress (Weight & Progress) clears `weight_entries` only. Reset all data (Account Settings, `AccountRepository.resetAllData`) clears meals, summaries, weigh-ins, days off and the AI Coach's notes, but keeps the profile and the AI and past-day counters.
 - The rules only let those counters go up by one, and only delete them once the profile is gone; account deletion deletes the profile first.
 - Reset all data and account deletion re-authenticate first (`AccountController`): with the email password, or with Google for a Google-only account.
 - YumSum Star lives outside the user's tree in `entitlements/{uid}`, which the app can only read (see YumSum Star).
@@ -79,10 +83,10 @@ The paid tier (plan 06; the code says `plus`).
 - **Where it shows:**
   - A row in the menu.
   - `StarBadge` beside the logo in the menu header and beside the name on Home: the star for members, a "Become a Star" chip for everyone else, nothing while the record loads.
-  - The members' star shines when it appears (`Shine`, `lib/widgets/shine.dart`): a white glint sweeps across it three times, then rests, and again when a page that covered it goes away (so each return to Home, which stays under the menu's pages), but not after a dialog or sheet; none when the phone asks for less motion. The Adaptive formula's On chip and free button use it too.
+  - The members' star shines when it appears (`Shine`, `lib/widgets/shine.dart`): a white glint sweeps across it three times, then rests, and again when a page that covered it goes away (so each return to Home, which stays under the menu's pages), but not after a dialog or sheet; none when the phone asks for less motion. The Adaptive formula's On chip and the free Adaptive formula and AI Coach buttons use it too.
   - A card in Account Settings.
   - `PlusPromptCard` on Home.
-  - The dimmed macro rings for free users, and the shining Adaptive formula button under the weight chart.
+  - The dimmed macro rings for free users, the shining Adaptive formula button under the weight chart, and the shining AI Coach button on finished weeks in History.
 - **Debug tools** (`/debug`, `DebugScreen`), in debug builds and for dev accounts in any build:
   - the User ID to copy;
   - "Pretend to be" (`debugAccountProvider`): free, subscribed, trial, ended or admin, on that device. A pretend account is real enough to change the Adaptive formula on the real plan.
@@ -154,9 +158,30 @@ YumSum Star (plan 08).
   - Plan Settings: a row with the sum (`adaptiveSumLine`) and how well it knows you (`adaptiveStageLine`, from `adaptiveProgressProvider`); the star for free users, whose tap opens `/plus`.
   - Weight & Progress: `AdaptiveSection` (`lib/screens/progress/helpers/adaptive_section.dart`), under the chart in its card.
     - With YumSum Star: the title, a solid green "✨ On" chip whose white glint sweeps across three times when it appears (none when the phone asks for less motion), and the info button on the right. Then two plain lines, each with an icon and a note: "You burn 2440 kcal a day" (`adaptiveBurn`, measured up to yesterday; "Learnt from your weigh-ins and meals." or, before it has learnt anything, "A first estimate. It learns as you weigh in.") and "Your target is 1620 kcal a day" ("To lose 0.75 kg a week." or "To keep your weight steady."). Then the stage and this week's line.
-    - Free users: the name itself is the button, a warm orange pill with an arrow and a soft glow that shines when it appears (the star waits in the dialog's Enable), over "A customised formula tailored just for you. Adapting with time and your weigh-ins." No info button and no numbers, so it invites rather than knocks the standard plan. A tap opens the dialog, which offers Enable.
-- **The explainer:** `showAdaptiveIntro` (`lib/screens/dashboard/helpers/adaptive_dialogs.dart`), titled "Adaptive formula" over "A target that learns from you": four bold promises (finds your real burn, adapts to your body, beats plateaus, learns as you go), each with one short line. With YumSum Star, "Log weight now" opens the weigh-in dialog (`logWeightWithFeedback`); without it (`plus: false`), "Enable" with the star opens `/plus`. The other button is Close. It is shown once after subscribing, from Plan Settings and the info button under the chart, and from the free users' button.
+    - Free users: the name itself is the button (`TryButton`, `lib/widgets/feature_intro.dart`, shared with AI Coach), a warm orange pill with an arrow and a soft glow that shines when it appears (the star waits in the dialog's Enable), over "A customised formula tailored just for you. Adapting with time and your weigh-ins." No info button and no numbers, so it invites rather than knocks the standard plan. A tap opens the dialog, which offers Enable.
+- **The explainer:** `showAdaptiveIntro` (`lib/screens/dashboard/helpers/adaptive_dialogs.dart`, laid out by `FeatureIntroDialog`, shared with AI Coach), titled "Adaptive formula" over "A target that learns from you": four bold promises (finds your real burn, adapts to your body, beats plateaus, learns as you go), each with one short line. With YumSum Star, "Log weight now" opens the weigh-in dialog (`logWeightWithFeedback`); without it (`plus: false`), "Enable" with the star opens `/plus`. The other button is Close. It is shown once after subscribing, from Plan Settings and the info button under the chart, and from the free users' button.
 - **Tests:** the seeded simulator in `test/adaptive_fixtures.dart`.
+
+## AI Coach
+
+The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Coach.
+- **The facts:** the app works out every fact and the AI only writes. `buildWeekFacts` (`lib/helpers/week_facts.dart`, pure) gives the lines the AI is told:
+  - the days logged, the target and the calorie minimum, what History's card already shows, and each day;
+  - weekdays against the weekend, steady weekdays, the biggest day, days under the minimum, and a usual big day over the last 4 weeks;
+  - protein, and the first meal of the day (by logging order, only on days whose meals were all logged on the day) with ideas from the user's own first meals and the library's breakfasts;
+  - fibre, salt, sugars and saturates against the guides (`macroTargets`), each on days where every meal has it, with where the salt came from and fibre-rich recipes under 2 g of salt;
+  - how many weigh-ins (never the weights), and the Adaptive formula's change on that week's Monday.
+  - Days off are left out of every pattern, average and tip; fat and carbs never appear. The same data always gives the same lines.
+- **The call:** `WeeklyReviewService` (`lib/services/weekly_review_service.dart`).
+  - `weeklyReviewInstruction` as a system instruction, the facts as the message, and a response schema (`points`, at most 3).
+  - `parseReviewPoints` keeps at most 3 notes, dropping any over 160 characters, with a number not in the facts, or with a shaming word; none left is a failure, and nothing is saved.
+- **When:** only for finished weeks with at least 4 judged days (logged, not taken off), when a subscriber opens the week in History.
+  - `weeklyReviewProvider` rebuilds the facts each time and keeps the notes in `weekly_reviews/{Monday}` with `basis`: `weeklyReviewPromptVersion` and the facts as sent. The AI is asked again only when `basis` changes, so raise the version whenever the instruction or the facts change.
+  - `refreshHistory` invalidates it.
+- **Where it shows** (`lib/screens/review/weekly_notes.dart`):
+  - `WeeklyNotesCard`, first in a finished week's review: the notes and "Written by AI from what you logged.", or why there are none for a thin week, a spinner, or "Could not get this week's notes. Try again." with Try again. Numbers keep their units on one line. The info button opens `showCoachIntro`.
+  - Free users get the shining AI Coach button (`TryButton`) and a line on weeks that would have notes, and nothing on thin weeks. Either opens `showCoachIntro(plus: false)`, whose Enable opens `/plus`.
+  - `WeeklyNotesLine` on Home, for YumSum Star: when last week had 4 judged days and its notes haven't been shown (`weekly_review.seen`, which only moves on). It opens History on last week.
 
 ## Days
 
@@ -179,9 +204,10 @@ YumSum Star (plan 08).
   - Estimates return calories, protein and a per-item breakdown with grams (`EstimateItem`).
   - `EstimateBreakdown` shows the breakdown as one line that expands on tap; correcting an item's grams rescales it (`resized`, `totalOf`) with no further AI call.
   - `estimateFromPhoto` sends a resized JPEG with the same prompt.
+- **AI Coach** is the one call that isn't an estimate (see AI Coach): no `nutritionContext`, a system instruction and a response schema. It shares `aiModelId`, `generateWithRetries` and `decodeAiJson` with the estimates.
 - **Voice:** records a short clip with `record` (16 kHz mono PCM, wrapped as WAV by `lib/helpers/wav.dart`) and sends the audio to Gemini (`parseVoiceAudio`), which understands English, Bulgarian or a mix with no language setting. Recording ends on Stop, after a pause once something was said, or at 30 s.
 - **The daily allowance:** typed, voice and photo estimates and a contribution's `readLabel` share `AiUsageRepository.dailyLimit` (20 a user a day for now; plan 06 makes it 10 free and 30 for YumSum Star), counted in Firestore.
-  - The save-time fill-in (`estimateNutrients`) doesn't count.
+  - The save-time fill-in (`estimateNutrients`) doesn't count, and nor does AI Coach.
   - The counter is client-side and not tamper-proof; App Check, the per-user rate limit and the spend cap are the real protection.
   - The bar shows how many are left once half are used, and the mic says so before recording once none are.
 - **Errors:** `aiErrorMessage` maps server errors by their wording.
