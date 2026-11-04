@@ -169,8 +169,8 @@ void main() {
       await pump(tester, card(), entitlement: null);
       expect(
         find.text(
-          'See what\'s working, what\'s holding you back, and one easy fix '
-          'for next\u00A0week.',
+          'See what\'s working, what\'s holding you back, and ways to improve '
+          'next\u00A0week.',
         ),
         findsOneWidget,
       );

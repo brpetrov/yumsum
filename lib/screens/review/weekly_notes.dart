@@ -38,8 +38,8 @@ Future<void> showCoachIntro(BuildContext context, {bool plus = true}) async {
         ),
         (
           Icons.lightbulb_outline_rounded,
-          'One easy tip',
-          'From your own meals or our\u00A0recipes.',
+          'Ways to improve',
+          'Like more fibre or less salt, with ideas from our\u00A0recipes.',
         ),
         (
           Icons.event_available_rounded,
@@ -206,8 +206,8 @@ class CoachPrompt extends StatelessWidget {
             TryButton(label: 'AI Coach', onTap: open),
             const SizedBox(height: 12),
             Text(
-              'See what\'s working, what\'s holding you back, and one easy '
-              'fix for next week.',
+              'See what\'s working, what\'s holding you back, and ways to '
+              'improve next week.',
               style: TextStyle(
                 fontSize: 14,
                 height: 1.35,

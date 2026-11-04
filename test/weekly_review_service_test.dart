@@ -92,4 +92,9 @@ void main() {
       expect(weeklyReviewInstruction, isNot(contains('!')));
     },
   );
+
+  test('the instruction asks for ways to improve, not one tip', () {
+    expect(weeklyReviewInstruction, contains('ways the user can improve'));
+    expect(weeklyReviewInstruction, isNot(contains('one small')));
+  });
 }

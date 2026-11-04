@@ -186,7 +186,7 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
   - `refreshHistory` invalidates it.
 - **Where it shows** (`lib/screens/review/weekly_notes.dart`):
   - `WeeklyNotesCard`, first in a finished week's review: the notes and "Written by AI from what you logged.", or why there are none for a thin week, a spinner, or "Could not get this week's notes. Try again." with Try again. Numbers keep their units on one line. The info button opens `showCoachIntro`.
-  - Free users get `CoachPrompt`: the shining AI Coach button (`TryButton`) and "See what's working, what's holding you back, and one easy fix for next week.", on weeks that would have notes and on months with 4 judged days, and nothing on thin ones. Either opens `showCoachIntro(plus: false)`, whose Enable opens `/plus`.
+  - Free users get `CoachPrompt`: the shining AI Coach button (`TryButton`) and "See what's working, what's holding you back, and ways to improve next week.", on weeks that would have notes and on months with 4 judged days, and nothing on thin ones. Either opens `showCoachIntro(plus: false)`, whose Enable opens `/plus`.
   - Nothing on Home: the notes are only in History.
 
 ## Days
