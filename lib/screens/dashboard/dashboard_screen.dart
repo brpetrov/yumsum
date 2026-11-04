@@ -31,6 +31,7 @@ import 'package:lean_streak/screens/dashboard/helpers/quick_log_bar.dart';
 import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/screens/progress/helpers/log_weight_dialog.dart';
+import 'package:lean_streak/screens/review/weekly_notes.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/widgets/bowl_note.dart';
@@ -344,6 +345,7 @@ class _DashboardContent extends StatelessWidget {
                 onDeleteMeal: onDeleteMeal,
               ),
               const SizedBox(height: 18),
+              WeeklyNotesLine(today: date),
               _MonthPreviewCard(date: date, onOpenReview: onOpenReview),
               const SizedBox(height: 18),
               const PlusPromptCard(),

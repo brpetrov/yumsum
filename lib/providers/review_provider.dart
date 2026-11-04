@@ -5,6 +5,7 @@ import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/period_review_provider.dart';
+import 'package:lean_streak/providers/weekly_review_provider.dart';
 
 class ReviewRange {
   const ReviewRange({required this.startDate, required this.endDate});
@@ -56,4 +57,5 @@ void refreshHistory(Ref ref) {
   ref.invalidate(firstLoggedDayProvider);
   ref.invalidate(reviewSummariesProvider);
   ref.invalidate(periodReviewProvider);
+  ref.invalidate(weeklyReviewProvider);
 }

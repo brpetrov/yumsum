@@ -11,6 +11,7 @@ import 'package:lean_streak/providers/period_review_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/review/day_meals_sheet.dart';
+import 'package:lean_streak/screens/review/weekly_notes.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/bowl_note.dart';
 import 'package:lean_streak/widgets/calorie_bars.dart';
@@ -19,9 +20,12 @@ import 'package:lean_streak/widgets/pill_toggle.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 
 /// Calendar on top, the period's review underneath. Week and month share one
-/// switch; any day up to today opens its meals.
+/// switch; any day up to today opens its meals. It opens on this month, or
+/// on the week of [initialWeek] (Today's AI Coach line).
 class ReviewScreen extends ConsumerStatefulWidget {
-  const ReviewScreen({super.key});
+  const ReviewScreen({super.key, this.initialWeek});
+
+  final DateTime? initialWeek;
 
   @override
   ConsumerState<ReviewScreen> createState() => _ReviewScreenState();
@@ -30,8 +34,10 @@ class ReviewScreen extends ConsumerStatefulWidget {
 enum _ReviewMode { week, month }
 
 class _ReviewScreenState extends ConsumerState<ReviewScreen> {
-  _ReviewMode _mode = _ReviewMode.month;
-  DateTime _anchor = _dateOnly(DateTime.now());
+  late _ReviewMode _mode = widget.initialWeek == null
+      ? _ReviewMode.month
+      : _ReviewMode.week;
+  late DateTime _anchor = _dateOnly(widget.initialWeek ?? DateTime.now());
 
   @override
   Widget build(BuildContext context) {
@@ -423,6 +429,12 @@ class _PeriodReviewCard extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // AI Coach, once all seven days of the week are over.
+        if (!isMonth && days.length == 7)
+          WeeklyNotesCard(
+            monday: days.first,
+            judgedDays: review.loggedDays - review.daysOff,
+          ),
         AppCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

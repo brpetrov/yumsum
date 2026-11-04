@@ -30,7 +30,7 @@ Deploys are the owner's to run: give the command rather than running it. The VS 
 - **State:** Riverpod 2. StreamProviders for live Firestore data, FutureProviders for one-off reads, `AsyncNotifier` controllers in `lib/providers/` for changes (`LogMealController`, `WeightLogController`, …), `Notifier`s for device settings.
 - **Routing:** GoRouter (`goRouterProvider`, paths in `AppRoutes`, `lib/app/router.dart`), with auth and profile redirects: Splash → Auth → Onboarding → Home. Home is the root; the menu's pages swap one level above it, so Back always returns Home.
 - **Data:** a repository per Firestore collection (`lib/repositories/`), services that combine them (`lib/services/`), providers that expose them. Open Food Facts and Formspree are reached over `http`.
-- **Firestore:** the profile is `users/{uid}`; everything else is in its subcollections (`meals`, `daily_summaries`, `weight_entries`, `ai_usage`, `day_edits`, `days_off`). YumSum Star's record is the top-level `entitlements/{uid}`, which the app can only read.
+- **Firestore:** the profile is `users/{uid}`; everything else is in its subcollections (`meals`, `daily_summaries`, `weight_entries`, `ai_usage`, `day_edits`, `days_off`, `weekly_reviews`). YumSum Star's record is the top-level `entitlements/{uid}`, which the app can only read.
 - **Device settings:** SharedPreferences through `sharedPreferencesProvider`, overridden in `main()`; unoverridden it throws.
 - **Styling:** `AppColors` (`lib/core/constants/app_colors.dart`) switches between the light and dark palettes at run time, so expressions using it can't be `const`. Use `AppCard` for cards, Nunito for text and Fredoka (`AppTheme.display`) for headings and big numbers. Orange (`primary`) is for actions, green (`veryGood`) for on track and progress.
 
@@ -38,7 +38,7 @@ Deploys are the owner's to run: give the command rather than running it. The VS 
 
 - **New stored field:** add it to the model's `fromFirestore`/`toFirestore` and to `firestore.rules`, whose `hasOnly` lists reject unknown fields. Deploy the rules before a build that writes it, or saving fails.
 - **Formula change:** bump `planCalculationVersion` or `activityScaleVersion` in `lib/models/user_profile.dart`, so stored plans are recalculated at startup.
-- **Tests never touch Firebase, the network or device hardware.** Pump screens in a `ProviderScope` inside `MaterialApp(theme: AppTheme.light, …)` and override what reads Firestore or the device: `currentUidProvider`, `userProfileProvider`, `entitlementProvider`, the data providers, `sharedPreferencesProvider` (after `SharedPreferences.setMockInitialValues`), and the AI, Open Food Facts, recorder and camera providers. `test/quick_log_bar_test.dart` has the full set. Fake controllers by subclassing and services with `Fake implements …`.
+- **Tests never touch Firebase, the network or device hardware.** Pump screens in a `ProviderScope` inside `MaterialApp(theme: AppTheme.light, …)` and override what reads Firestore or the device: `currentUidProvider`, `userProfileProvider`, `entitlementProvider`, the data providers, `weeklyReviewProvider`, `sharedPreferencesProvider` (after `SharedPreferences.setMockInitialValues`), and the AI, Open Food Facts, recorder and camera providers. `test/quick_log_bar_test.dart` has the full set. Fake controllers by subclassing and services with `Fake implements …`.
 - **Formatting:** run `dart format` on the files you changed only; `dart format lib` reformats untouched files.
 - **AI:** Gemini through Firebase AI Logic, so there's no key in the app. Every call needs an App Check token: a debug build prints a debug token that must be registered in the Firebase console, and the web needs the fixed port 5000.
 - **YumSum Star gates:**
@@ -67,6 +67,7 @@ Short and plain, in British English, saying "you":
 | Adaptive formula | `lib/helpers/adaptive_formula.dart`, `lib/providers/adaptive_formula_provider.dart` | 08 |
 | Quick-log bar | `lib/screens/dashboard/helpers/quick_log_bar.dart` | |
 | AI estimates and the allowance | `lib/services/calorie_estimate_service.dart`, `lib/repositories/ai_usage_repository.dart` | 03 |
+| AI Coach (the weekly review) | `lib/helpers/week_facts.dart`, `lib/services/weekly_review_service.dart`, `lib/providers/weekly_review_provider.dart`, `lib/screens/review/weekly_notes.dart` | 09 |
 | Macros | `lib/models/nutrients.dart`, `lib/widgets/macro_rings.dart`, `macro_totals.dart`, `macro_guide.dart` | 10 |
 | Daily summaries, statuses, day off | `lib/services/daily_summary_service.dart`, `lib/widgets/day_status.dart` | |
 | Packaged foods and contributing | `lib/services/food_lookup_service.dart`, `food_contribution_service.dart` | 01 |
@@ -84,7 +85,7 @@ Short and plain, in British English, saying "you":
 - 06 YumSum Star
 - 07 billing
 - 08 Adaptive formula
-- 09 AI weekly review
+- 09 AI weekly review (AI Coach)
 - 10 full macros
 
 `README.md` and `leanstreak_agent_build_spec.md` are out of date.

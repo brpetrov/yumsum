@@ -75,6 +75,18 @@ service cloud.firestore {
         && d.updatedAt is timestamp;
     }
 
+    // The AI Coach's notes on a week, with the facts they were written from.
+    function validWeeklyReview(d) {
+      return d.keys().hasOnly(['points', 'basis', 'createdAt'])
+        && d.points is list
+        && d.points.size() <= 3
+        && (d.points.size() < 1 || text(d.points[0], 200))
+        && (d.points.size() < 2 || text(d.points[1], 200))
+        && (d.points.size() < 3 || text(d.points[2], 200))
+        && text(d.basis, 4000)
+        && d.createdAt is timestamp;
+    }
+
     function validWeightEntry(d) {
       return d.keys().hasOnly(['dateKey', 'weightKg', 'loggedAt', 'source'])
         && dateKey(d.dateKey)
@@ -142,6 +154,13 @@ service cloud.firestore {
         allow create, update: if isOwner(userId)
           && request.resource.data.keys().hasOnly(['date'])
           && dateKey(request.resource.data.date);
+      }
+
+      match /weekly_reviews/{week} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && dateKey(week)
+          && validWeeklyReview(request.resource.data);
       }
 
       match /ai_usage/{date} {
