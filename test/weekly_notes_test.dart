@@ -119,9 +119,25 @@ void main() {
     ) async {
       await pump(tester, card());
       expect(find.text('AI Coach'), findsOneWidget);
-      for (final note in _notes) {
-        expect(find.text(note), findsOneWidget);
-      }
+      // Each number keeps its unit on its line.
+      expect(
+        find.text(
+          'Weekdays were steady at about 1,890\u00A0kcal, but the weekend '
+          'averaged 2,580.',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.text(
+          'Your first meal of the day averaged 14\u00A0g of protein. A '
+          '"Greek yoghurt berry bowl" gives 30\u00A0g for 332\u00A0kcal.',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.text('Salt averaged 7.4\u00A0g against the 6\u00A0g guide.'),
+        findsOneWidget,
+      );
       expect(find.text('Written by AI from what you logged.'), findsOneWidget);
       expect(reads, 1);
       expect(prefs.getString(weeklyReviewSeenKey), '2026-10-26');
@@ -169,7 +185,7 @@ void main() {
       expect(find.text('Looking over your week'), findsOneWidget);
       wait.complete(_notes);
       await tester.pumpAndSettle();
-      expect(find.text(_notes.first), findsOneWidget);
+      expect(find.textContaining('Weekdays were steady'), findsOneWidget);
     });
 
     testWidgets('a failure says so, and Try again asks again', (tester) async {
@@ -183,7 +199,7 @@ void main() {
       await tester.tap(find.text('Try again'));
       await tester.pumpAndSettle();
       expect(reads, 2);
-      expect(find.text(_notes.first), findsOneWidget);
+      expect(find.textContaining('Weekdays were steady'), findsOneWidget);
     });
   });
 
@@ -195,7 +211,7 @@ void main() {
       expect(
         find.text(
           'Notes on your week every Monday: your patterns, your salt and '
-          'fibre, and one easy tip.',
+          'fibre, and one easy\u00A0tip.',
         ),
         findsOneWidget,
       );

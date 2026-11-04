@@ -18,6 +18,12 @@ import 'package:lean_streak/widgets/plus_mark.dart';
 
 String _weekKey(DateTime monday) => DateFormat('yyyy-MM-dd').format(monday);
 
+/// A number and its unit on the same line: "14 g", never "14" then "g".
+String _keepUnits(String note) => note.replaceAllMapped(
+  RegExp(r'(\d) (g|kcal)\b'),
+  (match) => '${match[1]}\u00A0${match[2]}',
+);
+
 /// What AI Coach does (plan 09): from the card's info button, and from the
 /// free users' button, where Enable opens the YumSum Star page.
 Future<void> showCoachIntro(BuildContext context, {bool plus = true}) async {
@@ -35,12 +41,12 @@ Future<void> showCoachIntro(BuildContext context, {bool plus = true}) async {
         (
           Icons.eco_rounded,
           'Looks past calories',
-          'Protein, fibre, salt and sugar, against the UK guides.',
+          'Protein, fibre, salt and sugar, against the UK\u00A0guides.',
         ),
         (
           Icons.lightbulb_outline_rounded,
           'One easy tip',
-          'From your own meals or our recipes.',
+          'From your own meals or our\u00A0recipes.',
         ),
         (
           Icons.event_available_rounded,
@@ -96,7 +102,7 @@ class WeeklyNotesCard extends ConsumerWidget {
               const SizedBox(height: 12),
               Text(
                 'Notes on your week every Monday: your patterns, your salt '
-                'and fibre, and one easy tip.',
+                'and fibre, and one easy\u00A0tip.',
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.35,
@@ -191,7 +197,7 @@ class WeeklyNotesCard extends ConsumerWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          point,
+                          _keepUnits(point),
                           style: TextStyle(
                             fontSize: 14.5,
                             height: 1.4,
