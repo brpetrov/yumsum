@@ -63,7 +63,9 @@
 
 ### On Today
 
-Decided: **yes, one line, for YumSum Star users only.** History opens in the month view, so without a pointer most people would never find the week view, and your testers would only get one or two Mondays to notice it.
+**Changed on 4 November: nothing on Today.** You decided the notes live only in History, so the line below, `weekly_review.seen` and `initialWeek` were removed. What follows is the earlier decision, kept for the record.
+
+Decided at first: **yes, one line, for YumSum Star users only.** History opens in the month view, so without a pointer most people would never find the week view, and your testers would only get one or two Mondays to notice it.
 
 - **What:** a slim tappable `AppCard` above the month card: the sparkle bubble, "AI Coach" in bold over "Your notes on last week" and a chevron. It opens History in the week view on last week.
 - **When:**
@@ -79,7 +81,7 @@ Decided: **yes, one line, for YumSum Star users only.** History opens in the mon
 
 The Adaptive formula's pattern, since it works:
 
-- **History, week view, a finished week with at least 4 judged days:** the free Adaptive formula's shining orange pill, shared rather than copied, reading "AI Coach" with the arrow. Under it: "Notes on your week every Monday: your patterns, your salt and fibre, and one easy tip." Tapping either opens the dialog.
+- **History, a finished week with at least 4 judged days, and (changed 4 November) a month with at least 4:** the free Adaptive formula's shining orange pill, shared rather than copied, reading "AI Coach" with the arrow. Under it (changed 4 November): "See what's working, what's holding you back, and one easy fix for next week." Tapping either opens the dialog. The notes themselves stay weekly.
 - **The dialog,** `showCoachIntro(context, {plus = true})`, laid out like `showAdaptiveIntro` (title with subtitle, four promise rows with an `IconBubble`):
   - Title "AI Coach", subtitle "Your week, read for you"
 
@@ -91,7 +93,7 @@ The Adaptive formula's pattern, since it works:
     | Ready every Monday | 3 short notes on the week just gone. |
 
   - Free: Close and Enable with the star, which opens the paywall. YumSum Star: Close only.
-- **The YumSum Star page** says "AI Coach" with "Spots your patterns every Monday." instead of "AI Assisted Coach" and "Weekly and monthly reviews, with advice." Monthly reviews are only a Later idea.
+- **The YumSum Star page** says "AI Coach" with "What's working, what isn't, and one easy fix." (changed 4 November from "Spots your patterns every Monday.") instead of "AI Assisted Coach" and "Weekly and monthly reviews, with advice." Monthly reviews are only a Later idea.
 - **No pop-up on Today** for free users.
 
 ## The facts

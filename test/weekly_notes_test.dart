@@ -6,11 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
-import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
-import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/weekly_review_provider.dart';
 import 'package:lean_streak/screens/review/weekly_notes.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
@@ -27,21 +25,8 @@ const _notes = [
   'Salt averaged 7.4 g against the 6 g guide.',
 ];
 
-DailySummary _logged(String date, {bool dayOff = false}) => DailySummary(
-  date: date,
-  totalCalories: 1900,
-  targetCalories: 1900,
-  calorieDelta: 0,
-  mealCount: 3,
-  status: DailyStatus.green,
-  dayOff: dayOff,
-  updatedAt: DateTime(2026, 11, 2),
-);
-
 void main() {
-  late SharedPreferences prefs;
   late int reads;
-  late Object? opened;
 
   /// [notes] is what each read of the notes gives, in turn; a [Completer]
   /// keeps it loading and an [Exception] fails it.
@@ -50,17 +35,14 @@ void main() {
     Widget child, {
     Entitlement? entitlement = _plus,
     List<Object> notes = const [_notes],
-    Map<String, DailySummary> lastWeek = const {},
-    Map<String, Object> saved = const {},
     bool settle = true,
   }) async {
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
-    SharedPreferences.setMockInitialValues(saved);
-    prefs = await SharedPreferences.getInstance();
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
     reads = 0;
-    opened = null;
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -74,7 +56,6 @@ void main() {
               _ => result as List<String>,
             };
           }),
-          reviewSummariesProvider.overrideWith((ref, range) async => lastWeek),
         ],
         child: MaterialApp.router(
           theme: AppTheme.light,
@@ -93,13 +74,6 @@ void main() {
                 path: AppRoutes.plus,
                 builder: (_, _) => const Scaffold(body: Text('The paywall')),
               ),
-              GoRoute(
-                path: AppRoutes.review,
-                builder: (_, state) {
-                  opened = state.extra;
-                  return const Scaffold(body: Text('History'));
-                },
-              ),
             ],
           ),
         ),
@@ -114,9 +88,7 @@ void main() {
       WeeklyNotesCard(monday: _monday, judgedDays: judgedDays);
 
   group('with YumSum Star', () {
-    testWidgets('the notes and the footer, and Today\'s line can go', (
-      tester,
-    ) async {
+    testWidgets('the notes and the footer', (tester) async {
       await pump(tester, card());
       expect(find.text('AI Coach'), findsOneWidget);
       // Each number keeps its unit on its line.
@@ -140,18 +112,6 @@ void main() {
       );
       expect(find.text('Written by AI from what you logged.'), findsOneWidget);
       expect(reads, 1);
-      expect(prefs.getString(weeklyReviewSeenKey), '2026-10-26');
-    });
-
-    testWidgets('seen only moves on, never back to an older week', (
-      tester,
-    ) async {
-      await pump(
-        tester,
-        card(),
-        saved: const {weeklyReviewSeenKey: '2026-11-02'},
-      );
-      expect(prefs.getString(weeklyReviewSeenKey), '2026-11-02');
     });
 
     testWidgets('the info button explains it, with Close only', (tester) async {
@@ -194,7 +154,6 @@ void main() {
         find.text('Could not get this week\'s notes. Try again.'),
         findsOneWidget,
       );
-      expect(prefs.getString(weeklyReviewSeenKey), isNull);
 
       await tester.tap(find.text('Try again'));
       await tester.pumpAndSettle();
@@ -210,8 +169,8 @@ void main() {
       await pump(tester, card(), entitlement: null);
       expect(
         find.text(
-          'Notes on your week every Monday: your patterns, your salt and '
-          'fibre, and one easy\u00A0tip.',
+          'See what\'s working, what\'s holding you back, and one easy fix '
+          'for next\u00A0week.',
         ),
         findsOneWidget,
       );
@@ -229,70 +188,13 @@ void main() {
 
     testWidgets('the line under it opens the dialog too', (tester) async {
       await pump(tester, card(), entitlement: null);
-      await tester.tap(find.textContaining('Notes on your week'));
+      await tester.tap(find.textContaining('See what\'s working'));
       await tester.pumpAndSettle();
       expect(find.text('Your week, read for you'), findsOneWidget);
     });
 
     testWidgets('nothing for a thin week', (tester) async {
       await pump(tester, card(judgedDays: 3), entitlement: null);
-      expect(find.text('AI Coach'), findsNothing);
-    });
-  });
-
-  group('Today\'s line', () {
-    // Wednesday 4 November: last week is 26 October to 1 November.
-    final line = WeeklyNotesLine(today: DateTime(2026, 11, 4));
-    final fourDays = {
-      for (final date in [
-        '2026-10-26',
-        '2026-10-27',
-        '2026-10-28',
-        '2026-10-30',
-      ])
-        date: _logged(date),
-      '2026-10-31': _logged('2026-10-31', dayOff: true),
-    };
-
-    testWidgets('with 4 judged days last week; a tap opens that week', (
-      tester,
-    ) async {
-      await pump(tester, line, lastWeek: fourDays);
-      expect(find.text('Your notes on last week'), findsOneWidget);
-
-      await tester.tap(find.text('AI Coach'));
-      await tester.pumpAndSettle();
-      expect(find.text('History'), findsOneWidget);
-      expect(opened, _monday);
-    });
-
-    testWidgets('not with 3, as a day off doesn\'t count', (tester) async {
-      await pump(tester, line, lastWeek: {...fourDays}..remove('2026-10-30'));
-      expect(find.text('AI Coach'), findsNothing);
-    });
-
-    testWidgets('gone once last week\'s notes have been seen', (tester) async {
-      await pump(
-        tester,
-        line,
-        lastWeek: fourDays,
-        saved: const {weeklyReviewSeenKey: '2026-10-26'},
-      );
-      expect(find.text('AI Coach'), findsNothing);
-    });
-
-    testWidgets('back on a new week, until those are seen', (tester) async {
-      await pump(
-        tester,
-        line,
-        lastWeek: fourDays,
-        saved: const {weeklyReviewSeenKey: '2026-10-19'},
-      );
-      expect(find.text('AI Coach'), findsOneWidget);
-    });
-
-    testWidgets('never for free users', (tester) async {
-      await pump(tester, line, entitlement: null, lastWeek: fourDays);
       expect(find.text('AI Coach'), findsNothing);
     });
   });

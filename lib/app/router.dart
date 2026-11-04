@@ -103,11 +103,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.review,
-        builder: (context, state) => ReviewScreen(
-          initialWeek: state.extra is DateTime
-              ? state.extra! as DateTime
-              : null,
-        ),
+        builder: (context, state) => const ReviewScreen(),
       ),
       GoRoute(
         path: AppRoutes.profile,

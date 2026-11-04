@@ -97,7 +97,11 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
       'Adaptive Formula',
       'Learns your real burn and tunes your target.',
     ),
-    (Icons.insights_rounded, 'AI Coach', 'Spots your patterns every Monday.'),
+    (
+      Icons.insights_rounded,
+      'AI Coach',
+      'What\'s working, what isn\'t, and one easy fix.',
+    ),
     (
       Icons.pie_chart_outline_rounded,
       'Detailed Macros',

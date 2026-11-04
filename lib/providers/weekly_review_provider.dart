@@ -8,7 +8,6 @@ import 'package:lean_streak/models/weekly_review.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
-import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/recipe_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
@@ -94,25 +93,3 @@ final weeklyReviewProvider = FutureProvider.autoDispose
       }
       return points;
     });
-
-/// Device setting: the Monday (yyyy-MM-dd) of the latest week whose notes
-/// History has shown. Today's AI Coach line goes once it's last week's.
-const weeklyReviewSeenKey = 'weekly_review.seen';
-
-class WeeklyReviewSeen extends Notifier<String?> {
-  @override
-  String? build() =>
-      ref.watch(sharedPreferencesProvider).getString(weeklyReviewSeenKey);
-
-  /// Only ever moves on, so reading an older week doesn't bring the line
-  /// back.
-  void markSeen(String week) {
-    if (state != null && state!.compareTo(week) >= 0) return;
-    state = week;
-    ref.read(sharedPreferencesProvider).setString(weeklyReviewSeenKey, week);
-  }
-}
-
-final weeklyReviewSeenProvider = NotifierProvider<WeeklyReviewSeen, String?>(
-  WeeklyReviewSeen.new,
-);

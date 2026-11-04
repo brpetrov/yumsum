@@ -8,6 +8,7 @@ import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/period_review.dart';
 import 'package:lean_streak/providers/period_review_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/review/day_meals_sheet.dart';
@@ -20,12 +21,9 @@ import 'package:lean_streak/widgets/pill_toggle.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 
 /// Calendar on top, the period's review underneath. Week and month share one
-/// switch; any day up to today opens its meals. It opens on this month, or
-/// on the week of [initialWeek] (Today's AI Coach line).
+/// switch; any day up to today opens its meals.
 class ReviewScreen extends ConsumerStatefulWidget {
-  const ReviewScreen({super.key, this.initialWeek});
-
-  final DateTime? initialWeek;
+  const ReviewScreen({super.key});
 
   @override
   ConsumerState<ReviewScreen> createState() => _ReviewScreenState();
@@ -34,10 +32,8 @@ class ReviewScreen extends ConsumerStatefulWidget {
 enum _ReviewMode { week, month }
 
 class _ReviewScreenState extends ConsumerState<ReviewScreen> {
-  late _ReviewMode _mode = widget.initialWeek == null
-      ? _ReviewMode.month
-      : _ReviewMode.week;
-  late DateTime _anchor = _dateOnly(widget.initialWeek ?? DateTime.now());
+  _ReviewMode _mode = _ReviewMode.month;
+  DateTime _anchor = _dateOnly(DateTime.now());
 
   @override
   Widget build(BuildContext context) {
@@ -275,6 +271,8 @@ class _Calendar extends StatelessWidget {
           builder: (context, constraints) => GridView.count(
             crossAxisCount: 7,
             shrinkWrap: true,
+            // Not the phone's bottom inset, which the page already leaves.
+            padding: EdgeInsets.zero,
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 8,
             crossAxisSpacing: 6,
@@ -429,12 +427,17 @@ class _PeriodReviewCard extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // AI Coach, once all seven days of the week are over.
+        // AI Coach, once all seven days of the week are over. Its notes are
+        // weekly, so a month shows only the prompt to people without Star.
         if (!isMonth && days.length == 7)
           WeeklyNotesCard(
             monday: days.first,
             judgedDays: review.loggedDays - review.daysOff,
-          ),
+          )
+        else if (isMonth &&
+            !ref.watch(plusProvider) &&
+            review.loggedDays - review.daysOff >= 4)
+          const CoachPrompt(),
         AppCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

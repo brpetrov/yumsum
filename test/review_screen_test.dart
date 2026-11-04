@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/period_review_provider.dart';
@@ -17,7 +19,30 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const _plus = Entitlement(active: true, source: EntitlementSource.manual);
 
-Future<Widget> _app(DateTime? firstDay, {DateTime? initialWeek}) async {
+final _lastMonth = DateTime(DateTime.now().year, DateTime.now().month - 1);
+
+/// Four days logged at the start of last month.
+final _fourDays = [
+  for (var day = 1; day <= 4; day++)
+    DailySummary(
+      date: DateFormat(
+        'yyyy-MM-dd',
+      ).format(DateTime(_lastMonth.year, _lastMonth.month, day)),
+      totalCalories: 1900,
+      targetCalories: 1900,
+      calorieDelta: 0,
+      mealCount: 3,
+      status: DailyStatus.green,
+      updatedAt: DateTime.now(),
+    ),
+];
+
+/// [summaries] are what every period's review counts.
+Future<Widget> _app(
+  DateTime? firstDay, {
+  Entitlement? entitlement = _plus,
+  List<DailySummary> summaries = const [],
+}) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
   return ProviderScope(
@@ -25,24 +50,21 @@ Future<Widget> _app(DateTime? firstDay, {DateTime? initialWeek}) async {
       sharedPreferencesProvider.overrideWithValue(prefs),
       currentUidProvider.overrideWithValue('test'),
       userProfileProvider.overrideWith((ref) => Stream.value(null)),
-      entitlementProvider.overrideWith((ref) => Stream.value(_plus)),
+      entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
       firstLoggedDayProvider.overrideWith((ref) async => firstDay),
       reviewSummariesProvider.overrideWith((ref, range) async => {}),
       periodReviewProvider.overrideWith(
         (ref, range) async => PeriodReviewService().buildReview(
           startDate: range.startDate,
           endDate: range.endDate,
-          summaries: const [],
+          summaries: summaries,
         ),
       ),
       weeklyReviewProvider.overrideWith(
         (ref, monday) async => const ['Weekdays were steady.'],
       ),
     ],
-    child: MaterialApp(
-      theme: AppTheme.light,
-      home: ReviewScreen(initialWeek: initialWeek),
-    ),
+    child: MaterialApp(theme: AppTheme.light, home: const ReviewScreen()),
   );
 }
 
@@ -75,6 +97,23 @@ void main() {
     expect(_previous(tester).onPressed, isNull);
   });
 
+  testWidgets('the phone\'s bottom inset adds no gap under the calendar', (
+    tester,
+  ) async {
+    tester.view.padding = const FakeViewPadding(bottom: 120);
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(await _app(null));
+    await tester.pumpAndSettle();
+
+    final lastRow = tester.getBottomLeft(
+      find
+          .descendant(of: find.byType(GridView), matching: find.byType(InkWell))
+          .last,
+    );
+    final keyTop = tester.getTopLeft(find.byType(Wrap)).dy;
+    expect(keyTop - lastRow.dy, 16);
+  });
+
   testWidgets('no AI Coach in the month view, or for the week in progress', (
     tester,
   ) async {
@@ -87,16 +126,40 @@ void main() {
     expect(find.byType(WeeklyNotesCard), findsNothing);
   });
 
-  testWidgets('initialWeek opens the week view on that week, with AI Coach', (
+  testWidgets('with Star, a month with 4 days logged has no prompt', (
     tester,
   ) async {
+    await tester.pumpWidget(await _app(_lastMonth, summaries: _fourDays));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Previous'));
+    await tester.pumpAndSettle();
+    expect(find.byType(CoachPrompt), findsNothing);
+  });
+
+  testWidgets('without Star, a month with 4 days logged has the prompt', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      await _app(_lastMonth, entitlement: null, summaries: _fourDays),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Previous'));
+    await tester.pumpAndSettle();
+    expect(find.byType(CoachPrompt), findsOneWidget);
+  });
+
+  testWidgets('AI Coach on a finished week', (tester) async {
     final now = DateTime.now();
     final lastMonday = DateTime(
       now.year,
       now.month,
       now.day - (now.weekday - DateTime.monday) - 7,
     );
-    await tester.pumpWidget(await _app(null, initialWeek: lastMonday));
+    await tester.pumpWidget(await _app(lastMonday));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Week'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Previous'));
     await tester.pumpAndSettle();
 
     final card = tester.widget<WeeklyNotesCard>(find.byType(WeeklyNotesCard));

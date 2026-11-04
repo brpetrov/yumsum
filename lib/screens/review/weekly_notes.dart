@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
-import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
-import 'package:lean_streak/helpers/week_facts.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
-import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/weekly_review_provider.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/feature_intro.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
-
-String _weekKey(DateTime monday) => DateFormat('yyyy-MM-dd').format(monday);
 
 /// A number and its unit on the same line: "14 g", never "14" then "g".
 String _keepUnits(String note) => note.replaceAllMapped(
@@ -73,8 +66,8 @@ Future<void> showCoachIntro(BuildContext context, {bool plus = true}) async {
 
 /// AI Coach on a finished week in History, above the week's review. With
 /// YumSum Star: up to 3 notes the AI wrote from the week's facts, or why
-/// there are none. Without: the shining AI Coach button, when the week has
-/// enough logged for notes. [judgedDays] are the logged days that weren't
+/// there are none. Without: [CoachPrompt], when the week has enough logged
+/// for notes. [judgedDays] are the logged days that weren't
 /// days off; notes need 4.
 class WeeklyNotesCard extends ConsumerWidget {
   const WeeklyNotesCard({
@@ -90,29 +83,7 @@ class WeeklyNotesCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final plus = ref.watch(plusProvider);
     if (!plus) {
-      if (judgedDays < 4) return const SizedBox.shrink();
-      void open() => showCoachIntro(context, plus: false);
-      return _Spaced(
-        AppCard(
-          onTap: open,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TryButton(label: 'AI Coach', onTap: open),
-              const SizedBox(height: 12),
-              Text(
-                'Notes on your week every Monday: your patterns, your salt '
-                'and fibre, and one easy\u00A0tip.',
-                style: TextStyle(
-                  fontSize: 14,
-                  height: 1.35,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+      return judgedDays < 4 ? const SizedBox.shrink() : const CoachPrompt();
     }
 
     final muted = TextStyle(
@@ -169,14 +140,6 @@ class WeeklyNotesCard extends ConsumerWidget {
           ),
           data: (points) {
             if (points.isEmpty) return const SizedBox.shrink();
-            // Shown, so Today's line can go.
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (context.mounted) {
-                ref
-                    .read(weeklyReviewSeenProvider.notifier)
-                    .markSeen(_weekKey(monday));
-              }
-            });
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -219,6 +182,39 @@ class WeeklyNotesCard extends ConsumerWidget {
               ],
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+/// For people without YumSum Star, on History's weeks and months: the
+/// shining AI Coach button and a line on what it does, both opening the
+/// dialog.
+class CoachPrompt extends StatelessWidget {
+  const CoachPrompt({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    void open() => showCoachIntro(context, plus: false);
+    return _Spaced(
+      AppCard(
+        onTap: open,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TryButton(label: 'AI Coach', onTap: open),
+            const SizedBox(height: 12),
+            Text(
+              'See what\'s working, what\'s holding you back, and one easy '
+              'fix for next week.',
+              style: TextStyle(
+                fontSize: 14,
+                height: 1.35,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -277,74 +273,4 @@ class _Spaced extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       Padding(padding: const EdgeInsets.only(bottom: 18), child: child);
-}
-
-/// On Today, for YumSum Star: a slim line to last week's notes, from the
-/// Monday until they've been read in History. Last week needs 4 judged
-/// days, as the notes do.
-class WeeklyNotesLine extends ConsumerWidget {
-  const WeeklyNotesLine({super.key, required this.today});
-
-  final DateTime today;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    if (!ref.watch(plusProvider)) return const SizedBox.shrink();
-    final monday = DateTime(
-      today.year,
-      today.month,
-      today.day - (today.weekday - DateTime.monday) - 7,
-    );
-    final summaries = ref
-        .watch(
-          reviewSummariesProvider(
-            ReviewRange(
-              startDate: monday,
-              endDate: DateTime(monday.year, monday.month, monday.day + 6),
-            ),
-          ),
-        )
-        .valueOrNull;
-    final judged = summaries?.values.where(isJudgedDay).length ?? 0;
-    if (judged < 4 || ref.watch(weeklyReviewSeenProvider) == _weekKey(monday)) {
-      return const SizedBox.shrink();
-    }
-
-    return _Spaced(
-      AppCard(
-        onTap: () => context.push(AppRoutes.review, extra: monday),
-        padding: const EdgeInsets.fromLTRB(18, 14, 12, 14),
-        child: Row(
-          children: [
-            const IconBubble(Icons.auto_awesome_rounded, size: 40),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'AI Coach',
-                    style: TextStyle(
-                      fontSize: 15.5,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'Your notes on last week',
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
-          ],
-        ),
-      ),
-    );
-  }
 }

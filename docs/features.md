@@ -8,7 +8,6 @@ How each part of the app works, for when you're working on it. `CLAUDE.md` has t
 - Calories, then the protein and macro rings, the day's meals, a month graph and weight.
 - The umbrella at the top right takes the day off (see Days).
 - `PlusPromptCard` for free users; its cross hides it for 14 days.
-- `WeeklyNotesLine` above the month card, for YumSum Star, until last week's AI Coach notes have been seen (see AI Coach).
 
 **The quick-log bar** (`QuickLogBar`, `lib/screens/dashboard/helpers/quick_log_bar.dart`), pinned at the bottom of Home:
 - Type the meal; the calories and protein go in two plain number boxes that appear under it once the bar is in use. The boxes have keys `quick-log-name`, `-kcal` and `-protein`.
@@ -24,8 +23,7 @@ How each part of the app works, for when you're working on it. `CLAUDE.md` has t
 - The top-left menu (`AppDrawer` in `lib/widgets/app_frame.dart`, on every page) lists Home, History, Recipes, Weight & Progress, Plan Settings, Notifications and Account Settings, then YumSum Star, and Debug tools where they're on offer. There are no bottom tabs.
 - Home is the root and every other page sits one level above it: picking a page from inside another swaps it (`pushReplacement`), so Back always returns Home. YumSum Star opens over the current page instead.
 - History (`ReviewScreen`, `/review`): a week/month calendar with the period review; tapping a day opens `showDayMealsSheet` (`lib/screens/review/day_meals_sheet.dart`) to add, edit or delete its meals.
-  - For finished weeks in the week view, YumSum Star users get the AI Coach's notes (`WeeklyNotesCard`, plan 09) above the review.
-  - It takes an optional `initialWeek` as `extra`, which opens it in the week view on that week.
+  - For finished weeks in the week view, YumSum Star users get the AI Coach's notes (`WeeklyNotesCard`, plan 09) above the review. Free users get its prompt (`CoachPrompt`) there and on months.
 - Plan Settings is `PlanSettingsScreen` in `lib/screens/profile/profile_screen.dart`; Account Settings is `AccountSettingsScreen` on `/profile`.
 - Routing: `goRouterProvider` listens to `authStateProvider` and `userProfileProvider` and enforces Splash → Auth → Onboarding → Home; a profile that fails to load goes to `ProfileLoadErrorScreen`.
 
@@ -50,7 +48,6 @@ SharedPreferences through `sharedPreferencesProvider` (`lib/providers/preference
 - `feedback.sent_day`, `feedback.sent_count` (3 feedback messages a day)
 - `plus.prompt_hidden_until`
 - `adaptive.intro_shown`, `adaptive.lapse_notice` (the Adaptive formula's one-time dialogs)
-- `weekly_review.seen` (the Monday of the latest week whose AI Coach notes History has shown)
 - `debug.account` (Debug tools' pretend account)
 
 ## Firestore data and resets
@@ -189,8 +186,8 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
   - `refreshHistory` invalidates it.
 - **Where it shows** (`lib/screens/review/weekly_notes.dart`):
   - `WeeklyNotesCard`, first in a finished week's review: the notes and "Written by AI from what you logged.", or why there are none for a thin week, a spinner, or "Could not get this week's notes. Try again." with Try again. Numbers keep their units on one line. The info button opens `showCoachIntro`.
-  - Free users get the shining AI Coach button (`TryButton`) and a line on weeks that would have notes, and nothing on thin weeks. Either opens `showCoachIntro(plus: false)`, whose Enable opens `/plus`.
-  - `WeeklyNotesLine` on Home, for YumSum Star: when last week had 4 judged days and its notes haven't been shown (`weekly_review.seen`, which only moves on). It opens History on last week.
+  - Free users get `CoachPrompt`: the shining AI Coach button (`TryButton`) and "See what's working, what's holding you back, and one easy fix for next week.", on weeks that would have notes and on months with 4 judged days, and nothing on thin ones. Either opens `showCoachIntro(plus: false)`, whose Enable opens `/plus`.
+  - Nothing on Home: the notes are only in History.
 
 ## Days
 
