@@ -89,5 +89,6 @@ Short and plain, in British English, saying "you":
 - 08 Adaptive formula
 - 09 AI weekly review (AI Coach)
 - 10 full macros
+- 11 pricing YumSum Star
 
 `README.md` and `leanstreak_agent_build_spec.md` are out of date.
