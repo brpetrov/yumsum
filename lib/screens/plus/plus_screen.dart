@@ -10,6 +10,8 @@ import 'package:lean_streak/core/constants/legal_links.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
+import 'package:lean_streak/providers/plus_purchase_controller.dart';
+import 'package:lean_streak/services/billing_service.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
@@ -54,10 +56,17 @@ String plusStatusLine(Entitlement? entitlement, DateTime now) {
   };
 }
 
-/// The YumSum Star promo: what it adds, the yearly and monthly plans and
-/// the free week, on one phone screen. It isn't on sale yet, so the buttons
-/// say so; Play billing (docs/plans/07-billing.md) will load the real
-/// prices and start the purchase.
+/// Whether a Play subscription will keep renewing, so deleting the account
+/// must warn that it doesn't cancel it.
+bool renewsInPlay(Entitlement? entitlement) =>
+    entitlement?.source == EntitlementSource.play &&
+    entitlement!.state != 'cancelled' &&
+    entitlement.state != 'expired';
+
+/// The YumSum Star page: what it adds, then the yearly and monthly plans at
+/// Play's own prices, with the free trial when Play offers one to this
+/// Google account, all on one phone screen. Buying and restoring go through
+/// [plusPurchaseControllerProvider]; the page closes once YumSum Star is on.
 class PlusScreen extends ConsumerStatefulWidget {
   const PlusScreen({super.key});
 
@@ -67,6 +76,10 @@ class PlusScreen extends ConsumerStatefulWidget {
 
 class _PlusScreenState extends ConsumerState<PlusScreen> {
   bool _yearly = true;
+
+  /// A purchase or restore started here, so YumSum Star switching on is its
+  /// result (and not just the record loading).
+  bool _started = false;
 
   static const _features = [
     (
@@ -84,11 +97,7 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
       'Adaptive Formula',
       'Learns your real burn and tunes your target.',
     ),
-    (
-      Icons.insights_rounded,
-      'AI Assisted Coach',
-      'Weekly and monthly reviews, with advice.',
-    ),
+    (Icons.insights_rounded, 'AI Coach', 'Spots your patterns every Monday.'),
     (
       Icons.pie_chart_outline_rounded,
       'Detailed Macros',
@@ -96,27 +105,121 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
     ),
   ];
 
-  Future<void> _comingSoon() => showDialog<void>(
-    context: context,
-    builder: (context) => AlertDialog(
-      icon: const PlusStar(size: 64),
-      title: const Text('Coming soon'),
-      content: const Text(
-        'YumSum Star isn\'t on sale yet. You\'ll be able to start your free '
-        'week here soon.',
-        textAlign: TextAlign.center,
-      ),
-      actions: [
-        FilledButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('OK'),
+  void _buy(StarPlan plan) {
+    _started = true;
+    ref.read(plusPurchaseControllerProvider.notifier).buy(plan);
+  }
+
+  void _restore() {
+    _started = true;
+    ref.read(plusPurchaseControllerProvider.notifier).restore();
+  }
+
+  /// The yearly and monthly tiles, the button and the terms under it.
+  Widget _plans(List<StarPlan> plans, PlusPurchase purchase, TextStyle muted) {
+    final [yearly, monthly] = plans;
+    final chosen = _yearly ? yearly : monthly;
+    final period = _yearly ? 'year' : 'month';
+    final saving = (100 * (1 - yearly.micros / (12 * monthly.micros))).round();
+    final trial = chosen.trialDays;
+    final terms =
+        '${chosen.price} a $period. Renews every $period until you cancel. '
+        'Cancel any time in Google Play.';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Both tiles as tall as the taller one.
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _PlanTile(
+                  title: 'Yearly',
+                  price: yearly.price,
+                  per: 'a year',
+                  note:
+                      '${NumberFormat.simpleCurrency(name: yearly.currency).format(yearly.micros / 12e6)}'
+                      ' a month',
+                  badge: saving > 0 ? 'Save $saving%' : null,
+                  selected: _yearly,
+                  onTap: () => setState(() => _yearly = true),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _PlanTile(
+                  title: 'Monthly',
+                  price: monthly.price,
+                  per: 'a month',
+                  selected: !_yearly,
+                  onTap: () => setState(() => _yearly = false),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        _StartButton(
+          label: purchase.checking
+              ? 'Checking with Google Play'
+              : trial == null
+              ? 'Subscribe'
+              : 'Start $trial days free',
+          onPressed: purchase.checking ? null : () => _buy(chosen),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          trial == null
+              ? terms
+              : '$trial days free, then ${chosen.price} a $period. Renews '
+                    'every $period until you cancel. Cancel any time in '
+                    'Google Play.',
+          textAlign: TextAlign.center,
+          style: muted,
         ),
       ],
-    ),
-  );
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(plusPurchaseControllerProvider, (_, next) {
+      if (next.message case final message?) {
+        showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    });
+    // Bought or restored: back to where the person came from, which now
+    // has YumSum Star.
+    ref.listen(plusProvider, (_, plus) {
+      if (!plus || !_started) return;
+      _started = false;
+      final e = ref.read(entitlementProvider).valueOrNull;
+      final messenger = ScaffoldMessenger.of(context);
+      Navigator.of(context).maybePop();
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            e != null && e.inTrial && e.expiresAt != null
+                ? 'YumSum Star is on. Your free week ends on '
+                      '${DateFormat('d MMMM').format(e.expiresAt!)}.'
+                : 'YumSum Star is on.',
+          ),
+        ),
+      );
+    });
+
     final entitlement = ref.watch(entitlementProvider).valueOrNull;
     final now = DateTime.now();
     final plus = entitlement?.isPlusAt(now) ?? false;
@@ -167,53 +270,41 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
           style: muted.copyWith(fontSize: 15),
         ),
       );
-    } else {
-      offer = Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Both tiles as tall as the taller one.
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: _PlanTile(
-                    title: 'Yearly',
-                    price: '£17.99',
-                    per: 'a year',
-                    note: '£1.50 a month',
-                    badge: 'Save 50%',
-                    selected: _yearly,
-                    onTap: () => setState(() => _yearly = true),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _PlanTile(
-                    title: 'Monthly',
-                    price: '£2.99',
-                    per: 'a month',
-                    selected: !_yearly,
-                    onTap: () => setState(() => _yearly = false),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          _StartButton(onPressed: _comingSoon),
-          const SizedBox(height: 8),
-          Text(
-            _yearly
-                ? '7 days free, then £17.99 a year. Renews every year until '
-                      'you cancel. Cancel any time in Google Play.'
-                : '7 days free, then £2.99 a month. Renews every month '
-                      'until you cancel. Cancel any time in Google Play.',
-            textAlign: TextAlign.center,
-            style: muted,
-          ),
-        ],
+    } else if (!playBilling) {
+      // Apple's rules don't let the iPhone app point to another way to pay.
+      offer = AppCard(
+        child: Text(
+          'YumSum Star can\'t be bought on iPhone yet.',
+          textAlign: TextAlign.center,
+          style: muted.copyWith(fontSize: 15),
+        ),
       );
+    } else {
+      final purchase = ref.watch(plusPurchaseControllerProvider);
+      offer = ref
+          .watch(starPlansProvider)
+          .when(
+            data: (plans) => _plans(plans, purchase, muted),
+            loading: () => const SizedBox(
+              height: 200,
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (_, _) => AppCard(
+              child: Column(
+                children: [
+                  Text(
+                    playUnreachable,
+                    textAlign: TextAlign.center,
+                    style: muted.copyWith(fontSize: 15),
+                  ),
+                  TextButton(
+                    onPressed: () => ref.invalidate(starPlansProvider),
+                    child: const Text('Try again'),
+                  ),
+                ],
+              ),
+            ),
+          );
     }
 
     final link = TextButton.styleFrom(visualDensity: VisualDensity.compact);
@@ -298,10 +389,10 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
                             Wrap(
                               alignment: WrapAlignment.center,
                               children: [
-                                if (!plus && !kIsWeb)
+                                if (!plus && playBilling)
                                   TextButton(
                                     style: link,
-                                    onPressed: _comingSoon,
+                                    onPressed: _restore,
                                     child: const Text(
                                       'Restore purchase',
                                       style: linkSize,
@@ -501,10 +592,12 @@ class _PlanTile extends StatelessWidget {
 }
 
 /// The big orange "Start 7 days free" pill, glowing like the mic button.
+/// It keeps its look while a purchase is checked ([onPressed] null).
 class _StartButton extends StatelessWidget {
-  const _StartButton({required this.onPressed});
+  const _StartButton({required this.label, required this.onPressed});
 
-  final VoidCallback onPressed;
+  final String label;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -526,9 +619,11 @@ class _StartButton extends StatelessWidget {
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           foregroundColor: AppColors.onPrimary,
+          disabledBackgroundColor: Colors.transparent,
+          disabledForegroundColor: AppColors.onPrimary,
           minimumSize: const Size.fromHeight(56),
         ),
-        child: const Text('Start 7 days free', style: TextStyle(fontSize: 18)),
+        child: Text(label, style: const TextStyle(fontSize: 18)),
       ),
     );
   }

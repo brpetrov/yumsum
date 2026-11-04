@@ -7,6 +7,7 @@ import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 
@@ -144,6 +145,11 @@ class AccountController extends AsyncNotifier<void> {
 
     try {
       final user = await _reauthenticate(password);
+      // The YumSum Star record is the server's, so only the server can
+      // delete it. Only an account that ever had YumSum Star has one.
+      if (await ref.read(realEntitlementProvider.future) != null) {
+        await ref.read(billingRepositoryProvider).deleteBillingData();
+      }
       await ref.read(accountRepositoryProvider).deleteAccountData(user.uid);
       await user.delete();
       await FirebaseAuth.instance.signOut();

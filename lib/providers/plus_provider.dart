@@ -1,14 +1,46 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/debug_provider.dart';
+import 'package:lean_streak/repositories/billing_repository.dart';
 import 'package:lean_streak/repositories/entitlement_repository.dart';
+import 'package:lean_streak/services/billing_service.dart';
 
 final entitlementRepositoryProvider = Provider<EntitlementRepository>((ref) {
   return EntitlementRepository(FirebaseFirestore.instance);
+});
+
+/// Whether YumSum Star can be bought here: the Android app, through Google
+/// Play. The website and an iPhone build only read the account's record.
+bool get playBilling =>
+    !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+
+/// Google Play Billing; read only where [playBilling].
+final billingServiceProvider = Provider<BillingService>((ref) {
+  return BillingService(InAppPurchase.instance);
+});
+
+final billingRepositoryProvider = Provider<BillingRepository>((ref) {
+  return BillingRepository(
+    FirebaseFunctions.instanceFor(region: 'europe-west2'),
+  );
+});
+
+/// YumSum Star's plans with Play's own prices, for the YumSum Star page.
+final starPlansProvider = FutureProvider.autoDispose<List<StarPlan>>((
+  ref,
+) async {
+  try {
+    return await ref.watch(billingServiceProvider).loadPlans();
+  } catch (error) {
+    debugPrint('Could not load the plans: $error');
+    rethrow;
+  }
 });
 
 /// The account's own record, never a pretend one.

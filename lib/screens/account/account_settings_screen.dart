@@ -150,7 +150,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       title: 'Delete account?',
       description: _confirmNote(
         'This deletes your account and everything in it. It can\'t be '
-        'undone.',
+        'undone.${renewsInPlay(ref.read(entitlementProvider).valueOrNull) ? ' Deleting your account doesn\'t cancel YumSum Star. Cancel it in Google Play first, or it keeps renewing.' : ''}',
       ),
       confirmLabel: 'Delete account',
       destructive: true,

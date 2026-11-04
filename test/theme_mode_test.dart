@@ -14,6 +14,8 @@ import 'package:lean_streak/providers/reminder_provider.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'billing_fixtures.dart';
+
 void main() {
   late SharedPreferences prefs;
 
@@ -26,6 +28,8 @@ void main() {
           sharedPreferencesProvider.overrideWithValue(prefs),
           currentUidProvider.overrideWithValue('test'),
           entitlementProvider.overrideWith((ref) => Stream.value(null)),
+          realEntitlementProvider.overrideWith((ref) => Stream.value(null)),
+          billingServiceProvider.overrideWithValue(FakeBillingService()),
           activityScaleMigrationProvider.overrideWith((ref) async {}),
           adaptiveMondayProvider.overrideWith((ref) async {}),
           reminderSyncProvider.overrideWith((ref) async {}),

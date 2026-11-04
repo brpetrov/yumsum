@@ -17,6 +17,8 @@ import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'billing_fixtures.dart';
+
 class _FakeAccountController extends AccountController {
   final resetPasswords = <String>[];
   final deletePasswords = <String>[];
@@ -99,6 +101,11 @@ void main() {
           authStateProvider.overrideWith((ref) => Stream<User?>.value(user)),
           accountControllerProvider.overrideWith(() => controller),
           entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
+          realEntitlementProvider.overrideWith(
+            (ref) => Stream.value(entitlement),
+          ),
+          billingServiceProvider.overrideWithValue(FakeBillingService()),
+          billingRepositoryProvider.overrideWithValue(FakeBillingRepository()),
         ],
         child: MaterialApp.router(
           theme: AppTheme.light,
@@ -151,6 +158,35 @@ void main() {
 
     expect(controller.resetPasswords, ['hunter2']);
     expect(find.text('All logged data deleted.'), findsOneWidget);
+  });
+
+  group('Deleting warns only while a Play subscription still renews', () {
+    const warning =
+        'Deleting your account doesn\'t cancel YumSum Star. Cancel it in '
+        'Google Play first, or it keeps renewing.';
+    Entitlement play(String state) => Entitlement(
+      active: true,
+      source: EntitlementSource.play,
+      state: state,
+      expiresAt: DateTime.now().add(const Duration(days: 30)),
+    );
+
+    for (final (name, entitlement, warns) in [
+      ('renewing', play('active'), true),
+      ('cancelled', play('cancelled'), false),
+      ('never had it', null, false),
+    ]) {
+      testWidgets(name, (tester) async {
+        await pumpScreen(tester, entitlement: entitlement);
+        await tester.ensureVisible(find.text('Delete account'));
+        await tester.tap(find.text('Delete account'));
+        await tester.pumpAndSettle();
+        expect(
+          find.textContaining(warning),
+          warns ? findsOneWidget : findsNothing,
+        );
+      });
+    }
   });
 
   testWidgets('A Google account confirms with Google, not a password', (
