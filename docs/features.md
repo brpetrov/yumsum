@@ -62,15 +62,24 @@ SharedPreferences through `sharedPreferencesProvider` (`lib/providers/preference
 ## YumSum Star
 
 The paid tier (plan 06; the code says `plus`).
-- **The record:** `entitlements/{uid}`, written by the server (Play billing, plan 07, not built yet) or by the owner in the console.
+- **The record:** `entitlements/{uid}`, written by the server (the billing functions, plan 07) or by the owner in the console.
   - A manual grant is `active` true, `source` `manual` and an optional `expiresAt`.
   - `admin` true is YumSum Star for good with no daily AI limit (`aiDailyLimitProvider` is null) and no past-day change limit.
   - `dev` true is admin plus Debug tools in every build.
 - **Providers** (`lib/providers/plus_provider.dart`): `entitlementProvider` (with Debug tools' pretend account applied), `plusProvider`, `adminProvider`, and `realEntitlementProvider` / `debugToolsProvider`, which read the real record so pretending never hides Debug tools. Tests override `entitlementProvider`.
 - **The page:** gates call `showPlusPaywall`, which opens `PlusScreen` (`/plus`), a one-screen promo (a smaller bowl on screens under 800 px tall).
-  - It names Smart Snap (photo logging), Triple the AI estimates, Adaptive Formula, AI Assisted Coach (the weekly review, a monthly one later) and Detailed Macros.
-  - Its buttons show "Coming soon" until billing exists.
-  - On the web it says to subscribe in the Android app.
+  - It names Smart Snap (photo logging), Triple the AI estimates, Adaptive Formula, AI Coach (the weekly review) and Detailed Macros.
+  - On Android the yearly and monthly tiles show Play's own prices (`starPlansProvider`), with the yearly price as the big number, its monthly cost and saving worked out from Play's figures. "Start 7 days free" and the trial wording only when Play offers this Google account the trial; otherwise "Subscribe".
+  - Restore purchase, and "Could not reach Google Play…" with Try again when the plans don't load.
+  - Once YumSum Star switches on after a purchase or restore started there, it closes with "YumSum Star is on." (and the trial's end date).
+  - On the web it says to subscribe in the Android app; on an iPhone, that it can't be bought there yet.
+- **Billing** (plan 07), Android only (`playBilling`):
+  - `BillingService` (`lib/services/billing_service.dart`) wraps `in_app_purchase`: the plans (`starPlansFrom` picks each base plan's trial offer when Play lists one), buy, restore, complete.
+  - `BillingRepository` calls the `verifyPurchase` and `deleteBillingData` functions in `europe-west2` (`functions/`).
+  - `plusPurchaseControllerProvider` (`lib/providers/plus_purchase_controller.dart`) listens to Play's purchase stream for the app's life (`LeanStreakApp` keeps it alive). It sends every purchased or restored YumSum Star purchase to `verifyPurchase`, then completes it; the server's write to the record is what switches YumSum Star on. It shows the plan's messages (pending, not confirmed, linked to another account, nothing to restore). Signed in without YumSum Star, it restores quietly once per account at start-up.
+  - Buying passes a SHA-256 of the uid as Play's account ID.
+  - Deleting an account calls `deleteBillingData` first when the account has a record. The delete dialog warns while a Play subscription still renews (`renewsInPlay`).
+  - Tests use `test/billing_fixtures.dart` (`FakeBillingService`, `FakeBillingRepository`); screens that open the page or pump `LeanStreakApp` override `billingServiceProvider` and `realEntitlementProvider`.
 - **The look** (`lib/widgets/plus_mark.dart`):
   - `PlusMark`: the wordmark, with "Star" in orange.
   - `PlusStar`: the smiling star, `assets/plus/star.webp`.
