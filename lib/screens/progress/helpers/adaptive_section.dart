@@ -10,13 +10,13 @@ import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/screens/dashboard/helpers/adaptive_dialogs.dart';
 import 'package:lean_streak/widgets/day_status.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
-import 'package:lean_streak/widgets/plus_mark.dart';
+import 'package:lean_streak/widgets/shine.dart';
 
 /// The Adaptive formula under the weight chart. With YumSum Star it's always
 /// on: a shining "On" chip, what you burn as it has learnt it, the target
 /// that follows, how well it knows you and this week's result, and an info
-/// button ([showAdaptiveIntro]). Without it, a Star button that opens the
-/// same dialog, offering to enable it.
+/// button ([showAdaptiveIntro]). Without it, an inviting button that opens
+/// the same dialog, offering to enable it.
 class AdaptiveSection extends ConsumerWidget {
   const AdaptiveSection({super.key, required this.profile});
 
@@ -34,8 +34,8 @@ class AdaptiveSection extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _StarButton(onTap: open),
-              const SizedBox(height: 10),
+              _TryButton(onTap: open),
+              const SizedBox(height: 12),
               Text(
                 'A customised formula tailored just for you. Adapting with '
                 'time and your weigh-ins.',
@@ -129,44 +129,68 @@ class AdaptiveSection extends ConsumerWidget {
   }
 }
 
-/// For free users: the Adaptive formula itself as the button, with the star
-/// that says it's a YumSum Star feature, like a bigger "Become a Star" chip.
-class _StarButton extends StatelessWidget {
-  const _StarButton({required this.onTap});
+/// For free users: the Adaptive formula itself as the button, a warm orange
+/// pill with a soft glow under it and a [Shine] across it when it appears,
+/// asking to be tapped. The star waits in the dialog's Enable.
+class _TryButton extends StatelessWidget {
+  const _TryButton({required this.onTap});
 
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.primaryContainer,
-      shape: const StadiumBorder(),
-      child: InkWell(
-        customBorder: const StadiumBorder(),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const PlusStar(size: 30),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  'Adaptive formula',
-                  style: AppTheme.display.copyWith(
-                    fontSize: 17,
-                    color: AppColors.onPrimaryContainer,
-                  ),
+    final shape = BorderRadius.circular(999);
+    // The glow sits outside the shine, which would otherwise cut it off.
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: shape,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Shine(
+        child: Material(
+          shape: const StadiumBorder(),
+          clipBehavior: Clip.antiAlias,
+          child: Ink(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primary,
+                  Color.lerp(AppColors.primary, Colors.white, 0.2)!,
+                ],
+              ),
+            ),
+            child: InkWell(
+              onTap: onTap,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 10, 14, 10),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'Adaptive formula',
+                        style: AppTheme.display.copyWith(
+                          fontSize: 17,
+                          color: AppColors.onPrimary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 20,
+                      color: AppColors.onPrimary,
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 2),
-              Icon(
-                Icons.chevron_right_rounded,
-                size: 22,
-                color: AppColors.onPrimaryContainer,
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -174,97 +198,44 @@ class _StarButton extends StatelessWidget {
   }
 }
 
-/// The green "On" chip, with a glint that sweeps across it three times when
-/// it appears: enough to catch the eye, then it rests. No glint when the
-/// phone asks for less motion.
-class _OnChip extends StatefulWidget {
+/// The green "On" chip, with a [Shine] across it when it appears.
+class _OnChip extends StatelessWidget {
   const _OnChip();
-
-  @override
-  State<_OnChip> createState() => _OnChipState();
-}
-
-class _OnChipState extends State<_OnChip> with SingleTickerProviderStateMixin {
-  late final _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 1800),
-  )..repeat(count: 3);
-
-  // The sweep takes the first 60%; the rest is a pause before the next.
-  late final _sweep = CurvedAnimation(
-    parent: _controller,
-    curve: const Interval(0, 0.6, curve: Curves.easeInOut),
-  );
-
-  @override
-  void dispose() {
-    _sweep.dispose();
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     // Solid green, so the white glint shows.
-    final chip = Container(
-      padding: const EdgeInsets.fromLTRB(8, 4, 11, 4),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.veryGood,
-            Color.lerp(AppColors.veryGood, Colors.white, 0.22)!,
-          ],
+    return Shine(
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(8, 4, 11, 4),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.veryGood,
+              Color.lerp(AppColors.veryGood, Colors.white, 0.22)!,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(999),
         ),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.auto_awesome_rounded, size: 14, color: Colors.white),
-          const SizedBox(width: 4),
-          Text(
-            'On',
-            style: AppTheme.display.copyWith(
-              fontSize: 14,
-              height: 1.2,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.auto_awesome_rounded,
+              size: 14,
               color: Colors.white,
             ),
-          ),
-        ],
-      ),
-    );
-    if (MediaQuery.disableAnimationsOf(context)) return chip;
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(999),
-      child: Stack(
-        children: [
-          chip,
-          Positioned.fill(
-            child: IgnorePointer(
-              child: AnimatedBuilder(
-                animation: _sweep,
-                // From off the left edge to off the right.
-                builder: (context, child) => FractionalTranslation(
-                  translation: Offset(_sweep.value * 2 - 1, 0),
-                  child: child,
-                ),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.white.withValues(alpha: 0),
-                        Colors.white.withValues(alpha: 0.6),
-                        Colors.white.withValues(alpha: 0),
-                      ],
-                      stops: const [0.3, 0.5, 0.7],
-                    ),
-                  ),
-                ),
+            const SizedBox(width: 4),
+            Text(
+              'On',
+              style: AppTheme.display.copyWith(
+                fontSize: 14,
+                height: 1.2,
+                color: Colors.white,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

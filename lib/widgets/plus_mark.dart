@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
+import 'package:lean_streak/widgets/shine.dart';
 
 /// The YumSum Star wordmark, with "Star" in the icon's orange. (The code
 /// calls the paid tier "plus", from before it had a name.)
@@ -50,8 +51,9 @@ class PlusStar extends StatelessWidget {
 }
 
 /// YumSum Star at a glance, beside the logo in the menu and the name on Home: the
-/// star for members, a "Become a Star" chip for everyone else. Nothing while
-/// the account loads, so a member never sees the chip flash.
+/// star for members, with a [Shine] when it appears, and a "Become a Star"
+/// chip for everyone else. Nothing while the account loads, so a member
+/// never sees the chip flash.
 class StarBadge extends ConsumerWidget {
   const StarBadge({super.key, required this.onTap});
 
@@ -68,7 +70,7 @@ class StarBadge extends ConsumerWidget {
         child: InkResponse(
           onTap: onTap,
           radius: 20,
-          child: const PlusStar(size: 28),
+          child: const Shine(strength: 0.9, child: PlusStar(size: 28)),
         ),
       );
     }

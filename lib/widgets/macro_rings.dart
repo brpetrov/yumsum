@@ -192,7 +192,7 @@ class _Locked extends StatelessWidget {
         child: Stack(
           children: [
             Opacity(
-              opacity: 0.4,
+              opacity: 0.3,
               child: IgnorePointer(
                 // Cut off at the edge rather than scrolled.
                 child: SingleChildScrollView(

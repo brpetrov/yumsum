@@ -79,9 +79,10 @@ The paid tier (plan 06; the code says `plus`).
 - **Where it shows:**
   - A row in the menu.
   - `StarBadge` beside the logo in the menu header and beside the name on Home: the star for members, a "Become a Star" chip for everyone else, nothing while the record loads.
+  - The members' star shines when it appears (`Shine`, `lib/widgets/shine.dart`): a white glint sweeps across it three times, then rests; none when the phone asks for less motion. The Adaptive formula's On chip and free button use it too.
   - A card in Account Settings.
   - `PlusPromptCard` on Home.
-  - The dimmed macro rings for free users, and the starred Adaptive formula button under the weight chart.
+  - The dimmed macro rings for free users, and the shining Adaptive formula button under the weight chart.
 - **Debug tools** (`/debug`, `DebugScreen`), in debug builds and for dev accounts in any build:
   - the User ID to copy;
   - "Pretend to be" (`debugAccountProvider`): free, subscribed, trial, ended or admin, on that device. A pretend account is real enough to change the Adaptive formula on the real plan.
@@ -118,7 +119,7 @@ YumSum Star only (plan 10). `macrosForEveryone` in `calorie_estimate_service.dar
   - Colours: protein and fibre stay green however far over. Carbs and fat are judged like the calorie bar: green up to 10% over, amber up to 20%, red past that. Sugars, saturates and salt turn amber past their limit and red past 20% over.
   - A tap on a ring opens the guide. The card's info button, at its top right beside the status pill, opens it with calories first ("Your targets").
   - A ring's round ends are allowed for, so a ring just under its target stops short of the top and a full one's ends meet there.
-  - Free users see the protein ring live and the rest dimmed and part-filled, with no figures, under an "Unlock full macros" chip; a tap anywhere there opens `/plus`.
+  - Free users see the protein ring live and the rest dimmed (30% opacity) and part-filled, with no figures, under an "Unlock full macros" chip; a tap anywhere there opens `/plus`.
 - **Elsewhere:**
   - History's day sheet uses `MacroTotals` (`lib/widgets/macro_totals.dart`): one line of fat, carbs and salt that opens to all six, with "at least" where some meals lack a figure.
   - A `MealRow` with macros shows an orange "Nutrition" hint beside its time, and a tap shows its `macrosLine`, with protein between fibre and salt as on a food label when protein tracking is on.
@@ -153,7 +154,7 @@ YumSum Star (plan 08).
   - Plan Settings: a row with the sum (`adaptiveSumLine`) and how well it knows you (`adaptiveStageLine`, from `adaptiveProgressProvider`); the star for free users, whose tap opens `/plus`.
   - Weight & Progress: `AdaptiveSection` (`lib/screens/progress/helpers/adaptive_section.dart`), under the chart in its card.
     - With YumSum Star: the title, a solid green "✨ On" chip whose white glint sweeps across three times when it appears (none when the phone asks for less motion), and the info button on the right. Then two plain lines, each with an icon and a note: "You burn 2440 kcal a day" (`adaptiveBurn`, measured up to yesterday; "Learnt from your weigh-ins and meals." or, before it has learnt anything, "A first estimate. It learns as you weigh in.") and "Your target is 1620 kcal a day" ("To lose 0.75 kg a week." or "To keep your weight steady."). Then the stage and this week's line.
-    - Free users: the name itself is the button, a bigger "Become a Star" chip with the star, over "A customised formula tailored just for you. Adapting with time and your weigh-ins." No info button and no numbers, so it invites rather than knocks the standard plan. A tap opens the dialog, which offers Enable.
+    - Free users: the name itself is the button, a warm orange pill with an arrow and a soft glow that shines when it appears (the star waits in the dialog's Enable), over "A customised formula tailored just for you. Adapting with time and your weigh-ins." No info button and no numbers, so it invites rather than knocks the standard plan. A tap opens the dialog, which offers Enable.
 - **The explainer:** `showAdaptiveIntro` (`lib/screens/dashboard/helpers/adaptive_dialogs.dart`), titled "Adaptive formula" over "A target that learns from you": four bold promises (finds your real burn, adapts to your body, beats plateaus, learns as you go), each with one short line. With YumSum Star, "Log weight now" opens the weigh-in dialog (`logWeightWithFeedback`); without it (`plus: false`), "Enable" with the star opens `/plus`. The other button is Close. It is shown once after subscribing, from Plan Settings and the info button under the chart, and from the free users' button.
 - **Tests:** the seeded simulator in `test/adaptive_fixtures.dart`.
 

@@ -16,6 +16,7 @@ import 'package:lean_streak/screens/progress/progress_screen.dart';
 import 'package:lean_streak/services/weight_log_service.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
+import 'package:lean_streak/widgets/shine.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'adaptive_fixtures.dart';
@@ -94,16 +95,19 @@ void main() {
     expect(weighIns.barWidth, 0);
   });
 
-  testWidgets('without YumSum Star it is a Star button that offers it', (
+  testWidgets('without YumSum Star it is a shining button that offers it', (
     tester,
   ) async {
     await pumpScreen(tester, profile: planProfile());
     // In the chart's card, under the chart: the button is the name itself,
-    // with the star.
-    final button = find.ancestor(
-      of: find.text('Adaptive formula'),
-      matching: find.byType(InkWell),
-    );
+    // shining; the star waits in the dialog.
+    // The nearest one; the card has its own.
+    final button = find
+        .ancestor(
+          of: find.text('Adaptive formula'),
+          matching: find.byType(InkWell),
+        )
+        .first;
     expect(
       find.descendant(
         of: find.ancestor(
@@ -115,9 +119,10 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.descendant(of: button.first, matching: find.byType(PlusStar)),
+      find.ancestor(of: button, matching: find.byType(Shine)),
       findsOneWidget,
     );
+    expect(find.byType(PlusStar), findsNothing);
     expect(
       find.text(
         'A customised formula tailored just for you. Adapting with time and '
