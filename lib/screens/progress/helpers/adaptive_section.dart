@@ -9,6 +9,7 @@ import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/screens/dashboard/helpers/adaptive_dialogs.dart';
 import 'package:lean_streak/widgets/day_status.dart';
+import 'package:lean_streak/widgets/feature_intro.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
 import 'package:lean_streak/widgets/shine.dart';
 
@@ -34,7 +35,7 @@ class AdaptiveSection extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _TryButton(onTap: open),
+              TryButton(label: 'Adaptive formula', onTap: open),
               const SizedBox(height: 12),
               Text(
                 'A customised formula tailored just for you. Adapting with '
@@ -125,75 +126,6 @@ class AdaptiveSection extends ConsumerWidget {
           Text(week, style: muted),
         ],
       ],
-    );
-  }
-}
-
-/// For free users: the Adaptive formula itself as the button, a warm orange
-/// pill with a soft glow under it and a [Shine] across it when it appears,
-/// asking to be tapped. The star waits in the dialog's Enable.
-class _TryButton extends StatelessWidget {
-  const _TryButton({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final shape = BorderRadius.circular(999);
-    // The glow sits outside the shine, which would otherwise cut it off.
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: shape,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Shine(
-        child: Material(
-          shape: const StadiumBorder(),
-          clipBehavior: Clip.antiAlias,
-          child: Ink(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.primary,
-                  Color.lerp(AppColors.primary, Colors.white, 0.2)!,
-                ],
-              ),
-            ),
-            child: InkWell(
-              onTap: onTap,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 10, 14, 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        'Adaptive formula',
-                        style: AppTheme.display.copyWith(
-                          fontSize: 17,
-                          color: AppColors.onPrimary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Icon(
-                      Icons.arrow_forward_rounded,
-                      size: 20,
-                      color: AppColors.onPrimary,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
