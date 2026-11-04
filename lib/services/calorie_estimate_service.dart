@@ -233,6 +233,71 @@ class CalorieEstimateException implements Exception {
   String toString() => 'CalorieEstimateException: $message';
 }
 
+/// The Gemini model every AI call uses.
+const String aiModelId = 'gemini-3.5-flash-lite';
+
+const int _maxServerRetries = 3;
+
+/// The model's JSON reply as a map; code fences are stripped just in case.
+Map<String, dynamic> decodeAiJson(GenerateContentResponse response) {
+  final raw = response.text?.trim() ?? '';
+  if (raw.isEmpty) {
+    throw const CalorieEstimateException('No answer from the AI. Try again.');
+  }
+  final jsonStr = raw
+      .replaceAll(RegExp(r'```(?:json)?\s*'), '')
+      .replaceAll('```', '')
+      .trim();
+  return jsonDecode(jsonStr) as Map<String, dynamic>;
+}
+
+/// Asks [model], with up to 3 attempts on server errors and lost
+/// connections, and logs the tokens the call used.
+Future<GenerateContentResponse> generateWithRetries(
+  GenerativeModel model,
+  List<Content> content,
+) async {
+  for (var attempt = 1; attempt <= _maxServerRetries; attempt++) {
+    try {
+      final response = await model.generateContent(content);
+      // Token use is what the AI costs; logged to check the estimates.
+      final usage = response.usageMetadata;
+      debugPrint(
+        'AI tokens: in ${usage?.promptTokenCount}, '
+        'out ${usage?.candidatesTokenCount}, '
+        'thinking ${usage?.thoughtsTokenCount}',
+      );
+      return response;
+    } on ServerException catch (error) {
+      if (!isTransientAiError(error.message) || attempt == _maxServerRetries) {
+        rethrow;
+      }
+      await Future<void>.delayed(Duration(milliseconds: 700 * attempt));
+    } on FirebaseAIException catch (error) {
+      // Quota, API not enabled, bad key, unsupported location: none of
+      // these clear up on retry, so say what it is.
+      throw CalorieEstimateException(_firebaseAiMessage(error));
+    } on SocketException {
+      if (attempt == _maxServerRetries) rethrow;
+      await Future<void>.delayed(Duration(milliseconds: 700 * attempt));
+    }
+  }
+
+  throw const CalorieEstimateException('Could not reach the AI. Try again.');
+}
+
+/// The package doesn't export its quota / not-enabled exception types, so
+/// they are told apart by name, or by the server's wording.
+String _firebaseAiMessage(FirebaseAIException error) {
+  final type = error.runtimeType.toString();
+  if (type == 'ServiceApiNotEnabled' || error is InvalidApiKey) {
+    return aiNotSwitchedOnMessage;
+  }
+  // Quota errors (QuotaExceeded) are told apart by their wording, which
+  // also separates an empty prepaid balance from a busy minute.
+  return aiErrorMessage(error.message);
+}
+
 class CalorieEstimateService {
   CalorieEstimateService(
     this._usageRepo, {
@@ -259,8 +324,6 @@ class CalorieEstimateService {
 
   bool get _askMacros => macrosForEveryone || _plus;
 
-  static const String _modelId = 'gemini-3.5-flash-lite';
-  static const int _maxServerRetries = 3;
   static final _generationConfig = GenerationConfig(
     responseMimeType: 'application/json',
   );
@@ -270,7 +333,7 @@ class CalorieEstimateService {
   // proves the call comes from this app (enforced in the Firebase console).
   GenerativeModel get _model => FirebaseAI.googleAI(
     appCheck: appCheckAvailable ? FirebaseAppCheck.instance : null,
-  ).generativeModel(model: _modelId, generationConfig: _generationConfig);
+  ).generativeModel(model: aiModelId, generationConfig: _generationConfig);
 
   String get _context =>
       nutritionContext(country: _country, usualFood: _usualFood);
@@ -420,8 +483,8 @@ class CalorieEstimateService {
         '{input}',
         description.trim(),
       );
-      final map = _decode(
-        await _generateWithRetries(_model, [Content.text(prompt)]),
+      final map = decodeAiJson(
+        await generateWithRetries(_model, [Content.text(prompt)]),
       );
       final kcal = (map['kcal'] as num).toInt();
       final protein = (map['protein_g'] as num?)?.round();
@@ -457,8 +520,8 @@ class CalorieEstimateService {
     }
 
     try {
-      final map = _decode(
-        await _generateWithRetries(_model, [
+      final map = decodeAiJson(
+        await generateWithRetries(_model, [
           Content.multi([
             TextPart(_voicePromptTemplate),
             InlineDataPart('audio/wav', wav),
@@ -498,8 +561,8 @@ class CalorieEstimateService {
     }
 
     try {
-      final map = _decode(
-        await _generateWithRetries(_model, [
+      final map = decodeAiJson(
+        await generateWithRetries(_model, [
           Content.multi([
             TextPart(_photoPromptTemplate),
             InlineDataPart('image/jpeg', jpeg),
@@ -543,8 +606,8 @@ class CalorieEstimateService {
     }
 
     try {
-      final map = _decode(
-        await _generateWithRetries(_model, [
+      final map = decodeAiJson(
+        await generateWithRetries(_model, [
           Content.multi([
             TextPart(_labelPrompt(withFront: front != null)),
             if (front != null) InlineDataPart('image/jpeg', front),
@@ -585,8 +648,8 @@ class CalorieEstimateService {
     final prompt = _nutrientsPromptTemplate
         .replaceFirst('{name}', name.trim())
         .replaceFirst('{kcal}', '$kcal');
-    final map = _decode(
-      await _generateWithRetries(_model, [Content.text(prompt)]),
+    final map = decodeAiJson(
+      await generateWithRetries(_model, [Content.text(prompt)]),
     );
     return (
       protein: (map['protein_g'] as num?)?.round(),
@@ -601,67 +664,6 @@ class CalorieEstimateService {
     macros: parseNutrients(map['macros']),
     items: parseEstimateItems(map['items']),
   );
-
-  /// The model's JSON reply as a map; code fences are stripped just in case.
-  Map<String, dynamic> _decode(GenerateContentResponse response) {
-    final raw = response.text?.trim() ?? '';
-    if (raw.isEmpty) {
-      throw const CalorieEstimateException('No answer from the AI. Try again.');
-    }
-    final jsonStr = raw
-        .replaceAll(RegExp(r'```(?:json)?\s*'), '')
-        .replaceAll('```', '')
-        .trim();
-    return jsonDecode(jsonStr) as Map<String, dynamic>;
-  }
-
-  Future<GenerateContentResponse> _generateWithRetries(
-    GenerativeModel model,
-    List<Content> content,
-  ) async {
-    for (var attempt = 1; attempt <= _maxServerRetries; attempt++) {
-      try {
-        final response = await model.generateContent(content);
-        // Token use is what the AI costs; logged to check the estimates.
-        final usage = response.usageMetadata;
-        debugPrint(
-          'AI tokens: in ${usage?.promptTokenCount}, '
-          'out ${usage?.candidatesTokenCount}, '
-          'thinking ${usage?.thoughtsTokenCount}',
-        );
-        return response;
-      } on ServerException catch (error) {
-        if (!_isTransientServerError(error.message) ||
-            attempt == _maxServerRetries) {
-          rethrow;
-        }
-        await Future<void>.delayed(Duration(milliseconds: 700 * attempt));
-      } on FirebaseAIException catch (error) {
-        // Quota, API not enabled, bad key, unsupported location: none of
-        // these clear up on retry, so say what it is.
-        throw CalorieEstimateException(_firebaseAiMessage(error));
-      } on SocketException {
-        if (attempt == _maxServerRetries) rethrow;
-        await Future<void>.delayed(Duration(milliseconds: 700 * attempt));
-      }
-    }
-
-    throw const CalorieEstimateException('Could not reach the AI. Try again.');
-  }
-
-  bool _isTransientServerError(String message) => isTransientAiError(message);
-
-  /// The package doesn't export its quota / not-enabled exception types, so
-  /// they are told apart by name, or by the server's wording.
-  String _firebaseAiMessage(FirebaseAIException error) {
-    final type = error.runtimeType.toString();
-    if (type == 'ServiceApiNotEnabled' || error is InvalidApiKey) {
-      return aiNotSwitchedOnMessage;
-    }
-    // Quota errors (QuotaExceeded) are told apart by their wording, which
-    // also separates an empty prepaid balance from a busy minute.
-    return aiErrorMessage(error.message);
-  }
 
   String _friendlyServerError(String message) => aiErrorMessage(message);
 }
