@@ -1,6 +1,6 @@
 # Plan 7: Billing
 
-*Written 2 November 2026. Status: planned, not built.*
+*Written 2 November 2026. Status: steps A, B and C built (2–4 November); D, trying it on the phone, waits on your Play Console steps.*
 
 ## The short version
 
@@ -320,6 +320,17 @@ App Check enforced, signed-in only. Deletes `entitlements/{uid}` and the caller'
 
 Once built, CLAUDE.md gets the new collections, the functions and the deploy command.
 
+### As built (4 November)
+
+- **Functions** (`functions/`): `firebase-functions` 7, `firebase-admin` 14, `@googleapis/androidpublisher`, Node 22, all in `europe-west2` with at most 10 instances each as a cost cap. `npm test` runs 39 tests of `entitlementFrom` on Google's own example answers. `firebase.json`'s predeploy builds them, from PowerShell too.
+- **Where it differs from the plan above:**
+  - A notification writes the record only for the stored `purchaseId`, when there's none yet, or for a purchase that replaced it (through `linkedPurchaseToken` or `expiredPurchaseToken`). A purchase found that way gets its own `playPurchases` link, because Play drops the replaced token once it's acknowledged.
+  - `endedAt` is the old `expiresAt` when that had already passed (a late notification), otherwise now.
+  - `playPurchases.orderId` is the line item's `latestSuccessfulOrderId`; the top-level `latestOrderId` is gone from the API.
+  - After a failed acknowledge, the purchase is read again and it only counts as failed if Play still says pending. `verifyPurchase` logs it and still answers; `playNotifications` throws so Pub/Sub retries.
+  - Play's 400, 404 and 410 count as an unknown token. Play errors are logged without their request URL, which contains the token.
+- **The app:** Play Billing Library 8 (through `in_app_purchase_android` 0.5.0). `verifyPurchase`'s `{plus}` answer isn't used: the record changing is what switches YumSum Star on. Deleting an account calls `deleteBillingData` only when the account has a record, so accounts that never had YumSum Star don't depend on the functions.
+
 ## Testing
 
 **Automated (no Firebase, no Play):**
@@ -369,9 +380,9 @@ Once built, CLAUDE.md gets the new collections, the functions and the deploy com
 ## Checklist
 
 **Me**
-- [ ] A: entitlement, `plusProvider`, rule, Account Settings row, tests
-- [ ] B: the three functions, mapping tests, delete-account call and dialog line
-- [ ] C: paywall, purchase controller, restore, legal page drafts
+- [x] A: entitlement, `plusProvider`, rule, Account Settings row, tests
+- [x] B: the three functions, mapping tests, delete-account call and dialog line (4 November)
+- [x] C: paywall, purchase controller, restore, legal page drafts (4 November)
 - [ ] D: phone checklist with you
 - [ ] CLAUDE.md updated
 
