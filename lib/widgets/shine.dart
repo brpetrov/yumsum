@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 /// A white glint that sweeps across [child] three times when it appears,
-/// then rests: enough to catch the eye, never a distraction. It lights only
-/// what the child draws, so it follows a chip's or the star's own shape.
-/// None when the phone asks for less motion.
+/// then rests: enough to catch the eye, never a distraction. It shines again
+/// when a page that covered it goes away, since Home stays underneath the
+/// menu's pages, but not after a dialog or sheet. It lights only what the
+/// child draws, so it follows a chip's or the star's own shape. None when
+/// the phone asks for less motion.
 class Shine extends StatefulWidget {
   const Shine({super.key, required this.child, this.strength = 0.6});
 
@@ -23,6 +25,10 @@ class _ShineState extends State<Shine> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final CurvedAnimation _sweep;
 
+  /// The page's secondary animation, which only a page pushed on top moves
+  /// (a dialog or sheet leaves it alone).
+  Animation<double>? _covered;
+
   @override
   void initState() {
     super.initState();
@@ -38,7 +44,26 @@ class _ShineState extends State<Shine> with SingleTickerProviderStateMixin {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final covered = ModalRoute.of(context)?.secondaryAnimation;
+    if (covered == _covered) return;
+    _covered?.removeStatusListener(_onCovered);
+    _covered = covered?..addStatusListener(_onCovered);
+  }
+
+  void _onCovered(AnimationStatus status) {
+    // The page on top has gone: back in view, so shine again.
+    if (status == AnimationStatus.dismissed) {
+      _controller
+        ..value = 0
+        ..repeat(count: 3);
+    }
+  }
+
+  @override
   void dispose() {
+    _covered?.removeStatusListener(_onCovered);
     _sweep.dispose();
     _controller.dispose();
     super.dispose();

@@ -79,7 +79,7 @@ The paid tier (plan 06; the code says `plus`).
 - **Where it shows:**
   - A row in the menu.
   - `StarBadge` beside the logo in the menu header and beside the name on Home: the star for members, a "Become a Star" chip for everyone else, nothing while the record loads.
-  - The members' star shines when it appears (`Shine`, `lib/widgets/shine.dart`): a white glint sweeps across it three times, then rests; none when the phone asks for less motion. The Adaptive formula's On chip and free button use it too.
+  - The members' star shines when it appears (`Shine`, `lib/widgets/shine.dart`): a white glint sweeps across it three times, then rests, and again when a page that covered it goes away (so each return to Home, which stays under the menu's pages), but not after a dialog or sheet; none when the phone asks for less motion. The Adaptive formula's On chip and free button use it too.
   - A card in Account Settings.
   - `PlusPromptCard` on Home.
   - The dimmed macro rings for free users, and the shining Adaptive formula button under the weight chart.
