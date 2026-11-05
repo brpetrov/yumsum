@@ -27,8 +27,7 @@
       "program": "lib/main.dart",
       "args": [
         "-d",
-        "R5CX205WQNV",
-        "--dart-define-from-file=config/off_account.json"
+        "R5CX205WQNV"
       ]
     },
     {
@@ -39,7 +38,6 @@
       "args": [
         "-d",
         "R5CX205WQNV",
-        "--dart-define-from-file=config/off_account.json",
         "--dart-define=OFF_DRY_RUN=true"
       ]
     }

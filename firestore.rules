@@ -201,6 +201,10 @@ service cloud.firestore {
           && counterIncrement();
       }
 
+      // contribution_usage/{yyyy-MM-dd} and feedback_usage/{yyyy-MM-dd}
+      // ({count}): the contributeProduct and sendFeedback functions' daily
+      // limits. Only the functions read or write them, so there's no rule.
+
       // Legacy check-ins: no longer written, only deleted with the account.
       match /check_ins/{document=**} {
         allow read, delete: if isOwner(userId);

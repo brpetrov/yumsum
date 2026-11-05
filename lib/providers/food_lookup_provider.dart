@@ -1,3 +1,4 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/providers/preferences_provider.dart';
@@ -16,5 +17,8 @@ final foodContributionServiceProvider = Provider<FoodContributionService>((
   final prefs = ref.watch(sharedPreferencesProvider);
   final uuid = prefs.getString(key) ?? newAppUuid();
   prefs.setString(key, uuid);
-  return FoodContributionService(appUuid: uuid);
+  return FoodContributionService(
+    appUuid: uuid,
+    functions: FirebaseFunctions.instanceFor(region: 'europe-west2'),
+  );
 });

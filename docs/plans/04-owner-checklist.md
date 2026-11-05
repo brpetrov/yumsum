@@ -13,6 +13,7 @@
 - [x] **Open Food Facts account** (30 October 2026): made on the real server with help.yumsum, in `config/off_account.json`, login checked; API usage form sent. The test server was down all day, so testing goes straight to the real one
   - [ ] Try both flows safely first: run "YumSum (Android, contribute dry run)" and scan the two test barcodes Claude put on screen (3809990001236 is unknown, 5010251434573 is listed without calories). Nothing is sent; the AI reading still counts towards the 20 a day
   - [ ] Then for real with "YumSum (Android)": scan a packet Open Food Facts doesn't know, or one it has without calories, contribute it, then check its page at world.openfoodfacts.org/product/ followed by the barcode
+  - [ ] The account now lives in the `contributeProduct` function, not the app (5 November 2026). Change its password on Open Food Facts, since builds made before carry the old one; then `firebase functions:secrets:set OFF_USER_ID` and `firebase functions:secrets:set OFF_PASSWORD` (type each when asked), and `firebase deploy --only firestore:rules,functions`. Do this before the "for real" try above, and before the next upload to Play
 - [ ] **Recipes** (built 31 October 2026; all 40 recipes written, 10 photos in): see `docs/plans/05-recipes.md`
   - [x] The 40 recipes (redone by Claude for easy, common, high-protein, lower-calorie meals; checked by `flutter test test/recipes_asset_test.dart`)
   - [ ] Read through them and change anything you'd cook differently, then run the check again
@@ -79,7 +80,7 @@ The app sends feedback to a Formspree form (formspree.io, signed up with help.yu
   - [x] In `android/key.properties`, replace both `CHANGE_ME` with that password, and save.
   - [x] Back up `C:\Users\brpet\keys\yumsum-upload.jks` and the password together somewhere safe (a password manager, or the file in Google Drive and the password in your head). If it's lost, Play support can swap in a new one, but it takes days.
   - [x] Claude built the app bundle: signed by `CN=Boyan Petrov`, upload key SHA-1 `A9:1D:7C:AF:C3:2E:51:1B:E8:31:5D:44:03:0F:76:B9:96:95:6D:4F`, SHA-256 `CA:F6:11:56:58:AD:A4:AA:D8:28:7C:16:6A:73:95:85:82:11:75:CC:76:F5:C6:8E:90:A9:D2:15:E6:EC:54:1F` (Play shows the same under App integrity → Upload key).
-  - The bundle to upload: `flutter build appbundle --dart-define-from-file=config/off_account.json` (the Open Food Facts account goes in, so contributing works), file `build\app\outputs\bundle\release\app-release.aab`. Raise the `+1` in `version: 0.1.0+1` (pubspec.yaml) for every upload after the first.
+  - The bundle to upload: `flutter build appbundle` (the Open Food Facts account is on the server, not in the app), file `build\app\outputs\bundle\release\app-release.aab`. Raise the `+1` in `version: 0.1.0+1` (pubspec.yaml) for every upload after the first.
 - [x] **Play developer account**: personal, developer name YumSum, set up 29 October 2026.
   - [ ] Google checks your ID (a few days, they email you), then verify the contact phone number from the Play Console home page.
 

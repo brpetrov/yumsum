@@ -1,6 +1,6 @@
 # Plan 1: Contribute to Open Food Facts
 
-*Written 23 October 2026. Status: built and tested in the app. The Open Food Facts account was made and checked on 30 October 2026, and the same day "Add its nutrition" was added for products listed without calories.*
+*Written 23 October 2026. Status: built and tested in the app. The Open Food Facts account was made and checked on 30 October 2026, and the same day "Add its nutrition" was added for products listed without calories. On 5 November 2026 the sending moved to the `contributeProduct` Cloud Function, so the account's password is no longer in the app.*
 
 ## Why
 
@@ -27,24 +27,24 @@ It also fixes LeanStreak's weakest spot. Bulgarian products and UK supermarket o
 | Invitation, check form, thank-you | `lib/screens/dashboard/helpers/contribute_sheet.dart` |
 | Two-photo camera mode | `MealCameraPage(photoSteps: …)`, `takeProductPhotos` in `meal_photo.dart` |
 | AI label reading | `CalorieEstimateService.readLabel`, `parseLabelReading` (counts towards the 20-a-day AI limit) |
-| Upload | `lib/services/food_contribution_service.dart` |
+| Upload | `lib/services/food_contribution_service.dart`, which hands it to the `contributeProduct` function (`functions/src/off.ts`), the only place the account is |
 | Wiring in the bar | `_offerContribution` in `quick_log_bar.dart` |
 | Legal | privacy page (contributions section), terms ("Contributing to Open Food Facts"), and a "Food data from Open Food Facts" credit in Account Settings → Help & Legal |
-| Tests | `test/food_contribution_service_test.dart`; the full scan → contribute → log flow in `test/quick_log_bar_test.dart` |
+| Tests | `test/food_contribution_service_test.dart`; the full scan → contribute → log flow in `test/quick_log_bar_test.dart`; the function's requests in `functions/test/off.test.ts` |
 
 ### What gets sent
 
-This follows Open Food Facts' own Flutter app and their server code (checked 23 October 2026):
+This follows Open Food Facts' own Flutter app and their server code (checked 23 October 2026). The app sends the fields and photos to `contributeProduct`, which refuses any field the app doesn't write and makes these requests itself:
 
 - **Details:** a form `POST` to `/cgi/product_jqm2.pl` with these fields:
   - `code`
   - `product_name_<lang>`, plus `lang` and `lc`: the language the AI reads off the pack (e.g. `bg`, `en`, `sr`), or `bg` for a Cyrillic name and `en` otherwise if it can't tell
   - `add_brands`, which appends, so it never wipes what's there
-  - `add_countries` (`en:united-kingdom` or `en:bulgaria`) and `cc` (`uk`, not `gb`, or `bg`). These are sent only when the profile's country is one of the common ways of writing the UK or Bulgaria; otherwise Open Food Facts goes by where the request came from.
+  - `add_countries` (`en:united-kingdom` or `en:bulgaria`) and `cc` (`uk`, not `gb`, or `bg`). These are sent only when the profile's country is one of the common ways of writing the UK or Bulgaria; otherwise Open Food Facts goes by where the request came from, which is now the function in London.
   - `quantity` and `serving_size`
   - `nutrition_data_per`: `100ml` when the pack or serving size is in ml, cl or l, otherwise `100g`
   - `nutriment_<id>` and `nutriment_<id>_unit` for each figure
-- **Account fields:** the app's shared account (`user_id`, `password`) plus `app_name`, `app_version` and `app_uuid`.
+- **Account fields:** the app's shared account (`user_id`, `password`, added by the function from its secrets) plus `app_name`, `app_version` and `app_uuid` from the app.
   - `app_uuid` is a random ID kept per install, so Open Food Facts' moderators can block one bad contributor without blocking the whole app.
   - A `comment` of "YumSum 0.1.0 user <app_uuid>", as their docs ask. Nothing personal.
 - **Photos:** two multipart `POST`s to `/cgi/product_image_upload.pl`, front first.
@@ -65,40 +65,32 @@ This follows Open Food Facts' own Flutter app and their server code (checked 23 
 
 ## Set-up steps (for you)
 
-The feature stays hidden until the app has an Open Food Facts account. Test on their **test server** first: it has its own accounts and its own database, so nothing real is touched.
+Contributing goes through the `contributeProduct` function, which holds the app's Open Food Facts account as two Functions secrets. The app never sees the password. The function talks to the real server, world.openfoodfacts.org; their test server, world.openfoodfacts.net, has accounts of its own and would need `host` in `functions/src/off.ts` changed.
 
-1. **Create a test account.** Go to <https://world.openfoodfacts.net/cgi/user.pl>; if the browser asks for a login, use `off` / `off`. Choose a username such as `yumsum-app`. It's a username, not an email: the app sends the username.
-2. **Fill in `config/off_account.json`** in the project (it already exists, empty; git ignores it):
-   ```json
-   {
-     "OFF_USER_ID": "yumsum-app",
-     "OFF_PASSWORD": "the password you chose",
-     "OFF_HOST": "world.openfoodfacts.net"
-   }
-   ```
-   Don't paste the password into chat. Put it straight into the file.
-3. **Run the app** with the VS Code "YumSum (Android)" configuration, which passes that file. From a terminal: `flutter run --dart-define-from-file=config/off_account.json`.
-4. **Try it with a real packet.** Barcode lookups still come from the real database, so pick something it doesn't know: a local Bulgarian product or a supermarket own brand. Contribute it, then open `https://world.openfoodfacts.net/product/<barcode>` (login `off` / `off`). Check the name, figures, language and both photos.
-5. **When you're happy, create the real account** at <https://world.openfoodfacts.org> with help.yumsum@gmail.com, not your personal Gmail, and a password used nowhere else (it's built into the app).
-6. **Fill in Open Food Facts' API usage form:** <https://docs.google.com/forms/d/e/1FAIpQLSdIE3D8qvjC_zRJw1W8OmuHhsWJ_NSckiiniAHlfaVwUZCziQ/viewform>. Their docs ask apps to do this "so that we can identify your usage and prevent potential bans."
-7. **Optional but worth doing:** email `reuse@openfoodfacts.org`, or post in the `#api` channel on their Slack. Say you'd like the YumSum account listed as an app account, so each install's edits show as "yumsum.<id>" rather than all under one username. Mention that the label is read by AI and checked by the user. They have no written rule on AI-read labels, and it's better they hear it from us.
-8. **Switch to the real server:** set `OFF_HOST` to `world.openfoodfacts.org` with the real username and password. The release build needs the same `--dart-define-from-file` flag.
+1. **Create the account** at <https://world.openfoodfacts.org> with help.yumsum@gmail.com, not your personal Gmail, and a password used nowhere else. Choose a username such as `yumsum-app`. It's a username, not an email: the function sends the username. (Done 30 October 2026.)
+2. **Fill in Open Food Facts' API usage form:** <https://docs.google.com/forms/d/e/1FAIpQLSdIE3D8qvjC_zRJw1W8OmuHhsWJ_NSckiiniAHlfaVwUZCziQ/viewform>. Their docs ask apps to do this "so that we can identify your usage and prevent potential bans." (Done 30 October 2026.)
+3. **Optional but worth doing:** email `reuse@openfoodfacts.org`, or post in the `#api` channel on their Slack. Say you'd like the YumSum account listed as an app account, so each install's edits show as "yumsum.<id>" rather than all under one username. Mention that the label is read by AI and checked by the user. They have no written rule on AI-read labels, and it's better they hear it from us.
+4. **Give the function the account.** In the VS Code terminal, run `firebase functions:secrets:set OFF_USER_ID` and type the username when it asks, then `firebase functions:secrets:set OFF_PASSWORD` and type the password. Don't paste the password into chat. If the password was ever in a build you gave anyone, change it on Open Food Facts first and set the new one.
+5. **Deploy:** `firebase deploy --only functions`.
+6. **Try it with a real packet.** Run the app with the VS Code "YumSum (Android)" configuration and pick something Open Food Facts doesn't know: a local Bulgarian product or a supermarket own brand. Contribute it, then open `https://world.openfoodfacts.org/product/<barcode>` and check the name, figures, language and both photos. The "contribute dry run" configuration walks through the same screens without sending anything.
+
+The old `config/off_account.json` is no longer read by anything; it stays gitignored, and can be deleted once the secrets are set.
 
 ## Phone checklist
 
 - [ ] Unknown barcode → invitation → Contribute → both camera steps → form prefilled
 - [ ] The AI's figures match the packet; a missing figure stays blank (not guessed)
 - [ ] Contribute → thank-you → Log it → amount sheet starts at the pack or serving size
-- [ ] The product page on the test server has both photos, the right language and the figures
+- [ ] The product page has both photos, the right language and the figures
 - [ ] Not now, closing the camera, and closing the form each leave the bar as before
 - [ ] Offline: a clear message; Contribute works once the connection is back
 - [ ] A Bulgarian product gets a Bulgarian name and `lang=bg`; a UK one gets `en`
 
 ## Risks
 
-- **The shared password is inside the app.** Anyone determined can extract it. Open Food Facts documents this "global account" approach for apps, and the per-install ID limits the damage. If it's ever abused, change the password and ship an update. A server in between would need Cloud Functions, which needs the paid Firebase plan (see Plan 3).
+- **The shared account.** Only the function has the password, so it can't be pulled out of the app. A signed-in user (with App Check) can still send up to 10 contributions a day through it, and only the fields the app writes. Open Food Facts documents this "global account" approach for apps, and the per-install ID lets their moderators block one contributor. If it's ever abused, change the password and set the secret again; no app update is needed.
 - **Wrong figures.** The AI can misread a label. The check step, the "never guess" prompt, and Open Food Facts' volunteer moderation are the safeguards.
-- **Rate limit.** Open Food Facts allows about 15 requests a minute per IP address. One contribution is 3 requests, so a person can't hit it. Many users behind the same mobile-network IP could, but that's unlikely at our size.
+- **Rate limit.** Open Food Facts allows about 15 requests a minute per IP address. One contribution is 3 requests, and they all come from the function's few Google Cloud addresses now, so about 5 contributions a minute across all users could hit it. That's unlikely at our size.
 - **Search lag.** It's unknown how fast a new product reaches the Search foods results. A barcode scan finds it within seconds.
 
 ## Later

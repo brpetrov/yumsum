@@ -47,7 +47,7 @@ app.*.map.json
 # API keys — never commit
 lib/core/config/api_keys.dart
 
-# Open Food Facts app account (copy config/off_account.example.json)
+# The old Open Food Facts account file; the account is a Functions secret now
 config/off_account.json
 
 # Your own data for test/adaptive_replay_test.dart, from the debug log

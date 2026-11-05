@@ -52,7 +52,7 @@ SharedPreferences through `sharedPreferencesProvider` (`lib/providers/preference
 
 ## Firestore data and resets
 
-- The profile is `/users/{uid}`; everything else is in subcollections: `meals`, `daily_summaries` and `weight_entries` (both keyed by date), `ai_usage/{yyyy-MM-dd}`, `day_edits/{yyyy-MM}`, `days_off/{yyyy-MM-dd}` and `weekly_reviews/{yyyy-MM-dd}`.
+- The profile is `/users/{uid}`; everything else is in subcollections: `meals`, `daily_summaries` and `weight_entries` (both keyed by date), `ai_usage/{yyyy-MM-dd}`, `day_edits/{yyyy-MM}`, `days_off/{yyyy-MM-dd}` and `weekly_reviews/{yyyy-MM-dd}`, plus the functions' daily limits `contribution_usage/{yyyy-MM-dd}` and `feedback_usage/{yyyy-MM-dd}` (UTC days), which the app can't read or write.
 - Period reviews are computed, never stored; only the AI Coach's notes are cached, in `weekly_reviews`, with the facts they were written from. Legacy `check_ins` and `check_in_prompt_status` documents are only deleted with the account.
 - Repositories in `lib/repositories/` do the reads and writes; `AccountRepository` does the bulk deletes.
 - Reset progress (Weight & Progress) clears `weight_entries` only. Reset all data (Account Settings, `AccountRepository.resetAllData`) clears meals, summaries, weigh-ins, days off and the AI Coach's notes, but keeps the profile and the AI and past-day counters.
@@ -77,7 +77,7 @@ The paid tier (plan 06; the code says `plus`).
   - On the web it says to subscribe in the Android app; on an iPhone, that it can't be bought there yet.
 - **Billing** (plan 07), Android only (`playBilling`):
   - `BillingService` (`lib/services/billing_service.dart`) wraps `in_app_purchase`: the plans (`starPlansFrom` picks each base plan's trial offer when Play lists one), buy, restore, complete.
-  - `BillingRepository` calls the `verifyPurchase` and `deleteBillingData` functions in `europe-west2` (`functions/`).
+  - `BillingRepository` calls the `verifyPurchase` and `deleteBillingData` functions in `europe-west2` (`functions/`). The other functions are `contributeProduct`, `sendFeedback` and `deleteAccount` (see their features); all are App Check enforced and signed-in only.
   - `plusPurchaseControllerProvider` (`lib/providers/plus_purchase_controller.dart`) listens to Play's purchase stream for the app's life (`LeanStreakApp` keeps it alive). It sends every purchased or restored YumSum Star purchase to `verifyPurchase`, then completes it; the server's write to the record is what switches YumSum Star on. It shows the plan's messages (pending, not confirmed, linked to another account, nothing to restore). Signed in without YumSum Star, it restores quietly once per account at start-up.
   - Buying passes a SHA-256 of the uid as Play's account ID.
   - Deleting an account calls `deleteBillingData` first when the account has a record. The delete dialog warns while a Play subscription still renews (`renewsInPlay`).
@@ -250,15 +250,15 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
 - **Adding nutrition to a listed product without calories** (`BarcodeLookup.needsNutrition`, a `ListedProduct`): "Add its nutrition" takes one photo of the table and shows a form with only the figures, plus the name or serving size if the product has none.
   - `FoodContributionService.addNutrition` sends just those, and the nutrition photo if it has none, never touching the name, brand or front photo.
   - A listed product with calories but no name is not offered.
-- **Sending:** `FoodContributionService` posts to `cgi/product_jqm2.pl` and each photo to `cgi/product_image_upload.pl` (`front_<lc>`, `nutrition_<lc>`), under the app's shared account, with a random per-install `app_uuid` so moderators can block one contributor.
+- **Sending:** `FoodContributionService` builds the form fields and hands them, with the photos (base64, in order) and the per-install `app_uuid`, to the `contributeProduct` function (`functions/src/off.ts`). The function accepts only the fields the app writes, then posts to `cgi/product_jqm2.pl` and each photo to `cgi/product_image_upload.pl` (`front_<lc>`, `nutrition_<lc>`) on world.openfoodfacts.org, under the app's shared account, with `app_name`, `app_version`, the `app_uuid` (so moderators can block one contributor) and the `YumSum/<version> (help.yumsum@gmail.com)` User-Agent.
   - `product_name_<lc>`, with `lc` from the language `readLabel` reads off the pack, else `productLanguage`.
   - `add_brands`.
   - `add_countries` and `cc`, only for recognised UK/Bulgaria spellings.
   - `nutriment_<id>` per 100 g, or per 100 ml for volume packs.
-- **The account:** set at build time with `--dart-define-from-file=config/off_account.json` (`OFF_USER_ID`, `OFF_PASSWORD`, `OFF_HOST`; gitignored, copy `config/off_account.example.json`; the VS Code Android config passes it).
-  - `OFF_HOST` defaults to `world.openfoodfacts.org`; `world.openfoodfacts.net` is their test server, with its own accounts and the shared basic-auth login off:off.
-  - Without an account (`FoodContributionService.isConfigured`), or on the web, contributing isn't offered.
-  - `--dart-define=OFF_DRY_RUN=true` (the "YumSum (Android, contribute dry run)" config) offers it anyway but only prints what would be sent; the AI reading still runs and counts.
+- **The account:** only the function has it, as the Functions secrets `OFF_USER_ID` and `OFF_PASSWORD`; nothing about it is in the app.
+  - `contributeProduct` takes 10 calls a day per account (`contribution_usage`), every try counted. Past that the sheet says "You've sent all you can today. You can send more tomorrow."; a refusal from Open Food Facts (`aborted`) says it didn't accept it, and anything else that it couldn't reach them.
+  - `FoodContributionService.isConfigured` is always true now; contributing still isn't offered on the web.
+  - `--dart-define=OFF_DRY_RUN=true` (the "YumSum (Android, contribute dry run)" config) only prints what would be sent and never calls the function; the AI reading still runs and counts.
 - **Afterwards:** a thank-you screen counts contributions per device, and the product can go straight to the portion sheet. Set-up steps are in plan 01.
 
 ## Recipes
@@ -313,6 +313,6 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
 ## Hosting and release
 
 - **Signing:** release builds are signed with the upload key named in `android/key.properties` (gitignored; the key file is outside the repo, alias `upload`). Without that file they fall back to the debug key, which Play rejects.
-- **VS Code configs** (`.vscode/launch.json`): `--web-port 5000` for Edge (App Check), and `--dart-define-from-file=config/off_account.json` for Android (Open Food Facts).
+- **VS Code configs** (`.vscode/launch.json`): `--web-port 5000` for Edge (App Check), and the Android phone with and without the contribute dry run (`OFF_DRY_RUN`).
 - **Building the site:** `tools/build_hosting.ps1` builds the web app into `build/hosting`, an `/app` build plus a `/webkit` build for Safari/iOS behind a small redirect page, and copies the legal pages and recipe photos. `web/flutter_bootstrap.js` leaves CanvasKit's variant to Flutter, so Chrome and Edge get the smaller Chromium one and Safari the full one.
 - **Hosting:** Firebase Hosting serves it with SPA rewrites at `yumsum.web.app` (target `app`). The old default site `lean-streak-project.web.app` (target `old`, public folder `tools/hosting-redirect`) 301-redirects every path there. Targets are mapped in `.firebaserc`.

@@ -34,6 +34,7 @@ const db = getFirestore();
 // After setGlobalOptions: onCall reads the region as each is defined.
 export { deleteAccount } from "./account";
 export { sendFeedback } from "./feedback";
+export { contributeProduct } from "./off";
 
 /**
  * Checks a purchase with Play, links it to the caller's account and writes

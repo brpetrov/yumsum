@@ -17,7 +17,7 @@ firebase deploy --only firestore:rules  # Firestore rules
 firebase deploy --only functions        # The Cloud Functions (functions/; their tests: npm test there)
 ```
 
-Run the deploys a change needs yourself, straight after it: rules, then the website. The VS Code configs in `.vscode/launch.json` add `--web-port 5000` for Edge and the Open Food Facts account for Android.
+Run the deploys a change needs yourself, straight after it: rules, then the website. The VS Code configs in `.vscode/launch.json` add `--web-port 5000` for Edge, and a contribute dry run (`OFF_DRY_RUN`) for Android.
 
 ## Names
 
@@ -31,7 +31,7 @@ Run the deploys a change needs yourself, straight after it: rules, then the webs
 - **State:** Riverpod 2. StreamProviders for live Firestore data, FutureProviders for one-off reads, `AsyncNotifier` controllers in `lib/providers/` for changes (`LogMealController`, `WeightLogController`, …), `Notifier`s for device settings.
 - **Routing:** GoRouter (`goRouterProvider`, paths in `AppRoutes`, `lib/app/router.dart`), with auth and profile redirects: Splash → Auth → Onboarding → Home. Home is the root; the menu's pages swap one level above it, so Back always returns Home.
 - **Data:** a repository per Firestore collection (`lib/repositories/`), services that combine them (`lib/services/`), providers that expose them. Open Food Facts and Formspree are reached over `http`; the billing Cloud Functions through `cloud_functions`.
-- **Firestore:** the profile is `users/{uid}`; everything else is in its subcollections (`meals`, `daily_summaries`, `weight_entries`, `ai_usage`, `day_edits`, `days_off`, `weekly_reviews`). YumSum Star's record is the top-level `entitlements/{uid}`, which the app can only read; the billing functions write it and keep `playPurchases`, which the app can't see.
+- **Firestore:** the profile is `users/{uid}`; everything else is in its subcollections (`meals`, `daily_summaries`, `weight_entries`, `ai_usage`, `day_edits`, `days_off`, `weekly_reviews`, and the functions' own `contribution_usage` and `feedback_usage`). YumSum Star's record is the top-level `entitlements/{uid}`, which the app can only read; the billing functions write it and keep `playPurchases`, which the app can't see.
 - **Device settings:** SharedPreferences through `sharedPreferencesProvider`, overridden in `main()`; unoverridden it throws.
 - **Styling:** `AppColors` (`lib/core/constants/app_colors.dart`) switches between the light and dark palettes at run time, so expressions using it can't be `const`. Use `AppCard` for cards, Nunito for text and Fredoka (`AppTheme.display`) for headings and big numbers. Orange (`primary`) is for actions, green (`veryGood`) for on track and progress.
 
@@ -48,7 +48,7 @@ Run the deploys a change needs yourself, straight after it: rules, then the webs
   - Macros are YumSum Star only for good, whatever they cost (`macrosForEveryone` stays false).
 - **The Adaptive formula changes targets only on Mondays,** never on a weigh-in.
 - **Recipe photos are served from the website,** so deploy hosting before an app release that lists new recipes, and run `test/recipes_asset_test.dart` after adding any.
-- **Secrets:** never print or commit them. The Open Food Facts account is in the gitignored `config/off_account.json`; the release signing details are in the gitignored `android/key.properties`.
+- **Secrets:** never print or commit them. The Open Food Facts account is held only by the functions, as the secrets `OFF_USER_ID` and `OFF_PASSWORD`, never in the app; the release signing details are in the gitignored `android/key.properties`.
 
 ## Copy
 
@@ -71,7 +71,7 @@ Short and plain, in British English, saying "you":
 | AI Coach (the weekly review) | `lib/helpers/week_facts.dart`, `lib/services/weekly_review_service.dart`, `lib/providers/weekly_review_provider.dart`, `lib/screens/review/weekly_notes.dart` | 09 |
 | Macros | `lib/models/nutrients.dart`, `lib/widgets/macro_rings.dart`, `macro_totals.dart`, `macro_guide.dart` | 10 |
 | Daily summaries, statuses, day off | `lib/services/daily_summary_service.dart`, `lib/widgets/day_status.dart` | |
-| Packaged foods and contributing | `lib/services/food_lookup_service.dart`, `food_contribution_service.dart` | 01 |
+| Packaged foods and contributing | `lib/services/food_lookup_service.dart`, `food_contribution_service.dart`, `functions/src/off.ts` | 01 |
 | Recipes | `assets/recipes/recipes.json`, `lib/models/recipe.dart`, `lib/screens/recipes/` | 05 |
 | YumSum Star, Debug tools | `lib/providers/plus_provider.dart`, `lib/screens/plus/`, `lib/widgets/plus_mark.dart`, `lib/screens/debug/` | 06, 07 |
 | Billing | `lib/services/billing_service.dart`, `lib/providers/plus_purchase_controller.dart`, `lib/repositories/billing_repository.dart`, `functions/` | 07 |

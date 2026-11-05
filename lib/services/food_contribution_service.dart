@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:lean_streak/core/constants/app_info.dart';
 
@@ -48,17 +48,6 @@ class FoodContributionException implements Exception {
   String toString() => message;
 }
 
-// The app's shared Open Food Facts account, given at build time
-// (`--dart-define-from-file=config/off_account.json`) so the password never
-// sits in the repository. Without it, contributing is simply not offered.
-const _userId = String.fromEnvironment('OFF_USER_ID');
-const _password = String.fromEnvironment('OFF_PASSWORD');
-// world.openfoodfacts.org for real contributions; world.openfoodfacts.net
-// is their test server, with accounts of its own.
-const _host = String.fromEnvironment(
-  'OFF_HOST',
-  defaultValue: 'world.openfoodfacts.org',
-);
 // A trial run (`--dart-define=OFF_DRY_RUN=true`, the "contribute dry run"
 // launch configuration): every screen, any barcode, but what would be sent
 // is only printed to the log, so nothing reaches Open Food Facts.
@@ -66,161 +55,84 @@ const _dryRun = bool.fromEnvironment('OFF_DRY_RUN');
 
 final _cyrillic = RegExp(r'[Ѐ-ӿ]');
 
-/// Adds products to Open Food Facts on the user's behalf, through the app's
-/// shared account as Open Food Facts asks apps to. [appUuid] is a random id
-/// per install, so their moderators can turn away one bad contributor
-/// without banning the whole app; nothing else about the user is sent.
+/// Adds products to Open Food Facts on the user's behalf. The
+/// `contributeProduct` function sends them through the app's shared
+/// account, as Open Food Facts asks apps to; only the server has its
+/// password. [appUuid] is a random id per install, so their moderators can
+/// turn away one bad contributor without banning the whole app; nothing
+/// else about the user is sent.
 class FoodContributionService {
   FoodContributionService({
     required this.appUuid,
-    http.Client? client,
-    this.userId = _userId,
-    this.password = _password,
-    this.host = _host,
+    required FirebaseFunctions functions,
     this.dryRun = _dryRun,
-  }) : _client = client ?? http.Client();
+  }) : _functions = functions;
 
   final String appUuid;
-  final String userId;
-  final String password;
-  final String host;
   final bool dryRun;
-  final http.Client _client;
+  final FirebaseFunctions _functions;
 
-  bool get isConfigured => dryRun || (userId.isNotEmpty && password.isNotEmpty);
-
-  Map<String, String> get _account => {
-    'user_id': userId,
-    'password': password,
-    'app_name': 'YumSum',
-    'app_version': appVersion,
-    'app_uuid': appUuid,
-  };
-
-  Map<String, String> get _headers => {
-    if (!kIsWeb) 'User-Agent': 'YumSum/$appVersion ($supportEmail)',
-    // The test server sits behind a shared password of its own.
-    if (host.endsWith('.net'))
-      'Authorization': 'Basic ${base64Encode(utf8.encode('off:off'))}',
-  };
+  /// The account is on the server, so contributing can always be offered
+  /// (Today still leaves it out on the web).
+  bool get isConfigured => true;
 
   /// Saves the product's details, then its two photos, front first: only
   /// a photo sent as the front becomes the product's front picture.
-  Future<void> contribute(ProductContribution product) async {
+  Future<void> contribute(ProductContribution product) {
     final lc = product.lang ?? productLanguage(product.name);
-    await _send(
-      http.Request('POST', Uri.https(host, '/cgi/product_jqm2.pl'))
-        ..bodyFields = {
-          ..._account,
-          ...productFields(product, lc),
-          'comment': _comment,
-        },
-      saved: (reply) => reply?['status'] == 1,
-    );
-    await _upload(product.barcode, lc, 'front', product.frontPhoto);
-    await _upload(product.barcode, lc, 'nutrition', product.labelPhoto);
+    return _send(productFields(product, lc), {
+      'front_$lc': product.frontPhoto,
+      'nutrition_$lc': product.labelPhoto,
+    });
   }
 
   /// Adds the nutrition to a product Open Food Facts already lists, then
   /// the nutrition photo if it has none. Nothing else on it is changed.
-  Future<void> addNutrition(NutritionContribution nutrition) async {
-    await _send(
-      http.Request('POST', Uri.https(host, '/cgi/product_jqm2.pl'))
-        ..bodyFields = {
-          ..._account,
-          ...nutritionFields(nutrition),
-          'comment': _comment,
-        },
-      saved: (reply) => reply?['status'] == 1,
-    );
-    if (nutrition.labelPhoto case final photo?) {
-      await _upload(nutrition.barcode, nutrition.lang, 'nutrition', photo);
-    }
-  }
+  Future<void> addNutrition(NutritionContribution nutrition) => _send(
+    nutritionFields(nutrition),
+    {'nutrition_${nutrition.lang}': ?nutrition.labelPhoto},
+  );
 
-  // Open Food Facts asks for "user agent + user id", nothing personal.
-  String get _comment => 'YumSum $appVersion user $appUuid';
-
-  /// Uploads a photo as the product's [kind] (front or nutrition) picture
-  /// in language [lc].
-  Future<void> _upload(
-    String barcode,
-    String lc,
-    String kind,
-    Uint8List bytes,
-  ) {
-    final field = '${kind}_$lc';
-    return _send(
-      http.MultipartRequest(
-          'POST',
-          Uri.https(host, '/cgi/product_image_upload.pl'),
-        )
-        ..fields.addAll({
-          ..._account,
-          'code': barcode,
-          'lc': lc,
-          'imagefield': field,
-        })
-        ..files.add(
-          http.MultipartFile.fromBytes(
-            'imgupload_$field',
-            bytes,
-            filename: '$field.jpg',
-          ),
-        ),
-      // A photo sent before (a retry after a dropped connection) comes
-      // back as "already exists" with its id, which is just as good.
-      saved: (reply) =>
-          reply?['status'] == 'status ok' || reply?['imgid'] != null,
-    );
-  }
-
-  /// Sends [request]; [saved] reads Open Food Facts' JSON reply. A wrong
-  /// account password comes back as an HTML page, so it fails [saved] too.
+  /// Has the server send [fields], then each of [photos] in order as the
+  /// picture its key names (front_en, nutrition_bg, ...).
   Future<void> _send(
-    http.BaseRequest request, {
-    required bool Function(Map<String, dynamic>? reply) saved,
-  }) async {
+    Map<String, String> fields,
+    Map<String, Uint8List> photos,
+  ) async {
     if (dryRun) {
-      final fields = switch (request) {
-        http.Request(:final bodyFields) => {...bodyFields},
-        http.MultipartRequest(:final fields) => {...fields},
-        _ => <String, String>{},
-      }..remove('password');
       debugPrint(
-        'Open Food Facts dry run, not sent: ${request.url.path} $fields',
+        'Open Food Facts dry run, not sent: $fields, photos ${photos.keys}',
       );
       await Future<void>.delayed(const Duration(milliseconds: 600));
       return;
     }
-    request.headers.addAll(_headers);
-    final http.Response response;
     try {
-      response = await http.Response.fromStream(
-        await _client.send(request).timeout(const Duration(seconds: 30)),
-      );
-    } on Exception {
-      throw const FoodContributionException(
-        'Could not reach Open Food Facts. Check your connection and try '
-        'again.',
-      );
-    }
-    if (response.statusCode != 200 || !saved(_json(response.body))) {
-      debugPrint(
-        'Open Food Facts said ${response.statusCode}: ${response.body}',
-      );
-      throw const FoodContributionException(
-        'Open Food Facts didn\'t accept it. Try again in a moment.',
-      );
-    }
-  }
-
-  static Map<String, dynamic>? _json(String body) {
-    try {
-      final decoded = jsonDecode(body);
-      return decoded is Map<String, dynamic> ? decoded : null;
-    } on FormatException {
-      return null;
+      await _functions
+          .httpsCallable(
+            'contributeProduct',
+            options: HttpsCallableOptions(timeout: const Duration(minutes: 2)),
+          )
+          .call<Object?>({
+            'appUuid': appUuid,
+            'appVersion': appVersion,
+            'fields': fields,
+            'photos': [
+              for (final MapEntry(key: field, value: bytes) in photos.entries)
+                {'field': field, 'jpeg': base64Encode(bytes)},
+            ],
+          });
+    } on Exception catch (error) {
+      debugPrint('Could not contribute: $error');
+      throw FoodContributionException(switch (error) {
+        FirebaseFunctionsException(code: 'resource-exhausted') =>
+          "You've sent all you can today. You can send more tomorrow.",
+        // Open Food Facts answered, but not with a yes.
+        FirebaseFunctionsException(code: 'aborted') =>
+          "Open Food Facts didn't accept it. Try again in a moment.",
+        _ =>
+          'Could not reach Open Food Facts. Check your connection and try '
+              'again.',
+      });
     }
   }
 }

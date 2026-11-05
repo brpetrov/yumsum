@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart';
+import 'package:lean_streak/core/constants/app_info.dart';
 import 'package:lean_streak/services/food_contribution_service.dart';
+
+import 'fake_functions.dart';
 
 final ProductContribution _lyutenitsa = (
   barcode: '3800000000017',
@@ -73,20 +75,12 @@ void main() {
     expect(drink.containsKey('cc'), isFalse);
   });
 
-  test('details first, then the front and nutrition photos', () async {
-    final sent = <http.Request>[];
+  test('the function gets the details, then the front and nutrition '
+      'photos', () async {
+    final functions = FakeFunctions();
     final service = FoodContributionService(
       appUuid: 'install-1',
-      userId: 'leanstreak-app',
-      password: 'secret',
-      host: 'world.openfoodfacts.net',
-      client: MockClient((request) async {
-        sent.add(request);
-        // Details reply with a number, photos with words.
-        return request.url.path.endsWith('jqm2.pl')
-            ? http.Response('{"status": 1}', 200)
-            : http.Response('{"status": "status ok", "imgid": 1}', 200);
-      }),
+      functions: functions,
     );
 
     // The AI read the name as Serbian, not Bulgarian.
@@ -103,27 +97,27 @@ void main() {
       lang: 'sr',
     ));
 
-    expect(sent.map((request) => request.url.path), [
-      '/cgi/product_jqm2.pl',
-      '/cgi/product_image_upload.pl',
-      '/cgi/product_image_upload.pl',
+    final call = functions.calls.single;
+    expect(call.name, 'contributeProduct');
+    // Three requests to Open Food Facts, one after another.
+    expect(call.timeout, const Duration(minutes: 2));
+    final data = call.data! as Map<String, Object?>;
+    expect(data['appUuid'], 'install-1');
+    expect(data['appVersion'], appVersion);
+    final fields = data['fields']! as Map<String, String>;
+    expect(fields['code'], '3800000000017');
+    expect(fields['lang'], 'sr');
+    expect(fields.containsKey('password'), isFalse);
+    expect(data['photos'], [
+      {
+        'field': 'front_sr',
+        'jpeg': base64Encode([1, 2]),
+      },
+      {
+        'field': 'nutrition_sr',
+        'jpeg': base64Encode([3, 4]),
+      },
     ]);
-    final details = sent.first.bodyFields;
-    expect(details['user_id'], 'leanstreak-app');
-    expect(details['app_uuid'], 'install-1');
-    expect(details['code'], '3800000000017');
-    expect(details['comment'], contains('install-1'));
-    // The test server's own shared password.
-    expect(
-      sent.first.headers['Authorization'],
-      'Basic ${base64Encode(utf8.encode('off:off'))}',
-    );
-    final front = utf8.decode(sent[1].bodyBytes, allowMalformed: true);
-    expect(details['lang'], 'sr');
-    expect(front, contains('front_sr'));
-    expect(front, contains('name="imgupload_front_sr"'));
-    final label = utf8.decode(sent[2].bodyBytes, allowMalformed: true);
-    expect(label, contains('nutrition_sr'));
   });
 
   test('adding nutrition sends the figures and nothing it already has', () {
@@ -163,17 +157,10 @@ void main() {
   });
 
   test('the nutrition photo goes only when the product has none', () async {
-    final paths = <String>[];
+    final functions = FakeFunctions();
     final service = FoodContributionService(
       appUuid: 'install-1',
-      userId: 'yumsum-app',
-      password: 'secret',
-      client: MockClient((request) async {
-        paths.add(request.url.path);
-        return request.url.path.endsWith('jqm2.pl')
-            ? http.Response('{"status": 1}', 200)
-            : http.Response('{"status": "status ok", "imgid": 1}', 200);
-      }),
+      functions: functions,
     );
     NutritionContribution withPhoto(Uint8List? photo) => (
       barcode: '3800000000024',
@@ -184,61 +171,68 @@ void main() {
       per100g: const {'energy-kcal': 95},
       labelPhoto: photo,
     );
+    List<Object?> photosSent() =>
+        (functions.calls.removeLast().data! as Map)['photos'] as List<Object?>;
 
     await service.addNutrition(withPhoto(Uint8List.fromList([3, 4])));
-    expect(paths, ['/cgi/product_jqm2.pl', '/cgi/product_image_upload.pl']);
-    paths.clear();
+    expect(photosSent(), [
+      {
+        'field': 'nutrition_bg',
+        'jpeg': base64Encode([3, 4]),
+      },
+    ]);
     await service.addNutrition(withPhoto(null));
-    expect(paths, ['/cgi/product_jqm2.pl']);
+    expect(photosSent(), isEmpty);
   });
 
-  test('a dry run sends nothing, even without an account', () async {
+  test('a dry run sends nothing', () async {
+    final functions = FakeFunctions();
     final service = FoodContributionService(
       appUuid: 'install-1',
-      userId: '',
-      password: '',
+      functions: functions,
       dryRun: true,
-      client: MockClient((_) async => fail('nothing should be sent')),
     );
     expect(service.isConfigured, isTrue);
     await service.contribute(_lyutenitsa);
+    expect(functions.calls, isEmpty);
   });
 
-  test('a refusal or a dropped connection says so', () async {
-    FoodContributionService replying(Future<http.Response> Function() reply) =>
-        FoodContributionService(
-          appUuid: 'install-1',
-          userId: 'leanstreak-app',
-          password: 'secret',
-          client: MockClient((_) => reply()),
-        );
+  test('a refusal, the daily limit or a dropped connection says so', () async {
+    Future<String> messageFor(Exception error) async {
+      final service = FoodContributionService(
+        appUuid: 'install-1',
+        functions: FakeFunctions()..error = error,
+      );
+      try {
+        await service.contribute(_lyutenitsa);
+      } on FoodContributionException catch (error) {
+        return error.message;
+      }
+      fail('nothing was thrown');
+    }
 
-    await expectLater(
-      replying(
-        () async => http.Response('{"status": 0}', 200),
-      ).contribute(_lyutenitsa),
-      throwsA(isA<FoodContributionException>()),
-    );
-    // A wrong account password: an HTML page, not JSON.
-    await expectLater(
-      replying(
-        () async => http.Response('<html>Incorrect user name</html>', 403),
-      ).contribute(_lyutenitsa),
-      throwsA(isA<FoodContributionException>()),
-    );
-    await expectLater(
-      replying(
-        () async => throw http.ClientException('offline'),
-      ).contribute(_lyutenitsa),
-      throwsA(isA<FoodContributionException>()),
+    expect(
+      await messageFor(
+        FirebaseFunctionsException(code: 'aborted', message: ''),
+      ),
+      "Open Food Facts didn't accept it. Try again in a moment.",
     );
     expect(
-      FoodContributionService(
-        appUuid: 'x',
-        userId: '',
-        password: '',
-      ).isConfigured,
-      isFalse,
+      await messageFor(
+        FirebaseFunctionsException(code: 'resource-exhausted', message: ''),
+      ),
+      "You've sent all you can today. You can send more tomorrow.",
     );
+    for (final offline in [
+      FirebaseFunctionsException(code: 'unavailable', message: ''),
+      FirebaseFunctionsException(code: 'internal', message: ''),
+      Exception('offline'),
+    ]) {
+      expect(
+        await messageFor(offline),
+        'Could not reach Open Food Facts. Check your connection and try '
+        'again.',
+      );
+    }
   });
 }
