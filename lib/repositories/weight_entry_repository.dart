@@ -57,4 +57,18 @@ class WeightEntryRepository {
       return WeightEntry.fromFirestore(snapshot.docs.first);
     });
   }
+
+  /// How many entries fall from [startDate] to [endDate] (yyyy-MM-dd), both
+  /// included, reading only those.
+  Future<int> countEntriesInRange(
+    String uid, {
+    required String startDate,
+    required String endDate,
+  }) async {
+    final snapshot = await _entries(uid)
+        .where('dateKey', isGreaterThanOrEqualTo: startDate)
+        .where('dateKey', isLessThanOrEqualTo: endDate)
+        .get();
+    return snapshot.size;
+  }
 }

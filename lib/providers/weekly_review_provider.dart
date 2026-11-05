@@ -24,6 +24,12 @@ final weeklyReviewRepositoryProvider = Provider<WeeklyReviewRepository>((ref) {
 
 final _dateKey = DateFormat('yyyy-MM-dd');
 
+/// The notes the AI is writing, by user, week and basis, so runs that
+/// overlap (the page rebuilt while the AI is still at it) share one call.
+final _writingProvider = Provider<Map<String, Future<List<ReviewPoint>>>>(
+  (ref) => {},
+);
+
 /// The AI Coach's notes on the week starting [monday], for YumSum Star
 /// (plan 09). The facts are worked out afresh each time; the saved notes
 /// are shown while they still match, and the AI writes new ones only when
@@ -39,11 +45,12 @@ final weeklyReviewProvider = FutureProvider.autoDispose
 
       final summaryRepository = ref.watch(dailySummaryRepositoryProvider);
       final mealRepository = ref.watch(mealRepositoryProvider);
+      final weightRepository = ref.watch(weightEntryRepositoryProvider);
       final repository = ref.watch(weeklyReviewRepositoryProvider);
       final service = ref.watch(weeklyReviewServiceProvider);
-      final (user, weightEntries, recipes) = await (
+      final writing = ref.watch(_writingProvider);
+      final (user, recipes) = await (
         ref.watch(userProfileProvider.future),
-        ref.watch(weightEntriesProvider.future),
         ref.watch(recipesProvider.future),
       ).wait;
       if (user == null) return const [];
@@ -64,13 +71,11 @@ final weeklyReviewProvider = FutureProvider.autoDispose
           startDate: week,
           endDate: end,
         ),
-        weighIns: weightEntries
-            .where(
-              (entry) =>
-                  entry.dateKey.compareTo(week) >= 0 &&
-                  entry.dateKey.compareTo(end) <= 0,
-            )
-            .length,
+        weighIns: await weightRepository.countEntriesInRange(
+          uid,
+          startDate: week,
+          endDate: end,
+        ),
         profile: user,
         recipes: recipes,
       );
@@ -80,16 +85,30 @@ final weeklyReviewProvider = FutureProvider.autoDispose
       final saved = await repository.fetch(uid, week);
       if (saved != null && saved.basis == basis) return saved.points;
 
-      final points = await service.write(facts.text);
+      final key = '$uid $week $basis';
+      final call = writing[key] ??= () async {
+        final points = await service.write(facts.text);
+        try {
+          await repository.save(
+            uid,
+            week,
+            WeeklyReview(
+              points: points,
+              basis: basis,
+              createdAt: DateTime.now(),
+            ),
+          );
+        } catch (error) {
+          // The notes are written and worth showing; the next look asks again.
+          debugPrint('Could not save the weekly review: $error');
+        }
+        return points;
+      }();
       try {
-        await repository.save(
-          uid,
-          week,
-          WeeklyReview(points: points, basis: basis, createdAt: DateTime.now()),
-        );
-      } catch (error) {
-        // The notes are written and worth showing; the next look asks again.
-        debugPrint('Could not save the weekly review: $error');
+        return await call;
+      } finally {
+        // Done, so a later run reads the saved notes or, after a failure,
+        // asks again.
+        if (identical(writing[key], call)) writing.remove(key);
       }
-      return points;
     });
