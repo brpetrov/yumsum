@@ -10,6 +10,7 @@
 4. **It costs about 0.05p a week per subscriber** (one Gemini 3.5 Flash-Lite call; measured 5 November: 977 tokens in, 80 out, no thinking). It doesn't use the user's daily AI allowance.
    *Changed 5 November:* ideas come from the library only; the user's own meals aren't suggested back to them (a dinner logged first in the day had been offered as a breakfast idea), prompt version 5.
    *Changed 5 November:* each note says whether it's about something that went well (`good`, prompt version 4), and the card gives those a green dot instead of orange; recipe links are underlined; the rules allow 6 notes, as the instruction has asked for since 4 November.
+   *Changed 5 November, later:* AI Coach has its own page (`/coach`, in the menu), and History's card only opens it. The notes are fuller: 5 to 7, each with a title and 2 to 4 sentences on what the facts show, why it matters, cheap everyday foods and two library recipes that fit (prompt version 6; the rules allow 8 notes and a longer basis). The facts gained the country, last week's average, each nutrient over the last 4 weeks ("under the guide for 3 weeks running") and the whole library. Past weeks stay saved, and the page pages back through them.
 5. **Free users see a shining "AI Coach" button** on finished weeks that would have notes, like the free Adaptive formula button. Tapping it opens a dialog that sells it, with Enable.
 6. **It's called AI Coach** everywhere a user sees it (decided 4 November). "What I noticed" is only how the AI talks about the week.
 

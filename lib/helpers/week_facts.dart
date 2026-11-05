@@ -61,9 +61,9 @@ String _quoted(String name) =>
 double _average(Iterable<double> values) =>
     values.reduce((a, b) => a + b) / values.length;
 
-/// The facts about the week starting [monday]. [summaries] cover the 4
-/// weeks ending on its Sunday (for the usual big day); [meals] are this
-/// week's; [weighIns] is how many fell in the week.
+/// The facts about the week starting [monday]. [summaries] and [meals]
+/// cover the 4 weeks ending on its Sunday (for the usual big day and the
+/// nutrients over the weeks); [weighIns] is how many fell in the week.
 WeekFacts buildWeekFacts({
   required DateTime monday,
   required List<DailySummary> summaries,
@@ -95,6 +95,25 @@ WeekFacts buildWeekFacts({
   }
   List<Meal> mealsOn(DailySummary day) => mealsByDate[day.date] ?? const [];
 
+  /// The judged days of the week [weeksBack] weeks before this one.
+  List<DailySummary> judgedOf(int weeksBack) => [
+    for (var i = 0; i < 7; i++)
+      byDate[_dateKey.format(dayOf(i - 7 * weeksBack))],
+  ].nonNulls.where(isJudgedDay).toList();
+
+  /// Each day's total of what [of] gives, on the days where every meal has
+  /// it, since a gap would make the day look low.
+  Map<String, double> totalsByDay(
+    List<DailySummary> days,
+    double? Function(Meal) of,
+  ) => {
+    for (final day in days)
+      if (mealsOn(day) case final dayMeals
+          when dayMeals.isNotEmpty &&
+              dayMeals.every((meal) => of(meal) != null))
+        day.date: dayMeals.fold(0.0, (sum, meal) => sum + of(meal)!),
+  };
+
   final target = logged.isEmpty
       ? profile.dailyCalorieTarget.round()
       : logged.last.targetCalories;
@@ -117,7 +136,12 @@ WeekFacts buildWeekFacts({
         '(${day.status.label.toLowerCase()}, $away)';
   }
 
+  final usualFood = profile.usualFood.trim().replaceAll(RegExp(r'\s+'), ' ');
   final lines = <String>[
+    'The user lives in ${profile.country}.',
+    if (usualFood.isNotEmpty)
+      'What they usually eat, in their words: '
+          '"${String.fromCharCodes(usualFood.runes.take(200))}".',
     'Week: ${DateFormat('EEEE d MMMM').format(monday)} to '
         '${DateFormat('EEEE d MMMM').format(dayOf(6))}.',
     'On track means within 10% of the daily target; close means within 20%.',
@@ -192,10 +216,7 @@ WeekFacts buildWeekFacts({
   // counting weeks with 4 judged days and a single biggest day.
   final wins = <int, int>{};
   for (var weeksBack = 3; weeksBack >= 0; weeksBack--) {
-    final days = [
-      for (var i = 0; i < 7; i++)
-        byDate[_dateKey.format(dayOf(i - 7 * weeksBack))],
-    ].nonNulls.where(isJudgedDay).toList();
+    final days = judgedOf(weeksBack);
     if (days.length < 4) continue;
     final most = days.map((day) => day.totalCalories).reduce(math.max);
     final top = days.where((day) => day.totalCalories == most).toList();
@@ -212,6 +233,26 @@ WeekFacts buildWeekFacts({
     }
   }
 
+  // Last week against this one, when both had 4 judged days.
+  final lastWeek = [
+    for (var i = -7; i < 0; i++) byDate[_dateKey.format(dayOf(i))],
+  ].nonNulls.toList();
+  if (judged.length >= 4 && lastWeek.where(isJudgedDay).length >= 4) {
+    final lastCard = PeriodReviewService().buildReview(
+      startDate: dayOf(-7),
+      endDate: dayOf(-1),
+      summaries: lastWeek,
+    );
+    final difference =
+        card.averageCaloriesPerDay.round() -
+        lastCard.averageCaloriesPerDay.round();
+    lines.add(
+      'Last week averaged ${_n(lastCard.averageCaloriesPerDay.round())} kcal '
+      'over ${_days(lastCard.loggedDays)} logged; this week is '
+      '${_versus(difference, 'kcal')}.',
+    );
+  }
+
   // Protein, from days where every meal has it, since a gap looks low.
   final proteinTarget = HealthCalculator.proteinTargetGrams(
     targetWeightKg: profile.targetWeightKg,
@@ -219,11 +260,11 @@ WeekFacts buildWeekFacts({
   );
   if (profile.trackProtein) {
     final proteinDays = [
-      for (final day in judged)
-        if (mealsOn(day) case final dayMeals
-            when dayMeals.isNotEmpty &&
-                dayMeals.every((meal) => meal.proteinGrams != null))
-          dayMeals.fold(0.0, (sum, meal) => sum + meal.proteinGrams!).round(),
+      for (final grams in totalsByDay(
+        judged,
+        (meal) => meal.proteinGrams,
+      ).values)
+        grams.round(),
     ];
     int? proteinAverage;
     if (proteinDays.length >= 3) {
@@ -287,15 +328,11 @@ WeekFacts buildWeekFacts({
     calories: target,
     proteinGrams: proteinTarget,
   );
-  Map<String, double> nutrientDays(double? Function(Nutrients) of) => {
-    for (final day in judged)
-      if (mealsOn(day) case final dayMeals
-          when dayMeals.isNotEmpty &&
-              dayMeals.every(
-                (meal) => meal.macros != null && of(meal.macros!) != null,
-              ))
-        day.date: dayMeals.fold(0.0, (sum, meal) => sum + of(meal.macros!)!),
-  };
+  Map<String, double> nutrientDays(double? Function(Nutrients) of) =>
+      totalsByDay(
+        judged,
+        (meal) => meal.macros == null ? null : of(meal.macros!),
+      );
 
   final fibre = nutrientDays((n) => n.fibre);
   final fibreAverage = fibre.length < 3 ? null : _average(fibre.values).round();
@@ -329,6 +366,68 @@ WeekFacts buildWeekFacts({
       '$name: the guide is at most $guide g a day. Averaged '
       '${_average(days.values).round()} g on the ${days.length} days with '
       '${name.toLowerCase()} for every meal; over on ${_days(over.length)}.',
+    );
+  }
+
+  // The same over the last 4 weeks, each week by the same rules: off the
+  // guide for weeks running, or back on it after weeks off.
+  double? weekAverage(int weeksBack, double? Function(Meal) of) {
+    final totals = totalsByDay(judgedOf(weeksBack), of);
+    return totals.length < 3 ? null : _average(totals.values);
+  }
+
+  for (final (name, of, off, offWord, metWord) in [
+    if (profile.trackProtein)
+      (
+        'Protein',
+        (Meal meal) => meal.proteinGrams,
+        (double g) => g.round() < proteinTarget,
+        'below target',
+        'was on target',
+      ),
+    (
+      'Fibre',
+      (Meal meal) => meal.macros?.fibre,
+      (double g) => g.round() < guides.fibre,
+      'under the guide',
+      'met the guide',
+    ),
+    (
+      'Salt',
+      (Meal meal) => meal.macros?.salt,
+      (double g) => _toTenth(g) > guides.salt,
+      'over the guide',
+      'was under the guide',
+    ),
+    (
+      'Sugars',
+      (Meal meal) => meal.macros?.sugars,
+      (double g) => g.round() > guides.sugars,
+      'over the guide',
+      'was under the guide',
+    ),
+    (
+      'Saturates',
+      (Meal meal) => meal.macros?.saturates,
+      (double g) => g.round() > guides.saturates,
+      'over the guide',
+      'was under the guide',
+    ),
+  ]) {
+    final thisWeek = weekAverage(0, of);
+    if (thisWeek == null) continue;
+    var earlier = 0;
+    for (var weeksBack = 1; weeksBack <= 3; weeksBack++) {
+      final average = weekAverage(weeksBack, of);
+      if (average == null || !off(average)) break;
+      earlier++;
+    }
+    if (earlier == 0) continue;
+    lines.add(
+      off(thisWeek)
+          ? '$name has been $offWord for ${earlier + 1} weeks running.'
+          : '$name $metWord this week, after '
+                '${earlier == 1 ? '1 week' : '$earlier weeks'} $offWord.',
     );
   }
 
@@ -400,8 +499,32 @@ WeekFacts buildWeekFacts({
     );
   }
 
+  // The whole library, so the AI can pick recipes that fit each note; by
+  // id, so the order never changes.
+  if (recipes.isNotEmpty) {
+    final library = [...recipes]..sort((a, b) => a.id.compareTo(b.id));
+    final listed = [
+      for (final recipe in library)
+        '${_quoted(recipe.name)} (${recipe.category.label.toLowerCase()}; '
+            '${_n(recipe.kcalPerPortion)} kcal; ${recipe.proteinPerPortion} g '
+            'protein; ${recipe.macrosPerPortion.fibre!.round()} g fibre; '
+            '${_tenths.format(_toTenth(recipe.macrosPerPortion.salt!))} g '
+            'salt; ${recipe.macrosPerPortion.sugars!.round()} g sugars; '
+            '${recipe.macrosPerPortion.saturates!.round()} g saturates)',
+    ];
+    lines.add(
+      'Recipes in the app\'s library, per portion: ${listed.join('; ')}.',
+    );
+  }
+
   return WeekFacts(judgedDays: judged.length, lines: lines);
 }
+
+/// A difference from last week, for the AI to quote as it is.
+String _versus(int difference, String unit) => difference == 0
+    ? 'the same'
+    : '${_n(difference.abs())} $unit a day '
+          '${difference > 0 ? 'higher' : 'lower'}';
 
 /// Most of [value] per kcal first, then by id, so the order never changes.
 int Function(Recipe, Recipe) _byRatio(double Function(Recipe) value) => (a, b) {

@@ -16,6 +16,7 @@ import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/bowl_note.dart';
 import 'package:lean_streak/widgets/calorie_bars.dart';
 import 'package:lean_streak/widgets/day_status.dart';
+import 'package:lean_streak/widgets/period_bar.dart';
 import 'package:lean_streak/widgets/pill_toggle.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 
@@ -97,7 +98,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                 onChanged: (mode) => setState(() => _mode = mode),
               ),
               const SizedBox(height: 18),
-              _PeriodBar(
+              PeriodBar(
                 label: _periodLabel(start, _mode),
                 onPrevious: start.isAfter(firstStart)
                     ? () => setState(() => _anchor = _shift(start, -1, _mode))
@@ -156,53 +157,6 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _PeriodBar extends StatelessWidget {
-  const _PeriodBar({
-    required this.label,
-    required this.onPrevious,
-    required this.onNext,
-    required this.onToday,
-  });
-
-  final String label;
-  final VoidCallback? onPrevious;
-  final VoidCallback? onNext;
-  final VoidCallback? onToday;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppCard(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-      child: Row(
-        children: [
-          IconButton(
-            tooltip: 'Previous',
-            onPressed: onPrevious,
-            icon: const Icon(Icons.chevron_left_rounded),
-          ),
-          Expanded(
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              style: AppTheme.display.copyWith(
-                fontSize: 18,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ),
-          if (onToday != null)
-            TextButton(onPressed: onToday, child: const Text('Today')),
-          IconButton(
-            tooltip: 'Next',
-            onPressed: onNext,
-            icon: const Icon(Icons.chevron_right_rounded),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -610,9 +564,5 @@ String _periodLabel(DateTime start, _ReviewMode mode) {
   if (mode == _ReviewMode.month) {
     return DateFormat('MMMM yyyy').format(start);
   }
-  final end = _periodEnd(start, mode);
-  final startLabel = start.month == end.month
-      ? DateFormat('d').format(start)
-      : DateFormat('d MMM').format(start);
-  return '$startLabel – ${DateFormat('d MMM yyyy').format(end)}';
+  return weekLabel(start);
 }

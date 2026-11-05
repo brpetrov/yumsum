@@ -1,18 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// One of the AI Coach's notes; [good] when it's about something that went
-/// well, which the card marks with a green dot.
-typedef ReviewPoint = ({String text, bool good});
+/// One of the AI Coach's notes: a short [title], a few sentences of [text],
+/// and [good] when it's about something that went well, which the page
+/// marks with a green dot.
+typedef ReviewPoint = ({String title, String text, bool good});
 
-/// A note as saved or as the AI wrote it: `{text, good}`, or a bare string
-/// from before prompt version 4, which isn't good. Null for anything else.
+/// A note as saved or as the AI wrote it: `{title, text, good}`; from
+/// before prompt version 6 without a title, and before 4 a bare string,
+/// which isn't good. Null for anything else.
 ReviewPoint? reviewPointFrom(Object? raw) => switch (raw) {
-  {'text': final String text, 'good': final bool good} => (
+  {'text': final String text} && final Map<Object?, Object?> map => (
+    title: switch (map['title']) {
+      final String title => title,
+      _ => '',
+    },
     text: text,
-    good: good,
+    good: map['good'] == true,
   ),
-  {'text': final String text} => (text: text, good: false),
-  final String text => (text: text, good: false),
+  final String text => (title: '', text: text, good: false),
   _ => null,
 };
 
@@ -47,7 +52,8 @@ class WeeklyReview {
 
   Map<String, dynamic> toFirestore() => {
     'points': [
-      for (final point in points) {'text': point.text, 'good': point.good},
+      for (final point in points)
+        {'title': point.title, 'text': point.text, 'good': point.good},
     ],
     'basis': basis,
     'createdAt': Timestamp.fromDate(createdAt),

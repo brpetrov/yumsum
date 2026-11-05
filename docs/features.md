@@ -20,10 +20,10 @@ How each part of the app works, for when you're working on it. `CLAUDE.md` has t
 
 **Other pages:**
 - Editing a meal, or adding one to a past day, uses the meal form `showLogMealSheet` (`lib/screens/meals/log_meal_sheet.dart`), which has its own AI estimate.
-- The top-left menu (`AppDrawer` in `lib/widgets/app_frame.dart`, on every page) lists Home, History, Recipes, Weight & Progress, Plan Settings, Notifications and Account Settings, then YumSum Star, and Debug tools where they're on offer. There are no bottom tabs.
+- The top-left menu (`AppDrawer` in `lib/widgets/app_frame.dart`, on every page) lists Home, History, AI Coach, Recipes, Weight & Progress, Plan Settings, Notifications and Account Settings, then YumSum Star, and Debug tools where they're on offer. There are no bottom tabs.
 - Home is the root and every other page sits one level above it: picking a page from inside another swaps it (`pushReplacement`), so Back always returns Home. YumSum Star opens over the current page instead.
 - History (`ReviewScreen`, `/review`): a week/month calendar with the period review; tapping a day opens `showDayMealsSheet` (`lib/screens/review/day_meals_sheet.dart`) to add, edit or delete its meals.
-  - AI Coach (`WeeklyNotesCard`, plan 09) sits under the calendar in both views: the week's notes in the week view, and in the month view the latest week that ended in that month, named ("Week of 26 October"). Free users get its prompt (`CoachPrompt`) in both.
+  - AI Coach (`WeeklyNotesCard`, plan 09) sits under the calendar in both views as a card that opens the AI Coach page on that week: the week shown in the week view, and in the month view the latest week that ended in that month, named ("Week of 26 October"). Free users get its prompt (`CoachPrompt`) in both, which opens the page too.
 - Plan Settings is `PlanSettingsScreen` in `lib/screens/profile/profile_screen.dart`; Account Settings is `AccountSettingsScreen` on `/profile`.
 - Routing: `goRouterProvider` listens to `authStateProvider` and `userProfileProvider` and enforces Splash → Auth → Onboarding → Home; a profile that fails to load goes to `ProfileLoadErrorScreen`.
 
@@ -173,24 +173,29 @@ YumSum Star (plan 08).
 
 ## AI Coach
 
-The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Coach.
+The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Coach. It has its own page, `CoachScreen` (`lib/screens/coach/coach_screen.dart`, `/coach`, in the menu), which History's card opens too.
 - **The facts:** the app works out every fact and the AI only writes. `buildWeekFacts` (`lib/helpers/week_facts.dart`, pure) gives the lines the AI is told:
+  - the user's country and, in their words, what they usually eat (one line each, so the foods it suggests fit);
   - the days logged, the target and the calorie minimum, what History's card already shows, and each day;
   - weekdays against the weekend, steady weekdays, the biggest day, days under the minimum, and a usual big day over the last 4 weeks;
+  - last week's average against this week's ("this week is 15 kcal a day lower"), when both weeks had 4 judged days;
   - protein, and the first meal of the day (by logging order, only on days whose meals were all logged on the day) with ideas from the library's breakfasts only (the user's own meals aren't suggested back to them, since 5 November);
   - fibre, salt, sugars and saturates against the guides (`macroTargets`), each on days where every meal has it, with where the salt came from and fibre-rich recipes under 2 g of salt;
-  - how many weigh-ins (never the weights), and the Adaptive formula's change on that week's Monday.
+  - the same nutrients over the last 4 weeks, each week by the same rules: "Fibre has been under the guide for 3 weeks running", or "Fibre met the guide this week, after 2 weeks under the guide" (a week without the nutrient ends the run);
+  - how many weigh-ins (never the weights), and the Adaptive formula's change on that week's Monday;
+  - the whole recipe library last, one entry each with its meal, kcal, protein, fibre, salt, sugars and saturates per portion, by id, so the AI can pick recipes that fit each note.
   - Days off are left out of every pattern, average and tip; fat and carbs never appear. The same data always gives the same lines.
 - **The call:** `WeeklyReviewService` (`lib/services/weekly_review_service.dart`) sends the facts to the `aiWeeklyReview` function (see AI), which checks YumSum Star.
-  - `weeklyReviewInstruction` (`functions/src/prompts.ts`) as a system instruction, the facts as the message, and a response schema (`points`, at most 6, each `{text, good}`; `good` only for a note about something that went well).
-  - `parseReviewPoints` keeps at most 6 notes (the instruction asks for 4 to 6) as `ReviewPoint`s, dropping any over 160 characters, with a number not in the facts, or with a shaming word; a bare string counts as not good. None left is a failure, and nothing is saved.
-- **When:** only for finished weeks with at least 4 judged days (logged, not taken off), when a subscriber opens the week in History.
-  - `weeklyReviewProvider` rebuilds the facts each time and keeps the notes (`{text, good}` each, up to 6 in the rules) in `weekly_reviews/{Monday}` with `basis`: `weeklyReviewPromptVersion` and the facts as sent. The AI is asked again only when `basis` changes, so raise the version whenever the instruction or the facts change.
+  - `weeklyReviewInstruction` (`functions/src/prompts.ts`) as a system instruction, the facts as the message (at most 16,000 characters), and a response schema (`points`, at most 8, each `{title, text, good}`; `good` only for a note about something that went well). It asks for 5 to 7 notes, most useful first, each with a heading of at most 40 characters and 2 to 4 sentences of at most 450: what the facts show, why it matters in everyday terms, then what to do, with cheap everyday foods (no brands, no numbers) and two recipes from the library that fit. A nutrient off for weeks running is the first note.
+  - `parseReviewPoints` keeps at most 8 notes as `ReviewPoint`s, dropping any whose text is over 600 characters or title over 80, with a number not in the facts, or with a shaming word in either; a bare string counts as untitled and not good. None left is a failure, and nothing is saved.
+- **When:** only for finished weeks with at least 4 judged days (logged, not taken off), when a subscriber opens the week on the page.
+  - `weeklyReviewProvider` rebuilds the facts each time (reading 4 weeks of summaries and meals) and keeps the notes (`{title, text, good}` each, up to 8 in the rules, with `basis` up to 12,000 characters) in `weekly_reviews/{Monday}` with `basis`: `weeklyReviewPromptVersion` and the facts as sent. The AI is asked again only when `basis` changes, so raise the version whenever the instruction or the facts change (a recipe added to the library changes every week's facts too).
   - `refreshHistory` invalidates it. Runs that overlap for the same week and basis share one call (`_writingProvider`), and the week's weigh-ins are counted with a query for that week only (`countEntriesInRange`).
-- **Where it shows** (`lib/screens/review/weekly_notes.dart`):
-  - `WeeklyNotesCard`, under the calendar: for a week still going, "Your notes on this week come on Monday."; then the notes, or why there are none for a thin week, a spinner, or "Could not get this week's notes. Try again." with Try again. Each note has an orange dot, green for one about something that went well. Numbers keep their units on one line, and a library recipe named in a note is an orange underlined link to its page, shown without the AI's quotes (`_noteSpans`). The info button opens `showCoachIntro`.
-  - Free users get `CoachPrompt`: the shining AI Coach button (`TryButton`) and "See what's working, what's holding you back, and get personal tips on how to improve.", in both views whatever was logged. Either opens `showCoachIntro(plus: false)`, whose Enable opens `/plus`.
-  - Nothing on Home: the notes are only in History.
+  - Past weeks are kept for good, one small document each, so the page can scroll back through them.
+- **The page** (`CoachScreen`): a `PeriodBar` (`lib/widgets/period_bar.dart`, shared with History) over the week ("26 Oct – 1 Nov 2026"; Previous and Next between the first logged week and the latest finished one, Latest to come back), opened on the week History asked for (`?week=yyyy-MM-dd`, a finished Monday) or else the latest finished week. Under it, each note is an `AppCard` with a dot (green for one about something that went well), its title in the display font and the text; or, for a thin week, why there are none; a spinner ("Looking over your week"); or "Could not get this week's notes. Try again." with Try again. Numbers keep their units on one line, and a library recipe named in a note is an orange underlined link to its page, shown without the AI's quotes (`_NoteText`). The info button opens `showCoachIntro` (Close only).
+  - Free users get the page without the bar: the illustration's place, "AI Coach", "Your week, read for you", the four promises (`coachPromises`, `FeaturePromises`) and Enable, which opens `/plus`.
+- **In History** (`lib/screens/review/weekly_notes.dart`): `WeeklyNotesCard` under the calendar in both views is a slim card ("Read your notes on this week.", or "Your notes on this week come on Monday." for a week still going) that opens the page on that week with `openPage`, swapping History for it so Back lands on Home. Free users get `CoachPrompt`: the shining AI Coach button (`TryButton`) and "See what's working, what's holding you back, and get personal tips on how to improve.", both opening the page.
+  - Nothing on Home.
 
 ## Days
 

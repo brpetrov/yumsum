@@ -405,11 +405,34 @@ WeekFacts _facts({
 Iterable<String> _starting(List<String> lines, String prefix) =>
     lines.where((line) => line.startsWith(prefix));
 
+/// The last line: the whole library, by id.
+const _library =
+    'Recipes in the app\'s library, per portion: '
+    '"Chilli edamame" (snack; 186 kcal; 17 g protein; 8 g fibre; 1 g salt; '
+    '8 g sugars; 3 g saturates); '
+    '"Cod with chorizo and white beans" (dinner; 375 kcal; 44 g protein; '
+    '10 g fibre; 1.8 g salt; 8 g sugars; 3 g saturates); '
+    '"Greek yoghurt berry bowl" (breakfast; 332 kcal; 30 g protein; 6 g '
+    'fibre; 0.3 g salt; 8 g sugars; 3 g saturates); '
+    '"Lighter full English" (breakfast; 408 kcal; 36 g protein; 9 g fibre; '
+    '2.9 g salt; 8 g sugars; 3 g saturates); '
+    '"Menemen" (breakfast; 443 kcal; 29 g protein; 8 g fibre; 2 g salt; '
+    '8 g sugars; 3 g saturates); '
+    '"Pea and ham soup" (lunch; 297 kcal; 27 g protein; 11 g fibre; 2.8 g '
+    'salt; 8 g sugars; 3 g saturates); '
+    '"Quark pancakes" (breakfast; 345 kcal; 26 g protein; 4 g fibre; 0.5 g '
+    'salt; 8 g sugars; 3 g saturates); '
+    '"Skyr overnight oats" (breakfast; 417 kcal; 28 g protein; 10 g fibre; '
+    '0.3 g salt; 8 g sugars; 3 g saturates); '
+    '"Tuna and white bean salad" (lunch; 327 kcal; 37 g protein; 10 g '
+    'fibre; 1.6 g salt; 8 g sugars; 3 g saturates).';
+
 void main() {
   test('the plan\'s example week, line by line', () {
     final facts = _facts();
     expect(facts.judgedDays, 7);
     expect(facts.lines, [
+      'The user lives in United Kingdom.',
       'Week: Monday 26 October to Sunday 1 November.',
       'On track means within 10% of the daily target; close means within '
           '20%.',
@@ -426,6 +449,8 @@ void main() {
       'Every weekday logged was on track.',
       'Biggest day: Saturday, 2,705 kcal.',
       'Saturday was the biggest day in 3 of the last 4 weeks.',
+      'Last week averaged 2,100 kcal over 5 days logged; this week is 15 '
+          'kcal a day lower.',
       'Protein target: 112 g a day. Averaged 88 g on the 7 days with protein '
           'for every meal; reached on 1 day.',
       'The first meal of the day averaged 14 g of protein, on 6 days.',
@@ -446,7 +471,145 @@ void main() {
           'salad" (327 kcal, 10 g fibre); "Cod with chorizo and white beans" '
           '(375 kcal, 10 g fibre).',
       'Weigh-ins this week: 3.',
+      _library,
     ]);
+  });
+
+  test('the country and the usual food come first, on one line each', () {
+    final lines = _facts(
+      profile: _profile.copyWith(
+        country: 'Bulgaria',
+        usualFood: '  Bulgarian home cooking:\nbanitsa, shopska  salad ',
+      ),
+    ).lines;
+    expect(lines.take(3), [
+      'The user lives in Bulgaria.',
+      'What they usually eat, in their words: "Bulgarian home cooking: '
+          'banitsa, shopska salad".',
+      'Week: Monday 26 October to Sunday 1 November.',
+    ]);
+  });
+
+  test('last week is compared only when both weeks have 4 judged days', () {
+    final thinLastWeek = [
+      for (final day in _summaries)
+        if (!const ['2026-10-21', '2026-10-23'].contains(day.date)) day,
+    ];
+    expect(
+      _starting(_facts(summaries: thinLastWeek).lines, 'Last week'),
+      isEmpty,
+    );
+  });
+
+  group('the nutrients over the weeks', () {
+    /// Every logged day of the three earlier weeks with the same meals:
+    /// [fibre] and [salt] g a day, 80 g protein, 60 g sugars and 18 g
+    /// saturates.
+    List<Meal> earlier({required double fibre, required double salt}) => [
+      for (final day in _summaries)
+        if (day.date.compareTo('2026-10-26') < 0)
+          ..._dayMeals(
+            day.date,
+            breakfast: 'Toast',
+            firstProtein: 12,
+            protein: 80,
+            lunch: 'Soup',
+            lunchSalt: 1.0,
+            fibre: fibre,
+            salt: salt,
+            sugars: 60,
+            saturates: 18,
+          ),
+    ];
+
+    /// This week with plenty of protein and fibre and little salt.
+    final thisWeekFine = [
+      for (final day in _summaries)
+        if (day.date.compareTo('2026-10-26') >= 0)
+          ..._dayMeals(
+            day.date,
+            breakfast: 'Oats',
+            firstProtein: 30,
+            protein: 120,
+            lunch: 'Soup',
+            lunchSalt: 1.0,
+            fibre: 34,
+            salt: 5.0,
+            sugars: 60,
+            saturates: 18,
+          ),
+    ];
+
+    test('off the guide for weeks running', () {
+      // This week: protein 88 of 112, fibre 17 of 30, salt 7.4 over 6;
+      // sugars and saturates within their guides.
+      final lines = _facts(
+        meals: [...earlier(fibre: 12, salt: 8), ..._meals],
+      ).lines;
+      expect(
+        lines,
+        containsAll([
+          'Protein has been below target for 4 weeks running.',
+          'Fibre has been under the guide for 4 weeks running.',
+          'Salt has been over the guide for 4 weeks running.',
+        ]),
+      );
+      expect(_starting(lines, 'Sugars has been'), isEmpty);
+      expect(_starting(lines, 'Saturates has been'), isEmpty);
+    });
+
+    test('back on the guide after weeks off', () {
+      final lines = _facts(
+        meals: [...earlier(fibre: 12, salt: 8), ...thisWeekFine],
+      ).lines;
+      expect(
+        lines,
+        containsAll([
+          'Protein was on target this week, after 3 weeks below target.',
+          'Fibre met the guide this week, after 3 weeks under the guide.',
+          'Salt was under the guide this week, after 3 weeks over the guide.',
+        ]),
+      );
+    });
+
+    test('a week without the nutrient ends the run', () {
+      final lastWeekOnly = [
+        for (final meal in earlier(fibre: 12, salt: 8))
+          if (meal.date.compareTo('2026-10-19') >= 0) meal,
+      ];
+      final weekBeforeOnly = [
+        for (final meal in earlier(fibre: 12, salt: 8))
+          if (meal.date.compareTo('2026-10-19') < 0 &&
+              meal.date.compareTo('2026-10-12') >= 0)
+            meal,
+      ];
+      expect(
+        _facts(meals: [...lastWeekOnly, ..._meals]).lines,
+        contains('Fibre has been under the guide for 2 weeks running.'),
+      );
+      expect(
+        _facts(meals: [...lastWeekOnly, ...thisWeekFine]).lines,
+        contains(
+          'Fibre met the guide this week, after 1 week under the guide.',
+        ),
+      );
+      expect(
+        _starting(
+          _facts(meals: [...weekBeforeOnly, ..._meals]).lines,
+          'Fibre has been',
+        ),
+        isEmpty,
+      );
+    });
+
+    test('nothing without earlier weeks, or when they were fine', () {
+      expect(_starting(_facts().lines, 'Fibre has been'), isEmpty);
+      final lines = _facts(
+        meals: [...earlier(fibre: 32, salt: 4), ..._meals],
+      ).lines;
+      expect(_starting(lines, 'Fibre has been'), isEmpty);
+      expect(_starting(lines, 'Salt has been'), isEmpty);
+    });
   });
 
   test('an ordinary week: a day off, steady weekdays and a formula change', () {
@@ -490,6 +653,7 @@ void main() {
     );
     expect(facts.judgedDays, 5);
     expect(facts.lines, [
+      'The user lives in United Kingdom.',
       'Week: Monday 19 October to Sunday 25 October.',
       'On track means within 10% of the daily target; close means within '
           '20%.',
@@ -515,6 +679,7 @@ void main() {
       'Weigh-ins this week: 4.',
       'On Monday the Adaptive formula changed the daily target from 1,850 to '
           '1,900 kcal, from the user\'s weigh-ins and logged food.',
+      _library,
     ]);
   });
 

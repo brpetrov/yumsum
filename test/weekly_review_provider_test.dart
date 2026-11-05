@@ -50,12 +50,17 @@ class _FakeSummaries extends Fake implements DailySummaryRepository {
 }
 
 class _FakeMeals extends Fake implements MealRepository {
+  final ranges = <(String, String)>[];
+
   @override
   Future<List<Meal>> fetchMealsInRange(
     String uid, {
     required String startDate,
     required String endDate,
-  }) async => const [];
+  }) async {
+    ranges.add((startDate, endDate));
+    return const [];
+  }
 }
 
 class _FakeWeighIns extends Fake implements WeightEntryRepository {
@@ -96,7 +101,9 @@ class _FakeCoach extends Fake implements WeeklyReviewService {
   }
 }
 
-const _points = <ReviewPoint>[(text: 'Steady all week.', good: true)];
+const _points = <ReviewPoint>[
+  (title: 'Steady', text: 'Steady all week.', good: true),
+];
 
 void main() {
   final now = DateTime.now();
@@ -104,11 +111,13 @@ void main() {
   final monday = DateTime(now.year, now.month, now.day - now.weekday - 6);
   final week = _key(monday);
   final sunday = _key(DateTime(monday.year, monday.month, monday.day + 6));
+  late _FakeMeals meals;
   late _FakeWeighIns weighIns;
   late _FakeReviews reviews;
   late _FakeCoach coach;
 
   ProviderContainer container() {
+    meals = _FakeMeals();
     weighIns = _FakeWeighIns();
     reviews = _FakeReviews();
     coach = _FakeCoach();
@@ -120,7 +129,7 @@ void main() {
         dailySummaryRepositoryProvider.overrideWithValue(
           _FakeSummaries(monday),
         ),
-        mealRepositoryProvider.overrideWithValue(_FakeMeals()),
+        mealRepositoryProvider.overrideWithValue(meals),
         weightEntryRepositoryProvider.overrideWithValue(weighIns),
         weeklyReviewRepositoryProvider.overrideWithValue(reviews),
         weeklyReviewServiceProvider.overrideWithValue(coach),
@@ -136,6 +145,15 @@ void main() {
     await pumpEventQueue();
     expect(weighIns.ranges, [(week, sunday)]);
     expect(coach.facts, contains('Weigh-ins this week: 2.'));
+  });
+
+  test('reads 4 weeks of meals, for the nutrients over the weeks', () async {
+    container();
+    await pumpEventQueue();
+    final fourWeeksAgo = _key(
+      DateTime(monday.year, monday.month, monday.day - 21),
+    );
+    expect(meals.ranges, [(fourWeeksAgo, sunday)]);
   });
 
   test('a run that overlaps one still writing shares its call', () async {

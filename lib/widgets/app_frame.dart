@@ -82,6 +82,21 @@ class AppFrame extends ConsumerWidget {
   }
 }
 
+/// Opens one of the menu's pages ([route], with any query) from anywhere.
+/// Home is the root and every other page sits one level above it, so
+/// moving between pages swaps the top one and Back always lands on Home.
+void openPage(BuildContext context, String route) {
+  final router = GoRouter.of(context);
+  if (router.state.uri.toString() == route) return;
+  if (route == AppRoutes.dashboard) {
+    router.go(route);
+  } else if (router.canPop()) {
+    router.pushReplacement(route);
+  } else {
+    router.push(route);
+  }
+}
+
 /// The menu, shown on every page: Home first, then the other pages,
 /// appearance and log out.
 class AppDrawer extends ConsumerWidget {
@@ -93,6 +108,11 @@ class AppDrawer extends ConsumerWidget {
       route: AppRoutes.review,
       icon: Icons.calendar_month_outlined,
       label: 'History',
+    ),
+    (
+      route: AppRoutes.coach,
+      icon: Icons.auto_awesome_outlined,
+      label: 'AI Coach',
     ),
     (
       route: AppRoutes.recipes,
@@ -121,19 +141,9 @@ class AppDrawer extends ConsumerWidget {
     ),
   ];
 
-  /// Home is the root and every other page sits one level above it, so
-  /// moving between pages swaps the top one and Back always lands on Home.
   void _open(BuildContext context, String route) {
     Navigator.of(context).pop();
-    final router = GoRouter.of(context);
-    if (router.state.uri.path == route) return;
-    if (route == AppRoutes.dashboard) {
-      router.go(route);
-    } else if (router.canPop()) {
-      router.pushReplacement(route);
-    } else {
-      router.push(route);
-    }
+    openPage(context, route);
   }
 
   @override

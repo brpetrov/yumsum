@@ -56,19 +56,20 @@ final weeklyReviewProvider = FutureProvider.autoDispose
       if (user == null) return const [];
       final week = _dateKey.format(monday);
       final end = _dateKey.format(sunday);
+      // Four weeks, for the usual big day and the nutrients over the weeks.
+      final fourWeeks = _dateKey.format(
+        DateTime(monday.year, monday.month, monday.day - 21),
+      );
       final facts = buildWeekFacts(
         monday: monday,
-        // Four weeks, for the usual big day.
         summaries: await summaryRepository.fetchSummariesInRange(
           uid,
-          startDate: _dateKey.format(
-            DateTime(monday.year, monday.month, monday.day - 21),
-          ),
+          startDate: fourWeeks,
           endDate: end,
         ),
         meals: await mealRepository.fetchMealsInRange(
           uid,
-          startDate: week,
+          startDate: fourWeeks,
           endDate: end,
         ),
         weighIns: await weightRepository.countEntriesInRange(

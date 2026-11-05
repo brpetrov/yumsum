@@ -316,7 +316,8 @@ describe("estimateAsk", () => {
     }
     assert.throws(() => estimateAsk(null), HttpsError);
     assert.throws(() => weeklyReviewAsk({ facts: "" }), HttpsError);
-    assert.throws(() => weeklyReviewAsk({ facts: "x".repeat(8001) }), HttpsError);
+    assert.throws(() => weeklyReviewAsk({ facts: "x".repeat(16001) }), HttpsError);
+    weeklyReviewAsk({ facts: "x".repeat(16000) });
   });
 
   test("the fill-in rounds the calories", () => {
@@ -372,6 +373,10 @@ describe("the prompts", () => {
       "ways the user can improve",
       `"good" is true only`,
       "never suggest the user's own meals",
+      "5 to 7 notes",
+      "weeks running",
+      "two recipes from the app's library",
+      "never a brand",
     ]) {
       assert.ok(weeklyReviewInstruction.includes(rule), rule);
     }

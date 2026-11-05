@@ -119,7 +119,7 @@ void main() {
     await pumpAt(tester, AppRoutes.review);
     await tester.tap(find.byTooltip('Open navigation menu'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.byType(PlusMark));
+    await tester.scrollUntilVisible(find.byType(PlusMark), 100);
     await tester.pumpAndSettle();
     await tester.tap(find.byType(PlusMark));
     await tester.pumpAndSettle();

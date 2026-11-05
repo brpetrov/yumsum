@@ -15,37 +15,61 @@ List<String> _parse(Object? raw) => [
   for (final point in parseReviewPoints(raw, facts: _facts)) point.text,
 ];
 
+Map<String, Object?> _note(String title, String text) => {
+  'title': title,
+  'text': text,
+  'good': false,
+};
+
 void main() {
-  test('keeps the good mark; a bare string is not good', () {
+  test('keeps the title and the good mark; a bare string has neither', () {
     expect(
       parseReviewPoints([
-        {'text': 'Fibre met the guide all week.', 'good': true},
+        {
+          'title': 'Fibre on track',
+          'text': 'Fibre met the guide.',
+          'good': true,
+        },
         'Salt averaged 7.4 g.',
         {'text': 'Steady weekdays.', 'good': 'yes'},
       ], facts: _facts),
       [
-        (text: 'Fibre met the guide all week.', good: true),
-        (text: 'Salt averaged 7.4 g.', good: false),
-        (text: 'Steady weekdays.', good: false),
+        (title: 'Fibre on track', text: 'Fibre met the guide.', good: true),
+        (title: '', text: 'Salt averaged 7.4 g.', good: false),
+        (title: '', text: 'Steady weekdays.', good: false),
       ],
     );
   });
 
-  test('keeps at most 6 notes, in order', () {
-    final notes = ['One.', 'Two.', 'Three.', 'Four.', 'Five.', 'Six.'];
-    expect(_parse([...notes, 'Seven.']), notes);
+  test('keeps at most 8 notes, in order', () {
+    final notes = [
+      'One.',
+      'Two.',
+      'Three.',
+      'Four.',
+      'Five.',
+      'Six.',
+      'Seven.',
+      'Eight.',
+    ];
+    expect(_parse([...notes, 'Nine.']), notes);
   });
 
-  test('drops a note over 160 characters', () {
-    final long = 'Steady weekdays. ${'x' * 150}';
+  test('drops a note over 600 characters, or a title over 80', () {
+    final long = 'Steady weekdays. ${'x' * 590}';
     expect(_parse([long, 'Short.']), ['Short.']);
-    expect(_parse(['y' * 160, 'Short.']), hasLength(2));
+    expect(_parse(['y' * 600, 'Short.']), hasLength(2));
+    expect(_parse([_note('t' * 81, 'Short.'), _note('t' * 80, 'Fine.')]), [
+      'Fine.',
+    ]);
   });
 
-  test('drops a note with a number not in the facts', () {
+  test('drops a note with a number not in the facts, in the text or the '
+      'title', () {
     expect(
       _parse([
         'That\'s nearly 700 kcal more on weekend days.',
+        _note('700 kcal more', 'Weekend days ran higher.'),
         'Weekdays were steady at about 1,890 kcal.',
       ]),
       ['Weekdays were steady at about 1,890 kcal.'],
@@ -66,27 +90,32 @@ void main() {
     );
   });
 
-  test('drops a note with a shaming word', () {
+  test('drops a note with a shaming word, in the text or the title', () {
     expect(
       _parse([
         'Saturday was a cheat day.',
         'No need to feel guilty about Saturday.',
+        _note('A lazy weekend', 'Saturday ran high.'),
         'Saturday was the biggest day in 3 of the last 4 weeks.',
       ]),
       ['Saturday was the biggest day in 3 of the last 4 weeks.'],
     );
   });
 
-  test('drops non-strings and blanks', () {
+  test('drops non-strings and blanks, and trims', () {
     expect(
-      _parse([
+      parseReviewPoints([
         42,
         null,
         '  ',
         ' Steady weekdays. ',
         {'a': 1},
-      ]),
-      ['Steady weekdays.'],
+        _note(' Weekends ', 'Higher.'),
+      ], facts: _facts),
+      [
+        (title: '', text: 'Steady weekdays.', good: false),
+        (title: 'Weekends', text: 'Higher.', good: false),
+      ],
     );
   });
 
@@ -104,13 +133,19 @@ void main() {
     final functions = FakeAiFunctions()
       ..reply = {
         'points': [
-          {'text': 'Salt averaged 7.4 g.', 'good': false},
+          {
+            'title': 'Salt over the guide',
+            'text': 'Salt averaged 7.4 g.',
+            'good': false,
+          },
         ],
       };
 
     final points = await WeeklyReviewService(functions).write(_facts);
 
-    expect(points, [(text: 'Salt averaged 7.4 g.', good: false)]);
+    expect(points, [
+      (title: 'Salt over the guide', text: 'Salt averaged 7.4 g.', good: false),
+    ]);
     expect(functions.calls.single.$1, 'aiWeeklyReview');
     expect(functions.calls.single.$2.keys, ['facts', 'dateKey']);
     expect(functions.calls.single.$2['facts'], _facts);

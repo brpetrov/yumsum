@@ -78,22 +78,25 @@ service cloud.firestore {
     // The AI Coach's notes on a week, with the facts they were written from.
     function validReviewPoint(p) {
       return p is map
-        && p.keys().hasOnly(['text', 'good'])
-        && text(p.text, 200)
+        && p.keys().hasOnly(['title', 'text', 'good'])
+        && text(p.title, 80)
+        && text(p.text, 600)
         && p.good is bool;
     }
 
     function validWeeklyReview(d) {
       return d.keys().hasOnly(['points', 'basis', 'createdAt'])
         && d.points is list
-        && d.points.size() <= 6
+        && d.points.size() <= 8
         && (d.points.size() < 1 || validReviewPoint(d.points[0]))
         && (d.points.size() < 2 || validReviewPoint(d.points[1]))
         && (d.points.size() < 3 || validReviewPoint(d.points[2]))
         && (d.points.size() < 4 || validReviewPoint(d.points[3]))
         && (d.points.size() < 5 || validReviewPoint(d.points[4]))
         && (d.points.size() < 6 || validReviewPoint(d.points[5]))
-        && text(d.basis, 4000)
+        && (d.points.size() < 7 || validReviewPoint(d.points[6]))
+        && (d.points.size() < 8 || validReviewPoint(d.points[7]))
+        && text(d.basis, 12000)
         && d.createdAt is timestamp;
     }
 

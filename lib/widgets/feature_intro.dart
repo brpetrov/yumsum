@@ -112,49 +112,61 @@ class FeatureIntroDialog extends StatelessWidget {
           ),
         ],
       ),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            for (final (i, (icon, headline, line)) in promises.indexed) ...[
-              if (i > 0) const SizedBox(height: 16),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  IconBubble(icon, size: 38),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          headline,
-                          style: TextStyle(
-                            fontSize: 15.5,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          line,
-                          style: TextStyle(
-                            fontSize: 13.5,
-                            height: 1.35,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
+      content: SingleChildScrollView(child: FeaturePromises(promises)),
+      actions: actions,
+    );
+  }
+}
+
+/// A feature's bold promises, each with an icon and one short line: in
+/// [FeatureIntroDialog], and on the AI Coach page for free users.
+class FeaturePromises extends StatelessWidget {
+  const FeaturePromises(this.promises, {super.key});
+
+  /// Icon, headline and line.
+  final List<(IconData, String, String)> promises;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final (i, (icon, headline, line)) in promises.indexed) ...[
+          if (i > 0) const SizedBox(height: 16),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              IconBubble(icon, size: 38),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      headline,
+                      style: TextStyle(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 2),
+                    Text(
+                      line,
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        height: 1.35,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
-          ],
-        ),
-      ),
-      actions: actions,
+          ),
+        ],
+      ],
     );
   }
 }

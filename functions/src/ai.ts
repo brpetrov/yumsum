@@ -170,7 +170,7 @@ export function weeklyReviewAsk(raw: unknown): Ask {
   return {
     use: "coach",
     star: true,
-    contents: filled(text(dataOf(raw).facts, 8000)),
+    contents: filled(text(dataOf(raw).facts, 16000)),
     config: weeklyReviewConfig,
   };
 }

@@ -68,7 +68,7 @@ Short and plain, in British English, saying "you":
 | Adaptive formula | `lib/helpers/adaptive_formula.dart`, `lib/providers/adaptive_formula_provider.dart` | 08 |
 | Quick-log bar | `lib/screens/dashboard/helpers/quick_log_bar.dart` | |
 | AI estimates and the allowance | `lib/services/calorie_estimate_service.dart`, `lib/repositories/ai_usage_repository.dart`, `functions/src/ai.ts`, `functions/src/prompts.ts` | 03 |
-| AI Coach (the weekly review) | `lib/helpers/week_facts.dart`, `lib/services/weekly_review_service.dart`, `lib/providers/weekly_review_provider.dart`, `lib/screens/review/weekly_notes.dart` | 09 |
+| AI Coach (the weekly review) | `lib/helpers/week_facts.dart`, `lib/services/weekly_review_service.dart`, `lib/providers/weekly_review_provider.dart`, `lib/screens/coach/coach_screen.dart`, `lib/screens/review/weekly_notes.dart` | 09 |
 | Macros | `lib/models/nutrients.dart`, `lib/widgets/macro_rings.dart`, `macro_totals.dart`, `macro_guide.dart` | 10 |
 | Daily summaries, statuses, day off | `lib/services/daily_summary_service.dart`, `lib/widgets/day_status.dart` | |
 | Packaged foods and contributing | `lib/services/food_lookup_service.dart`, `food_contribution_service.dart`, `functions/src/off.ts` | 01 |

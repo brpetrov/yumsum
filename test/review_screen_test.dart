@@ -9,7 +9,6 @@ import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
-import 'package:lean_streak/providers/weekly_review_provider.dart';
 import 'package:lean_streak/screens/review/review_screen.dart';
 import 'package:lean_streak/screens/review/weekly_notes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,11 +31,6 @@ Future<Widget> _app(
       entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
       firstLoggedDayProvider.overrideWith((ref) async => firstDay),
       reviewSummariesProvider.overrideWith((ref, range) => Stream.value({})),
-      weeklyReviewProvider.overrideWith(
-        (ref, monday) async => const [
-          (text: 'Weekdays were steady.', good: false),
-        ],
-      ),
     ],
     child: MaterialApp(theme: AppTheme.light, home: const ReviewScreen()),
   );
@@ -147,7 +141,7 @@ void main() {
 
     final card = tester.widget<WeeklyNotesCard>(find.byType(WeeklyNotesCard));
     expect(card.monday, lastMonday);
-    // Nothing logged in the override, so it says why there are no notes.
-    expect(find.textContaining('Not enough logged this week'), findsOneWidget);
+    // The notes themselves are on the AI Coach page.
+    expect(find.text('Read your notes on this week.'), findsOneWidget);
   });
 }

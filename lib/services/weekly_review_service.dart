@@ -8,7 +8,7 @@ import 'package:lean_streak/services/calorie_estimate_service.dart';
 /// of each cached review's `basis`, so the notes are written again. The
 /// instruction (plan 09) is `weeklyReviewInstruction` in
 /// `functions/src/prompts.ts`, on the server with its response schema.
-const weeklyReviewPromptVersion = 5;
+const weeklyReviewPromptVersion = 6;
 
 /// The AI's answer had no note worth showing.
 class WeeklyReviewException implements Exception {
@@ -33,24 +33,28 @@ Set<double> _numbersIn(String text) => {
     double.parse(match[0]!),
 };
 
-/// The notes worth showing from the AI's `points`, at most 6, in order:
-/// each a `{text, good}` (or a bare string, not good) whose text is
-/// non-empty and at most 160 characters (140 asked for), with every number
-/// in [facts] and no shaming word. Throws [WeeklyReviewException] when none
+/// The notes worth showing from the AI's `points`, at most 8, in order:
+/// each a `{title, text, good}` (or a bare string, untitled and not good)
+/// whose text is non-empty and at most 600 characters (450 asked for) and
+/// whose title is at most 80 (40 asked for), with every number in [facts]
+/// and no shaming word in either. Throws [WeeklyReviewException] when none
 /// is left.
 List<ReviewPoint> parseReviewPoints(Object? raw, {required String facts}) {
   final known = _numbersIn(facts);
+  bool fine(String note, int max) =>
+      note.length <= max &&
+      _numbersIn(note).every(known.contains) &&
+      !_shaming.hasMatch(note);
   final points = [
     if (raw is List)
       for (final entry in raw)
         if (reviewPointFrom(entry) case final point?)
-          if (point.text.trim() case final note
-              when note.isNotEmpty &&
-                  note.length <= 160 &&
-                  _numbersIn(note).every(known.contains) &&
-                  !_shaming.hasMatch(note))
-            (text: note, good: point.good),
-  ].take(6).toList();
+          if ((point.title.trim(), point.text.trim()) case (
+            final title,
+            final note,
+          ) when note.isNotEmpty && fine(note, 600) && fine(title, 80))
+            (title: title, text: note, good: point.good),
+  ].take(8).toList();
   if (points.isEmpty) throw const WeeklyReviewException();
   return points;
 }
@@ -73,7 +77,7 @@ class WeeklyReviewService {
       );
       return parseReviewPoints(map['points'], facts: facts);
     } catch (error, st) {
-      // The card says the same for every failure; the detail is here.
+      // The page says the same for every failure; the detail is here.
       debugPrint('WeeklyReviewService error: $error\n$st');
       rethrow;
     }
