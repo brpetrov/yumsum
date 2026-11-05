@@ -26,41 +26,116 @@ String _keepUnits(String note) => note.replaceAllMapped(
   (match) => '${match[1]}\u00A0${match[2]}',
 );
 
-/// The note as spans, with every library recipe it names a [link] that
-/// [open]s it, shedding the quotes the AI puts round names. Longer names
-/// first, so one that contains another wins.
-List<InlineSpan> _noteSpans(
-  String note,
-  List<Recipe> recipes, {
-  required TextStyle link,
-  required void Function(Recipe) open,
-}) {
-  if (recipes.isEmpty) return [TextSpan(text: note)];
+/// Finds the library's recipe names in a note, with any quotes the AI puts
+/// round them. Longer names first, so one that contains another wins. Built
+/// once per library; null when it has no recipes.
+final _recipeNamesProvider = Provider<RegExp?>((ref) {
+  final recipes = ref.watch(recipesProvider).valueOrNull ?? const [];
+  if (recipes.isEmpty) return null;
   final names = recipes.map((recipe) => recipe.name).toList()
     ..sort((a, b) => b.length.compareTo(a.length));
-  final pattern = RegExp(
+  return RegExp(
     '["\u201C\u201D]?(${names.map(RegExp.escape).join('|')})["\u201C\u201D]?',
     caseSensitive: false,
   );
-  final spans = <InlineSpan>[];
-  var at = 0;
-  for (final match in pattern.allMatches(note)) {
-    final name = match[1]!;
-    final recipe = recipes.firstWhere(
-      (recipe) => recipe.name.toLowerCase() == name.toLowerCase(),
+});
+
+/// A note, with every library recipe it names a link that opens it,
+/// shedding the quotes the AI puts round names. It's split once per text,
+/// and the links' recognizers are disposed with it.
+class _NoteText extends StatefulWidget {
+  const _NoteText(this.text, {required this.recipes, required this.names});
+
+  final String text;
+  final List<Recipe> recipes;
+
+  /// From [_recipeNamesProvider].
+  final RegExp? names;
+
+  @override
+  State<_NoteText> createState() => _NoteTextState();
+}
+
+class _NoteTextState extends State<_NoteText> {
+  /// The note in pieces: its text, and a recognizer on each recipe name.
+  var _pieces = <(String, TapGestureRecognizer?)>[];
+
+  @override
+  void initState() {
+    super.initState();
+    _split();
+  }
+
+  @override
+  void didUpdateWidget(_NoteText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.text != oldWidget.text || widget.names != oldWidget.names) {
+      _disposeRecognizers();
+      _split();
+    }
+  }
+
+  @override
+  void dispose() {
+    _disposeRecognizers();
+    super.dispose();
+  }
+
+  void _split() {
+    final note = _keepUnits(widget.text);
+    final pieces = <(String, TapGestureRecognizer?)>[];
+    var at = 0;
+    for (final match
+        in widget.names?.allMatches(note) ?? const <RegExpMatch>[]) {
+      final name = match[1]!;
+      final recipe = widget.recipes.firstWhere(
+        (recipe) => recipe.name.toLowerCase() == name.toLowerCase(),
+      );
+      pieces.add((note.substring(at, match.start), null));
+      pieces.add((
+        name,
+        TapGestureRecognizer()
+          ..onTap = () =>
+              context.push(AppRoutes.recipePath(recipe.id), extra: recipe),
+      ));
+      at = match.end;
+    }
+    pieces.add((note.substring(at), null));
+    _pieces = pieces;
+  }
+
+  void _disposeRecognizers() {
+    for (final (_, recognizer) in _pieces) {
+      recognizer?.dispose();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final link = TextStyle(
+      color: AppColors.primary,
+      fontWeight: FontWeight.w800,
+      decoration: TextDecoration.underline,
+      decorationColor: AppColors.primary,
     );
-    spans.add(TextSpan(text: note.substring(at, match.start)));
-    spans.add(
+    return Text.rich(
       TextSpan(
-        text: name,
-        style: link,
-        recognizer: TapGestureRecognizer()..onTap = () => open(recipe),
+        style: TextStyle(
+          fontSize: 14.5,
+          height: 1.4,
+          color: AppColors.textPrimary,
+        ),
+        children: [
+          for (final (text, recognizer) in _pieces)
+            TextSpan(
+              text: text,
+              style: recognizer == null ? null : link,
+              recognizer: recognizer,
+            ),
+        ],
       ),
     );
-    at = match.end;
   }
-  spans.add(TextSpan(text: note.substring(at)));
-  return spans;
 }
 
 /// What AI Coach does (plan 09): from the card's info button, and from the
@@ -208,6 +283,7 @@ class WeeklyNotesCard extends ConsumerWidget {
           data: (points) {
             if (points.isEmpty) return const SizedBox.shrink();
             final recipes = ref.watch(recipesProvider).valueOrNull ?? const [];
+            final names = ref.watch(_recipeNamesProvider);
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -229,28 +305,10 @@ class WeeklyNotesCard extends ConsumerWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Text.rich(
-                          TextSpan(
-                            style: TextStyle(
-                              fontSize: 14.5,
-                              height: 1.4,
-                              color: AppColors.textPrimary,
-                            ),
-                            children: _noteSpans(
-                              _keepUnits(point.text),
-                              recipes,
-                              link: TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w800,
-                                decoration: TextDecoration.underline,
-                                decorationColor: AppColors.primary,
-                              ),
-                              open: (recipe) => context.push(
-                                AppRoutes.recipePath(recipe.id),
-                                extra: recipe,
-                              ),
-                            ),
-                          ),
+                        child: _NoteText(
+                          point.text,
+                          recipes: recipes,
+                          names: names,
                         ),
                       ),
                     ],
