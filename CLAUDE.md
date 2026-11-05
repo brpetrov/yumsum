@@ -14,7 +14,7 @@ flutter analyze                # Lint (flutter_lints)
 tools/build_hosting.ps1        # Build the website into build/hosting, before a hosting deploy
 firebase deploy --only hosting:app      # The website
 firebase deploy --only firestore:rules  # Firestore rules
-firebase deploy --only functions        # The billing functions (functions/; their tests: npm test there)
+firebase deploy --only functions        # The Cloud Functions (functions/; their tests: npm test there)
 ```
 
 Run the deploys a change needs yourself, straight after it: rules, then the website. The VS Code configs in `.vscode/launch.json` add `--web-port 5000` for Edge and the Open Food Facts account for Android.

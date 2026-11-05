@@ -31,6 +31,9 @@ setGlobalOptions({ region: "europe-west2", maxInstances: 10 });
 initializeApp();
 const db = getFirestore();
 
+// After setGlobalOptions: onCall reads the region as each is defined.
+export { deleteAccount } from "./account";
+
 /**
  * Checks a purchase with Play, links it to the caller's account and writes
  * their entitlement. Returns whether YumSum Star is on afterwards.

@@ -106,8 +106,7 @@ service cloud.firestore {
     }
 
     // The AI allowance and past-day edit counters only ever go up by one.
-    // They are deleted only with the account: after the profile is gone, or
-    // in the same batch as it.
+    // The deleteAccount function deletes them with the account.
     function counterCreate() {
       return request.resource.data.keys().hasOnly(['count'])
         && request.resource.data.count == 1;
@@ -120,6 +119,20 @@ service cloud.firestore {
 
     function profileGone(userId) {
       return !existsAfter(/databases/$(database)/documents/users/$(userId));
+    }
+
+    // A yyyy-MM key for the month at time t (UTC).
+    function monthAt(month, t) {
+      return int(month.replace('-', '')) == t.year() * 100 + t.month();
+    }
+
+    // The phone's month: the server's, give or take a day for time zones, so
+    // changing the phone's date doesn't start a new count.
+    function currentMonth(month) {
+      return month.matches('[0-9]{4}-[0-9]{2}')
+        && (monthAt(month, request.time - duration.value(1, 'd'))
+          || monthAt(month, request.time)
+          || monthAt(month, request.time + duration.value(1, 'd')));
     }
 
     match /users/{userId} {
@@ -182,9 +195,10 @@ service cloud.firestore {
 
       match /day_edits/{month} {
         allow read: if isOwner(userId);
-        allow create: if isOwner(userId) && counterCreate();
-        allow update: if isOwner(userId) && counterIncrement();
-        allow delete: if isOwner(userId) && profileGone(userId);
+        allow create: if isOwner(userId) && currentMonth(month)
+          && counterCreate();
+        allow update: if isOwner(userId) && currentMonth(month)
+          && counterIncrement();
       }
 
       // Legacy check-ins: no longer written, only deleted with the account.

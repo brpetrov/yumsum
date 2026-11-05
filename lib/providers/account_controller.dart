@@ -148,8 +148,11 @@ class AccountController extends AsyncNotifier<void> {
       if (await ref.read(realEntitlementProvider.future) != null) {
         await ref.read(billingRepositoryProvider).deleteBillingData();
       }
-      await ref.read(accountRepositoryProvider).deleteAccountData(user.uid);
-      await user.delete();
+      final accounts = ref.read(accountRepositoryProvider);
+      await accounts.deleteAccountData(user.uid);
+      // The server deletes the login too, with the counters, so they can't
+      // be reset without the account going.
+      await accounts.deleteAccount();
       await FirebaseAuth.instance.signOut();
       state = const AsyncData(null);
     } catch (error, stackTrace) {

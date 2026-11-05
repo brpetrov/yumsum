@@ -56,7 +56,8 @@ SharedPreferences through `sharedPreferencesProvider` (`lib/providers/preference
 - Period reviews are computed, never stored; only the AI Coach's notes are cached, in `weekly_reviews`, with the facts they were written from. Legacy `check_ins` and `check_in_prompt_status` documents are only deleted with the account.
 - Repositories in `lib/repositories/` do the reads and writes; `AccountRepository` does the bulk deletes.
 - Reset progress (Weight & Progress) clears `weight_entries` only. Reset all data (Account Settings, `AccountRepository.resetAllData`) clears meals, summaries, weigh-ins, days off and the AI Coach's notes, but keeps the profile and the AI and past-day counters.
-- The rules only let those counters go up by one, and only delete them once the profile is gone; account deletion deletes the profile first.
+- The rules only let those counters go up by one, and never let the app delete them. `day_edits` only takes the server's month, give or take a day for time zones, so changing the phone's date doesn't start a new count.
+- Account deletion: `AccountRepository.deleteAccountData` deletes the data and the profile, then `deleteAccount` (the function) deletes the counters and the login itself, so the counters only start again with a new account.
 - Reset all data and account deletion re-authenticate first (`AccountController`): with the email password, or with Google for a Google-only account.
 - YumSum Star lives outside the user's tree in `entitlements/{uid}`, which the app can only read (see YumSum Star).
 

@@ -329,7 +329,7 @@ Once built, CLAUDE.md gets the new collections, the functions and the deploy com
   - `playPurchases.orderId` is the line item's `latestSuccessfulOrderId`; the top-level `latestOrderId` is gone from the API.
   - After a failed acknowledge, the purchase is read again and it only counts as failed if Play still says pending. `verifyPurchase` logs it and still answers; `playNotifications` throws so Pub/Sub retries.
   - Play's 400, 404 and 410 count as an unknown token. Play errors are logged without their request URL, which contains the token.
-- **The app:** Play Billing Library 8 (through `in_app_purchase_android` 0.5.0). `verifyPurchase`'s `{plus}` answer isn't used: the record changing is what switches YumSum Star on. Deleting an account calls `deleteBillingData` only when the account has a record, so accounts that never had YumSum Star don't depend on the functions.
+- **The app:** Play Billing Library 8 (through `in_app_purchase_android` 0.5.0). `verifyPurchase`'s `{plus}` answer isn't used: the record changing is what switches YumSum Star on. Deleting an account calls `deleteBillingData` only when the account has a record. Since 5 November 2026 every deletion ends with the `deleteAccount` function (the counters and the login), so all accounts depend on the functions for that.
 
 ## Testing
 
