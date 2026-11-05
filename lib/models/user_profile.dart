@@ -272,7 +272,8 @@ class UserProfile {
       goalPaceLevel: GoalPaceLevel.fromString(d['goalPaceLevel'] as String),
       onboardingCompleted: d['onboardingCompleted'] as bool,
       createdAt: (d['createdAt'] as Timestamp).toDate(),
-      updatedAt: (d['updatedAt'] as Timestamp).toDate(),
+      // Null until the server stamps a save made with updateProfile.
+      updatedAt: (d['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       adaptiveKcal: (d['adaptiveKcal'] as num?)?.round() ?? 0,
       adaptiveWeek: d['adaptiveWeek'] as String?,
       adaptiveNote: d['adaptiveNote'] as String?,

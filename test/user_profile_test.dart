@@ -59,6 +59,15 @@ void main() {
     ]);
   });
 
+  test('reads while a save waits for the server to stamp updatedAt', () {
+    // Until the server replies, a server timestamp reads as null.
+    final stored = _profile.toFirestore()..['updatedAt'] = null;
+    final before = DateTime.now();
+    final profile = UserProfile.fromMap(stored);
+    expect(profile.name, 'Test');
+    expect(profile.updatedAt.isBefore(before), isFalse);
+  });
+
   test('unset dates and notes are left out of the document', () {
     final stored = _profile.toFirestore();
     expect(stored.containsKey('adaptiveWeek'), isFalse);
