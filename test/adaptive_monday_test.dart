@@ -19,7 +19,14 @@ import 'package:lean_streak/services/daily_summary_service.dart';
 import 'adaptive_fixtures.dart';
 
 class _FakeProfiles extends Fake implements UserProfileRepository {
+  _FakeProfiles(this.server);
+
+  /// The server's copy, which the run decides from.
+  final UserProfile server;
   final saved = <UserProfile>[];
+
+  @override
+  Future<UserProfile?> fetchProfile(String uid) async => server;
 
   @override
   Future<void> createProfile(UserProfile profile) async => saved.add(profile);
@@ -39,7 +46,7 @@ class _FakeWeighIns extends Fake implements WeightEntryRepository {
   final List<WeightEntry> entries;
 
   @override
-  Stream<List<WeightEntry>> watchEntries(String uid) => Stream.value(entries);
+  Future<List<WeightEntry>> fetchEntries(String uid) async => entries;
 }
 
 class _FakeSummaries extends Fake implements DailySummaryRepository {
@@ -73,8 +80,13 @@ void main() {
   late _FakeSummaryService summaryService;
 
   /// Runs the Monday run once for [profile], with 4 weeks of data from
-  /// someone burning 227 less than the formula says.
-  Future<void> run(UserProfile profile, {Entitlement? entitlement}) async {
+  /// someone burning 227 less than the formula says. [cached] is what the
+  /// phone's stream shows first, the server's copy by default.
+  Future<void> run(
+    UserProfile profile, {
+    Entitlement? entitlement,
+    UserProfile? cached,
+  }) async {
     final data = simulate(
       Scenario(
         profile: planProfile(),
@@ -84,12 +96,14 @@ void main() {
         intake: 1830,
       ),
     );
-    profiles = _FakeProfiles();
+    profiles = _FakeProfiles(profile);
     summaryService = _FakeSummaryService();
     final container = ProviderContainer(
       overrides: [
         currentUidProvider.overrideWithValue('user-1'),
-        userProfileProvider.overrideWith((ref) => Stream.value(profile)),
+        userProfileProvider.overrideWith(
+          (ref) => Stream.value(cached ?? profile),
+        ),
         entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
         userProfileRepositoryProvider.overrideWithValue(profiles),
         dailySummaryServiceProvider.overrideWithValue(summaryService),
@@ -135,6 +149,15 @@ void main() {
       await run(
         planProfile(adaptiveWeek: thisWeek, adaptiveNote: 'steady'),
         entitlement: _plus,
+      );
+      expect(profiles.saved, isEmpty);
+    });
+
+    test('decides from the server, not a stale cached copy', () async {
+      await run(
+        planProfile(adaptiveWeek: thisWeek, adaptiveNote: 'steady'),
+        entitlement: _plus,
+        cached: planProfile(adaptiveWeek: lastWeek, adaptiveNote: 'first_sign'),
       );
       expect(profiles.saved, isEmpty);
     });

@@ -13,13 +13,14 @@ final activityScaleMigrationProvider = FutureProvider.autoDispose<void>((
   final uid = ref.watch(currentUidProvider);
   if (uid == null) return;
 
-  final profile = await ref.watch(userProfileProvider.future);
-  if (profile == null) return;
-  final activityScaleCurrent =
-      profile.activityScaleVersion >= currentActivityScaleVersion;
-  final planCalculationCurrent =
-      profile.planCalculationVersion >= currentPlanCalculationVersion;
-  if (activityScaleCurrent && planCalculationCurrent) return;
+  final cached = await ref.watch(userProfileProvider.future);
+  if (cached == null || _isCurrent(cached)) return;
+  // The stream's first value can be this phone's cached copy, and the write
+  // replaces the whole profile, so migrate the server's.
+  final profile = await ref
+      .read(userProfileRepositoryProvider)
+      .fetchProfile(uid);
+  if (profile == null || _isCurrent(profile)) return;
 
   final migratedProfile = _migrateProfile(profile);
   await ref.read(userProfileRepositoryProvider).createProfile(migratedProfile);
@@ -27,6 +28,10 @@ final activityScaleMigrationProvider = FutureProvider.autoDispose<void>((
   final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
   await ref.read(dailySummaryServiceProvider).recomputeForDate(uid, today);
 });
+
+bool _isCurrent(UserProfile profile) =>
+    profile.activityScaleVersion >= currentActivityScaleVersion &&
+    profile.planCalculationVersion >= currentPlanCalculationVersion;
 
 UserProfile _migrateProfile(UserProfile profile) {
   final plan = HealthCalculator.calculatePlan(

@@ -23,14 +23,18 @@ import 'package:lean_streak/providers/weight_entry_provider.dart';
 final adaptiveMondayProvider = FutureProvider.autoDispose<void>((ref) async {
   final uid = ref.watch(currentUidProvider);
   if (uid == null) return;
-  final profile = await ref.watch(userProfileProvider.future);
-  if (profile == null) return;
+  // Only the trigger: its first value can be this phone's cached copy, and
+  // the writes below replace the whole profile, so they start from the
+  // server's.
+  if (await ref.watch(userProfileProvider.future) == null) return;
   // Awaited, so a subscription still loading is never read as free.
   final entitlement = await ref.watch(entitlementProvider.future);
   final now = DateTime.now();
   final today = AdaptiveFormula.dateKey(now);
   final profiles = ref.read(userProfileRepositoryProvider);
   final summaryService = ref.read(dailySummaryServiceProvider);
+  final profile = await profiles.fetchProfile(uid);
+  if (profile == null) return;
 
   if (!(entitlement?.isPlusAt(now) ?? false)) {
     // Frozen for 2 weeks after YumSum Star ends, then the plain plan.
@@ -67,8 +71,7 @@ final adaptiveMondayProvider = FutureProvider.autoDispose<void>((ref) async {
 
   final entries = await ref
       .read(weightEntryRepositoryProvider)
-      .watchEntries(uid)
-      .first;
+      .fetchEntries(uid);
   final summaries = await ref
       .read(dailySummaryRepositoryProvider)
       .fetchSummariesInRange(

@@ -23,6 +23,13 @@ class WeightEntryRepository {
     });
   }
 
+  /// One-time fetch of all entries, oldest first; waits for the server when
+  /// online.
+  Future<List<WeightEntry>> fetchEntries(String uid) async {
+    final snapshot = await _entries(uid).orderBy('dateKey').get();
+    return snapshot.docs.map(WeightEntry.fromFirestore).toList();
+  }
+
   Future<void> deleteEntry(String uid, String dateKey) {
     return _entries(uid).doc(dateKey).delete();
   }

@@ -147,6 +147,7 @@ YumSum Star (plan 08).
   - `monday` scales the gap by confidence and applies the limits: 5% of the plan a week (scaled by days ÷ 21 in the first 3 weeks), 15% in all, "unusual" past 20%, a 20 kcal dead band, and two Mondays in a row before a cut.
   - It acts from a week of data with 3 weigh-ins, 2 in the finished week. Trust grows each week to full at 6, and needs 4 weigh-ins a week for full marks.
 - **Only on Mondays:** `adaptiveMondayProvider` (`lib/providers/adaptive_formula_provider.dart`, watched in `LeanStreakApp`) runs on the first open on or after a Monday, once a week (`adaptiveWeek`), never on a weigh-in.
+  - It decides from the server's profile and weigh-ins (`fetchProfile`, `fetchEntries`), not the phone's cached copy, since it writes the whole profile; so does the plan update after a version bump (`activityScaleMigrationProvider`).
   - It prints an "Adaptive: …" debug line plus the window's JSON.
   - `test/adaptive_replay_test.dart` replays that JSON from the gitignored `config/adaptive_replay.json`.
 - **Always on with YumSum Star:** there is no switch. Without enough weigh-ins it simply has nothing to say and the plan stands.
