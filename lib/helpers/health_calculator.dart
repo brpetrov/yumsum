@@ -4,7 +4,7 @@ import 'package:lean_streak/models/user_profile.dart';
 
 /// Pure functions for health and calorie calculations.
 ///
-/// All formulas are defined in the build spec (Section 9).
+/// docs/features.md (Plan, weight and the trend) describes them.
 class HealthCalculator {
   HealthCalculator._();
 

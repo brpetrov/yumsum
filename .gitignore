@@ -58,3 +58,6 @@ config/adaptive_replay.json
 
 # Full-size recipe photos before make_recipe_photos.py shrinks them
 /recipe-photos/
+
+# Claude Code agent worktrees: full copies of the repo, kept out of git and VS Code search
+.claude/worktrees/
