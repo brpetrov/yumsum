@@ -300,8 +300,9 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
 - **Launch actions:** a tap on the weigh-in reminder becomes `LaunchAction.logWeight` (`lib/app/launch_actions.dart`, bound in `main()` before Firebase so a cold-start tap isn't lost), and Home opens the log-weight dialog.
 - **Android widget:** `LogWidgetProvider.kt` (a `home_widget` `HomeWidgetProvider`) draws `res/layout/log_widget.xml`, a 2×1 mini log bar (`res/xml/log_widget_info.xml`, colours in `values(-night)/colors.xml`).
   - Taps open `leanstreak://log/text` or `leanstreak://log/voice`, which `launchActionForUri` maps to `LaunchAction.typeLog` / `voiceLog`.
+  - Each link carries `?key=` and this install's launch key (`launchKeyFor`: random, kept in the app's preferences and copied into home_widget's for the widget, which is redrawn when it changes). Links without it are ignored, so another app can open YumSum but can't start the mic.
   - Flutter deep linking is off in the manifest so go_router never sees those URIs, and `MainActivity` blanks the intent on a relaunch from Recents.
-- **App-icon shortcut:** `quick_actions`, id `log_voice`, uses the same path. The quick-log bar consumes the shortcut and widget actions.
+- **App-icon shortcut:** `quick_actions`, type `log_voice:` and the launch key, uses the same path. The quick-log bar consumes the shortcut and widget actions.
 
 ## Feedback, crashes and legal pages
 

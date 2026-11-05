@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/helpers/weight_reminder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   group('nextDailyAt', () {
@@ -67,19 +68,40 @@ void main() {
   group('launch actions', () {
     test('maps widget and shortcut URIs', () {
       expect(
-        launchActionForUri(Uri.parse('leanstreak://log/voice')),
+        launchActionForUri(Uri.parse('leanstreak://log/voice?key=k1'), 'k1'),
         LaunchAction.voiceLog,
       );
       expect(
-        launchActionForUri(Uri.parse('leanstreak://log/text')),
+        launchActionForUri(Uri.parse('leanstreak://log/text?key=k1'), 'k1'),
         LaunchAction.typeLog,
       );
       expect(
-        launchActionForUri(Uri.parse('leanstreak://log/weight')),
+        launchActionForUri(Uri.parse('leanstreak://log/weight?key=k1'), 'k1'),
         LaunchAction.logWeight,
       );
-      expect(launchActionForUri(Uri.parse('leanstreak://other')), isNull);
-      expect(launchActionForUri(null), isNull);
+      expect(
+        launchActionForUri(Uri.parse('leanstreak://other?key=k1'), 'k1'),
+        isNull,
+      );
+      expect(launchActionForUri(null, 'k1'), isNull);
+    });
+
+    test("ignores links without this install's key", () {
+      for (final link in [
+        'leanstreak://log/voice',
+        'leanstreak://log/voice?key=',
+        'leanstreak://log/voice?key=k2',
+      ]) {
+        expect(launchActionForUri(Uri.parse(link), 'k1'), isNull);
+      }
+    });
+
+    test('the launch key is random, then kept', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final key = launchKeyFor(prefs);
+      expect(key, matches(RegExp(r'^[0-9a-f]{32}$')));
+      expect(launchKeyFor(prefs), key);
     });
 
     test('maps notification payloads', () {
