@@ -133,6 +133,18 @@ export function isCurrentOrNewer(
   );
 }
 
+/**
+ * Whether a purchase may be linked to [uid]. The app buys with the
+ * account's SHA-256 as Play's obfuscated account ID, so a purchase with
+ * another ID belongs to another account. One with none was bought outside
+ * the app, and goes to the first account that checks it.
+ */
+export function boughtFor(subscription: Subscription, uid: string): boolean {
+  const account =
+    subscription.externalAccountIdentifiers?.obfuscatedExternalAccountId;
+  return !account || account === createHash("sha256").update(uid).digest("hex");
+}
+
 /** The document ID for a purchase: the raw token is never stored. */
 export function purchaseIdFor(token: string): string {
   return createHash("sha256").update(token).digest("hex");

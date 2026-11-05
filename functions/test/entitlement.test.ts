@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import {
+  boughtFor,
   entitlementFrom,
   isCurrentOrNewer,
   isPlusAt,
@@ -256,6 +257,30 @@ describe("isCurrentOrNewer", () => {
   test("a late expiry for a purchase that was replaced", () => {
     const old = later("SUBSCRIPTION_STATE_EXPIRED", past);
     assert.equal(isCurrentOrNewer(old, purchaseIdFor("token-0"), current), false);
+  });
+});
+
+describe("boughtFor", () => {
+  // The app buys with sha256.convert(utf8.encode(uid)).toString(): for the
+  // uid "abc", the standard SHA-256 test vector.
+  const boughtByAbc: Subscription = {
+    ...newPurchase,
+    externalAccountIdentifiers: {
+      obfuscatedExternalAccountId:
+        "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+    },
+  };
+
+  test("the account the app bought it for", () => {
+    assert.equal(boughtFor(boughtByAbc, "abc"), true);
+  });
+
+  test("another account on the same phone is refused", () => {
+    assert.equal(boughtFor(boughtByAbc, "abd"), false);
+  });
+
+  test("bought outside the app, with no ID: the first to check it", () => {
+    assert.equal(boughtFor(newPurchase, "abd"), true);
   });
 });
 

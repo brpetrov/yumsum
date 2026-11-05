@@ -123,7 +123,7 @@ final plusProvider = StreamProvider.autoDispose<bool>((ref) {
 
 - **Restore purchase** on the paywall calls `restorePurchases()`, and each active purchase it finds goes to `verifyPurchase`.
 - **At start-up** on Android, signed in and without YumSum Star, the app restores quietly once. This picks up a purchase whose check never finished (the app was closed straight after paying, or the phone lost signal), within Play's 3 days. Errors stay silent here.
-- **One subscription, one account:** a Play purchase belongs to the first YumSum account that checks it. Restoring it on another account says so. If the first account no longer exists, the purchase moves to the new one.
+- **One subscription, one account:** a purchase made in the app belongs to the account that bought it, whose SHA-256 Play keeps as its obfuscated account ID; any other account that checks it is told it's linked to another account, and nothing is linked (5 November 2026). A purchase with no ID (bought outside the app) belongs to the first YumSum account that checks it. Restoring it on another account says so. If the first account no longer exists, the purchase moves to the new one.
 
 ### The paywall
 
@@ -208,7 +208,7 @@ They run as the project's default service account (`296684319013-compute@develop
 
 App Check enforced (`enforceAppCheck: true`) and signed-in only. Takes `{purchaseToken}`.
 
-1. Read the purchase with `purchases.subscriptionsv2.get` (package `com.bpetrov.yumsum`). Refuse it unless the line item's product is `yumsum_plus`.
+1. Read the purchase with `purchases.subscriptionsv2.get` (package `com.bpetrov.yumsum`). Refuse it unless the line item's product is `yumsum_plus`, and with "already linked" when its `obfuscatedExternalAccountId` is set and isn't the SHA-256 of the caller's uid (`boughtFor`).
 2. Link it in a transaction on `playPurchases/{sha256(token)}`. If it's already linked to another account that still exists, refuse with "already linked". A link to a deleted account moves to this one.
 3. Write `entitlements/{uid}` from `entitlementFrom()` (unless a live manual grant is there), with this purchase as `purchaseId`.
 4. If Play says `ACKNOWLEDGEMENT_STATE_PENDING` and the state is active or in grace, acknowledge with `purchases.subscriptions.acknowledge`. An "already acknowledged" answer is fine.

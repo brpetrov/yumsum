@@ -11,6 +11,7 @@ import * as logger from "firebase-functions/logger";
 import { setGlobalOptions } from "firebase-functions/options";
 import { onMessagePublished } from "firebase-functions/pubsub";
 import {
+  boughtFor,
   entitlementFrom,
   isCurrentOrNewer,
   isPlusAt,
@@ -59,6 +60,9 @@ export const verifyPurchase = onCall({ enforceAppCheck: true }, async (request) 
   }
   if (subscription.lineItems?.[0]?.productId !== productId) {
     throw new HttpsError("invalid-argument", "Not YumSum Star.");
+  }
+  if (!boughtFor(subscription, uid)) {
+    throw new HttpsError("already-exists", "Bought for another account.");
   }
 
   const purchaseId = purchaseIdFor(token);
