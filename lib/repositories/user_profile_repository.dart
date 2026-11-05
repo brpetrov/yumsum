@@ -17,20 +17,23 @@ class UserProfileRepository {
     return UserProfile.fromFirestore(snap);
   }
 
-  /// Real-time stream. Emits null when the document does not exist.
+  /// Real-time stream. Emits null when the document does not exist, and
+  /// again only when the data changes.
   Stream<UserProfile?> watchProfile(String uid) async* {
+    // Metadata changes are listened to so that a missing document read from
+    // the cache waits for the server's word. Snapshots that change only the
+    // metadata are dropped, so watchers don't run again for the same profile.
+    var yielded = false;
+    Map<String, dynamic>? last;
     await for (final snap in _doc(
       uid,
     ).snapshots(includeMetadataChanges: true)) {
-      final data = snap.data();
-      if (!snap.exists || data == null) {
-        if (snap.metadata.isFromCache) {
-          continue;
-        }
-        yield null;
-        continue;
-      }
-      yield UserProfile.fromFirestore(snap);
+      final data = snap.exists ? snap.data() : null;
+      if (data == null && snap.metadata.isFromCache) continue;
+      if (yielded && _sameData(data, last)) continue;
+      yielded = true;
+      last = data;
+      yield data == null ? null : UserProfile.fromFirestore(snap);
     }
   }
 
@@ -46,4 +49,21 @@ class UserProfileRepository {
       uid,
     ).update({...fields, 'updatedAt': FieldValue.serverTimestamp()});
   }
+}
+
+/// Whether two Firestore values hold the same data: maps and lists by what
+/// is in them, the rest (numbers, strings, timestamps) by ==.
+bool _sameData(Object? a, Object? b) {
+  if (a is Map && b is Map) {
+    return a.length == b.length &&
+        a.keys.every((key) => b.containsKey(key) && _sameData(a[key], b[key]));
+  }
+  if (a is List && b is List) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (!_sameData(a[i], b[i])) return false;
+    }
+    return true;
+  }
+  return a == b;
 }
