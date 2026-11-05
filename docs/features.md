@@ -96,7 +96,7 @@ The paid tier (plan 06; the code says `plus`).
   - The dimmed macro rings for free users, the shining Adaptive formula button under the weight chart, and the shining AI Coach button on finished weeks in History.
 - **Debug tools** (`/debug`, `DebugScreen`), in debug builds and for dev accounts in any build:
   - the User ID to copy;
-  - "Pretend to be" (`debugAccountProvider`): free, subscribed, trial, ended or admin, on that device. A pretend account is real enough to change the Adaptive formula on the real plan.
+  - "Pretend to be" (`debugAccountProvider`): free, subscribed, trial, ended or admin, on that device. A pretend account is real enough to change the Adaptive formula on the real plan. The AI functions read only the real record, so AI estimates ask for macros only when it has YumSum Star too (`aiMacrosProvider`), and AI Coach needs it on the real record.
 
 ## Plan, weight and the trend
 

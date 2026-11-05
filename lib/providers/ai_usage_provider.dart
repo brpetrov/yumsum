@@ -24,8 +24,16 @@ final calorieEstimateServiceProvider = Provider<CalorieEstimateService>((ref) {
     country: profile?.country ?? defaultCountry,
     usualFood: profile?.usualFood ?? '',
     dailyLimit: ref.watch(aiDailyLimitProvider),
-    plus: ref.watch(plusProvider),
+    plus: ref.watch(aiMacrosProvider),
   );
+});
+
+/// Whether AI calls ask for macros: only when the app shows YumSum Star and
+/// the account's real record has it, which is what the server checks. Debug
+/// tools' pretend account changes what the app shows, never what it asks.
+final aiMacrosProvider = Provider.autoDispose<bool>((ref) {
+  final real = ref.watch(realEntitlementProvider).valueOrNull;
+  return ref.watch(plusProvider) && (real?.isPlusAt(DateTime.now()) ?? false);
 });
 
 /// How many AI estimates the user gets a day; null for the owner's admin
