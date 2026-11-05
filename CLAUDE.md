@@ -30,7 +30,7 @@ Run the deploys a change needs yourself, straight after it: rules, then the webs
 
 - **State:** Riverpod 2. StreamProviders for live Firestore data, FutureProviders for one-off reads, `AsyncNotifier` controllers in `lib/providers/` for changes (`LogMealController`, `WeightLogController`, …), `Notifier`s for device settings.
 - **Routing:** GoRouter (`goRouterProvider`, paths in `AppRoutes`, `lib/app/router.dart`), with auth and profile redirects: Splash → Auth → Onboarding → Home. Home is the root; the menu's pages swap one level above it, so Back always returns Home.
-- **Data:** a repository per Firestore collection (`lib/repositories/`), services that combine them (`lib/services/`), providers that expose them. Open Food Facts and Formspree are reached over `http`; the billing Cloud Functions through `cloud_functions`.
+- **Data:** a repository per Firestore collection (`lib/repositories/`), services that combine them (`lib/services/`), providers that expose them. Open Food Facts lookups are reached over `http`; the Cloud Functions (billing, AI, Open Food Facts contributions, feedback through Formspree, account deletion) through `cloud_functions`.
 - **Firestore:** the profile is `users/{uid}`; everything else is in its subcollections (`meals`, `daily_summaries`, `weight_entries`, `ai_usage`, `day_edits`, `days_off`, `weekly_reviews`, and the functions' own `contribution_usage` and `feedback_usage`). YumSum Star's record is the top-level `entitlements/{uid}`, which the app can only read; the billing functions write it and keep `playPurchases`, which the app can't see.
 - **Device settings:** SharedPreferences through `sharedPreferencesProvider`, overridden in `main()`; unoverridden it throws.
 - **Styling:** `AppColors` (`lib/core/constants/app_colors.dart`) switches between the light and dark palettes at run time, so expressions using it can't be `const`. Use `AppCard` for cards, Nunito for text and Fredoka (`AppTheme.display`) for headings and big numbers. Orange (`primary`) is for actions, green (`veryGood`) for on track and progress.
@@ -41,14 +41,14 @@ Run the deploys a change needs yourself, straight after it: rules, then the webs
 - **Formula change:** bump `planCalculationVersion` or `activityScaleVersion` in `lib/models/user_profile.dart`, so stored plans are recalculated at startup.
 - **Tests never touch Firebase, the network or device hardware.** Pump screens in a `ProviderScope` inside `MaterialApp(theme: AppTheme.light, …)` and override what reads Firestore or the device: `currentUidProvider`, `userProfileProvider`, `entitlementProvider`, the data providers, `weeklyReviewProvider`, `sharedPreferencesProvider` (after `SharedPreferences.setMockInitialValues`), `billingServiceProvider` and `realEntitlementProvider` where the YumSum Star page or `LeanStreakApp` is pumped (`test/billing_fixtures.dart`), and the AI, Open Food Facts, recorder and camera providers. `test/quick_log_bar_test.dart` has the full set. Fake controllers by subclassing and services with `Fake implements …`; `FakeFunctions` (`test/fake_functions.dart`) stands in for `FirebaseFunctions`.
 - **Formatting:** run `dart format` on the files you changed only; `dart format lib` reformats untouched files.
-- **AI:** Gemini through Firebase AI Logic, so there's no key in the app. Every call needs an App Check token: a debug build prints a debug token that must be registered in the Firebase console, and the web needs the fixed port 5000.
+- **AI:** every Gemini call goes through the `aiEstimate` and `aiWeeklyReview` Cloud Functions (`functions/src/ai.ts`), which count the allowance in `ai_usage` before asking, check YumSum Star, and hold the prompts and the model (`functions/src/prompts.ts`). The app sends only what the user gave, never prompt text, and can only read `ai_usage`. A change to AI Coach's instruction also needs `weeklyReviewPromptVersion` raised. Every call needs an App Check token: a debug build prints a debug token that must be registered in the Firebase console, and the web needs the fixed port 5000.
 - **YumSum Star gates:**
   - Use `plusProvider` for features and `adminProvider` for limits.
   - Owner grants are typed into `entitlements/{uid}` in the console: `active`, `source` `manual`, and `admin` or `dev` for the owner.
-  - Macros are YumSum Star only for good, whatever they cost (`macrosForEveryone` stays false).
+  - Macros are YumSum Star only for good, whatever they cost; the AI functions refuse them otherwise.
 - **The Adaptive formula changes targets only on Mondays,** never on a weigh-in.
 - **Recipe photos are served from the website,** so deploy hosting before an app release that lists new recipes, and run `test/recipes_asset_test.dart` after adding any.
-- **Secrets:** never print or commit them. The Open Food Facts account is held only by the functions, as the secrets `OFF_USER_ID` and `OFF_PASSWORD`, never in the app; the release signing details are in the gitignored `android/key.properties`.
+- **Secrets:** never print or commit them. The Open Food Facts account is held only by the functions, as the secrets `OFF_USER_ID` and `OFF_PASSWORD`, and the Gemini key as `GEMINI_API_KEY`, never in the app; the release signing details are in the gitignored `android/key.properties`.
 
 ## Copy
 
@@ -67,7 +67,7 @@ Short and plain, in British English, saying "you":
 | Weight trend | `lib/helpers/weight_trend.dart` | 08 |
 | Adaptive formula | `lib/helpers/adaptive_formula.dart`, `lib/providers/adaptive_formula_provider.dart` | 08 |
 | Quick-log bar | `lib/screens/dashboard/helpers/quick_log_bar.dart` | |
-| AI estimates and the allowance | `lib/services/calorie_estimate_service.dart`, `lib/repositories/ai_usage_repository.dart` | 03 |
+| AI estimates and the allowance | `lib/services/calorie_estimate_service.dart`, `lib/repositories/ai_usage_repository.dart`, `functions/src/ai.ts`, `functions/src/prompts.ts` | 03 |
 | AI Coach (the weekly review) | `lib/helpers/week_facts.dart`, `lib/services/weekly_review_service.dart`, `lib/providers/weekly_review_provider.dart`, `lib/screens/review/weekly_notes.dart` | 09 |
 | Macros | `lib/models/nutrients.dart`, `lib/widgets/macro_rings.dart`, `macro_totals.dart`, `macro_guide.dart` | 10 |
 | Daily summaries, statuses, day off | `lib/services/daily_summary_service.dart`, `lib/widgets/day_status.dart` | |

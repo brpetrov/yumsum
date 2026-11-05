@@ -28,6 +28,8 @@ import {
   productId,
 } from "./play";
 
+export { aiEstimate, aiWeeklyReview } from "./ai";
+
 setGlobalOptions({ region: "europe-west2", maxInstances: 10 });
 initializeApp();
 const db = getFirestore();

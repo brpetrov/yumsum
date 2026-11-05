@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// Tracks daily AI calorie estimate usage per user.
+/// Reads daily AI calorie estimate usage per user, which the AI's Cloud
+/// Functions count (`functions/src/ai.ts`); the app can't write it.
 ///
 /// Document path: `users/{uid}/ai_usage/{yyyy-MM-dd}`
 /// The date in the path acts as a natural daily reset —
@@ -9,6 +10,7 @@ class AiUsageRepository {
   AiUsageRepository(this._db);
   final FirebaseFirestore _db;
 
+  /// The same as the server's `limits.estimate` in `functions/src/ai.ts`.
   static const int dailyLimit = 20;
 
   DocumentReference<Map<String, dynamic>> _doc(String uid, String date) =>
@@ -18,10 +20,4 @@ class AiUsageRepository {
   Stream<int> watchCount(String uid, String date) => _doc(uid, date)
       .snapshots()
       .map((snap) => snap.exists ? ((snap.data()?['count'] as int?) ?? 0) : 0);
-
-  /// Atomically increments the usage count for [date].
-  Future<void> increment(String uid, String date) => _doc(
-    uid,
-    date,
-  ).set({'count': FieldValue.increment(1)}, SetOptions(merge: true));
 }

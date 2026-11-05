@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -19,6 +20,7 @@ final calorieEstimateServiceProvider = Provider<CalorieEstimateService>((ref) {
   );
   return CalorieEstimateService(
     ref.watch(aiUsageRepositoryProvider),
+    FirebaseFunctions.instanceFor(region: 'europe-west2'),
     country: profile?.country ?? defaultCountry,
     usualFood: profile?.usualFood ?? '',
     dailyLimit: ref.watch(aiDailyLimitProvider),

@@ -1,10 +1,201 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:lean_streak/repositories/ai_usage_repository.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 
-class _NoUsage extends Fake implements AiUsageRepository {}
+import 'ai_fixtures.dart';
+
+class _Usage extends Fake implements AiUsageRepository {
+  _Usage(this.count);
+
+  final int count;
+
+  @override
+  Stream<int> watchCount(String uid, String date) => Stream.value(count);
+}
 
 void main() {
+  late FakeAiFunctions functions;
+
+  CalorieEstimateService service({
+    bool plus = false,
+    int used = 0,
+    int? dailyLimit = AiUsageRepository.dailyLimit,
+  }) {
+    functions = FakeAiFunctions();
+    return CalorieEstimateService(
+      _Usage(used),
+      functions,
+      country: 'Bulgaria',
+      usualFood: 'home cooking',
+      dailyLimit: dailyLimit,
+      plus: plus,
+    );
+  }
+
+  group('the AI functions', () {
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    test(
+      'an estimate sends the meal and the profile, never a prompt',
+      () async {
+        final estimates = service(plus: true);
+        functions.reply = {
+          'items': [
+            {'item': 'Musaka', 'grams': 350, 'kcal': 520, 'protein_g': 28},
+          ],
+          'kcal': 520,
+          'protein_g': 28,
+          'macros': {'fat': 30, 'saturates': 12, 'carbs': 35},
+        };
+
+        final result = await estimates.estimate('u1', ' Musaka ');
+
+        final (name, data) = functions.calls.single;
+        expect(name, 'aiEstimate');
+        expect(data, {
+          'kind': 'meal',
+          'country': 'Bulgaria',
+          'usualFood': 'home cooking',
+          'macros': true,
+          'text': 'Musaka',
+          'dateKey': today,
+        });
+        expect(result.kcal, 520);
+        expect(result.protein, 28);
+        expect(result.macros?.fat, 30);
+        expect(result.items.single.name, 'Musaka');
+      },
+    );
+
+    test('macros are asked for only with YumSum Star', () async {
+      final estimates = service();
+      functions.reply = {'kcal': 520, 'protein_g': 28};
+      await estimates.estimate('u1', 'Musaka');
+      await estimates.estimateNutrients(' Lunch ', 500);
+      expect(functions.calls.map((call) => call.$2['macros']), [false, false]);
+      expect(functions.calls.last.$2, containsPair('kind', 'nutrients'));
+      expect(functions.calls.last.$2, containsPair('name', 'Lunch'));
+      expect(functions.calls.last.$2, containsPair('kcal', 500));
+    });
+
+    test('a voice note, a photo and a label go in base64', () async {
+      final estimates = service();
+      final bytes = Uint8List.fromList([1, 2, 3]);
+      functions.reply = {'name': 'Musaka', 'kcal': 640, 'protein_g': 28};
+      await estimates.parseVoiceAudio('u1', bytes);
+      await estimates.estimateFromPhoto('u1', bytes);
+      functions.reply = {
+        'name': 'Лютеница',
+        'per_100g': {'proteins': 2},
+      };
+      await estimates.readLabel('u1', null, bytes);
+      await estimates.readLabel('u1', bytes, bytes);
+
+      final sent = [for (final call in functions.calls) call.$2];
+      expect(sent[0], containsPair('audio', base64Encode(bytes)));
+      expect(sent[1], containsPair('photo', base64Encode(bytes)));
+      expect(sent[2], containsPair('label', base64Encode(bytes)));
+      expect(sent[2], isNot(contains('front')));
+      expect(sent[3], containsPair('front', base64Encode(bytes)));
+      expect(
+        [for (final data in sent) data['kind']],
+        ['voice', 'photo', 'label', 'label'],
+      );
+    });
+
+    test('a used-up allowance is said without a call', () async {
+      await expectLater(
+        service(used: 20).estimate('u1', 'Musaka'),
+        throwsA(isA<DailyLimitExceededException>()),
+      );
+      expect(functions.calls, isEmpty);
+
+      // The owner's account has no limit.
+      final owner = service(used: 20, dailyLimit: null);
+      functions.reply = {'kcal': 520};
+      await owner.estimate('u1', 'Musaka');
+      expect(functions.calls, hasLength(1));
+    });
+
+    test('no meal heard, and no food seen', () async {
+      final estimates = service();
+      functions.reply = {'error': 'no meal'};
+      await expectLater(
+        estimates.parseVoiceAudio('u1', Uint8List(4)),
+        throwsA(
+          isA<CalorieEstimateException>().having(
+            (error) => error.message,
+            'message',
+            contains('Couldn\'t hear a meal'),
+          ),
+        ),
+      );
+      await expectLater(
+        estimates.estimateFromPhoto('u1', Uint8List(4)),
+        throwsA(
+          isA<CalorieEstimateException>().having(
+            (error) => error.message,
+            'message',
+            contains('No food found'),
+          ),
+        ),
+      );
+    });
+
+    test('the server\'s errors become the messages the screens show', () async {
+      Future<Object?> failure(String code, [String? reason]) async {
+        final estimates = service();
+        functions.error = serverError(code, reason);
+        try {
+          await estimates.estimate('u1', 'Musaka');
+        } catch (error) {
+          return error is CalorieEstimateException ? error.message : error;
+        }
+        return null;
+      }
+
+      expect(
+        await failure('resource-exhausted'),
+        isA<DailyLimitExceededException>(),
+      );
+      expect(
+        await failure('failed-precondition', 'off'),
+        aiNotSwitchedOnMessage,
+      );
+      expect(await failure('failed-precondition', 'paused'), aiPausedMessage);
+      expect(await failure('unavailable', 'busy'), aiBusyMessage);
+      expect(await failure('unavailable', 'transient'), contains('busy'));
+      expect(await failure('permission-denied'), contains('YumSum Star'));
+      expect(
+        await failure('internal'),
+        'Could not estimate calories. Try again.',
+      );
+      expect(
+        await failure('unavailable'),
+        'Could not estimate calories. Try again.',
+      );
+    });
+
+    test('an answer that isn\'t an estimate is a failure', () async {
+      final estimates = service();
+      functions.reply = {'protein_g': 20};
+      await expectLater(
+        estimates.estimate('u1', 'Musaka'),
+        throwsA(
+          isA<CalorieEstimateException>().having(
+            (error) => error.message,
+            'message',
+            'Could not estimate calories. Try again.',
+          ),
+        ),
+      );
+    });
+  });
+
   group('macros', () {
     test('parseNutrients keeps the six figures', () {
       final macros = parseNutrients({
@@ -49,74 +240,6 @@ void main() {
       expect(parseNutrients({'carbs': 10, 'sugars': 25}), isNull);
       // Saturates alone can't be checked against fat.
       expect(parseNutrients({'saturates': 8})?.saturates, 8);
-    });
-
-    test('the prompts mention macros only when asked', () {
-      CalorieEstimateService service({required bool plus}) =>
-          CalorieEstimateService(
-            _NoUsage(),
-            country: 'United Kingdom',
-            usualFood: '',
-            plus: plus,
-          );
-
-      expect(macrosForEveryone, isFalse);
-      for (final prompt in service(plus: true).prompts) {
-        expect(prompt, contains('fat, saturates, carbohydrate, sugars'));
-        expect(prompt, contains('"macros": {"fat": <number>'));
-      }
-      for (final prompt in service(plus: false).prompts) {
-        expect(prompt, isNot(contains('macros')));
-        expect(prompt, isNot(contains('saturates')));
-      }
-    });
-  });
-
-  group('nutritionContext', () {
-    test('names the country and the usual food', () {
-      final context = nutritionContext(
-        country: 'Bulgaria',
-        usualFood: ' vegetarian home cooking ',
-      );
-      expect(
-        context,
-        startsWith(
-          'You are a nutrition assistant. The user lives in Bulgaria and '
-          'often eats vegetarian home cooking.',
-        ),
-      );
-      expect(context, isNot(contains('UK')));
-    });
-
-    test('leaves the food out when none is given', () {
-      expect(
-        nutritionContext(country: 'Germany', usualFood: ''),
-        startsWith(
-          'You are a nutrition assistant. The user lives in Germany. Read',
-        ),
-      );
-    });
-  });
-
-  group('aiErrorMessage', () {
-    test('tells setup, paused, quota and busy errors apart', () {
-      expect(
-        aiErrorMessage(
-          'Firebase AI Logic API has not been used in project 1 before or '
-          'it is disabled. Enable it by visiting https://…',
-        ),
-        aiNotSwitchedOnMessage,
-      );
-      expect(aiErrorMessage('Quota exceeded for quota metric'), aiBusyMessage);
-      expect(
-        aiErrorMessage('Your prepayment credits are depleted.'),
-        aiPausedMessage,
-      );
-      expect(aiErrorMessage('503 Service Unavailable'), contains('busy'));
-      expect(
-        aiErrorMessage('Something odd'),
-        'Could not estimate calories. Try again.',
-      );
     });
   });
 

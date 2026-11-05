@@ -60,6 +60,8 @@ Google adds **20% UK VAT**, and you pay in pounds. These figures assume about 40
 4. **Count every AI call.** *Done 24 October:* voice notes now count, and the mic says so before recording once the allowance is used up. The automatic protein estimate on saving a meal still doesn't count: it costs about a fifth of an estimate and comes with saving, so counting it would use up the allowance without the user asking for AI.
 
    *Not done: tightening the Firestore rules on the counter.* A rule can't make it tamper-proof. Deleting the day's document resets it, and deleting an account needs that delete to work. Changing the phone's date also starts a fresh day. The counter is a fair limit for ordinary use. The real protection is App Check (only the genuine app can call the AI), the per-user rate limit and the spend cap. A tamper-proof allowance needs a small server function, which comes with YumSum Star.
+
+   *Done 5 November 2026:* the server counts it now (see "AI through our own functions" below).
 5. **Clearer messages.** *Done 24 October:*
    - "The AI is busy right now. Try again in a minute." for quota and 429 errors, which on the paid tier are per-minute limits. They aren't retried automatically, because a per-user minute limit doesn't clear in a few seconds.
    - "Today's 10 AI estimates are used up…" only for the daily allowance
@@ -71,6 +73,20 @@ Google adds **20% UK VAT**, and you pay in pounds. These figures assume about 40
 8. **Show people their allowance.** *Done 24 October:* "3 AI estimates left today" appears above the bar, in muted text, once half is used and the meal has no calories yet.
 
 With all of that, **100 daily users cost about £5–£7 a month**, and nothing can run away from you.
+
+## AI through our own functions (5 November 2026)
+
+The app no longer calls Gemini itself. Anyone could copy the website's App Check token and call Firebase AI Logic with any prompt, with no account, so the allowance and the YumSum Star gates were only checked on the phone. Now two Cloud Functions (`functions/src/ai.ts`) hold the prompts, count the allowance before each call and check YumSum Star.
+
+They use the Gemini Developer API with a key kept as a secret, not Vertex AI. The $5 prepaid credit only covers the Gemini API; Vertex AI is billed on the normal Cloud cycle, so nothing would cap what AI costs.
+
+Set-up, in this order:
+1. **A key for the functions.** In <https://aistudio.google.com/apikey>, create a key in `lean-streak-project`, called "YumSum functions". In Google Cloud console → APIs & Services → Credentials, restrict it to the **Generative Language API**. It never goes in the app.
+2. **Keep it as a secret:** run `firebase functions:secrets:set GEMINI_API_KEY` in the project folder and paste the key. The first time, it switches on Secret Manager.
+3. **Deploy the functions, then the rules, then the app:** `firebase deploy --only functions`, `firebase deploy --only firestore:rules`, then the website (`tools/build_hosting.ps1`, `firebase deploy --only hosting:app`) and a new Android build. The rules stop the app writing `ai_usage`, so the old app's estimates fail until the new one is in: do them together.
+4. **Check it works:** one estimate on the phone puts "AI tokens" in the functions' log (Firebase console → Functions → Logs) and adds 1 to `count` in `users/{uid}/ai_usage/{today}`.
+5. **Close the old way in**, once the new build is everywhere: in Google Cloud console → APIs & Services, disable the **Firebase AI Logic API** (leave the Generative Language API on), and untick it on the app's keys (the key step in `04-owner-checklist.md`).
+6. **Check the cap still applies:** the £3 cap is on "Gemini Developer API (AI Logic)". If the functions' calls don't show under it, set a project spend cap in AI Studio → Spend. The $5 prepaid credit covers them either way.
 
 ## Step B: how to earn from it fairly
 
@@ -125,12 +141,20 @@ To cover everyone's AI, roughly **1 in 40 daily users (about 2.5%)** needs to be
 - [x] (me) Correct 429 and 402 handling and messages
 - [x] (me) Read the logged token use during the next phone test, then update the figures here (5 November, plan 11)
 - [x] (me) Drop the unused "note"
-- [ ] (me) Update `firebase_ai` for low-resolution photos, if the measurements say photos matter
+- [ ] (me) Low-resolution photos (`mediaResolution` in `functions/src/prompts.ts` since the AI moved to the server), if the measurements say photos matter
 - [x] (me) "AI estimates left today" hint
+
+**AI through our own functions (see above)**
+- [x] (me) The functions, the read-only `ai_usage` rule and the app calling them (5 November 2026)
+- [ ] The functions' Gemini key, as the `GEMINI_API_KEY` secret
+- [ ] Deploy the functions, the rules and the app together
+- [ ] One estimate shows in the functions' log and in `ai_usage`
+- [ ] Disable the Firebase AI Logic API and untick it on the app's keys
+- [ ] Check the spend cap covers the functions' calls
 
 **YumSum Star (before the closed test, see `06-yumsum-plus.md`)**
 - [x] Decide the free allowance and YumSum Star contents (2 November 2026: `06-yumsum-plus.md`)
-- [ ] Play Billing, Cloud Functions and the paywall (`07-billing.md`); server-side AI allowance later, only if abuse shows
+- [ ] Play Billing, Cloud Functions and the paywall (`07-billing.md`); the server-side AI allowance came first, on 5 November
 - [ ] Optional: opt-in rewarded ad for extra AI; tip-jar purchase
 - [ ] Payments profile (think about your public address first); tax registration if over £1,000
 

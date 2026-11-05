@@ -1,5 +1,8 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/services/weekly_review_service.dart';
+
+import 'ai_fixtures.dart';
 
 const _facts =
     'Week: Monday 26 October to Sunday 1 November.\n'
@@ -96,31 +99,29 @@ void main() {
     expect(() => _parse('One.'), throwsA(isA<WeeklyReviewException>()));
   });
 
-  test(
-    'the instruction keeps to the minimum, no medical advice and days off',
-    () {
-      expect(weeklyReviewInstruction, contains('less than the minimum'));
-      expect(weeklyReviewInstruction, contains('medical advice'));
-      expect(weeklyReviewInstruction, contains('on a day off'));
-      expect(weeklyReviewInstruction, contains('use only numbers'));
-      expect(weeklyReviewInstruction, isNot(contains('!')));
-    },
-  );
+  // The instruction's own rules are tested with it, in functions/test.
+  test('the server writes the notes from the facts alone', () async {
+    final functions = FakeAiFunctions()
+      ..reply = {
+        'points': [
+          {'text': 'Salt averaged 7.4 g.', 'good': false},
+        ],
+      };
 
-  test('the instruction asks for ways to improve, not one tip', () {
-    expect(weeklyReviewInstruction, contains('ways the user can improve'));
-    expect(weeklyReviewInstruction, isNot(contains('one small')));
+    final points = await WeeklyReviewService(functions).write(_facts);
+
+    expect(points, [(text: 'Salt averaged 7.4 g.', good: false)]);
+    expect(functions.calls.single.$1, 'aiWeeklyReview');
+    expect(functions.calls.single.$2.keys, ['facts', 'dateKey']);
+    expect(functions.calls.single.$2['facts'], _facts);
   });
 
-  test('the instruction asks which notes are about what went well', () {
-    expect(weeklyReviewInstruction, contains('"good" is true only'));
-  });
-
-  test('the instruction never suggests the user\'s own meals', () {
-    expect(weeklyReviewInstruction, isNot(contains('own first meals')));
-    expect(
-      weeklyReviewInstruction,
-      contains('never suggest the user\'s own meals'),
+  test('a refusal from the server is a failure', () async {
+    final functions = FakeAiFunctions()
+      ..error = serverError('permission-denied');
+    await expectLater(
+      WeeklyReviewService(functions).write(_facts),
+      throwsA(isA<FirebaseFunctionsException>()),
     );
   });
 }

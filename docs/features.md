@@ -56,7 +56,7 @@ SharedPreferences through `sharedPreferencesProvider` (`lib/providers/preference
 - Period reviews are computed, never stored; only the AI Coach's notes are cached, in `weekly_reviews`, with the facts they were written from. Legacy `check_ins` and `check_in_prompt_status` documents are only deleted with the account.
 - Repositories in `lib/repositories/` do the reads and writes; `AccountRepository` does the bulk deletes.
 - Reset progress (Weight & Progress) clears `weight_entries` only. Reset all data (Account Settings, `AccountRepository.resetAllData`) clears meals, summaries, weigh-ins, days off and the AI Coach's notes, but keeps the profile and the AI and past-day counters.
-- The rules only let those counters go up by one, and never let the app delete them. `day_edits` only takes the server's month, give or take a day for time zones, so changing the phone's date doesn't start a new count.
+- The app can only read the AI counter, which the AI functions keep (see AI). The rules let the past-day counter only go up by one, and never let the app delete either. `day_edits` only takes the server's month, give or take a day for time zones, so changing the phone's date doesn't start a new count.
 - Account deletion: `AccountRepository.deleteAccountData` deletes the data and the profile, then `deleteAccount` (the function) deletes the counters and the login itself, so the counters only start again with a new account.
 - Reset all data and account deletion re-authenticate first (`AccountController`): with the email password, or with Google for a Google-only account.
 - YumSum Star lives outside the user's tree in `entitlements/{uid}`, which the app can only read (see YumSum Star).
@@ -115,7 +115,7 @@ The paid tier (plan 06; the code says `plus`).
 
 ## Macros
 
-YumSum Star only (plan 10). `macrosForEveryone` in `calorie_estimate_service.dart` stays false for good: the owner's decision of 4 November 2026, whatever the cost.
+YumSum Star only (plan 10), for good: the owner's decision of 4 November 2026, whatever the cost. The AI functions refuse macros to an account without it (see AI).
 - **Data:** fat, saturates, carbs (without fibre, as UK labels give it), sugars, fibre and salt (never sodium; sodium × 2.5).
   - In grams, as one `Nutrients` value (`lib/models/nutrients.dart`) on `Meal.macros` and `DailySummary.macros` (totals over the meals that have them).
   - Stored as six optional flat fields to 0.1 g: `fatGrams`, `saturatesGrams`, `carbsGrams`, `sugarsGrams`, `fibreGrams`, `saltGrams`. They're in both `hasOnly` lists in `firestore.rules`.
@@ -181,8 +181,8 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
   - fibre, salt, sugars and saturates against the guides (`macroTargets`), each on days where every meal has it, with where the salt came from and fibre-rich recipes under 2 g of salt;
   - how many weigh-ins (never the weights), and the Adaptive formula's change on that week's Monday.
   - Days off are left out of every pattern, average and tip; fat and carbs never appear. The same data always gives the same lines.
-- **The call:** `WeeklyReviewService` (`lib/services/weekly_review_service.dart`).
-  - `weeklyReviewInstruction` as a system instruction, the facts as the message, and a response schema (`points`, at most 6, each `{text, good}`; `good` only for a note about something that went well).
+- **The call:** `WeeklyReviewService` (`lib/services/weekly_review_service.dart`) sends the facts to the `aiWeeklyReview` function (see AI), which checks YumSum Star.
+  - `weeklyReviewInstruction` (`functions/src/prompts.ts`) as a system instruction, the facts as the message, and a response schema (`points`, at most 6, each `{text, good}`; `good` only for a note about something that went well).
   - `parseReviewPoints` keeps at most 6 notes (the instruction asks for 4 to 6) as `ReviewPoint`s, dropping any over 160 characters, with a number not in the facts, or with a shaming word; a bare string counts as not good. None left is a failure, and nothing is saved.
 - **When:** only for finished weeks with at least 4 judged days (logged, not taken off), when a subscriber opens the week in History.
   - `weeklyReviewProvider` rebuilds the facts each time and keeps the notes (`{text, good}` each, up to 6 in the rules) in `weekly_reviews/{Monday}` with `basis`: `weeklyReviewPromptVersion` and the facts as sent. The AI is asked again only when `basis` changes, so raise the version whenever the instruction or the facts change.
@@ -206,26 +206,30 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
 
 ## AI
 
-- **Model:** Gemini 3.5 Flash-Lite through Firebase AI Logic (`firebase_ai`, the Gemini Developer API backend, `FirebaseAI.googleAI()`), so there's no API key in the app. The project needs AI Logic enabled (console → Build → AI Logic).
-- **Billing:** the Blaze plan with the Gemini API's paid tier (since 24 October 2026, required for UK/EU users). $5 is prepaid in AI Studio with auto-reload off, there's a £3/month spend cap on "Gemini Developer API (AI Logic)", and the per-user limit is lowered to 10 requests a minute (plan 03).
-- **Estimates** (`lib/services/calorie_estimate_service.dart`):
-  - Every estimate prompt (`estimate`, `parseVoiceAudio`, `estimateFromPhoto`, `estimateNutrients`; not `readLabel`) opens with `nutritionContext`, built from the profile's `country` and `usualFood` (the country from the phone's region at onboarding, usual food blank; both editable in Plan Settings; older profiles default to the UK and Bulgarian home cooking). It also keeps meal and item names in the user's language.
+- **Model:** Gemini 3.5 Flash-Lite (`aiModelId`), called only from two Cloud Functions in `functions/src/ai.ts` (since 5 November 2026; before, the app called Firebase AI Logic directly and anyone with a web App Check token could too). They use the Gemini Developer API through `@google/genai` with the `GEMINI_API_KEY` Functions secret, so there's no key in the app. Not Vertex AI: the Gemini API's prepaid credit is the hard cap on what AI costs, and Vertex AI is billed on the normal Cloud cycle with no cap.
+  - `aiEstimate` (`kind`: `meal`, `voice`, `photo`, `label` or `nutrients`) and `aiWeeklyReview` (`facts`): App Check enforced, signed in only, `europe-west2`, at most 10 instances, like the billing functions.
+  - The app sends only what the user gave (the meal text, the WAV or JPEG in base64, the name and calories, the week's facts), the profile's `country` and `usualFood`, `macros` (true for YumSum Star) and the phone's date (`callAi` in `lib/services/calorie_estimate_service.dart`). The server owns the prompts, the model, the config and AI Coach's schema (`functions/src/prompts.ts`) and returns the model's JSON as it is, which the app parses.
+- **Billing:** the Blaze plan with the Gemini API's paid tier (since 24 October 2026, required for UK/EU users). $5 is prepaid in AI Studio with auto-reload off (plan 03).
+- **Estimates** (`CalorieEstimateService`):
+  - Every estimate prompt (`meal`, `voice`, `photo`, `nutrients`; not `label`) opens with `nutritionContext`, built from the profile's `country` and `usualFood` (the country from the phone's region at onboarding, usual food blank; both editable in Plan Settings; older profiles default to the UK and Bulgarian home cooking). It also keeps meal and item names in the user's language.
   - Estimates return calories, protein and a per-item breakdown with grams (`EstimateItem`).
   - `EstimateBreakdown` shows the breakdown as one line that expands on tap; correcting an item's grams rescales it (`resized`, `totalOf`) with no further AI call.
   - `estimateFromPhoto` sends a resized JPEG with the same prompt.
-- **AI Coach** is the one call that isn't an estimate (see AI Coach): no `nutritionContext`, a system instruction and a response schema. It shares `aiModelId`, `generateWithRetries` and `decodeAiJson` with the estimates.
+- **AI Coach** is the one call that isn't an estimate (see AI Coach): no `nutritionContext`, a system instruction and a response schema.
 - **Voice:** records a short clip with `record` (16 kHz mono PCM, wrapped as WAV by `lib/helpers/wav.dart`) and sends the audio to Gemini (`parseVoiceAudio`), which understands English, Bulgarian or a mix with no language setting. Recording ends on Stop, after a pause once something was said, or at 30 s.
-- **The daily allowance:** typed, voice and photo estimates and a contribution's `readLabel` share `AiUsageRepository.dailyLimit` (20 a user a day for now; plan 06 makes it 10 free and 30 for YumSum Star), counted in Firestore.
-  - The save-time fill-in (`estimateNutrients`) doesn't count, and nor does AI Coach.
-  - The counter is client-side and not tamper-proof; App Check, the per-user rate limit and the spend cap are the real protection.
-  - The bar shows how many are left once half are used, and the mic says so before recording once none are.
-- **Errors:** `aiErrorMessage` maps server errors by their wording.
-  - Not enabled → `aiNotSwitchedOnMessage`.
-  - 402 or billing → `aiPausedMessage`.
-  - Quota or 429 → `aiBusyMessage`, not retried (the paid tier's limits are per minute).
-  - 5xx and connection errors get up to 3 attempts.
-- **Logging:** each call's token counts go to the debug log ("AI tokens: …").
-- **App Check:** every AI call carries a token (`lib/core/config/app_check.dart`, activated in `main()`). App Check enforcement is mandatory for AI Logic from 2 November 2026.
+- **The daily allowance:** typed, voice and photo estimates and a contribution's label read share 20 a user a day for now (`limits` in `functions/src/ai.ts`, and `AiUsageRepository.dailyLimit` for the app's messages; plan 06 makes it 10 free and 30 for YumSum Star).
+  - The server counts it in `users/{uid}/ai_usage/{date}` (`count`) in a transaction before asking Gemini, so calls at the same time are all counted, and failed calls and "no food" answers count too. The app can only read it.
+  - The date is the phone's, accepted only while it is today somewhere from UTC−12 to UTC+14, so changing the phone's date doesn't give a new day.
+  - The save-time fill-in (`estimateNutrients`) and AI Coach don't use it, but have caps of their own so they can't be scripted: 50 and 10 a day (`nutrients` and `coach` in the same document).
+  - The admin entitlement has no limits. Macros and AI Coach are refused (`permission-denied`) without YumSum Star, from `entitlements/{uid}` (`isPlusAt` in `functions/src/entitlement.ts`).
+  - The app still checks the count first, only to say the allowance is used up without a call. The bar shows how many are left once half are used, and the mic says so before recording once none are.
+- **Errors:** the server tells Gemini's errors apart by status and wording (`geminiError`), and the app maps the callable's code (`aiCallError`).
+  - `resource-exhausted` → `DailyLimitExceededException`.
+  - `failed-precondition`: not switched on (a disabled API or a bad key) → `aiNotSwitchedOnMessage`; 402 or billing → `aiPausedMessage`.
+  - `unavailable`: quota or 429 → `aiBusyMessage`, not retried (the paid tier's limits are per minute); 5xx and lost connections get up to 3 attempts on the server first.
+  - Anything else gets the call's own message, such as "Could not estimate calories. Try again."
+- **Logging:** each call's token counts go to the functions' log ("AI tokens").
+- **App Check:** every AI call carries a token (`lib/core/config/app_check.dart`, activated in `main()`), which the functions enforce.
   - Debug builds use the debug provider; its token, printed in the log at startup, must be registered under App Check → Apps → Manage debug tokens.
   - Release builds use Play Integrity on Android and DeviceCheck on iOS.
   - The web uses reCAPTCHA Enterprise (Fraud Defense in Google Cloud) with the public site key in `recaptchaSiteKey`.

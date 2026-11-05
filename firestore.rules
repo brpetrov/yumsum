@@ -105,8 +105,9 @@ service cloud.firestore {
         && text(d.source, 20);
     }
 
-    // The AI allowance and past-day edit counters only ever go up by one.
-    // The deleteAccount function deletes them with the account.
+    // The past-day edit counter only ever goes up by one; the AI functions
+    // keep the AI allowance. The deleteAccount function deletes both with the
+    // account.
     function counterCreate() {
       return request.resource.data.keys().hasOnly(['count'])
         && request.resource.data.count == 1;
@@ -115,10 +116,6 @@ service cloud.firestore {
     function counterIncrement() {
       return request.resource.data.keys().hasOnly(['count'])
         && request.resource.data.count == resource.data.count + 1;
-    }
-
-    function profileGone(userId) {
-      return !existsAfter(/databases/$(database)/documents/users/$(userId));
     }
 
     // A yyyy-MM key for the month at time t (UTC).
@@ -186,11 +183,10 @@ service cloud.firestore {
           && validWeeklyReview(request.resource.data);
       }
 
+      // Counted by the AI's Cloud Functions before each call; the app only
+      // reads it.
       match /ai_usage/{date} {
         allow read: if isOwner(userId);
-        allow create: if isOwner(userId) && counterCreate();
-        allow update: if isOwner(userId) && counterIncrement();
-        allow delete: if isOwner(userId) && profileGone(userId);
       }
 
       match /day_edits/{month} {

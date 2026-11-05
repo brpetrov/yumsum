@@ -85,9 +85,6 @@ class _FakeEstimateService implements CalorieEstimateService {
     int kcal,
   ) async => (protein: 30, macros: null);
 
-  @override
-  List<String> get prompts => const [];
-
   int photoCalls = 0;
 
   @override
