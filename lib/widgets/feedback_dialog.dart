@@ -7,6 +7,7 @@ import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/feedback_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
+import 'package:lean_streak/repositories/feedback_repository.dart';
 import 'package:lean_streak/widgets/pill_toggle.dart';
 
 /// Lets the user write to the developer without leaving the app; a thank-you
@@ -23,8 +24,9 @@ Future<void> showFeedbackDialog(BuildContext context) async {
   }
 }
 
-/// Per device and day: plenty for anyone with something to say, and one
-/// person can't use up the form's 50 a month.
+/// A day: plenty for anyone with something to say, and one person can't use
+/// up the form's 50 a month. The server holds each account to it; this
+/// device's count only says so before anything is sent.
 const _dailyLimit = 3;
 const _sentDayKey = 'feedback.sent_day';
 const _sentCountKey = 'feedback.sent_count';
@@ -72,20 +74,21 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
       _failed = false;
     });
     try {
-      final user = ref.read(authStateProvider).valueOrNull!;
       await ref
           .read(feedbackRepositoryProvider)
-          .send(
-            uid: user.uid,
-            email: user.email!,
-            kind: _kind.label,
-            text: _textCtrl.text.trim(),
-          );
+          .send(kind: _kind.label, text: _textCtrl.text.trim());
       final sent = _sentToday();
       final prefs = ref.read(sharedPreferencesProvider);
       await prefs.setString(_sentDayKey, _today);
       await prefs.setInt(_sentCountKey, sent + 1);
       if (mounted) Navigator.of(context).pop(true);
+    } on FeedbackLimitReached {
+      // Sent from another device, or this phone's day began before the
+      // server's UTC one: shown as if they were all sent from here.
+      final prefs = ref.read(sharedPreferencesProvider);
+      await prefs.setString(_sentDayKey, _today);
+      await prefs.setInt(_sentCountKey, _dailyLimit);
+      if (mounted) setState(() => _sending = false);
     } catch (_) {
       if (mounted) {
         setState(() {

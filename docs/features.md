@@ -303,8 +303,8 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
 
 - **Crash reporting:** `firebase_crashlytics`, on Android/iOS only (it has no web build); the handlers are set in `main()` after Firebase.
 - **Feedback:** Account Settings' feedback tile opens `showFeedbackDialog` (`lib/widgets/feedback_dialog.dart`): a Problem/Idea/Other `PillToggle`, which sets the prompt and the subject, over one message box.
-  - `FeedbackRepository` posts it as JSON to a Formspree form (`FeedbackRepository.endpoint`, in the help.yumsum Formspree account), which emails `supportEmail` (help.yumsum@gmail.com, `lib/core/constants/app_info.dart`) with the user's email as reply-to.
-  - There's no Firestore and no extension involved. The free plan takes 50 messages a month.
+  - `FeedbackRepository` sends the kind, text and app version to the `sendFeedback` function (`functions/src/feedback.ts`), which adds the uid and email from the sign-in and posts it as JSON to the Formspree form (in the help.yumsum Formspree account), which emails `supportEmail` (help.yumsum@gmail.com, `lib/core/constants/app_info.dart`) with the user's email as reply-to.
+  - The function holds each account to 3 a day (`feedback_usage`, UTC days; a failed send doesn't count). The dialog's count on the device says so before sending; when the server refuses (`FeedbackLimitReached`), the dialog shows the same limit line. The free plan takes 50 messages a month.
 - **Legal pages:** `tools/hosting/privacy.html` and `terms.html`, copied to the hosting root by `build_hosting.ps1` and served at `/privacy` and `/terms` (`cleanUrls`).
   - `LegalLinks` (`lib/core/constants/legal_links.dart`) holds the URLs, including the Open Food Facts credit.
   - `LegalFooter` (on sign-in; on the web it also has the reCAPTCHA attribution line) and Account Settings' legal section open them.

@@ -1,45 +1,36 @@
-import 'dart:convert';
-
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:lean_streak/core/constants/app_info.dart';
 
-/// Sends feedback to a Formspree form, which emails it to [supportEmail]
-/// with the user's address to reply to.
-class FeedbackRepository {
-  FeedbackRepository([http.Client? client]) : _client = client ?? http.Client();
-  final http.Client _client;
+/// The account has sent today's feedback, on this device or another.
+class FeedbackLimitReached implements Exception {
+  const FeedbackLimitReached();
+}
 
-  static final endpoint = Uri.parse('https://formspree.io/f/mqppllqo');
+/// Sends feedback through the `sendFeedback` function, which emails it to
+/// [supportEmail] from a Formspree form, with the account's address to reply
+/// to.
+class FeedbackRepository {
+  FeedbackRepository(this._functions);
+  final FirebaseFunctions _functions;
 
   /// [kind] (Problem, Idea or Other) goes in the subject, for sorting mail.
-  Future<void> send({
-    required String uid,
-    required String email,
-    required String kind,
-    required String text,
-  }) async {
+  /// The server adds the account's uid and email. Throws
+  /// [FeedbackLimitReached] once today's are sent.
+  Future<void> send({required String kind, required String text}) async {
     final platform = kIsWeb ? 'web' : defaultTargetPlatform.name;
-    final response = await _client.post(
-      endpoint,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        '_subject': 'YumSum feedback: $kind',
-        'email': email,
-        'message': text,
-        'user': uid,
+    try {
+      await _functions.httpsCallable('sendFeedback').call<Object?>({
+        'kind': kind,
+        'text': text,
         'app': '$appVersion, $platform',
-      }),
-    );
-    if (response.statusCode != 200) {
-      throw http.ClientException(
-        'Feedback failed: ${response.statusCode}',
-        endpoint,
-      );
+      });
+    } on FirebaseFunctionsException catch (error) {
+      if (error.code == 'resource-exhausted') {
+        throw const FeedbackLimitReached();
+      }
+      rethrow;
     }
   }
 }

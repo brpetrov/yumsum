@@ -22,20 +22,15 @@ class _User extends Fake implements User {
 }
 
 class _FakeFeedbackRepository extends Fake implements FeedbackRepository {
-  final sent = <({String uid, String email, String kind, String text})>[];
-  bool fail = false;
+  final sent = <({String kind, String text})>[];
+  Object? error;
   Completer<void>? gate;
 
   @override
-  Future<void> send({
-    required String uid,
-    required String email,
-    required String kind,
-    required String text,
-  }) async {
+  Future<void> send({required String kind, required String text}) async {
     await gate?.future;
-    if (fail) throw Exception('offline');
-    sent.add((uid: uid, email: email, kind: kind, text: text));
+    if (error case final error?) throw error;
+    sent.add((kind: kind, text: text));
   }
 }
 
@@ -114,9 +109,7 @@ void main() {
     repo.gate!.complete();
     await tester.pumpAndSettle();
 
-    expect(repo.sent, [
-      (uid: 'u1', email: 'a@b.com', kind: 'Problem', text: 'Love it'),
-    ]);
+    expect(repo.sent, [(kind: 'Problem', text: 'Love it')]);
     expect(find.byType(AlertDialog), findsNothing);
     expect(find.text('Feedback sent. Thank you.'), findsOneWidget);
     expect(prefs.getString('feedback.sent_day'), today);
@@ -136,6 +129,27 @@ void main() {
       find.text("You've sent 3 today. You can send more tomorrow."),
       findsOneWidget,
     );
+  });
+
+  testWidgets("The server's limit says so as this device's does", (
+    tester,
+  ) async {
+    // Sent from another phone: this one had none.
+    await openDialog(tester);
+    repo.error = const FeedbackLimitReached();
+    await tester.enterText(find.byKey(const Key('feedback-text')), 'More');
+    await tester.pump();
+    await tester.tap(find.widgetWithText(FilledButton, 'Send'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(sendButton(tester).onPressed, isNull);
+    expect(
+      find.text("You've sent 3 today. You can send more tomorrow."),
+      findsOneWidget,
+    );
+    expect(find.text('Could not send. Try again.'), findsNothing);
+    expect(prefs.getInt('feedback.sent_count'), 3);
   });
 
   testWidgets("Yesterday's count doesn't block today", (tester) async {
@@ -169,7 +183,7 @@ void main() {
 
   testWidgets('A failed send keeps the text and says so', (tester) async {
     await openDialog(tester);
-    repo.fail = true;
+    repo.error = Exception('offline');
     await tester.enterText(find.byKey(const Key('feedback-text')), 'Bug');
     await tester.pump();
     await tester.tap(find.widgetWithText(FilledButton, 'Send'));
