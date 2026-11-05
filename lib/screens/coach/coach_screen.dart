@@ -17,7 +17,6 @@ import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/widgets/feature_intro.dart';
-import 'package:lean_streak/widgets/icon_bubble.dart';
 import 'package:lean_streak/widgets/period_bar.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
@@ -180,8 +179,14 @@ class _CoachPitch extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 12),
-        // The coach illustration goes here once it's drawn.
-        const Center(child: IconBubble(Icons.auto_awesome_rounded, size: 120)),
+        // The coach illustration, trimmed and shrunk to 720 px for the web.
+        Center(
+          child: Image.asset(
+            'assets/coach.webp',
+            width: 220,
+            filterQuality: FilterQuality.medium,
+          ),
+        ),
         const SizedBox(height: 22),
         Text(
           'AI Coach',
