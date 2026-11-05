@@ -211,7 +211,7 @@ void main() {
       await tester.tap(find.byTooltip('How it works'));
       await tester.pumpAndSettle();
       expect(find.text('Your week, read for you'), findsOneWidget);
-      expect(find.text('Spots your patterns'), findsOneWidget);
+      expect(find.text('Detects your patterns'), findsOneWidget);
       expect(find.text('Fresh every Monday'), findsOneWidget);
       expect(find.text('Close'), findsOneWidget);
       expect(find.text('Enable'), findsNothing);

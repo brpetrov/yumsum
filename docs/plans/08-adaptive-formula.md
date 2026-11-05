@@ -339,12 +339,7 @@ Under it, for subscribers with it on:
 - **The sum**, from the preview, so it follows the form as you edit:
   - "1670 from your plan − 80 adaptive = 1590 kcal"
   - at the minimum: "1642 from your plan − 142 adaptive = 1500 kcal, your minimum"
-- **How well it knows you**, in plain stages, never a percentage:
-  - "Learning: 11 weigh-ins, 13 days logged" (before it can act)
-  - "Getting to know you: 21 weigh-ins and 21 days logged in 3 weeks" (confidence under 0.4)
-  - "Knows you fairly well: …" (0.4 to 0.7)
-  - "Knows you well: …" (0.7 or more)
-  - "Paused: no weigh-in for 10 days."
+- **Only when paused:** "Paused: no weigh-in for 10 days. Weigh in to keep it personal." *Changed 5 November:* the "how well it knows you" stages ("Learning: …", "Getting to know you: …", "Knows you well: …") are gone, as you found them noise; only the line that asks for something stays.
 - **When the form changes your details or activity:** "Saving starts it again from your new plan."
 - **A "How it works" link** that opens the dialog below.
 
@@ -353,10 +348,12 @@ The preview card's info dialog (`_CalculationInfoDialog`) gets an "Adaptive" lin
 ### How it works (once, after subscribing; again from the link)
 
 A dialog titled **Adaptive formula**, subtitled *A target that learns from you*. It has four bold promises, each with one short line, and icons in tinted bubbles, to take in at a glance:
-- (insights) **Finds your real burn.** From your own weigh-ins and meals, not a guess.
-- (tune) **Adapts to your body.** A target made for you, not the average person.
-- (trend) **Beats plateaus.** When the scale stops moving, your target does.
+- (insights) **Knows what you burn.** Worked out from your weigh-ins and what you log, not just a formula.
+- (tune) **Tailored to you.** A target built around your body and your habits.
+- (trend) **Keeps you moving.** If your weight stalls, your target adjusts so you keep losing.
 - (scale) **Learns as you go.** The more you weigh in, the smarter it gets. Daily is best.
+
+*Reworded 5 November, at your request; the last line is unchanged.*
 
 Buttons: **Close** and **Log weight now**, which opens the weigh-in dialog (`logWeightWithFeedback`), since weigh-ins are what it learns from.
 

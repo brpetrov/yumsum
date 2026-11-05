@@ -117,9 +117,8 @@ void main() {
     expect(find.text('The paywall'), findsOneWidget);
   });
 
-  testWidgets('a subscriber sees the sum and how well it knows them', (
-    tester,
-  ) async {
+  testWidgets('a subscriber sees the sum, and no line on how well it knows '
+      'them', (tester) async {
     await pumpSettings(tester);
     await showRow(tester);
     expect(
@@ -130,10 +129,30 @@ void main() {
       find.text('1670 from your plan − 80 adaptive = 1590 kcal'),
       findsOneWidget,
     );
-    expect(find.text('Learning: 11 weigh-ins, 13 days logged'), findsOneWidget);
+    expect(find.textContaining('days logged'), findsNothing);
+    expect(find.textContaining('Paused'), findsNothing);
     expect(
       find.text('Saving starts it again from your new plan.'),
       findsNothing,
+    );
+  });
+
+  testWidgets('paused, it asks for a weigh-in', (tester) async {
+    await pumpSettings(
+      tester,
+      progress: const AdaptiveMeasure(
+        hold: AdaptiveNote.paused,
+        days: 35,
+        weighIns: 20,
+        daysLogged: 30,
+      ),
+    );
+    await showRow(tester);
+    expect(
+      find.text(
+        'Paused: no weigh-in for 10 days. Weigh in to keep it personal.',
+      ),
+      findsOneWidget,
     );
   });
 
@@ -153,12 +172,6 @@ void main() {
     await showRow(tester);
     expect(
       find.text('1670 from your plan − 170 adaptive = 1500 kcal, your minimum'),
-      findsOneWidget,
-    );
-    expect(
-      find.text(
-        'Knows you fairly well: 33 weigh-ins and 35 days logged in 5 weeks',
-      ),
       findsOneWidget,
     );
   });

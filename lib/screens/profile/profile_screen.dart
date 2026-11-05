@@ -609,10 +609,11 @@ class _AdaptiveSection extends ConsumerWidget {
         ),
         if (plus) ...[
           if (preview != null) Text(adaptiveSumLine(preview), style: muted),
-          if (progress != null) ...[
-            const SizedBox(height: 4),
-            Text(adaptiveStageLine(progress), style: muted),
-          ],
+          if (progress != null)
+            if (adaptivePausedLine(progress) case final paused?) ...[
+              const SizedBox(height: 4),
+              Text(paused, style: muted),
+            ],
           if (restarts) ...[
             const SizedBox(height: 4),
             Text('Saving starts it again from your new plan.', style: muted),

@@ -328,18 +328,9 @@ int adaptiveBurn(UserProfile profile, AdaptiveMeasure? measure) {
   return (burn / 10).round() * 10;
 }
 
-/// How well it knows you, in plain stages rather than a percentage.
-String adaptiveStageLine(AdaptiveMeasure measure) {
-  String count(int n, String one, String many) => '$n ${n == 1 ? one : many}';
-  final weighIns = count(measure.weighIns, 'weigh-in', 'weigh-ins');
-  final days = '${count(measure.daysLogged, 'day', 'days')} logged';
-  final weeks = count(measure.days ~/ 7, 'week', 'weeks');
-  final known = '$weighIns and $days in $weeks';
-  return switch (measure.stage) {
-    AdaptiveStage.paused => 'Paused: no weigh-in for 10 days.',
-    AdaptiveStage.learning => 'Learning: $weighIns, $days',
-    AdaptiveStage.gettingToKnow => 'Getting to know you: $known',
-    AdaptiveStage.fairlyWell => 'Knows you fairly well: $known',
-    AdaptiveStage.well => 'Knows you well: $known',
-  };
-}
+/// The one stage worth a line, as it asks for something: paused, for want
+/// of a weigh-in. Null otherwise.
+String? adaptivePausedLine(AdaptiveMeasure measure) =>
+    measure.stage == AdaptiveStage.paused
+    ? 'Paused: no weigh-in for 10 days. Weigh in to keep it personal.'
+    : null;

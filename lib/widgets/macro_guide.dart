@@ -17,7 +17,7 @@ Future<void> showMacroGuide(
     'Calories',
     'The energy in food. Eat less than you burn and you lose weight.',
     'What you burn in a day, from your age, height, weight and activity, '
-        'less a set amount for your pace. Never below a safe minimum.',
+        'with a little taken off if you\'re losing weight.',
   );
   final groups = [
     (
@@ -33,7 +33,7 @@ Future<void> showMacroGuide(
         (
           'Fibre',
           'Keeps you full and your gut healthy.',
-          'At least 30 g a day, the UK advice for adults.',
+          'At least 30 g a day.',
         ),
       ],
     ),
@@ -43,12 +43,12 @@ Future<void> showMacroGuide(
       [
         (
           'Carbs',
-          'Your body\'s main fuel: bread, rice, pasta, potatoes and fruit.',
-          'What\'s left of your calories after protein and fat.',
+          'Your main fuel: bread, rice, pasta, potatoes and fruit.',
+          'What\'s left after protein and fat.',
         ),
         (
           'Fat',
-          'Energy, and it helps you absorb vitamins A, D, E and K.',
+          'Energy, and it helps you absorb vitamins.',
           'About 30% of your calories.',
         ),
       ],
@@ -59,26 +59,27 @@ Future<void> showMacroGuide(
       [
         (
           'Sugars',
-          'Added sugar brings calories without filling you up, and harms '
-              'your teeth.',
-          'At most 18% of your calories, the food-label guide. Keep added '
-              'sugar under 30 g.',
+          'Calories that don\'t fill you up, and bad for your teeth.',
+          'Under 18% of your calories.',
         ),
         (
           'Saturates',
-          'Too much raises your cholesterol: butter, cheese, fatty meat and '
-              'cakes.',
-          'At most 10% of your calories, the UK advice.',
+          'Raises your cholesterol: butter, cheese, fatty meat and cakes.',
+          'Under 10% of your calories.',
         ),
         (
           'Salt',
-          'Too much raises your blood pressure. Most is already in bread, '
-              'cheese and ready meals.',
-          'At most 6 g a day, about a teaspoon.',
+          'Raises your blood pressure. Most is hidden in bread, cheese and '
+              'ready meals.',
+          'Under 6 g a day, about a teaspoon.',
         ),
       ],
     ),
   ];
+  // Under the Keep under heading: why, once for all three.
+  const keepUnder =
+      'Keep these under the amounts shown. Going over day after day is what '
+      'harms your teeth, heart and blood pressure.';
   final body = TextStyle(
     fontSize: 13.5,
     height: 1.35,
@@ -155,6 +156,10 @@ Future<void> showMacroGuide(
                   ),
                 ],
               ),
+              if (group == 'Keep under') ...[
+                const SizedBox(height: 6),
+                Text(keepUnder, style: body),
+              ],
               for (final entry in items) ...item(entry),
             ],
             const SizedBox(height: 18),

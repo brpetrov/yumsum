@@ -108,6 +108,31 @@ enum GoalPaceLevel {
 const defaultCountry = 'United Kingdom';
 const legacyUsualFood = 'Bulgarian home cooking';
 
+/// The country the profile stores for the phone's region [code] (ISO, e.g.
+/// GB): its English name where YumSum knows it, else the code itself, which
+/// the AI still understands and Plan Settings shows to correct. No code
+/// gives [defaultCountry].
+String countryNameFor(String? code) {
+  if (code == null || code.isEmpty) return defaultCountry;
+  final upper = code.toUpperCase();
+  return _countryNames[upper] ?? upper;
+}
+
+const _countryNames = {
+  'GB': 'United Kingdom',
+  'BG': 'Bulgaria',
+  'IE': 'Ireland',
+  'US': 'United States',
+  'DE': 'Germany',
+  'FR': 'France',
+  'ES': 'Spain',
+  'IT': 'Italy',
+  'NL': 'Netherlands',
+  'GR': 'Greece',
+  'RO': 'Romania',
+  'TR': 'Türkiye',
+};
+
 /// One change the Adaptive formula made: the Monday (yyyy-MM-dd) and the
 /// target before and after.
 typedef AdaptiveChange = ({String week, int from, int to});

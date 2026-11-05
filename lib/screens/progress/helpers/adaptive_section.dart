@@ -118,8 +118,10 @@ class AdaptiveSection extends ConsumerWidget {
                     ' kg a week.',
         ),
         if (progress != null) ...[
-          const SizedBox(height: 12),
-          Text(adaptiveStageLine(progress), style: muted),
+          if (adaptivePausedLine(progress) case final paused?) ...[
+            const SizedBox(height: 12),
+            Text(paused, style: muted),
+          ],
         ],
         if (week != null) ...[
           const SizedBox(height: 4),

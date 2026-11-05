@@ -115,4 +115,12 @@ void main() {
   test('the instruction asks which notes are about what went well', () {
     expect(weeklyReviewInstruction, contains('"good" is true only'));
   });
+
+  test('the instruction never suggests the user\'s own meals', () {
+    expect(weeklyReviewInstruction, isNot(contains('own first meals')));
+    expect(
+      weeklyReviewInstruction,
+      contains('never suggest the user\'s own meals'),
+    );
+  });
 }

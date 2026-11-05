@@ -104,10 +104,11 @@ The paid tier (plan 06; the code says `plus`).
 - Stored plans are recalculated at startup by `activityScaleMigrationProvider` when a profile's `planCalculationVersion` or `activityScaleVersion` is behind the constants in `lib/models/user_profile.dart`.
 - **The trend** (free): `weightTrend` in `lib/helpers/weight_trend.dart`, an exponentially smoothed average (0.9 a day, allowing for gaps). A weigh-in more than 3% off the trend is set aside unless the next one agrees. Weight & Progress draws the weigh-ins as dots (hollow when set aside) under the trend line.
 - Onboarding and Plan Settings accept ages 18–120, matching the legal pages.
+- **Onboarding** (`OnboardingScreen`) asks one question per card, with a progress bar, Back and Next (Next stays off until the answer is valid): name, sex, age, height, current weight, the goal (Lose weight or Keep my weight, with one line on what a calorie is), the target weight (only when losing), daily movement, training, then "Your plan is ready" with the plan and Start. It doesn't ask the pace (moderate), protein (on), usual food (blank) or the country, which comes from the phone's region (`countryNameFor` in `lib/models/user_profile.dart`: a name for the countries it knows, else the region code, else the UK); the last card says Plan Settings changes all of these. Back on the first card signs out.
 
 ## Protein
 
-`UserProfile.trackProtein` (default true, read through `trackProteinProvider`), asked in onboarding and switchable in Plan Settings.
+`UserProfile.trackProtein` (default true, read through `trackProteinProvider`), on from onboarding and switchable in Plan Settings.
 - Off hides protein everywhere: Home's ring, the quick-log box, the meal form, meal rows, the day sheet, the breakdown, the portion sheets, the bar tooltips and the recipes.
 - Off also stops `LogMealController`'s automatic protein estimate. Protein the AI returns anyway is still saved, so switching back on loses nothing.
 
@@ -135,7 +136,7 @@ YumSum Star only (plan 10). `macrosForEveryone` in `calorie_estimate_service.dar
   - A `MealRow` with macros shows an orange "Nutrition" hint beside its time, and a tap shows its `macrosLine`, with protein between fibre and salt as on a food label when protein tracking is on.
   - There's one line on the recipe page and the amount sheet.
   - Macros aren't shown on recipe tiles, the AI breakdown, the month graph or the period review.
-- **The guide** (`showMacroGuide`, `lib/widgets/macro_guide.dart`), from the rings, Home's card and the day sheet: from the card, first a short calories item (what you burn less a set amount for your pace, never below the minimum); then the macros in three groups that match the ring colours (aim for, keep in balance, keep under), each with one line on why it matters and one on how its target is set. No figures; the rings have those.
+- **The guide** (`showMacroGuide`, `lib/widgets/macro_guide.dart`), from the rings, Home's card and the day sheet: from the card, first a short calories item (what you burn, with a little taken off if you're losing weight); then the macros in three groups that match the ring colours (aim for, keep in balance, keep under), each with one line on why it matters and one on its target. Keep under opens with one line on why: going over day after day harms your teeth, heart and blood pressure. No country's guidance is named, as the app isn't only for the UK. No figures beyond the targets; the rings have those.
 
 ## Adaptive formula
 
@@ -161,11 +162,11 @@ YumSum Star (plan 08).
   - Without YumSum Star it is frozen for 2 weeks from `Entitlement.endedAt` (a one-time dialog says when), then goes to 0.
 - **Where it shows:**
   - Home: that week's result as one line on the target card (`adaptiveTodayLineProvider`).
-  - Plan Settings: a row with the sum (`adaptiveSumLine`) and how well it knows you (`adaptiveStageLine`, from `adaptiveProgressProvider`); the star for free users, whose tap opens `/plus`.
+  - Plan Settings: a row with the sum (`adaptiveSumLine`), and "Paused: no weigh-in for 10 days. Weigh in to keep it personal." only when paused (`adaptivePausedLine`, from `adaptiveProgressProvider`; no line on how well it knows you since 5 November); the star for free users, whose tap opens `/plus`.
   - Weight & Progress: `AdaptiveSection` (`lib/screens/progress/helpers/adaptive_section.dart`), under the chart in its card.
-    - With YumSum Star: the title, a solid green "✨ On" chip whose white glint sweeps across three times when it appears (none when the phone asks for less motion), and the info button on the right. Then two plain lines, each with an icon and a note: "You burn 2440 kcal a day" (`adaptiveBurn`, measured up to yesterday; "Learnt from your weigh-ins and meals." or, before it has learnt anything, "A first estimate. It learns as you weigh in.") and "Your target is 1620 kcal a day" ("To lose 0.75 kg a week." or "To keep your weight steady."). Then the stage and this week's line.
+    - With YumSum Star: the title, a solid green "✨ On" chip whose white glint sweeps across three times when it appears (none when the phone asks for less motion), and the info button on the right. Then two plain lines, each with an icon and a note: "You burn 2440 kcal a day" (`adaptiveBurn`, measured up to yesterday; "Learnt from your weigh-ins and meals." or, before it has learnt anything, "A first estimate. It learns as you weigh in.") and "Your target is 1620 kcal a day" ("To lose 0.75 kg a week." or "To keep your weight steady."). Then the paused line, only when paused, and this week's line.
     - Free users: the name itself is the button (`TryButton`, `lib/widgets/feature_intro.dart`, shared with AI Coach), a warm orange pill with an arrow and a soft glow that shines when it appears (the star waits in the dialog's Enable), over "A customised formula tailored just for you. Adapting with time and your weigh-ins." No info button and no numbers, so it invites rather than knocks the standard plan. A tap opens the dialog, which offers Enable.
-- **The explainer:** `showAdaptiveIntro` (`lib/screens/dashboard/helpers/adaptive_dialogs.dart`, laid out by `FeatureIntroDialog`, shared with AI Coach), titled "Adaptive formula" over "A target that learns from you": four bold promises (finds your real burn, adapts to your body, beats plateaus, learns as you go), each with one short line. With YumSum Star, "Log weight now" opens the weigh-in dialog (`logWeightWithFeedback`); without it (`plus: false`), "Enable" with the star opens `/plus`. The other button is Close. It is shown once after subscribing, from Plan Settings and the info button under the chart, and from the free users' button.
+- **The explainer:** `showAdaptiveIntro` (`lib/screens/dashboard/helpers/adaptive_dialogs.dart`, laid out by `FeatureIntroDialog`, shared with AI Coach), titled "Adaptive formula" over "A target that learns from you": four bold promises (knows what you burn, tailored to you, keeps you moving, learns as you go), each with one short line. With YumSum Star, "Log weight now" opens the weigh-in dialog (`logWeightWithFeedback`); without it (`plus: false`), "Enable" with the star opens `/plus`. The other button is Close. It is shown once after subscribing, from Plan Settings and the info button under the chart, and from the free users' button.
 - **Tests:** the seeded simulator in `test/adaptive_fixtures.dart`.
 
 ## AI Coach
@@ -174,7 +175,7 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
 - **The facts:** the app works out every fact and the AI only writes. `buildWeekFacts` (`lib/helpers/week_facts.dart`, pure) gives the lines the AI is told:
   - the days logged, the target and the calorie minimum, what History's card already shows, and each day;
   - weekdays against the weekend, steady weekdays, the biggest day, days under the minimum, and a usual big day over the last 4 weeks;
-  - protein, and the first meal of the day (by logging order, only on days whose meals were all logged on the day) with ideas from the user's own first meals and the library's breakfasts;
+  - protein, and the first meal of the day (by logging order, only on days whose meals were all logged on the day) with ideas from the library's breakfasts only (the user's own meals aren't suggested back to them, since 5 November);
   - fibre, salt, sugars and saturates against the guides (`macroTargets`), each on days where every meal has it, with where the salt came from and fibre-rich recipes under 2 g of salt;
   - how many weigh-ins (never the weights), and the Adaptive formula's change on that week's Monday.
   - Days off are left out of every pattern, average and tip; fat and carbs never appear. The same data always gives the same lines.
@@ -206,7 +207,7 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
 - **Model:** Gemini 3.5 Flash-Lite through Firebase AI Logic (`firebase_ai`, the Gemini Developer API backend, `FirebaseAI.googleAI()`), so there's no API key in the app. The project needs AI Logic enabled (console → Build → AI Logic).
 - **Billing:** the Blaze plan with the Gemini API's paid tier (since 24 October 2026, required for UK/EU users). $5 is prepaid in AI Studio with auto-reload off, there's a £3/month spend cap on "Gemini Developer API (AI Logic)", and the per-user limit is lowered to 10 requests a minute (plan 03).
 - **Estimates** (`lib/services/calorie_estimate_service.dart`):
-  - Every estimate prompt (`estimate`, `parseVoiceAudio`, `estimateFromPhoto`, `estimateNutrients`; not `readLabel`) opens with `nutritionContext`, built from the profile's `country` and `usualFood` (asked in onboarding, editable in Plan Settings; older profiles default to the UK and Bulgarian home cooking). It also keeps meal and item names in the user's language.
+  - Every estimate prompt (`estimate`, `parseVoiceAudio`, `estimateFromPhoto`, `estimateNutrients`; not `readLabel`) opens with `nutritionContext`, built from the profile's `country` and `usualFood` (the country from the phone's region at onboarding, usual food blank; both editable in Plan Settings; older profiles default to the UK and Bulgarian home cooking). It also keeps meal and item names in the user's language.
   - Estimates return calories, protein and a per-item breakdown with grams (`EstimateItem`).
   - `EstimateBreakdown` shows the breakdown as one line that expands on tap; correcting an item's grams rescales it (`resized`, `totalOf`) with no further AI call.
   - `estimateFromPhoto` sends a resized JPEG with the same prompt.

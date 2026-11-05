@@ -8,7 +8,7 @@ import 'package:lean_streak/services/calorie_estimate_service.dart';
 
 /// Raise whenever the instruction or the facts change: it is the first line
 /// of each cached review's `basis`, so the notes are written again.
-const weeklyReviewPromptVersion = 4;
+const weeklyReviewPromptVersion = 5;
 
 /// The AI Coach's instruction (plan 09), sent as the system instruction with
 /// the week's facts as the message. It doesn't open with `nutritionContext`:
@@ -39,11 +39,11 @@ const weeklyReviewInstruction =
     'guides in the facts. Fibre under its guide, or salt, sugars or '
     'saturates over theirs, is worth a note; a guide met all week is worth '
     'saying so.\n\n'
-    'Food: a note may name only a meal listed under "The user\'s own first '
-    'meals" or one of the lists of recipes from the app\'s library, exactly '
-    'as written there. Never suggest any other food, product, brand or '
-    'recipe. Keep the user\'s meal names exactly as they wrote them, in '
-    'their language, in quotation marks.\n\n'
+    'Food: suggest only recipes from the lists of recipes from the app\'s '
+    'library, exactly as written there. Never suggest any other food, '
+    'product, brand or recipe, and never suggest the user\'s own meals. '
+    'Where the facts name the user\'s own meals, keep the names exactly as '
+    'they wrote them, in their language, in quotation marks.\n\n'
     'Never: suggest eating less than the minimum in the facts, skipping '
     'meals, fasting or cutting out foods; praise eating very little (a day '
     'under the minimum may just not be fully logged, so say that kindly if '

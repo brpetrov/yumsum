@@ -24,18 +24,19 @@ Future<void> showAdaptiveIntro(BuildContext context, {bool plus = true}) async {
       promises: const [
         (
           Icons.insights_rounded,
-          'Finds your real burn',
-          'From your own weigh-ins and meals, not a guess.',
+          'Knows what you burn',
+          'Worked out from your weigh-ins and what you log, not just a '
+              'formula.',
         ),
         (
           Icons.tune_rounded,
-          'Adapts to your body',
-          'A target made for you, not the average person.',
+          'Tailored to you',
+          'A target built around your body and your habits.',
         ),
         (
           Icons.trending_down_rounded,
-          'Beats plateaus',
-          'When the scale stops moving, your target does.',
+          'Keeps you moving',
+          'If your weight stalls, your target adjusts so you keep losing.',
         ),
         (
           Icons.monitor_weight_outlined,

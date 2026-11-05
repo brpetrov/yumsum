@@ -261,41 +261,12 @@ WeekFacts buildWeekFacts({
         '${firstMeals.length} days.',
       );
 
-      // Most protein first, one of each name.
-      final high = [
-        for (final meal in firstMeals)
-          if (meal.name != null && meal.proteinGrams!.round() >= 25) meal,
-      ];
-      high.sort((a, b) {
-        final byProtein = b.proteinGrams!.compareTo(a.proteinGrams!);
-        if (byProtein != 0) return byProtein;
-        final byDate = a.date.compareTo(b.date);
-        return byDate != 0 ? byDate : a.id.compareTo(b.id);
-      });
-      final own = <String, Meal>{};
-      for (final meal in high) {
-        own.putIfAbsent(meal.name!.trim().toLowerCase(), () => meal);
-      }
-      final ownIdeas = own.values.take(2).toList();
-      if (ownIdeas.isNotEmpty) {
-        final named = [
-          for (final meal in ownIdeas)
-            '${_quoted(meal.name!)} (${meal.proteinGrams!.round()} g)',
-        ];
-        lines.add(
-          'The user\'s own first meals with more protein: '
-          '${named.join('; ')}.',
-        );
-      }
-
-      final ownNames = {
-        for (final meal in ownIdeas) meal.name!.trim().toLowerCase(),
-      };
+      // Ideas come from the library only: the user's own meals were logged
+      // first on some day, not necessarily eaten as breakfast.
       final ideas = [
         for (final recipe in recipes)
           if (recipe.category == RecipeCategory.breakfast &&
-              recipe.proteinPerPortion >= firstAverage + 10 &&
-              !ownNames.contains(recipe.name.toLowerCase()))
+              recipe.proteinPerPortion >= firstAverage + 10)
             recipe,
       ]..sort(_byRatio((recipe) => recipe.proteinPerPortion.toDouble()));
       if (ideas.isNotEmpty) {

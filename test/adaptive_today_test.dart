@@ -262,7 +262,15 @@ void main() {
           )
           .dy;
       expect(top('Calories'), lessThan(top('Protein')));
-      expect(find.textContaining('Never below a safe minimum'), findsOneWidget);
+      expect(
+        find.textContaining('a little taken off if you\'re losing weight'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('UK'), findsNothing);
+      expect(
+        find.textContaining('Keep these under the amounts shown.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('How it works shows after subscribing', (tester) async {

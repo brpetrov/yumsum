@@ -429,8 +429,6 @@ void main() {
       'Protein target: 112 g a day. Averaged 88 g on the 7 days with protein '
           'for every meal; reached on 1 day.',
       'The first meal of the day averaged 14 g of protein, on 6 days.',
-      'The user\'s own first meals with more protein: "Skyr with honey" '
-          '(27 g).',
       'Recipes from the app\'s library: "Greek yoghurt berry bowl" (332 '
           'kcal, 30 g protein); "Lighter full English" (408 kcal, 36 g '
           'protein).',
@@ -687,19 +685,32 @@ void main() {
     );
   });
 
+  test('the user\'s own meals are never offered as ideas', () {
+    // "Skyr with honey" was a 27 g first meal: once it was an idea.
+    final lines = _facts().lines;
+    expect(lines.where((line) => line.contains('Skyr with honey')), isEmpty);
+    expect(_starting(lines, 'The user\'s own'), isEmpty);
+  });
+
   test('meal names are cut to 60 characters', () {
-    final long = 'Skyr with honey, ${'blueberries, ' * 6}and granola';
+    final long = 'Ham and cheese toastie, ${'pickles, ' * 6}and crisps';
     final meals = [
       for (final meal in _meals)
-        meal.id == '2026-10-28-0'
-            ? _meal(meal.date, 0, long, protein: 27, macros: meal.macros)
+        meal.name == 'Ham and cheese toastie'
+            ? _meal(
+                meal.date,
+                int.parse(meal.id.split('-').last),
+                long,
+                protein: meal.proteinGrams,
+                macros: meal.macros,
+              )
             : meal,
     ];
-    final idea = _starting(
+    final salt = _starting(
       _facts(meals: meals).lines,
-      'The user\'s own',
+      'Most salt came from',
     ).single;
-    expect(idea, contains('"${long.substring(0, 60).trimRight()}" (27 g)'));
+    expect(salt, contains('"${long.substring(0, 60).trimRight()}"'));
   });
 
   test('a nutrient needs 3 days with it for every meal', () {

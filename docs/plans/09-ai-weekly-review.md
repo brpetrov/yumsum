@@ -8,6 +8,7 @@
 2. **The app works out every fact and the AI only writes.** Averages, weekdays against the weekend, protein, fibre, salt, sugars and saturates against the UK guides, the biggest day and the ideas for a tip are all worked out in Dart. The AI gets those facts as plain lines and turns a few of them into sentences. A note that uses a number not in the facts is thrown away before anyone sees it.
 3. **It's written when someone opens the week, then kept.** The notes are saved in `weekly_reviews/{Monday}` along with the facts they were written from. If the facts change (a meal edited, a day taken off), they're written again the next time the week is opened. Nothing is written for a week still in progress, or for a week with fewer than 4 logged days.
 4. **It costs about 0.05p a week per subscriber** (one Gemini 3.5 Flash-Lite call; measured 5 November: 977 tokens in, 80 out, no thinking). It doesn't use the user's daily AI allowance.
+   *Changed 5 November:* ideas come from the library only; the user's own meals aren't suggested back to them (a dinner logged first in the day had been offered as a breakfast idea), prompt version 5.
    *Changed 5 November:* each note says whether it's about something that went well (`good`, prompt version 4), and the card gives those a green dot instead of orange; recipe links are underlined; the rules allow 6 notes, as the instruction has asked for since 4 November.
 5. **Free users see a shining "AI Coach" button** on finished weeks that would have notes, like the free Adaptive formula button. Tapping it opens a dialog that sells it, with Enable.
 6. **It's called AI Coach** everywhere a user sees it (decided 4 November). "What I noticed" is only how the AI talks about the week.
@@ -86,11 +87,12 @@ The Adaptive formula's pattern, since it works:
 
     | Headline | Line |
     |---|---|
-    | Spots your patterns | Sees what's quietly holding you back, so you can fix it. |
-    | Looks past calories | Checks your protein, fibre, salt and sugar, not just calories. |
-    | Tips written for you | Personal advice from your own meals, with recipes that help. |
-    | Fresh every Monday | A new read on every week, so you keep getting better. |
+    | Detects your patterns | Finds what's quietly holding you back, so you can fix it. |
+    | Looks past calories | Checks your protein, fibre, salt and sugar against the recommended amounts, not just your calories. |
+    | Tips written for you | Personal advice based on your own meals, with fixes and recipes that help. |
+    | Fresh every Monday | A new review every week, so you keep getting better. |
 
+  - Reworded on 5 November, at your request.
   - Rewritten on 4 November: each line now sells the feature in a full sentence, instead of finishing its headline ("3 short notes on the week just gone"). The third row was "One easy tip" before the notes gave several ways to improve (see The instruction).
   - Free: Close and Enable with the star, which opens the paywall. YumSum Star: Close only.
 - **The YumSum Star page** says "AI Coach" with "Reads your week and tells you how to do better." (changed 4 November from "Spots your patterns every Monday."; it stays one line so the buy button stays in view on a phone) instead of "AI Assisted Coach" and "Weekly and monthly reviews, with advice." Monthly reviews are only a Later idea.

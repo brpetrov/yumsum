@@ -74,23 +74,25 @@ Future<void> showCoachIntro(BuildContext context, {bool plus = true}) async {
       promises: const [
         (
           Icons.query_stats_rounded,
-          'Spots your patterns',
-          'Sees what\'s quietly holding you back, so you can fix\u00A0it.',
+          'Detects your patterns',
+          'Finds what\'s quietly holding you back, so you can fix\u00A0it.',
         ),
         (
           Icons.eco_rounded,
           'Looks past calories',
-          'Checks your protein, fibre, salt and sugar, not just\u00A0calories.',
+          'Checks your protein, fibre, salt and sugar against the recommended '
+              'amounts, not just your\u00A0calories.',
         ),
         (
           Icons.lightbulb_outline_rounded,
           'Tips written for you',
-          'Personal advice from your own meals, with recipes that\u00A0help.',
+          'Personal advice based on your own meals, with fixes and recipes '
+              'that\u00A0help.',
         ),
         (
           Icons.event_available_rounded,
           'Fresh every Monday',
-          'A new read on every week, so you keep getting\u00A0better.',
+          'A new review every week, so you keep getting\u00A0better.',
         ),
       ],
       actions: [
