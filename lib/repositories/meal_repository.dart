@@ -58,12 +58,17 @@ class MealRepository {
     return meals;
   }
 
-  /// The latest [limit] meals logged, newest first.
-  Future<List<Meal>> fetchRecentMeals(String uid, {int limit = 120}) async {
-    final snapshot = await _meals(
-      uid,
-    ).orderBy('createdAt', descending: true).limit(limit).get();
-    return snapshot.docs.map((doc) => Meal.fromFirestore(doc)).toList();
+  /// Real-time stream of the latest [limit] meals logged, newest first;
+  /// after the first read only changed meals are fetched again.
+  Stream<List<Meal>> watchRecentMeals(String uid, {int limit = 120}) {
+    return _meals(uid)
+        .orderBy('createdAt', descending: true)
+        .limit(limit)
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Meal.fromFirestore(doc)).toList(),
+        );
   }
 
   Future<void> deleteMeal(String uid, String mealId) async {

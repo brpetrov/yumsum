@@ -33,6 +33,25 @@ class DailySummaryRepository {
     return snapshot.docs.map((doc) => DailySummary.fromFirestore(doc)).toList();
   }
 
+  /// Real-time stream of the summaries in a range; after the first read only
+  /// changed days are fetched again.
+  Stream<List<DailySummary>> watchSummariesInRange(
+    String uid, {
+    required String startDate,
+    required String endDate,
+  }) {
+    return _dailySummaries(uid)
+        .where('date', isGreaterThanOrEqualTo: startDate)
+        .where('date', isLessThanOrEqualTo: endDate)
+        .orderBy('date')
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => DailySummary.fromFirestore(doc))
+              .toList(),
+        );
+  }
+
   /// The earliest day with a summary, or null when nothing is logged yet.
   Future<DateTime?> fetchFirstSummaryDate(String uid) async {
     final snapshot = await _dailySummaries(uid).orderBy('date').limit(1).get();

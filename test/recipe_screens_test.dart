@@ -156,7 +156,7 @@ void main() {
             (ref) async => [_oats, _soup, _bolognese],
           ),
           recipeImageProvider.overrideWithValue(pixelImage),
-          recentMealsProvider.overrideWith((ref) async => recent),
+          recentMealsProvider.overrideWith((ref) => Stream.value(recent)),
           dailySummaryForDateProvider.overrideWith(
             (ref, date) => Stream.value(today),
           ),

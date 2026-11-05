@@ -293,7 +293,7 @@ void main() {
         calorieEstimateServiceProvider.overrideWithValue(estimateService),
         currentUidProvider.overrideWithValue('user-1'),
         aiUsageTodayProvider.overrideWith((ref) => Stream.value(aiUsed)),
-        recentMealsProvider.overrideWith((ref) async => recents),
+        recentMealsProvider.overrideWith((ref) => Stream.value(recents)),
         recipesProvider.overrideWith((ref) async => recipes),
         audioRecorderProvider.overrideWithValue(recorder),
         userProfileProvider.overrideWith(

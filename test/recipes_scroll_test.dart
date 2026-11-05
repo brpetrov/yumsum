@@ -38,7 +38,7 @@ void main() {
             photoBuilds++;
             return pixelImage(url);
           }),
-          recentMealsProvider.overrideWith((ref) async => []),
+          recentMealsProvider.overrideWith((ref) => Stream.value([])),
           dailySummaryForDateProvider.overrideWith(
             (ref, date) => Stream.value(null),
           ),

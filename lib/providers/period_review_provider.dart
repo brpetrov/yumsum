@@ -1,9 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
-import 'package:lean_streak/models/period_review.dart';
-import 'package:lean_streak/providers/auth_provider.dart';
-import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/services/period_review_service.dart';
 
 final periodReviewServiceProvider = Provider<PeriodReviewService>((ref) {
@@ -26,42 +22,3 @@ class PeriodReviewRange {
   @override
   int get hashCode => Object.hash(startDate, endDate);
 }
-
-final periodReviewProvider = FutureProvider.autoDispose
-    .family<PeriodReview, PeriodReviewRange>((ref, range) async {
-      final uid = ref.watch(currentUidProvider);
-      if (uid == null) {
-        throw Exception('Not authenticated');
-      }
-
-      final formatter = DateFormat('yyyy-MM-dd');
-      final startDate = DateTime(
-        range.startDate.year,
-        range.startDate.month,
-        range.startDate.day,
-      );
-      final endDate = DateTime(
-        range.endDate.year,
-        range.endDate.month,
-        range.endDate.day,
-        23,
-        59,
-        59,
-        999,
-      );
-      final summaries = await ref
-          .watch(dailySummaryRepositoryProvider)
-          .fetchSummariesInRange(
-            uid,
-            startDate: formatter.format(startDate),
-            endDate: formatter.format(endDate),
-          );
-
-      return ref
-          .watch(periodReviewServiceProvider)
-          .buildReview(
-            startDate: range.startDate,
-            endDate: range.endDate,
-            summaries: summaries,
-          );
-    });

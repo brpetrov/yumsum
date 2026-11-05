@@ -13,12 +13,11 @@ final mealRepositoryProvider = Provider<MealRepository>((ref) {
 });
 
 /// The user's latest meals, newest first, for one-tap re-logging (see
-/// [distinctRecentMeals] and [usualMealsAt]). Refreshed by
-/// [LogMealController] after every change.
-final recentMealsProvider = FutureProvider.autoDispose<List<Meal>>((ref) async {
+/// [distinctRecentMeals] and [usualMealsAt]).
+final recentMealsProvider = StreamProvider.autoDispose<List<Meal>>((ref) {
   final uid = ref.watch(currentUidProvider);
-  if (uid == null) return const [];
-  return ref.watch(mealRepositoryProvider).fetchRecentMeals(uid);
+  if (uid == null) return Stream.value(const []);
+  return ref.watch(mealRepositoryProvider).watchRecentMeals(uid);
 });
 
 /// [meals] newest first, reduced to the latest meal per name (case

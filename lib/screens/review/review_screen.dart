@@ -68,15 +68,11 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     // Only finished days are reviewed; today is still going.
     final yesterday = today.subtract(const Duration(days: 1));
     final reviewEnd = end.isAfter(yesterday) ? yesterday : end;
+    final summariesAsync = ref.watch(
+      reviewSummariesProvider(ReviewRange(startDate: start, endDate: end)),
+    );
     final summariesByDate =
-        ref
-            .watch(
-              reviewSummariesProvider(
-                ReviewRange(startDate: start, endDate: end),
-              ),
-            )
-            .valueOrNull ??
-        const <String, DailySummary>{};
+        summariesAsync.valueOrNull ?? const <String, DailySummary>{};
 
     return ListView(
       padding: EdgeInsets.zero,
@@ -153,6 +149,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                       day,
                   ],
                   summariesByDate: summariesByDate,
+                  loaded: summariesAsync.hasValue,
                   isMonth: _mode == _ReviewMode.month,
                 ),
             ],
@@ -408,18 +405,21 @@ class _PeriodReviewCard extends ConsumerWidget {
     required this.range,
     required this.days,
     required this.summariesByDate,
+    required this.loaded,
     required this.isMonth,
   });
 
   final PeriodReviewRange range;
   final List<DateTime> days;
+
+  /// The whole period's, today's included.
   final Map<String, DailySummary> summariesByDate;
+  final bool loaded;
   final bool isMonth;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final review = ref.watch(periodReviewProvider(range)).valueOrNull;
-    if (review == null) {
+    if (!loaded) {
       return AppCard(
         child: SizedBox(
           height: 120,
@@ -429,6 +429,17 @@ class _PeriodReviewCard extends ConsumerWidget {
         ),
       );
     }
+    final endKey = _dateKey(range.endDate);
+    final review = ref
+        .watch(periodReviewServiceProvider)
+        .buildReview(
+          startDate: range.startDate,
+          endDate: range.endDate,
+          summaries: [
+            for (final summary in summariesByDate.values)
+              if (summary.date.compareTo(endKey) <= 0) summary,
+          ],
+        );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

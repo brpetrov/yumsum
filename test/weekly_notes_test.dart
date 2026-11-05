@@ -87,7 +87,7 @@ void main() {
             };
           }),
           reviewSummariesProvider.overrideWith(
-            (ref, range) async => {
+            (ref, range) => Stream.value({
               for (var day = 0; day < judgedDays; day++)
                 '2026-10-${26 + day}': DailySummary(
                   date: '2026-10-${26 + day}',
@@ -98,7 +98,7 @@ void main() {
                   status: DailyStatus.green,
                   updatedAt: DateTime(2026, 11, 2),
                 ),
-            },
+            }),
           ),
         ],
         child: MaterialApp.router(

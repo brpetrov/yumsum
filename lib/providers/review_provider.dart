@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
-import 'package:lean_streak/providers/period_review_provider.dart';
 import 'package:lean_streak/providers/weekly_review_provider.dart';
 
 class ReviewRange {
@@ -34,28 +33,29 @@ final firstLoggedDayProvider = FutureProvider.autoDispose<DateTime?>((
   return ref.watch(dailySummaryRepositoryProvider).fetchFirstSummaryDate(uid);
 });
 
-final reviewSummariesProvider = FutureProvider.autoDispose
-    .family<Map<String, DailySummary>, ReviewRange>((ref, range) async {
+final reviewSummariesProvider = StreamProvider.autoDispose
+    .family<Map<String, DailySummary>, ReviewRange>((ref, range) {
       final uid = ref.watch(currentUidProvider);
-      if (uid == null) return const {};
+      if (uid == null) return Stream.value(const {});
 
       final formatter = DateFormat('yyyy-MM-dd');
-      final summaries = await ref
+      return ref
           .watch(dailySummaryRepositoryProvider)
-          .fetchSummariesInRange(
+          .watchSummariesInRange(
             uid,
             startDate: formatter.format(range.startDate),
             endDate: formatter.format(range.endDate),
+          )
+          .map(
+            (summaries) => {
+              for (final summary in summaries) summary.date: summary,
+            },
           );
-
-      return {for (final summary in summaries) summary.date: summary};
     });
 
 /// Refetches History's one-off reads after a day's meals changed; the
-/// day summary streams follow by themselves.
+/// summary streams follow by themselves.
 void refreshHistory(Ref ref) {
   ref.invalidate(firstLoggedDayProvider);
-  ref.invalidate(reviewSummariesProvider);
-  ref.invalidate(periodReviewProvider);
   ref.invalidate(weeklyReviewProvider);
 }

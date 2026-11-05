@@ -5,13 +5,11 @@ import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/past_day_edit_provider.dart';
-import 'package:lean_streak/providers/period_review_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/screens/dashboard/helpers/quick_log_bar.dart';
 import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
 import 'package:lean_streak/screens/review/day_meals_sheet.dart';
 import 'package:lean_streak/screens/review/review_screen.dart';
-import 'package:lean_streak/services/period_review_service.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
 
@@ -39,14 +37,7 @@ Widget _app(Widget home) {
       ),
       dayEditsThisMonthProvider.overrideWith((ref) => Stream.value(0)),
       firstLoggedDayProvider.overrideWith((ref) async => null),
-      reviewSummariesProvider.overrideWith((ref, range) async => {}),
-      periodReviewProvider.overrideWith(
-        (ref, range) async => PeriodReviewService().buildReview(
-          startDate: range.startDate,
-          endDate: range.endDate,
-          summaries: const [],
-        ),
-      ),
+      reviewSummariesProvider.overrideWith((ref, range) => Stream.value({})),
     ],
     child: MaterialApp(home: home),
   );
@@ -74,7 +65,10 @@ void main() {
       ),
     );
 
-    expect(tester.getRect(find.byType(TextField)).bottom, lessThan(_safeBottom));
+    expect(
+      tester.getRect(find.byType(TextField)).bottom,
+      lessThan(_safeBottom),
+    );
     expect(
       tester.getRect(find.byTooltip('Speak')).bottom,
       lessThanOrEqualTo(_safeBottom),
@@ -85,7 +79,9 @@ void main() {
     tester,
   ) async {
     _phoneWithNavBar(tester);
-    await tester.pumpWidget(_app(_opener((context) => showLogMealSheet(context))));
+    await tester.pumpWidget(
+      _app(_opener((context) => showLogMealSheet(context))),
+    );
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
 
@@ -101,9 +97,7 @@ void main() {
     _phoneWithNavBar(tester);
     await tester.pumpWidget(
       _app(
-        _opener(
-          (context) => showDayMealsSheet(context, DateTime(2020, 3, 10)),
-        ),
+        _opener((context) => showDayMealsSheet(context, DateTime(2020, 3, 10))),
       ),
     );
     await tester.tap(find.text('open'));
@@ -128,9 +122,6 @@ void main() {
     await tester.pumpAndSettle();
 
     final lastCard = find.byType(AppCard).last;
-    expect(
-      tester.getRect(lastCard).bottom,
-      lessThan(screen.height - _navBar),
-    );
+    expect(tester.getRect(lastCard).bottom, lessThan(screen.height - _navBar));
   });
 }

@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
-import 'package:lean_streak/providers/period_review_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
@@ -13,7 +12,6 @@ import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weekly_review_provider.dart';
 import 'package:lean_streak/screens/review/review_screen.dart';
 import 'package:lean_streak/screens/review/weekly_notes.dart';
-import 'package:lean_streak/services/period_review_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _plus = Entitlement(active: true, source: EntitlementSource.manual);
@@ -33,14 +31,7 @@ Future<Widget> _app(
       userProfileProvider.overrideWith((ref) => Stream.value(null)),
       entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
       firstLoggedDayProvider.overrideWith((ref) async => firstDay),
-      reviewSummariesProvider.overrideWith((ref, range) async => {}),
-      periodReviewProvider.overrideWith(
-        (ref, range) async => PeriodReviewService().buildReview(
-          startDate: range.startDate,
-          endDate: range.endDate,
-          summaries: const [],
-        ),
-      ),
+      reviewSummariesProvider.overrideWith((ref, range) => Stream.value({})),
       weeklyReviewProvider.overrideWith(
         (ref, monday) async => const [
           (text: 'Weekdays were steady.', good: false),

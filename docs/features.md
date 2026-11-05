@@ -14,7 +14,7 @@ How each part of the app works, for when you're working on it. `CLAUDE.md` has t
 - Beside the idle box: round buttons for a photo of the plate, a packet's barcode (phones only) and the mic.
 - Once the bar is in use (text, or the keyboard up for it; not desktop's standing focus) they slide away for one round button: a sparkle (tooltip Estimate, greyed until there is a name), or a tick (Save) once there are calories.
 - A tap on nothing in particular anywhere in the app (`appShellBuilder`), a scroll of Home, or a swipe down on the bar (which shows a drag handle while open) lets go of the box: the keyboard goes and an empty bar folds.
-- Chips while a box is focused and there are no calories yet (`suggestionsFor` in `lib/helpers/meal_suggestions.dart`):
+- Chips while a box is focused and there are no calories yet (`suggestionsFor` in `lib/helpers/meal_suggestions.dart`), from the latest 120 meals (`recentMealsProvider`, a live query, so a change re-reads only that meal):
   - name empty: up to five meals usually logged around this time of day (`usualMealsAt`: at least twice within 90 minutes of now, not already logged today);
   - typing: up to three of the last 50 distinct meal names that match (`distinctRecentMeals`), own meals first, with a matching recipe (book icon) always given one of the three places, after a packaged-food search chip when not on the web.
 
@@ -201,7 +201,7 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
   - A day off never shows a status.
   - Period reviews count its calories but leave it out of the tally, the consistency rate and best/worst day, reporting a days-off count instead.
 - **Past-day changes:** adding, editing or deleting a meal on an earlier day uses one of 10 a calendar month (`DayEditRepository.monthlyLimit`). Once they're used up, `LogMealController` fails with `EditLimitExceededException`. Admin has no limit.
-- **Period reviews** (`lib/services/period_review_service.dart`): weekly and monthly figures from the summaries, under the History calendar for finished days.
+- **Period reviews** (`lib/services/period_review_service.dart`): weekly and monthly figures from the summaries, under the History calendar for finished days. They're built from the calendar's summaries (`reviewSummariesProvider`, a live range query, also behind Home's month card), so a meal change re-reads only its day.
 
 ## AI
 

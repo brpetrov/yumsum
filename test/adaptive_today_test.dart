@@ -94,7 +94,9 @@ void main() {
           (ref, date) => Stream<DailySummary?>.value(null),
         ),
         dayOffProvider.overrideWith((ref, date) => Stream.value(false)),
-        reviewSummariesProvider.overrideWith((ref, range) async => const {}),
+        reviewSummariesProvider.overrideWith(
+          (ref, range) => Stream.value(const {}),
+        ),
         dailySummaryServiceProvider.overrideWithValue(
           DailySummaryService(
             mealRepository: _FakeMeals(),
@@ -104,7 +106,7 @@ void main() {
           ),
         ),
         aiUsageTodayProvider.overrideWith((ref) => Stream.value(0)),
-        recentMealsProvider.overrideWith((ref) async => const []),
+        recentMealsProvider.overrideWith((ref) => Stream.value(const [])),
         recipesProvider.overrideWith((ref) async => const []),
       ],
     );
