@@ -54,6 +54,7 @@ void main() {
     WidgetTester tester, {
     UserProfile? profile,
     Entitlement? entitlement,
+    List<WeightEntry>? entries,
   }) async {
     controller = _FakeWeightLogController();
     SharedPreferences.setMockInitialValues({});
@@ -63,10 +64,10 @@ void main() {
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
           weightEntriesProvider.overrideWith(
-            (ref) => Stream.value([
-              _entry('2026-10-01', 86.0),
-              _entry('2026-10-08', 85.2),
-            ]),
+            (ref) => Stream.value(
+              entries ??
+                  [_entry('2026-10-01', 86.0), _entry('2026-10-08', 85.2)],
+            ),
           ),
           userProfileProvider.overrideWith(
             (ref) => Stream<UserProfile?>.value(profile),
@@ -205,11 +206,37 @@ void main() {
     expect(find.text('Weigh-in deleted.'), findsOneWidget);
   });
 
+  testWidgets('a long history builds only the weigh-ins on screen', (
+    tester,
+  ) async {
+    final start = DateTime.utc(2026, 8, 1);
+    await pumpScreen(
+      tester,
+      entries: [
+        for (var i = 0; i < 90; i++)
+          _entry(
+            start.add(Duration(days: i)).toIso8601String().substring(0, 10),
+            90 - i * 0.05,
+          ),
+      ],
+    );
+    // Newest first, so the oldest is far below and not built yet.
+    expect(find.text('Thu, 29 Oct 2026'), findsOneWidget);
+    final oldest = find.text('Sat, 1 Aug 2026', skipOffstage: false);
+    expect(oldest, findsNothing);
+
+    await tester.scrollUntilVisible(find.text('Sat, 1 Aug 2026'), 500);
+    expect(oldest, findsOneWidget);
+    expect(find.text('Thu, 29 Oct 2026', skipOffstage: false), findsNothing);
+  });
+
   testWidgets('Reset progress asks first, then clears the weight history', (
     tester,
   ) async {
     await pumpScreen(tester);
-    await tester.ensureVisible(find.text('Reset progress'));
+    await tester.ensureVisible(
+      find.text('Reset progress', skipOffstage: false),
+    );
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Reset progress'));

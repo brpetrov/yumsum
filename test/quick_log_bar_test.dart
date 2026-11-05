@@ -434,6 +434,38 @@ void main() {
     expect(find.text('g protein'), findsOneWidget);
   });
 
+  testWidgets('the keyboard sliding in or out rebuilds the bar once', (
+    tester,
+  ) async {
+    await pumpCard(tester);
+    await tester.tap(nameBox);
+    await tester.pumpAndSettle();
+    addTearDown(tester.view.resetViewInsets);
+
+    var builds = 0;
+    debugOnRebuildDirtyWidget = (element, _) {
+      if (element.widget is QuickLogBar) builds++;
+    };
+    try {
+      // Each frame of the slide changes the insets.
+      for (final inset in [100.0, 400.0, 800.0]) {
+        tester.view.viewInsets = FakeViewPadding(bottom: inset);
+        await tester.pump();
+      }
+      expect(builds, 1);
+      expect(kcalBox, findsOneWidget);
+
+      for (final inset in [400.0, 100.0, 0.0]) {
+        tester.view.viewInsets = FakeViewPadding(bottom: inset);
+        await tester.pump();
+      }
+      expect(builds, 2);
+      expect(kcalBox, findsNothing);
+    } finally {
+      debugOnRebuildDirtyWidget = null;
+    }
+  });
+
   testWidgets('estimates calories when none are typed, then waits for Save', (
     tester,
   ) async {

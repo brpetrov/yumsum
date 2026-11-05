@@ -90,6 +90,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
 
   bool _listening = false;
   bool _working = false;
+  // As of the last metrics change, so only the keyboard coming or going
+  // rebuilds, not each frame of its slide.
+  bool _keyboardUp = false;
   List<EstimateItem> _aiItems = const [];
   String? _error;
 
@@ -212,6 +215,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   /// The keyboard coming or going decides whether empty number boxes show.
   @override
   void didChangeMetrics() {
+    final keyboardUp = View.of(context).viewInsets.bottom > 0;
+    if (keyboardUp == _keyboardUp) return;
+    _keyboardUp = keyboardUp;
     if (_focusNode.hasFocus || _kcalFocus.hasFocus || _proteinFocus.hasFocus) {
       setState(() {});
     }

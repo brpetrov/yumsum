@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/data/latest_10y.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 /// Local reminders on Android and iOS. Scheduling is driven by
@@ -20,6 +20,7 @@ class NotificationService {
   static const int _weeklyWeightReminderId = 1002;
   static const int _creatineReminderId = 1003;
   static bool _initialized = false;
+  static bool _timezonesReady = false;
 
   static bool get isSupported {
     if (kIsWeb) return false;
@@ -29,15 +30,12 @@ class NotificationService {
     };
   }
 
-  /// Sets up the plugin and timezone. Does not ask for permission.
+  /// Sets up the plugin. Does not ask for permission. The timezones wait
+  /// until something is scheduled, so a cold start doesn't decode them.
   static Future<void> initialize({
     required void Function(String payload) onTap,
   }) async {
     if (!isSupported || _initialized) return;
-
-    tz.initializeTimeZones();
-    final timezoneInfo = await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(timezoneInfo.identifier));
 
     const initializationSettings = InitializationSettings(
       android: AndroidInitializationSettings('@drawable/ic_notification'),
@@ -56,6 +54,15 @@ class NotificationService {
       },
     );
     _initialized = true;
+  }
+
+  /// Loads the timezones and the device's own before the first schedule.
+  static Future<void> _ensureTimezones() async {
+    if (_timezonesReady) return;
+    tz.initializeTimeZones();
+    final timezoneInfo = await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(timezoneInfo.identifier));
+    _timezonesReady = true;
   }
 
   /// Payload of the notification that started the app, if one did. A
@@ -100,6 +107,7 @@ class NotificationService {
 
   static Future<void> scheduleDailyMealReminder() async {
     if (!isSupported) return;
+    await _ensureTimezones();
     await _notifications.cancel(id: _dailyReminderId);
 
     final now = tz.TZDateTime.now(tz.local);
@@ -148,6 +156,7 @@ class NotificationService {
     bool daily = false,
   }) async {
     if (!isSupported) return;
+    await _ensureTimezones();
     await _notifications.cancel(id: _weeklyWeightReminderId);
 
     await _notifications.zonedSchedule(
@@ -186,6 +195,7 @@ class NotificationService {
     required int minute,
   }) async {
     if (!isSupported) return;
+    await _ensureTimezones();
     await _notifications.cancel(id: _creatineReminderId);
 
     final now = tz.TZDateTime.now(tz.local);

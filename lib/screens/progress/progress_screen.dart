@@ -18,7 +18,6 @@ import 'package:lean_streak/screens/progress/helpers/adaptive_section.dart';
 import 'package:lean_streak/screens/progress/helpers/log_weight_dialog.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/app_logo_mark.dart';
-import 'package:lean_streak/widgets/responsive_page.dart';
 
 class ProgressScreen extends ConsumerWidget {
   const ProgressScreen({super.key});
@@ -56,45 +55,67 @@ class ProgressScreen extends ConsumerWidget {
               child: _EmptyState(onLogWeight: () => _logWeight(context, ref)),
             );
           }
-          return ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              ResponsivePage(
-                maxWidth: 760,
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              // As a ResponsivePage 760 wide: centred, with 20 at the sides.
+              final side = 20 + math.max(0.0, constraints.maxWidth - 760) / 2;
+              // Built as they scroll in, so a long history only builds the
+              // weigh-ins on screen: the stats and chart, the weigh-ins
+              // newest first, then Reset progress.
+              return ListView.builder(
                 padding: EdgeInsets.fromLTRB(
-                  20,
+                  side,
                   12,
-                  20,
+                  side,
                   MediaQuery.of(context).padding.bottom + 32,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _StatsHeader(entries: entries, profile: profile),
-                    const SizedBox(height: 18),
-                    _WeightChartCard(entries: entries, profile: profile),
-                    const SizedBox(height: 22),
-                    _HistorySection(
-                      entries: entries,
-                      onDelete: (entry) =>
-                          _deleteEntry(context, ref, entries, entry),
-                    ),
-                    const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton.icon(
-                        onPressed: () => _resetHistory(context, ref),
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppColors.error,
+                itemCount: entries.length + 2,
+                itemBuilder: (context, i) {
+                  if (i == 0) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _StatsHeader(entries: entries, profile: profile),
+                        const SizedBox(height: 18),
+                        _WeightChartCard(entries: entries, profile: profile),
+                        const SizedBox(height: 22),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
+                          child: Text(
+                            'History',
+                            style: AppTheme.display.copyWith(
+                              fontSize: 21,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
                         ),
-                        icon: const Icon(Icons.restart_alt_rounded),
-                        label: const Text('Reset progress'),
+                      ],
+                    );
+                  }
+                  if (i > entries.length) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton.icon(
+                          onPressed: () => _resetHistory(context, ref),
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.error,
+                          ),
+                          icon: const Icon(Icons.restart_alt_rounded),
+                          label: const Text('Reset progress'),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                    );
+                  }
+                  final entry = entries[entries.length - i];
+                  return _WeighInRow(
+                    entry: entry,
+                    onDelete: () => _deleteEntry(context, ref, entries, entry),
+                  );
+                },
+              );
+            },
           );
         },
         loading: () =>
@@ -505,76 +526,56 @@ class _WeightChartCard extends StatelessWidget {
   }
 }
 
-class _HistorySection extends StatelessWidget {
-  const _HistorySection({required this.entries, required this.onDelete});
+class _WeighInRow extends StatelessWidget {
+  const _WeighInRow({required this.entry, required this.onDelete});
 
-  final List<WeightEntry> entries;
-  final ValueChanged<WeightEntry> onDelete;
+  final WeightEntry entry;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
-    // Newest first for the list.
-    final reversed = entries.reversed.toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
-          child: Text(
-            'History',
-            style: AppTheme.display.copyWith(
-              fontSize: 21,
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ),
-        ...reversed.map(
-          (entry) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: AppCard(
-              padding: const EdgeInsets.fromLTRB(22, 4, 8, 4),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      DateFormat('EEE, d MMM yyyy').format(entry.date),
-                      style: TextStyle(
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ),
-                  if (entry.source == WeightSource.checkIn) ...[
-                    Icon(
-                      Icons.event_available_outlined,
-                      size: 16,
-                      color: AppColors.textSecondary,
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                  Text(
-                    '${entry.weightKg.toStringAsFixed(1)} kg',
-                    style: AppTheme.display.copyWith(
-                      fontSize: 18,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  IconButton(
-                    onPressed: () => onDelete(entry),
-                    tooltip: 'Delete weigh-in',
-                    iconSize: 20,
-                    color: AppColors.textSecondary,
-                    icon: const Icon(Icons.delete_outline_rounded),
-                  ),
-                ],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: AppCard(
+        padding: const EdgeInsets.fromLTRB(22, 4, 8, 4),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                DateFormat('EEE, d MMM yyyy').format(entry.date),
+                style: TextStyle(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
               ),
             ),
-          ),
+            if (entry.source == WeightSource.checkIn) ...[
+              Icon(
+                Icons.event_available_outlined,
+                size: 16,
+                color: AppColors.textSecondary,
+              ),
+              const SizedBox(width: 8),
+            ],
+            Text(
+              '${entry.weightKg.toStringAsFixed(1)} kg',
+              style: AppTheme.display.copyWith(
+                fontSize: 18,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(width: 4),
+            IconButton(
+              onPressed: onDelete,
+              tooltip: 'Delete weigh-in',
+              iconSize: 20,
+              color: AppColors.textSecondary,
+              icon: const Icon(Icons.delete_outline_rounded),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
