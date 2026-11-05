@@ -29,7 +29,6 @@ flutter build web `
   --base-href /webkit/ `
   --no-web-resources-cdn `
   --no-wasm-dry-run `
-  --dart-define=FLUTTER_WEB_CANVASKIT_FORCE_CPU_ONLY=true `
   -o $webkitBuild
 
 Reset-Directory $hostingBuild
