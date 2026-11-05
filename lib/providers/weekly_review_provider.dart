@@ -30,7 +30,7 @@ final _dateKey = DateFormat('yyyy-MM-dd');
 /// they don't. None for a week still going or with fewer than 4 judged
 /// days.
 final weeklyReviewProvider = FutureProvider.autoDispose
-    .family<List<String>, DateTime>((ref, monday) async {
+    .family<List<ReviewPoint>, DateTime>((ref, monday) async {
       final uid = ref.watch(currentUidProvider);
       final now = DateTime.now();
       final sunday = DateTime(monday.year, monday.month, monday.day + 6);

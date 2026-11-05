@@ -45,7 +45,7 @@
 | 1,000 | $77 (about £69) | $154 (about £138) |
 | 10,000 | $770 (about £690) | $1,540 (about £1,380) |
 
-Google adds **20% UK VAT**, and you pay in pounds. These figures assume about 400 input and 250 output tokens per call. Step A6 below measures the real numbers.
+Google adds **20% UK VAT**, and you pay in pounds. These figures assume about 400 input and 250 output tokens per call. *Measured 5 November 2026 (plan 11, B2):* a typed estimate is about 360 in and 145 out, voice 640 and 160, a photo 1,480 and 220, with no thinking; so about 0.04p, 0.055p and 0.09p a call with VAT. The table above overstates by about a third.
 
 **Paid-tier safety rails Google gives you:**
 - **Prepaid credit.** You top up from $5. At $0, AI stops for everyone with an HTTP 402 until you top up again; auto-reload is optional.
@@ -123,7 +123,7 @@ To cover everyone's AI, roughly **1 in 40 daily users (about 2.5%)** needs to be
 - [ ] Check the paid tier works: one AI estimate shows up as usage on <https://aistudio.google.com/billing>
 - [x] (me) Free allowance down to 10 a day; voice notes count (protein on save doesn't; Firestore rules can't make the counter tamper-proof, see step 4). Back up to 20 a day for now on 30 October, while testing
 - [x] (me) Correct 429 and 402 handling and messages
-- [ ] (me) Read the logged token use during the next phone test, then update the figures here
+- [x] (me) Read the logged token use during the next phone test, then update the figures here (5 November, plan 11)
 - [x] (me) Drop the unused "note"
 - [ ] (me) Update `firebase_ai` for low-resolution photos, if the measurements say photos matter
 - [x] (me) "AI estimates left today" hint

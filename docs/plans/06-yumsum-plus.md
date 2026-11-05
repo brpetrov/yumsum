@@ -88,9 +88,9 @@ Billing, the paywall and who counts as a subscriber are in `07-billing.md`.
 ### Why 30, not 50
 
 The limit has to cover the worst case, someone who uses every estimate every day:
-- At 30 photos a day for a month, that's about **90p** with VAT, or about £1.20 at the photo's real size of 1,120 tokens (plan 11). Either is under the £1.53 a month a yearly subscriber leaves you.
-- At 50 it would be about £1.50–£2.00, which can lose money on yearly subscribers.
-- Real use is far lower. Even a heavy logger needs about 8–12 estimates a day, about 25–35p a month.
+- At 30 photos a day for a month, that's about **84p** with VAT (measured 5 November: 1,480 tokens in, 220 out; plan 11). That is under the £1.53 a month a yearly subscriber leaves you.
+- At 50 it would be about £1.40, too close to it.
+- Real use is far lower. Even a heavy logger needs about 8–12 estimates a day, about 15–20p a month.
 
 ### What doesn't count
 

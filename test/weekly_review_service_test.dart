@@ -8,9 +8,26 @@ const _facts =
     'Salt: the UK guide is at most 6 g a day. Averaged 7.4 g on the 6 days '
     'with salt for every meal; over on 4 days.';
 
-List<String> _parse(Object? raw) => parseReviewPoints(raw, facts: _facts);
+List<String> _parse(Object? raw) => [
+  for (final point in parseReviewPoints(raw, facts: _facts)) point.text,
+];
 
 void main() {
+  test('keeps the good mark; a bare string is not good', () {
+    expect(
+      parseReviewPoints([
+        {'text': 'Fibre met the guide all week.', 'good': true},
+        'Salt averaged 7.4 g.',
+        {'text': 'Steady weekdays.', 'good': 'yes'},
+      ], facts: _facts),
+      [
+        (text: 'Fibre met the guide all week.', good: true),
+        (text: 'Salt averaged 7.4 g.', good: false),
+        (text: 'Steady weekdays.', good: false),
+      ],
+    );
+  });
+
   test('keeps at most 6 notes, in order', () {
     final notes = ['One.', 'Two.', 'Three.', 'Four.', 'Five.', 'Six.'];
     expect(_parse([...notes, 'Seven.']), notes);
@@ -93,5 +110,9 @@ void main() {
   test('the instruction asks for ways to improve, not one tip', () {
     expect(weeklyReviewInstruction, contains('ways the user can improve'));
     expect(weeklyReviewInstruction, isNot(contains('one small')));
+  });
+
+  test('the instruction asks which notes are about what went well', () {
+    expect(weeklyReviewInstruction, contains('"good" is true only'));
   });
 }

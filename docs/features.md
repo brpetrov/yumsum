@@ -179,13 +179,13 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
   - how many weigh-ins (never the weights), and the Adaptive formula's change on that week's Monday.
   - Days off are left out of every pattern, average and tip; fat and carbs never appear. The same data always gives the same lines.
 - **The call:** `WeeklyReviewService` (`lib/services/weekly_review_service.dart`).
-  - `weeklyReviewInstruction` as a system instruction, the facts as the message, and a response schema (`points`, at most 6).
-  - `parseReviewPoints` keeps at most 6 notes (the instruction asks for 4 to 6), dropping any over 160 characters, with a number not in the facts, or with a shaming word; none left is a failure, and nothing is saved.
+  - `weeklyReviewInstruction` as a system instruction, the facts as the message, and a response schema (`points`, at most 6, each `{text, good}`; `good` only for a note about something that went well).
+  - `parseReviewPoints` keeps at most 6 notes (the instruction asks for 4 to 6) as `ReviewPoint`s, dropping any over 160 characters, with a number not in the facts, or with a shaming word; a bare string counts as not good. None left is a failure, and nothing is saved.
 - **When:** only for finished weeks with at least 4 judged days (logged, not taken off), when a subscriber opens the week in History.
-  - `weeklyReviewProvider` rebuilds the facts each time and keeps the notes in `weekly_reviews/{Monday}` with `basis`: `weeklyReviewPromptVersion` and the facts as sent. The AI is asked again only when `basis` changes, so raise the version whenever the instruction or the facts change.
+  - `weeklyReviewProvider` rebuilds the facts each time and keeps the notes (`{text, good}` each, up to 6 in the rules) in `weekly_reviews/{Monday}` with `basis`: `weeklyReviewPromptVersion` and the facts as sent. The AI is asked again only when `basis` changes, so raise the version whenever the instruction or the facts change.
   - `refreshHistory` invalidates it.
 - **Where it shows** (`lib/screens/review/weekly_notes.dart`):
-  - `WeeklyNotesCard`, under the calendar: for a week still going, "Your notes on this week come on Monday."; then the notes, or why there are none for a thin week, a spinner, or "Could not get this week's notes. Try again." with Try again. Numbers keep their units on one line, and a library recipe named in a note is an orange link to its page, shown without the AI's quotes (`_noteSpans`). The info button opens `showCoachIntro`.
+  - `WeeklyNotesCard`, under the calendar: for a week still going, "Your notes on this week come on Monday."; then the notes, or why there are none for a thin week, a spinner, or "Could not get this week's notes. Try again." with Try again. Each note has an orange dot, green for one about something that went well. Numbers keep their units on one line, and a library recipe named in a note is an orange underlined link to its page, shown without the AI's quotes (`_noteSpans`). The info button opens `showCoachIntro`.
   - Free users get `CoachPrompt`: the shining AI Coach button (`TryButton`) and "See what's working, what's holding you back, and get personal tips on how to improve.", in both views whatever was logged. Either opens `showCoachIntro(plus: false)`, whose Enable opens `/plus`.
   - Nothing on Home: the notes are only in History.
 

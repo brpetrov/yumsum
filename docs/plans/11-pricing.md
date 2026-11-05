@@ -1,6 +1,6 @@
 # Plan 11: The price of YumSum Star
 
-*Written 4 November 2026. Status: decided the same day, **£3.99 a month, £25.99 a year, 7 days free**, from the research below; plans 03, 05, 06, 07 and 09 now carry it. Still yours: measuring the AI's real token use on the phone (B2), and the Play Console steps in plan 07.*
+*Written 4 November 2026. Status: decided the same day, **£3.99 a month, £25.99 a year, 7 days free**, from the research below; plans 03, 05, 06, 07 and 09 now carry it. The AI's real token use was measured on 5 November (B2) and came out under what was assumed. Still yours: the Play Console steps in plan 07.*
 
 ## The short version
 
@@ -143,9 +143,18 @@ The placeholder price is £2.99 a month or £17.99 a year, with a 7-day trial, s
 - **Where:** ai.google.dev pricing and media-resolution pages, and firebase.google.com AI Logic pricing.
 
 **B2. Real tokens per call (you, not an agent)**
-- **Do:** five typed, five voice and five photo estimates and one AI Coach, all with macros on, in a debug build. Read the debug log line "AI tokens: in …, out …, thinking …" for each.
-- **Return:** the average in, out and thinking tokens for each kind of call.
+- **Do:** typed, voice and photo estimates and one AI Coach, all with macros on, in a debug build. Read the debug log line "AI tokens: in …, out …, thinking …" for each.
 - **Why:** this replaces the assumed 400 in and 250 out, which predate macros and AI Coach.
+- **Measured 5 November 2026,** two of each, no thinking in any:
+
+  | Call | In | Out | Cost with VAT |
+  |---|---|---|---|
+  | Typed | about 360 | about 145 | about 0.04p |
+  | Voice | about 640 | about 160 | about 0.055p |
+  | Photo | about 1,480 | about 220 | about 0.09p |
+  | AI Coach | 977 | 80 | about 0.05p a week |
+
+  At $0.30 and $2.50 per million tokens, $1 at about £0.77, plus 20% VAT. The photo's 1,480 is the 1,120-token image plus the prompt. Lower than assumed: the answer is short, and there's no thinking.
 
 **B3. Firebase at 1,000 and 10,000 monthly users**
 - **Ask:** the current free quotas and prices, in europe-west2 where they vary, for:
@@ -540,9 +549,9 @@ They must be in a form that can be kept, such as email or text; a passing in-app
 - **£18.41 a year, £1.53 a month,** from a yearly one
 - The year is 6.5 months' worth. The paywall works out its badge from Play's prices: "Save 46%" and "£2.17 a month".
 
-**Against the costs** (assumed tokens until B2 is measured)
-- a light subscriber costs about 10p a month, a typical one about 30p, the worst case about £1.20
-- the yearly clears the worst case by about 33p a month, the monthly by about £1.60
+**Against the costs** (measured tokens, B2; 60% typed, 20% voice, 20% photo)
+- a light subscriber (3 a day) costs about 5p a month, a typical one (10 a day) about 17p, the worst case (30 photos a day) about 84p, plus 0.2p for AI Coach
+- the yearly clears the worst case by about 69p a month, the monthly by about £2
 - plan 06's rule holds: a yearly subscriber never loses you money
 
 **Why these and not the others**
@@ -553,7 +562,7 @@ They must be in a form that can be kept, such as email or text; a passing in-app
 - **7 days free:** trials of 5–9 days turn paid 37% of the time; 3-day trials 25%, with half cancelled on the first day. Longer trials convert a little more but delay the first payment.
 - **Nothing else for now:** no top-ups, no introductory price, no lifetime. Thin evidence and extra code.
 
-**If the measured tokens come out much higher** than assumed, the first lever is low-resolution photos (plan 03, step A7), which take the worst case down to about 90p; the second is the YumSum Star allowance, from 30 to 20.
+**If AI prices rise,** the first lever is low-resolution photos (plan 03, step A7), which take about three quarters off the image's tokens; the second is the YumSum Star allowance, from 30 to 20.
 
 **Income, for the record.** On Android about 0.9% of downloads pay within 35 days, so 10,000 downloads is about 90 payers, roughly £170 a month before churn. The price is about value and covering the AI until there are tens of thousands of downloads. The £3 spend cap bounds what the free tier costs you in the meantime.
 
@@ -562,7 +571,7 @@ They must be in a form that can be kept, such as email or text; a passing in-app
 - [x] (Claude) The questions and how to research them (4 November)
 - [x] (agents) A1–A5, B1, B3–B7, C1–C4, D1, D2, E1, E2 (4 November)
 - [x] (you) Q1–Q4 (4 November)
-- [ ] (you) B2: measure the tokens on the phone, then check "Against the costs" above still holds
+- [x] (you) B2: the tokens measured on the phone (5 November); "Against the costs" above uses them
 - [x] (Claude) The price: £3.99 a month, £25.99 a year, 7 days free (4 November)
 - [x] (Claude) Plans 03, 05, 06, 07 and 09 updated to it (4 November). The terms page names no price, so it's unchanged
 - [ ] (you) Set the prices on the base plans in Play Console (plan 07)

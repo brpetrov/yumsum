@@ -7,7 +7,8 @@
 1. **Every Monday, a YumSum Star user gets the AI Coach's notes in History:** 4 to 6 short notes on the finished Monday–Sunday week (at most 3 until 4 November, when you found 2 too few). It shows in the week view, above the existing review card.
 2. **The app works out every fact and the AI only writes.** Averages, weekdays against the weekend, protein, fibre, salt, sugars and saturates against the UK guides, the biggest day and the ideas for a tip are all worked out in Dart. The AI gets those facts as plain lines and turns a few of them into sentences. A note that uses a number not in the facts is thrown away before anyone sees it.
 3. **It's written when someone opens the week, then kept.** The notes are saved in `weekly_reviews/{Monday}` along with the facts they were written from. If the facts change (a meal edited, a day taken off), they're written again the next time the week is opened. Nothing is written for a week still in progress, or for a week with fewer than 4 logged days.
-4. **It costs about 0.1p a week per subscriber** (one Gemini 3.5 Flash-Lite call). It doesn't use the user's daily AI allowance.
+4. **It costs about 0.05p a week per subscriber** (one Gemini 3.5 Flash-Lite call; measured 5 November: 977 tokens in, 80 out, no thinking). It doesn't use the user's daily AI allowance.
+   *Changed 5 November:* each note says whether it's about something that went well (`good`, prompt version 4), and the card gives those a green dot instead of orange; recipe links are underlined; the rules allow 6 notes, as the instruction has asked for since 4 November.
 5. **Free users see a shining "AI Coach" button** on finished weeks that would have notes, like the free Adaptive formula button. Tapping it opens a dialog that sells it, with Enable.
 6. **It's called AI Coach** everywhere a user sees it (decided 4 November). "What I noticed" is only how the AI talks about the week.
 

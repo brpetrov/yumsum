@@ -5,11 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lean_streak/app/router.dart';
+import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/models/recipe.dart';
+import 'package:lean_streak/models/weekly_review.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/recipe_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
@@ -24,12 +26,30 @@ const _plus = Entitlement(active: true, source: EntitlementSource.manual);
 
 final _monday = DateTime(2026, 10, 26);
 
-const _notes = [
-  'Weekdays were steady at about 1,890 kcal, but the weekend averaged 2,580.',
-  'Your first meal of the day averaged 14 g of protein. A "Greek yoghurt '
-      'berry bowl" gives 30 g for 332 kcal.',
-  'Salt averaged 7.4 g against the 6 g guide.',
+const _notes = <ReviewPoint>[
+  (
+    text:
+        'Weekdays were steady at about 1,890 kcal, but the weekend averaged '
+        '2,580.',
+    good: false,
+  ),
+  (
+    text:
+        'Your first meal of the day averaged 14 g of protein. A "Greek '
+        'yoghurt berry bowl" gives 30 g for 332 kcal.',
+    good: false,
+  ),
+  (text: 'Salt averaged 7.4 g against the 6 g guide.', good: false),
+  (text: 'Fibre met the guide all week.', good: true),
 ];
+
+/// The dots before the notes, by colour.
+Finder _dots(Color color) => find.byWidgetPredicate(
+  (widget) =>
+      widget is Container &&
+      widget.decoration is BoxDecoration &&
+      (widget.decoration! as BoxDecoration).color == color,
+);
 
 void main() {
   late int reads;
@@ -61,9 +81,9 @@ void main() {
           weeklyReviewProvider.overrideWith((ref, monday) async {
             final result = notes[reads++ % notes.length];
             return switch (result) {
-              final Completer<List<String>> wait => wait.future,
+              final Completer<List<ReviewPoint>> wait => wait.future,
               final Exception error => throw error,
-              _ => result as List<String>,
+              _ => result as List<ReviewPoint>,
             };
           }),
           reviewSummariesProvider.overrideWith(
@@ -140,12 +160,20 @@ void main() {
         find.text('Salt averaged 7.4\u00A0g against the 6\u00A0g guide.'),
         findsOneWidget,
       );
+      expect(find.text('Fibre met the guide all week.'), findsOneWidget);
       expect(reads, 1);
     });
 
-    testWidgets('a recipe in a note is a link to it, without the quotes', (
+    testWidgets('a note on something that went well has a green dot', (
       tester,
     ) async {
+      await pump(tester, card());
+      expect(_dots(AppColors.veryGood), findsOneWidget);
+      expect(_dots(AppColors.primary), findsNWidgets(3));
+    });
+
+    testWidgets('a recipe in a note is an underlined link to it, without '
+        'the quotes', (tester) async {
       await pump(
         tester,
         card(),
@@ -158,6 +186,18 @@ void main() {
         ),
         findsOneWidget,
       );
+
+      TextSpan? link;
+      tester
+          .widget<Text>(find.textContaining('Greek yoghurt berry bowl'))
+          .textSpan!
+          .visitChildren((span) {
+            if (span is TextSpan && span.text == 'Greek yoghurt berry bowl') {
+              link = span;
+            }
+            return true;
+          });
+      expect(link!.style!.decoration, TextDecoration.underline);
 
       await tester.tapOnText(
         find.textRange.ofSubstring('Greek yoghurt berry bowl'),
@@ -213,7 +253,7 @@ void main() {
     });
 
     testWidgets('while it writes: Looking over your week', (tester) async {
-      final wait = Completer<List<String>>();
+      final wait = Completer<List<ReviewPoint>>();
       await pump(tester, card(), notes: [wait], settle: false);
       expect(find.text('Looking over your week'), findsOneWidget);
       wait.complete(_notes);

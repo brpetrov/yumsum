@@ -42,7 +42,9 @@ Future<Widget> _app(
         ),
       ),
       weeklyReviewProvider.overrideWith(
-        (ref, monday) async => const ['Weekdays were steady.'],
+        (ref, monday) async => const [
+          (text: 'Weekdays were steady.', good: false),
+        ],
       ),
     ],
     child: MaterialApp(theme: AppTheme.light, home: const ReviewScreen()),

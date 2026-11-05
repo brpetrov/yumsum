@@ -9,6 +9,7 @@ import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/week_facts.dart';
 import 'package:lean_streak/models/recipe.dart';
+import 'package:lean_streak/models/weekly_review.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/recipe_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
@@ -110,10 +111,11 @@ Future<void> showCoachIntro(BuildContext context, {bool plus = true}) async {
 }
 
 /// AI Coach in History, under the calendar in both views, on the week
-/// starting [monday]. With YumSum Star: up to 3 notes the AI wrote from the
-/// week's facts, or why there are none yet; notes need the week over and 4
-/// judged days (logged, not days off). Without: [CoachPrompt]. [named] adds
-/// the week's date, for the month view.
+/// starting [monday]. With YumSum Star: the notes the AI wrote from the
+/// week's facts (a green dot on one about something that went well), or why
+/// there are none yet; notes need the week over and 4 judged days (logged,
+/// not days off). Without: [CoachPrompt]. [named] adds the week's date, for
+/// the month view.
 class WeeklyNotesCard extends ConsumerWidget {
   const WeeklyNotesCard({super.key, required this.monday, this.named = false});
 
@@ -164,7 +166,7 @@ class WeeklyNotesCard extends ConsumerWidget {
     }
 
     final notes = summaries == null
-        ? const AsyncLoading<List<String>>()
+        ? const AsyncLoading<List<ReviewPoint>>()
         : ref.watch(weeklyReviewProvider(monday));
     return _Spaced(
       _CoachCard(
@@ -217,7 +219,9 @@ class WeeklyNotesCard extends ConsumerWidget {
                         height: 7,
                         margin: const EdgeInsets.only(top: 7),
                         decoration: BoxDecoration(
-                          color: AppColors.primary,
+                          color: point.good
+                              ? AppColors.veryGood
+                              : AppColors.primary,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -231,11 +235,13 @@ class WeeklyNotesCard extends ConsumerWidget {
                               color: AppColors.textPrimary,
                             ),
                             children: _noteSpans(
-                              _keepUnits(point),
+                              _keepUnits(point.text),
                               recipes,
                               link: TextStyle(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w800,
+                                decoration: TextDecoration.underline,
+                                decorationColor: AppColors.primary,
                               ),
                               open: (recipe) => context.push(
                                 AppRoutes.recipePath(recipe.id),
