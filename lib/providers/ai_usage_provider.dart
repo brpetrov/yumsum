@@ -20,7 +20,7 @@ final calorieEstimateServiceProvider = Provider<CalorieEstimateService>((ref) {
   );
   return CalorieEstimateService(
     ref.watch(aiUsageRepositoryProvider),
-    FirebaseFunctions.instanceFor(region: 'europe-west2'),
+    FirebaseFunctions.instanceFor(region: 'europe-west10'),
     country: profile?.country ?? defaultCountry,
     usualFood: profile?.usualFood ?? '',
     dailyLimit: ref.watch(aiDailyLimitProvider),

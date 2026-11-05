@@ -19,6 +19,6 @@ final foodContributionServiceProvider = Provider<FoodContributionService>((
   prefs.setString(key, uuid);
   return FoodContributionService(
     appUuid: uuid,
-    functions: FirebaseFunctions.instanceFor(region: 'europe-west2'),
+    functions: FirebaseFunctions.instanceFor(region: 'europe-west10'),
   );
 });

@@ -83,7 +83,7 @@ It takes effect within seconds, on the phone and the website. Delete the documen
 |---|---|
 | `lib/models/entitlement.dart` | `Entitlement` with `fromFirestore`, forgiving of missing fields (a hand-typed grant has only three) |
 | `lib/repositories/entitlement_repository.dart` | Watches `entitlements/{uid}` |
-| `lib/repositories/billing_repository.dart` | Calls `verifyPurchase` and `deleteBillingData` (region `europe-west2`) |
+| `lib/repositories/billing_repository.dart` | Calls `verifyPurchase` and `deleteBillingData` (region `europe-west10`) |
 | `lib/services/billing_service.dart` | A thin wrapper round `InAppPurchase`: is Play available, load the plans, buy, restore, the purchase stream |
 | `lib/providers/plus_provider.dart` | `entitlementProvider`, `plusProvider`, `billingServiceProvider`, `billingRepositoryProvider` and `plusPurchaseControllerProvider` |
 | `lib/screens/plus/plus_screen.dart` | The paywall, and `showPlusPaywall(context)` for the gates to call |
@@ -196,7 +196,7 @@ Manage in Google Play opens `https://play.google.com/store/account/subscriptions
 
 ## The server: Cloud Functions
 
-A new `functions/` folder: TypeScript, 2nd gen, region `europe-west2` (London), Node.js 22 runtime, with `firebase-functions`, `firebase-admin` and `@googleapis/androidpublisher`. `firebase.json` gets a `functions` section. Three functions:
+A new `functions/` folder: TypeScript, 2nd gen, region `europe-west10` (Berlin, beside the Firestore database), Node.js 22 runtime, with `firebase-functions`, `firebase-admin` and `@googleapis/androidpublisher`. `firebase.json` gets a `functions` section. Three functions:
 
 - `src/index.ts`: the three functions, kept thin.
 - `src/entitlement.ts`: `entitlementFrom(subscription, previous, now)`, a pure function from Play's answer to the document's fields, which is where the tests go.
@@ -322,7 +322,7 @@ Once built, CLAUDE.md gets the new collections, the functions and the deploy com
 
 ### As built (4 November)
 
-- **Functions** (`functions/`): `firebase-functions` 7, `firebase-admin` 14, `@googleapis/androidpublisher`, Node 22, all in `europe-west2` with at most 10 instances each as a cost cap. `npm test` runs 39 tests of `entitlementFrom` on Google's own example answers. `firebase.json`'s predeploy builds them, from PowerShell too.
+- **Functions** (`functions/`): `firebase-functions` 7, `firebase-admin` 14, `@googleapis/androidpublisher`, Node 22, all in `europe-west10` with at most 10 instances each as a cost cap. `npm test` runs 39 tests of `entitlementFrom` on Google's own example answers. `firebase.json`'s predeploy builds them, from PowerShell too.
 - **Where it differs from the plan above:**
   - A notification writes the record only for the stored `purchaseId`, when there's none yet, or for a purchase that replaced it (through `linkedPurchaseToken` or `expiredPurchaseToken`). A purchase found that way gets its own `playPurchases` link, because Play drops the replaced token once it's acknowledged.
   - `endedAt` is the old `expiresAt` when that had already passed (a late notification), otherwise now.

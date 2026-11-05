@@ -7,6 +7,6 @@ import 'package:lean_streak/repositories/account_repository.dart';
 final accountRepositoryProvider = Provider<AccountRepository>((ref) {
   return AccountRepository(
     FirebaseFirestore.instance,
-    FirebaseFunctions.instanceFor(region: 'europe-west2'),
+    FirebaseFunctions.instanceFor(region: 'europe-west10'),
   );
 });

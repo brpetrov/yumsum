@@ -5,6 +5,6 @@ import 'package:lean_streak/repositories/feedback_repository.dart';
 
 final feedbackRepositoryProvider = Provider<FeedbackRepository>((ref) {
   return FeedbackRepository(
-    FirebaseFunctions.instanceFor(region: 'europe-west2'),
+    FirebaseFunctions.instanceFor(region: 'europe-west10'),
   );
 });

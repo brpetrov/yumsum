@@ -27,7 +27,7 @@ final billingServiceProvider = Provider<BillingService>((ref) {
 
 final billingRepositoryProvider = Provider<BillingRepository>((ref) {
   return BillingRepository(
-    FirebaseFunctions.instanceFor(region: 'europe-west2'),
+    FirebaseFunctions.instanceFor(region: 'europe-west10'),
   );
 });
 

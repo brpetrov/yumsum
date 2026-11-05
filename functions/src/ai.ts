@@ -40,7 +40,7 @@ const geminiApiKey = defineSecret("GEMINI_API_KEY");
 // The region and instances of setGlobalOptions, set here as well because
 // index.ts imports this file before it calls setGlobalOptions.
 const options = {
-  region: "europe-west2",
+  region: "europe-west10",
   maxInstances: 10,
   enforceAppCheck: true,
   secrets: [geminiApiKey],

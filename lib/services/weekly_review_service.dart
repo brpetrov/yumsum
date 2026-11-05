@@ -67,7 +67,7 @@ class WeeklyReviewService {
   Future<List<ReviewPoint>> write(String facts) async {
     try {
       final map = await callAi(
-        _functions ?? FirebaseFunctions.instanceFor(region: 'europe-west2'),
+        _functions ?? FirebaseFunctions.instanceFor(region: 'europe-west10'),
         'aiWeeklyReview',
         {'facts': facts},
       );
