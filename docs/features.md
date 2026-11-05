@@ -312,5 +312,5 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
 
 - **Signing:** release builds are signed with the upload key named in `android/key.properties` (gitignored; the key file is outside the repo, alias `upload`). Without that file they fall back to the debug key, which Play rejects.
 - **VS Code configs** (`.vscode/launch.json`): `--web-port 5000` for Edge (App Check), and `--dart-define-from-file=config/off_account.json` for Android (Open Food Facts).
-- **Building the site:** `tools/build_hosting.ps1` builds the web app into `build/hosting`, an `/app` build plus a `/webkit` build for Safari/iOS behind a small redirect page, and copies the legal pages and recipe photos.
+- **Building the site:** `tools/build_hosting.ps1` builds the web app into `build/hosting`, an `/app` build plus a `/webkit` build for Safari/iOS behind a small redirect page, and copies the legal pages and recipe photos. `web/flutter_bootstrap.js` leaves CanvasKit's variant to Flutter, so Chrome and Edge get the smaller Chromium one and Safari the full one.
 - **Hosting:** Firebase Hosting serves it with SPA rewrites at `yumsum.web.app` (target `app`). The old default site `lean-streak-project.web.app` (target `old`, public folder `tools/hosting-redirect`) 301-redirects every path there. Targets are mapped in `.firebaserc`.

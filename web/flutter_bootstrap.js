@@ -140,7 +140,6 @@ keepFlutterTextInputsFocused();
 _flutter.loader.load({
   config: {
     canvasKitBaseUrl: 'canvaskit/',
-    canvasKitVariant: 'full',
   },
   onEntrypointLoaded: async function (engineInitializer) {
     const appRunner = await engineInitializer.initializeEngine();
