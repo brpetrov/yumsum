@@ -20,6 +20,7 @@ Recipe testRecipe(
   int servings = 4,
   int minutes = 30,
   int prepMinutes = 10,
+  double fibre = 5,
 }) => Recipe(
   id: name.toLowerCase().replaceAll(' ', '-'),
   name: name,
@@ -31,12 +32,12 @@ Recipe testRecipe(
   prepMinutes: prepMinutes,
   kcalPerPortion: kcal,
   proteinPerPortion: protein,
-  macrosPerPortion: const Nutrients(
+  macrosPerPortion: Nutrients(
     fat: 14,
     saturates: 5,
     carbs: 60,
     sugars: 9,
-    fibre: 5,
+    fibre: fibre,
     salt: 1.4,
   ),
   ingredients: const [

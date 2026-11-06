@@ -64,7 +64,11 @@ final _oats = testRecipe(
   kcal: 350,
   protein: 20,
 );
-final _soup = testRecipe('Lentil soup', category: RecipeCategory.lunch);
+final _soup = testRecipe(
+  'Lentil soup',
+  category: RecipeCategory.lunch,
+  fibre: 10,
+);
 
 final _noProteinProfile = UserProfile(
   uid: 'user-1',
@@ -246,6 +250,11 @@ void main() {
       expect(find.text('Fits today'), findsOneWidget);
     });
 
+    testWidgets('marks only the recipes high in fibre', (tester) async {
+      await pump(tester);
+      expect(find.byTooltip('Rich in fibre'), findsOneWidget);
+    });
+
     testWidgets('a tile opens its recipe', (tester) async {
       await pump(tester);
       await tester.tap(find.text('Lentil soup'));
@@ -369,6 +378,14 @@ void main() {
       tester.view.physicalSize = const Size(400, 2400);
       await tester.pumpAndSettle();
       expect(top('How to make it'), greaterThan(top('Ingredients')));
+    });
+
+    testWidgets('says when a recipe is rich in fibre', (tester) async {
+      await pump(tester, at: '/recipes/lentil-soup');
+      expect(find.text('Rich in fibre'), findsOneWidget);
+
+      await pump(tester, at: '/recipes/pasta-bolognese');
+      expect(find.text('Rich in fibre'), findsNothing);
     });
 
     testWidgets('an unknown recipe says so', (tester) async {

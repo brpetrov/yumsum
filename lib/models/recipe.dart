@@ -204,6 +204,9 @@ class Recipe {
 
   String get photoUrl => '$recipePhotoBase$id.webp';
 
+  /// At least 8 g of fibre a portion, over a quarter of the 30 g a day.
+  bool get highFibre => macrosPerPortion.fibre! >= 8;
+
   /// The rest of [minutes] after the prep; 0 for dishes with no cooking.
   int get cookMinutes => minutes - prepMinutes;
 

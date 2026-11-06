@@ -469,9 +469,7 @@ WeekFacts buildWeekFacts({
   if (fibreAverage != null && fibreAverage < guides.fibre) {
     final ideas = [
       for (final recipe in recipes)
-        if (recipe.macrosPerPortion.fibre! >= 8 &&
-            recipe.macrosPerPortion.salt! < 2)
-          recipe,
+        if (recipe.highFibre && recipe.macrosPerPortion.salt! < 2) recipe,
     ]..sort(_byRatio((recipe) => recipe.macrosPerPortion.fibre!));
     if (ideas.isNotEmpty) {
       final named = [

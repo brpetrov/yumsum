@@ -8,6 +8,7 @@ import 'package:lean_streak/providers/recipe_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/recipes/log_recipe_portion.dart';
 import 'package:lean_streak/widgets/app_card.dart';
+import 'package:lean_streak/widgets/fibre_badge.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
 import 'package:lean_streak/widgets/macro_totals.dart';
 import 'package:lean_streak/widgets/recipe_photo.dart';
@@ -90,7 +91,21 @@ class _RecipeBody extends ConsumerWidget {
 
     final photo = ClipRRect(
       borderRadius: BorderRadius.circular(AppTheme.cardRadius),
-      child: AspectRatio(aspectRatio: 4 / 3, child: RecipePhoto(recipe)),
+      child: AspectRatio(
+        aspectRatio: 4 / 3,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            RecipePhoto(recipe),
+            if (recipe.highFibre)
+              const Positioned(
+                left: 12,
+                top: 12,
+                child: FibreBadge(size: 32, showLabel: true),
+              ),
+          ],
+        ),
+      ),
     );
     final about = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -15,6 +15,7 @@ import 'package:lean_streak/screens/recipes/log_recipe_portion.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/widgets/bowl_note.dart';
+import 'package:lean_streak/widgets/fibre_badge.dart';
 import 'package:lean_streak/widgets/recipe_photo.dart';
 
 /// The recipe library: a search box, what was cooked lately, a filter by
@@ -244,6 +245,8 @@ class _RecipeTile extends ConsumerWidget {
               fit: StackFit.expand,
               children: [
                 RecipePhoto(recipe),
+                if (recipe.highFibre)
+                  const Positioned(left: 8, top: 8, child: FibreBadge()),
                 Positioned(
                   right: 8,
                   bottom: 8,

@@ -138,7 +138,7 @@ YumSum Star only (plan 10), for good: the owner's decision of 4 November 2026, w
   - History's day sheet uses `MacroTotals` (`lib/widgets/macro_totals.dart`): one line of fat, carbs and salt that opens to all six, with "at least" where some meals lack a figure.
   - A `MealRow` with macros shows an orange "Nutrition" hint beside its time, and a tap shows its `macrosLine`, with protein between fibre and salt as on a food label when protein tracking is on.
   - There's one line on the recipe page and the amount sheet.
-  - Macros aren't shown on recipe tiles, the AI breakdown, the month graph or the period review.
+  - Macros aren't shown on recipe tiles (only the high-fibre badge), the AI breakdown, the month graph or the period review.
 - **The guide** (`showMacroGuide`, `lib/widgets/macro_guide.dart`), from the rings, Home's card and the day sheet: from the card, first a short calories item (what you burn, with a little taken off if you're losing weight); then the macros in three groups that match the ring colours (aim for, keep in balance, keep under), each with one line on why it matters and one on its target. Keep under opens with one line on why: going over day after day harms your teeth, heart and blood pressure. No country's guidance is named, as the app isn't only for the UK. No figures beyond the targets; the rings have those.
 
 ## Adaptive formula
@@ -282,6 +282,7 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
   - A search box (`searchRecipes`): every word must be in the name, meal, cuisine, labels or ingredients. Plurals, accents and half-typed words don't matter. A few everyday words stand for others (`_alsoMeans`: fish, pasta, veggie, cheese…). A word that only describes the next one, like the egg in egg noodles, counts only when the search names both (`_describes`).
   - "Cooked recently" (`recentlyCookedRecipes`: the last 14 days' meal names, a ` × n` suffix stripped; hidden while searching).
   - Category `ChoiceChip`s, and photo tiles under a heading per meal (kept when one meal is picked), each with a + that logs.
+  - A recipe with at least 8 g of fibre a portion (`Recipe.highFibre`, the same line AI Coach's fibre ideas use) has `FibreBadge` (`lib/widgets/fibre_badge.dart`) in its photo's top-left corner: a drawn wheat sprig, "Rich in fibre" as its tooltip. The recipe page's photo has it as a pill with "Rich in fibre" beside the sprig (`showLabel`). Shown to everyone, as it gives no figures.
 - **`RecipeScreen`** (`/recipes/:id`; takes a `Recipe` as `extra` for recipes outside the library):
   - Prep, cook (`minutes` − `prepMinutes`) and serves, the ingredients, and "How to make it" with times and oven temperatures in bold.
   - From 600 px wide, the photo sits beside the title and the ingredients beside the steps.
