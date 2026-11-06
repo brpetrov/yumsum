@@ -924,6 +924,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   /// estimate a named meal (greyed until there is a name) or a tick to save one
   /// with calories. A change scales at the box's edge, which follows it.
   Widget _buildActions(_Entry entry, bool typing) {
+    final plus = ref.watch(plusProvider);
     final (String kind, Widget buttons) = _listening
         ? (
             'stop',
@@ -941,11 +942,12 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
               mainAxisSize: MainAxisSize.min,
               children: [
                 _circle(
-                  ref.watch(plusProvider)
+                  plus
                       ? const Icon(Icons.photo_camera_rounded)
                       : const _Starred(Icons.photo_camera_rounded),
                   'Take a photo',
                   _working ? null : _takePhoto,
+                  dim: !plus,
                 ),
                 if (hasBarcodeScanner) ...[
                   const SizedBox(width: 6),
@@ -1022,6 +1024,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     String tooltip,
     VoidCallback? onPressed, {
     bool stop = false,
+    bool dim = false,
   }) {
     // The bar sits at the bottom of the screen, so the tooltips show above
     // the buttons, clear of the phone's navigation bar.
@@ -1031,6 +1034,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
         enabled: onPressed != null,
         shape: const CircleBorder(),
         glow: stop ? AppColors.veryBad : AppColors.primary,
+        dim: dim,
         child: IconButton(
           onPressed: onPressed,
           tooltip: tooltip,
@@ -1048,32 +1052,40 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   }
 
   /// A glossy bubble in the icon tile's colours, with a soft glow; grey
-  /// when disabled.
+  /// when disabled. [dim] takes it down a shade, so a star on it shows.
   Widget _glossy({
     required bool enabled,
     required ShapeBorder shape,
     required Widget child,
     Color? glow,
+    bool dim = false,
   }) {
     final color = glow ?? AppColors.primary;
+    final shade = dim ? 0.15 : 0.0;
     return DecoratedBox(
       decoration: ShapeDecoration(
         shape: shape,
         color: enabled ? null : AppColors.surfaceVariant,
         gradient: !enabled
             ? null
-            : glow == null
-            ? AppColors.primaryGradient
             : LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color.lerp(color, Colors.white, 0.15)!, color],
+                colors: [
+                  for (final c
+                      in glow == null
+                          ? AppColors.primaryGradient.colors
+                          : [Color.lerp(color, Colors.white, 0.15)!, color])
+                    Color.lerp(c, Colors.black, shade)!,
+                ],
               ),
         shadows: !enabled
             ? null
             : [
                 BoxShadow(
-                  color: color.withValues(alpha: AppColors.isDark ? 0.3 : 0.4),
+                  color: color.withValues(
+                    alpha: (AppColors.isDark ? 0.3 : 0.4) * (dim ? 0.6 : 1),
+                  ),
                   blurRadius: 18,
                   offset: const Offset(0, 6),
                 ),
