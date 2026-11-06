@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/debug_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/account/account_settings_screen.dart';
@@ -196,6 +197,11 @@ String? _redirect(Ref ref, GoRouterState state) {
   // No profile or onboarding incomplete — send to onboarding.
   if (!onboardingDone) {
     return location == AppRoutes.onboarding ? null : AppRoutes.onboarding;
+  }
+
+  // Debug tools' preview of onboarding, for a finished account.
+  if (location == AppRoutes.onboarding && ref.read(onboardingPreviewProvider)) {
+    return null;
   }
 
   // 4. Fully set up — bounce off auth / splash / onboarding.

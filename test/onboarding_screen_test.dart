@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
+import 'package:lean_streak/providers/debug_provider.dart';
 import 'package:lean_streak/providers/onboarding_controller.dart';
 import 'package:lean_streak/screens/onboarding/onboarding_screen.dart';
 import 'package:lean_streak/widgets/health_plan_preview_card.dart';
@@ -232,6 +233,61 @@ void main() {
     await tester.tap(find.text('Back to sign in'));
     await tester.pumpAndSettle();
     expect(auth.signOuts, 1);
+  });
+
+  testWidgets('Debug tools\' preview: Back on the first card and Start go '
+      'back without saving or signing out', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    onboarding = _FakeOnboardingController();
+    auth = _FakeAuthController();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          onboardingControllerProvider.overrideWith(() => onboarding),
+          authControllerProvider.overrideWith(() => auth),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const Scaffold(body: Text('Debug tools')),
+        ),
+      ),
+    );
+    final debug = tester.element(find.text('Debug tools'));
+    final container = ProviderScope.containerOf(debug);
+    Future<void> open() async {
+      container.read(onboardingPreviewProvider.notifier).state = true;
+      Navigator.of(
+        debug,
+      ).push(MaterialPageRoute<void>(builder: (_) => const OnboardingScreen()));
+      await tester.pumpAndSettle();
+    }
+
+    await open();
+    expect(find.text('Back to sign in'), findsNothing);
+    await tester.tap(find.text('Back'));
+    await tester.pumpAndSettle();
+    expect(find.text('Debug tools'), findsOneWidget);
+    expect(auth.signOuts, 0);
+    expect(container.read(onboardingPreviewProvider), isFalse);
+
+    await open();
+    await answerAboutYou(tester);
+    await next(tester);
+    await type(tester, '70');
+    await next(tester);
+    await tester.tap(find.text('On feet often'));
+    await tester.pump();
+    await next(tester);
+    await tester.tap(find.text('1 to 2 sessions/week'));
+    await tester.pump();
+    await next(tester);
+    await tester.tap(find.text('Start'));
+    await tester.pumpAndSettle();
+    expect(find.text('Debug tools'), findsOneWidget);
+    expect(onboarding.submitted, isEmpty);
+    expect(container.read(onboardingPreviewProvider), isFalse);
   });
 
   test('the country from the phone\'s region', () {

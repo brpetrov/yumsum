@@ -71,3 +71,8 @@ final debugAccountProvider =
     NotifierProvider<DebugAccountNotifier, DebugAccount>(
       DebugAccountNotifier.new,
     );
+
+/// Debug tools "Go through onboarding again": while on, the router lets a
+/// finished account open onboarding, and Start or Back on its first card
+/// goes back to Debug tools without saving anything.
+final onboardingPreviewProvider = StateProvider<bool>((ref) => false);

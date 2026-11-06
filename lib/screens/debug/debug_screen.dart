@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/debug_provider.dart';
@@ -95,6 +97,22 @@ class DebugScreen extends ConsumerWidget {
                   'switches the Adaptive formula off and drops its '
                   'adjustment.',
                   style: muted,
+                ),
+                const SizedBox(height: 24),
+                const _Label('ONBOARDING'),
+                Text(
+                  'The questions a new account answers before Home. Nothing '
+                  'you enter is saved.',
+                  style: muted,
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    ref.read(onboardingPreviewProvider.notifier).state = true;
+                    context.push(AppRoutes.onboarding);
+                  },
+                  icon: const Icon(Icons.play_arrow_rounded),
+                  label: const Text('Go through onboarding again'),
                 ),
                 const SizedBox(height: 24),
                 const _Label('ONE-TIME PROMPTS'),

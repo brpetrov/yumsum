@@ -7,6 +7,7 @@ import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
+import 'package:lean_streak/providers/debug_provider.dart';
 import 'package:lean_streak/providers/onboarding_controller.dart';
 import 'package:lean_streak/widgets/health_plan_preview_card.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
@@ -165,14 +166,31 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   void _back() {
     if (_index == 0) {
-      ref.read(authControllerProvider.notifier).signOut();
+      if (_inPreview) {
+        _leavePreview();
+      } else {
+        ref.read(authControllerProvider.notifier).signOut();
+      }
       return;
     }
     FocusScope.of(context).unfocus();
     setState(() => _index--);
   }
 
+  /// Debug tools' preview: nothing is saved, and Start or Back on the
+  /// first card goes back to Debug tools.
+  bool get _inPreview => ref.read(onboardingPreviewProvider);
+
+  void _leavePreview() {
+    ref.read(onboardingPreviewProvider.notifier).state = false;
+    Navigator.of(context).pop();
+  }
+
   Future<void> _submit() async {
+    if (_inPreview) {
+      _leavePreview();
+      return;
+    }
     await ref
         .read(onboardingControllerProvider.notifier)
         .submit(
@@ -384,6 +402,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
     final isLoading = ref.watch(onboardingControllerProvider).isLoading;
     final isSigningOut = ref.watch(authControllerProvider).isLoading;
+    final inPreview = ref.watch(onboardingPreviewProvider);
     final steps = _steps;
     final step = steps[_index];
     final last = _index == steps.length - 1;
@@ -416,7 +435,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       onPressed: isLoading || isSigningOut ? null : _back,
                       icon: const Icon(Icons.arrow_back_rounded),
                       label: Text(
-                        _index > 0
+                        _index > 0 || inPreview
                             ? 'Back'
                             : isSigningOut
                             ? 'Signing out...'

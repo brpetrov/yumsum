@@ -97,6 +97,7 @@ The paid tier (plan 06; the code says `plus`).
 - **Debug tools** (`/debug`, `DebugScreen`), in debug builds and for dev accounts in any build:
   - the User ID to copy;
   - "Pretend to be" (`debugAccountProvider`): free, subscribed, trial, ended or admin, on that device. A pretend account is real enough to change the Adaptive formula on the real plan. The AI functions read only the real record, so AI estimates ask for macros only when it has YumSum Star too (`aiMacrosProvider`), and AI Coach needs it on the real record.
+  - "Go through onboarding again": the set-up questions as a preview over Debug tools (see Onboarding), and "Show the YumSum Star card again".
 
 ## Plan, weight and the trend
 
@@ -105,7 +106,7 @@ The paid tier (plan 06; the code says `plus`).
 - Stored plans are recalculated at startup by `activityScaleMigrationProvider` when a profile's `planCalculationVersion` or `activityScaleVersion` is behind the constants in `lib/models/user_profile.dart`.
 - **The trend** (free): `weightTrend` in `lib/helpers/weight_trend.dart`, an exponentially smoothed average (0.9 a day, allowing for gaps). A weigh-in more than 3% off the trend is set aside unless the next one agrees. Weight & Progress draws the weigh-ins as dots (hollow when set aside) under the trend line.
 - Onboarding and Plan Settings accept ages 18–120, matching the legal pages.
-- **Onboarding** (`OnboardingScreen`) asks one question per card, with a progress bar, Back and Next (Next stays off until the answer is valid): name, sex, age, height, current weight, the goal (Lose weight or Keep my weight, with one line on what a calorie is), the target weight (only when losing), daily movement, training, then "Your plan is ready" with the plan and Start. It doesn't ask the pace (moderate), protein (on), usual food (blank) or the country, which comes from the phone's region (`countryNameFor` in `lib/models/user_profile.dart`: a name for the countries it knows, else the region code, else the UK); the last card says Plan Settings changes all of these. Back on the first card signs out.
+- **Onboarding** (`OnboardingScreen`) asks one question per card, with a progress bar, Back and Next (Next stays off until the answer is valid): name, sex, age, height, current weight, the goal (Lose weight or Keep my weight, with one line on what a calorie is), the target weight (only when losing), daily movement, training, then "Your plan is ready" with the plan and Start. It doesn't ask the pace (moderate), protein (on), usual food (blank) or the country, which comes from the phone's region (`countryNameFor` in `lib/models/user_profile.dart`: a name for the countries it knows, else the region code, else the UK); the last card says Plan Settings changes all of these. Back on the first card signs out. Debug tools can open it again as a preview (`onboardingPreviewProvider`): the router lets a finished account in, and Start or Back on the first card goes back to Debug tools, saving nothing.
 
 ## Protein
 
