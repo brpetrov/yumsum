@@ -34,20 +34,22 @@ final mealCameraProvider =
       Future<MealCapture?> Function(BuildContext context, CameraMode mode)
     >((ref) => openMealCamera);
 
-/// Only phones read barcodes: the scanner runs on the device, and the
-/// browser can't run it.
-bool get hasBarcodeScanner =>
-    !kIsWeb &&
-    (defaultTargetPlatform == TargetPlatform.android ||
-        defaultTargetPlatform == TargetPlatform.iOS);
+/// Phones get the live camera page, in the app or a browser; a desktop,
+/// where nobody holds a plate up to the webcam, picks a photo file.
+bool get hasLiveCamera =>
+    defaultTargetPlatform == TargetPlatform.android ||
+    defaultTargetPlatform == TargetPlatform.iOS;
 
-/// Phones get the live camera; elsewhere a file picker chooses a photo,
-/// resized so the upload stays small (and the AI bill tiny).
+/// Only the app reads barcodes: the scanner runs on the phone, and a
+/// browser can't run it.
+bool get hasBarcodeScanner => !kIsWeb && hasLiveCamera;
+
+/// Phones get the live camera; elsewhere [pickMealPhoto].
 Future<MealCapture?> openMealCamera(
   BuildContext context,
   CameraMode mode,
 ) async {
-  if (hasBarcodeScanner) {
+  if (hasLiveCamera) {
     return Navigator.of(context).push<MealCapture>(
       MaterialPageRoute(
         fullscreenDialog: true,
@@ -65,6 +67,12 @@ Future<MealCapture?> openMealCamera(
       ),
     );
   }
+  return pickMealPhoto();
+}
+
+/// A photo chosen from the device's files, resized so the upload stays
+/// small (and the AI bill tiny).
+Future<MealCapture?> pickMealPhoto() async {
   final photo = await ImagePicker().pickImage(
     source: ImageSource.gallery,
     maxWidth: 1024,

@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
@@ -8,8 +7,8 @@ import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 
-/// The bar's camera on phones, in one of two modes. Resolves to what it
-/// got, or null when closed.
+/// The bar's camera on phones, in the app or a browser, in one of two
+/// modes. Resolves to what it got, or null when closed.
 class MealCameraPage extends StatefulWidget {
   /// A live picture that picks up a packet's barcode by itself; nothing
   /// to press.
@@ -34,14 +33,17 @@ class _MealCameraPageState extends State<MealCameraPage>
     DeviceOrientation.landscapeRight: 270,
   };
 
-  final _scanner = BarcodeScanner(
-    formats: const [
-      BarcodeFormat.ean13,
-      BarcodeFormat.ean8,
-      BarcodeFormat.upca,
-      BarcodeFormat.upce,
-    ],
-  );
+  /// The on-device barcode reader; the browser has none.
+  final BarcodeScanner? _scanner = hasBarcodeScanner
+      ? BarcodeScanner(
+          formats: const [
+            BarcodeFormat.ean13,
+            BarcodeFormat.ean8,
+            BarcodeFormat.upca,
+            BarcodeFormat.upce,
+          ],
+        )
+      : null;
   CameraController? _camera;
   bool _reading = false;
   bool _done = false;
@@ -55,16 +57,18 @@ class _MealCameraPageState extends State<MealCameraPage>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     // A sideways phone would squash the portrait preview box.
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    if (!kIsWeb) {
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    }
     _start();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    SystemChrome.setPreferredOrientations(const []);
+    if (!kIsWeb) SystemChrome.setPreferredOrientations(const []);
     _release();
-    _scanner.close();
+    _scanner?.close();
     super.dispose();
   }
 
@@ -94,6 +98,13 @@ class _MealCameraPageState extends State<MealCameraPage>
   void _retry() {
     setState(() => _problem = null);
     _start();
+  }
+
+  /// In a browser whose camera won't start: a photo from the device's
+  /// files instead.
+  Future<void> _pickInstead() async {
+    final capture = await pickMealPhoto();
+    if (capture != null) _leave(capture);
   }
 
   /// The camera is let go while the app is in the background and picked up
@@ -131,7 +142,7 @@ class _MealCameraPageState extends State<MealCameraPage>
         // 720p: sharp enough for barcodes and for the AI, small to upload.
         ResolutionPreset.high,
         enableAudio: false,
-        imageFormatGroup: Platform.isAndroid
+        imageFormatGroup: defaultTargetPlatform == TargetPlatform.android
             ? ImageFormatGroup.nv21
             : ImageFormatGroup.bgra8888,
       );
@@ -141,7 +152,9 @@ class _MealCameraPageState extends State<MealCameraPage>
         _letGo(camera);
         return;
       }
-      if (_scanning) await camera.startImageStream(_onFrame);
+      if (_scanning && _scanner != null) {
+        await camera.startImageStream(_onFrame);
+      }
       setState(() {});
     } on CameraException catch (error) {
       final failed = _camera;
@@ -149,10 +162,12 @@ class _MealCameraPageState extends State<MealCameraPage>
       _letGo(failed);
       if (!mounted) return;
       setState(
-        () => _problem = error.code.startsWith('CameraAccess')
-            ? 'Allow camera access to scan barcodes and take photos. If '
-                  'you said no before, turn it on in your phone\'s Settings.'
-            : 'The camera could not start.',
+        () => _problem = !error.code.startsWith('CameraAccess')
+            ? 'The camera could not start.'
+            : kIsWeb
+            ? 'Allow camera access in your browser to take photos.'
+            : 'Allow camera access to scan barcodes and take photos. If '
+                  'you said no before, turn it on in your phone\'s Settings.',
       );
     }
   }
@@ -165,7 +180,7 @@ class _MealCameraPageState extends State<MealCameraPage>
     if (image == null) return;
     _reading = true;
     try {
-      final barcodes = await _scanner.processImage(image);
+      final barcodes = await _scanner!.processImage(image);
       final code = barcodes.map((barcode) => barcode.rawValue).nonNulls;
       if (code.isNotEmpty && !_done) {
         _done = true;
@@ -185,7 +200,7 @@ class _MealCameraPageState extends State<MealCameraPage>
     final camera = _camera;
     if (camera == null || frame.planes.length != 1) return null;
     final sensor = camera.description.sensorOrientation;
-    final degrees = Platform.isAndroid
+    final degrees = defaultTargetPlatform == TargetPlatform.android
         ? (sensor -
                   (_orientationDegrees[camera.value.deviceOrientation] ?? 0) +
                   360) %
@@ -259,14 +274,23 @@ class _MealCameraPageState extends State<MealCameraPage>
           fit: StackFit.expand,
           children: [
             if (ready)
-              // The preview size is landscape; fill the portrait screen.
               FittedBox(
                 fit: BoxFit.cover,
-                child: SizedBox(
-                  width: camera.value.previewSize!.height,
-                  height: camera.value.previewSize!.width,
-                  child: CameraPreview(camera),
-                ),
+                child: kIsWeb
+                    // The browser turns the picture the way the phone is
+                    // held, so its size is the picture's own.
+                    ? SizedBox(
+                        width: camera.value.previewSize!.width,
+                        height: camera.value.previewSize!.height,
+                        child: camera.buildPreview(),
+                      )
+                    // The preview size is landscape; fill the portrait
+                    // screen.
+                    : SizedBox(
+                        width: camera.value.previewSize!.height,
+                        height: camera.value.previewSize!.width,
+                        child: CameraPreview(camera),
+                      ),
               )
             else
               Center(
@@ -294,6 +318,16 @@ class _MealCameraPageState extends State<MealCameraPage>
                               ),
                               child: const Text('Try again'),
                             ),
+                            if (kIsWeb && !_scanning) ...[
+                              const SizedBox(height: 8),
+                              TextButton(
+                                onPressed: _pickInstead,
+                                style: TextButton.styleFrom(
+                                  foregroundColor: white,
+                                ),
+                                child: const Text('Choose a photo instead'),
+                              ),
+                            ],
                           ],
                         ),
                       ),

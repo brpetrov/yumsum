@@ -269,7 +269,7 @@ void main() {
       expect(find.text('Detects your patterns'), findsOneWidget);
       expect(find.text('Fresh every Monday'), findsOneWidget);
       expect(find.text('Close'), findsOneWidget);
-      expect(find.text('Enable'), findsNothing);
+      expect(find.text('Become a Star'), findsNothing);
     });
 
     testWidgets('a thin week says why, and never asks for notes', (
@@ -404,7 +404,9 @@ void main() {
   });
 
   group('without YumSum Star', () {
-    testWidgets('what it does, and Enable opens the paywall', (tester) async {
+    testWidgets('what it does, and Become a Star opens the paywall', (
+      tester,
+    ) async {
       await pump(tester, entitlement: null);
       expect(_coach, findsOneWidget);
       expect(find.text(coachSubtitle), findsOneWidget);
@@ -416,9 +418,9 @@ void main() {
       expect(find.byTooltip('Previous'), findsNothing);
       expect(reads, 0);
 
-      await tester.ensureVisible(find.text('Enable'));
+      await tester.ensureVisible(find.text('Become a Star'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Enable'));
+      await tester.tap(find.text('Become a Star'));
       await tester.pumpAndSettle();
       expect(find.text('The paywall'), findsOneWidget);
     });
@@ -430,7 +432,7 @@ void main() {
       expiresAt: _days(DateTime.now(), -3),
     );
 
-    testWidgets('once it has ended, the notes stay, with Enable', (
+    testWidgets('once it has ended, the notes stay, with Become a Star', (
       tester,
     ) async {
       await pump(tester, entitlement: ended, kept: true);
@@ -445,7 +447,7 @@ void main() {
       expect(find.text('Weekends run high'), findsOneWidget);
       expect(find.byTooltip('How it works'), findsNothing);
 
-      await tester.tap(find.text('Enable'));
+      await tester.tap(find.text('Become a Star'));
       await tester.pumpAndSettle();
       expect(find.text('The paywall'), findsOneWidget);
     });

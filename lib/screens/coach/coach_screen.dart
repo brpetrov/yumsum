@@ -90,7 +90,7 @@ Future<void> showCoachIntro(BuildContext context) => showDialog<void>(
 /// on it, paging back through the finished weeks since YumSum Star began.
 /// Only the latest finished week is ever written; the others show what was
 /// saved. Someone whose YumSum Star has ended keeps their notes; anyone
-/// else without it gets what it does and Enable. [week] is a Monday as
+/// else without it gets what it does and Become a Star. [week] is a Monday as
 /// `yyyy-MM-dd`; anything else, or a week still going, opens the latest
 /// finished week.
 class CoachScreen extends ConsumerStatefulWidget {
@@ -331,7 +331,8 @@ class _FirstNotes extends StatelessWidget {
   }
 }
 
-/// Once YumSum Star has ended: the notes stay, and Enable brings new ones.
+/// Once YumSum Star has ended: the notes stay, and Become a Star brings new
+/// ones.
 class _Ended extends StatelessWidget {
   const _Ended();
 
@@ -356,7 +357,7 @@ class _Ended extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: () => showPlusPaywall(context),
               icon: const PlusStar(size: 22),
-              label: const Text('Enable'),
+              label: const Text('Become a Star'),
             ),
           ),
         ],
@@ -365,7 +366,7 @@ class _Ended extends StatelessWidget {
   }
 }
 
-/// For people without YumSum Star: what AI Coach does, and Enable.
+/// For people without YumSum Star: what AI Coach does, and Become a Star.
 class _CoachPitch extends StatelessWidget {
   const _CoachPitch();
 
@@ -375,7 +376,7 @@ class _CoachPitch extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 4),
-        // Small enough for Enable to be on screen on a phone.
+        // Small enough for Become a Star to be on screen on a phone.
         const Center(child: _CoachImage(width: 156)),
         const SizedBox(height: 16),
         Text(
@@ -405,7 +406,7 @@ class _CoachPitch extends StatelessWidget {
           child: FilledButton.icon(
             onPressed: () => showPlusPaywall(context),
             icon: const PlusStar(size: 24),
-            label: const Text('Enable'),
+            label: const Text('Become a Star'),
           ),
         ),
       ],

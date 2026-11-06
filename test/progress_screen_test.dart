@@ -141,9 +141,9 @@ void main() {
     await tester.tap(find.text('Adaptive formula'));
     await tester.pumpAndSettle();
     expect(find.text(adaptiveSubtitle), findsOneWidget);
-    expect(find.text('Enable'), findsOneWidget);
-    expect(find.text('Close'), findsOneWidget);
-    expect(find.text('Log weight now'), findsNothing);
+    expect(find.text('Become a Star'), findsOneWidget);
+    expect(find.text('Maybe later'), findsOneWidget);
+    expect(find.text('Log my weight'), findsNothing);
   });
 
   testWidgets('with YumSum Star it is on: what you burn and your target', (
@@ -167,8 +167,8 @@ void main() {
     await tester.ensureVisible(find.byTooltip('How it works'));
     await tester.tap(find.byTooltip('How it works'));
     await tester.pumpAndSettle();
-    expect(find.text('Log weight now'), findsOneWidget);
-    expect(find.text('Enable'), findsNothing);
+    expect(find.text('Log my weight'), findsOneWidget);
+    expect(find.text('Become a Star'), findsNothing);
   });
 
   testWidgets('a new member\'s burn is a first estimate', (tester) async {

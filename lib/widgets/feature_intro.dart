@@ -7,7 +7,8 @@ import 'package:lean_streak/widgets/shine.dart';
 
 /// For free users: a YumSum Star feature's name as the button, a warm
 /// orange pill with a soft glow under it and a [Shine] across it when it
-/// appears, asking to be tapped. The star waits in the dialog's Enable.
+/// appears, asking to be tapped. The star waits in the dialog's Become a
+/// Star.
 /// The Adaptive formula and AI Coach use it.
 class TryButton extends StatelessWidget {
   const TryButton({super.key, required this.label, required this.onTap});

@@ -64,7 +64,7 @@ export const limits: Record<Use, { field: string; perDay: number }> = {
 /** One call to Gemini, and what it needs before it's made. */
 export interface Ask {
   use: Use;
-  /** Whether it needs YumSum Star: macros, or AI Coach. */
+  /** Whether it needs YumSum Star: macros, a photo (Smart Snap), or AI Coach. */
   star: boolean;
   contents: ContentListUnion;
   config: GenerateContentConfig;
@@ -128,9 +128,13 @@ export function estimateAsk(raw: unknown): Ask {
         withMedia(voicePrompt(profile, macros), [media(data.audio, "audio/wav", maxAudioBytes)]),
       );
     case "photo":
-      return estimate(
-        withMedia(photoPrompt(profile, macros), [media(data.photo, "image/jpeg", maxPhotoBytes)]),
-      );
+      return {
+        ...estimate(
+          withMedia(photoPrompt(profile, macros), [media(data.photo, "image/jpeg", maxPhotoBytes)]),
+        ),
+        // Smart Snap is YumSum Star only, whatever the app says about macros.
+        star: true,
+      };
     case "label": {
       const front = data.front == null
         ? []

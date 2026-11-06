@@ -17,6 +17,7 @@ import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/recipe_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
@@ -25,6 +26,7 @@ import 'package:lean_streak/screens/dashboard/helpers/quick_log_bar.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/services/food_contribution_service.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
+import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:record/record.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -274,6 +276,7 @@ void main() {
     String? barcode,
     int aiUsed = 0,
     bool trackProtein = true,
+    bool plus = true,
   }) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
@@ -327,6 +330,7 @@ void main() {
           ];
         }),
         sharedPreferencesProvider.overrideWithValue(prefs),
+        plusProvider.overrideWithValue(plus),
       ],
     );
     addTearDown(container.dispose);
@@ -581,12 +585,37 @@ void main() {
 
   testWidgets('a meal photo goes to the AI', (tester) async {
     await pumpCard(tester);
+    expect(find.byType(PlusStar), findsNothing);
     await tester.tap(find.byTooltip('Take a photo'));
     await tester.pumpAndSettle();
     expect(cameraModes, [CameraMode.photo]);
     expect(foodLookup.lastBarcode, isNull);
     expect(estimateService.photoCalls, 1);
     expect(boxes(tester), ['Musaka', '640', '28']);
+  });
+
+  testWidgets('without YumSum Star the photo button wears a star and sells '
+      'Smart Snap instead of opening the camera', (tester) async {
+    await pumpCard(tester, plus: false);
+    expect(
+      find.descendant(
+        of: find.byTooltip('Take a photo'),
+        matching: find.byType(PlusStar),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byTooltip('Take a photo'));
+    await tester.pumpAndSettle();
+    expect(cameraModes, isEmpty);
+    expect(find.text('Smart Snap'), findsOneWidget);
+    expect(find.text('Point, snap, done'), findsOneWidget);
+    expect(find.text('Become a Star'), findsOneWidget);
+
+    await tester.tap(find.text('Maybe later'));
+    await tester.pumpAndSettle();
+    expect(find.text('Smart Snap'), findsNothing);
+    expect(estimateService.photoCalls, 0);
   });
 
   testWidgets('a missing product can be contributed, then logged', (

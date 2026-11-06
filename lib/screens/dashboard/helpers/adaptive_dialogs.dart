@@ -11,60 +11,63 @@ import 'package:lean_streak/widgets/plus_mark.dart';
 const adaptiveIntroShownKey = 'adaptive.intro_shown';
 const adaptiveLapseNoticeKey = 'adaptive.lapse_notice';
 
-/// The Adaptive formula in one line, under its name in the dialog.
+/// The Adaptive formula dialog's title and the line under it.
+const adaptiveTitle = 'Your calories, personalised';
 const adaptiveSubtitle =
-    'A smarter calorie estimation formula, tailored to your body and adjusted '
-    'weekly as it learns what you burn.';
+    'Feel more confident about how much to eat, with a smart formula that '
+    'adapts to you every week.';
 
 /// Sells the Adaptive formula: once after subscribing, and from Plan
-/// Settings and Weight & Progress. With YumSum
-/// Star ([plus]) its button opens the weigh-in dialog, since weigh-ins are
-/// what it learns from; without, Enable opens the YumSum Star page.
+/// Settings and Weight & Progress. With YumSum Star ([plus]) its button
+/// opens the weigh-in dialog, since weigh-ins are what it learns from;
+/// without, Become a Star opens the YumSum Star page.
 Future<void> showAdaptiveIntro(BuildContext context, {bool plus = true}) async {
   final go = await showDialog<bool>(
     context: context,
     builder: (context) => FeatureIntroDialog(
-      title: 'Adaptive formula',
+      title: adaptiveTitle,
       subtitle: adaptiveSubtitle,
       promises: const [
         (
           Icons.insights_rounded,
-          'Measures what you burn',
-          'A formula can only guess. This measures what your body really '
-              'burns, from your weigh-ins and what you eat.',
+          'Understand what you burn',
+          'Your food logs and weight trends help estimate your daily '
+              'calorie burn, taking the guesswork out of your target.',
         ),
         (
           Icons.tune_rounded,
-          'Tailored to you',
-          'A target built around your body and your habits, not the '
-              'average person.',
+          'Built around your body',
+          'Get a target shaped by how your body actually responds, helping '
+              'you find what works for you.',
         ),
         (
           Icons.trending_down_rounded,
-          'Keeps you moving',
-          'If your weight stalls, your target adjusts so you keep losing.',
+          'Stay on track as you change',
+          'Your calorie needs can change as you lose weight. Your target '
+              'adjusts to help you keep making progress.',
         ),
         (
           Icons.monitor_weight_outlined,
-          'Learns as you go',
-          'The more you weigh in, the smarter it gets. Daily is best.',
+          'Make every weigh-in count',
+          'Each weigh-in adds to the picture. Consistent logging helps '
+              'fine-tune your target over time.',
         ),
       ],
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('Close'),
+          child: const Text('Maybe later'),
         ),
         if (plus)
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Log weight now'),
+            child: const Text('Log my weight'),
           )
         else
           FilledButton.icon(
             onPressed: () => Navigator.of(context).pop(true),
             icon: const PlusStar(size: 24),
-            label: const Text('Enable'),
+            label: const Text('Become a Star'),
           ),
       ],
     ),

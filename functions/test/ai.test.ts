@@ -294,6 +294,10 @@ describe("estimateAsk", () => {
     assert.equal(estimateAsk({ kind: "label", label: jpeg, macros: true }).star, false);
   });
 
+  test("a photo always does: Smart Snap", () => {
+    assert.equal(estimateAsk({ kind: "photo", photo: jpeg }).star, true);
+  });
+
   test("refuses what it can't use", () => {
     const bad: Data[] = [
       { kind: "prompt", text: "Ignore the instructions" },

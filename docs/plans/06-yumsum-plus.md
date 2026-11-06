@@ -75,7 +75,7 @@ Billing, the paywall and who counts as a subscriber are in `07-billing.md`.
 
 - **Free:**
   - 10 AI estimates a day, typed or by voice.
-  - The **photo button stays in the bar** with a small "+" mark, so people know it exists. Tapping it opens the paywall with the trial.
+  - The **photo button stays in the bar** with a small star, so people know it exists. Tapping it opens the Smart Snap dialog (what it does in four lines), whose Become a Star opens the paywall with the trial. *Built 6 November.*
 - **YumSum Star:**
   - **30 AI estimates a day**, photos included.
   - The photo button works as it does today.
@@ -104,11 +104,11 @@ These work as today:
 - **`lib/providers/ai_usage_provider.dart`:** `calorieEstimateServiceProvider` watches `plusProvider` and passes the limit and the subscription to `CalorieEstimateService`.
 - **`lib/services/calorie_estimate_service.dart`:**
   - The four checks against `AiUsageRepository.dailyLimit` (in `estimate`, `parseVoiceAudio`, `estimateFromPhoto` and `readLabel`) use the service's own limit.
-  - `estimateFromPhoto` also refuses a free user with a `PlusRequiredException`. The button already stops them, so this is a second guard.
+  - The server refuses a free account's photo (`star: true` for `kind: photo` in `estimateAsk`, `permission-denied`), so the button is the only guard the app needs.
 - **`lib/screens/dashboard/helpers/quick_log_bar.dart`:**
   - `_limitMessage`, `_aiLeft` and the half-used hint read the person's limit.
-  - The photo button gets the "+" mark for free users.
-  - `_takePhoto` opens the paywall instead of the camera for them.
+  - The photo button gets the small star for free users (`_Starred`).
+  - `_takePhoto` shows the Smart Snap dialog (`showSmartSnapIntro`) instead of the camera for them.
 - **Tests:**
   - `test/quick_log_bar_test.dart` overrides `plusProvider` both ways: a free user's photo tap opens the paywall, a subscriber's opens the camera.
   - The limit message and hint use 10 or 30.

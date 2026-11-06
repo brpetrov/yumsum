@@ -19,6 +19,7 @@ import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/recipe_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/repositories/ai_usage_repository.dart';
@@ -26,9 +27,11 @@ import 'package:lean_streak/screens/dashboard/helpers/contribute_sheet.dart';
 import 'package:lean_streak/screens/dashboard/helpers/food_search_sheet.dart';
 import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 import 'package:lean_streak/screens/dashboard/helpers/portion_sheet.dart';
+import 'package:lean_streak/screens/dashboard/helpers/smart_snap_dialog.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
 import 'package:lean_streak/widgets/estimate_breakdown.dart';
+import 'package:lean_streak/widgets/plus_mark.dart';
 
 /// The microphone behind the bar's mic button; overridable in tests.
 final audioRecorderProvider = Provider<AudioRecorder>((ref) {
@@ -452,10 +455,15 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     }
   }
 
-  /// A photo of the plate goes to the AI.
+  /// A photo of the plate goes to the AI: Smart Snap, YumSum Star only.
+  /// Without it, the dialog that sells it.
   Future<void> _takePhoto() async {
     final uid = ref.read(currentUidProvider);
     if (uid == null) return;
+    if (!ref.read(plusProvider)) {
+      await showSmartSnapIntro(context);
+      return;
+    }
     final capture = await ref.read(mealCameraProvider)(
       context,
       CameraMode.photo,
@@ -933,7 +941,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
               mainAxisSize: MainAxisSize.min,
               children: [
                 _circle(
-                  const Icon(Icons.photo_camera_rounded),
+                  ref.watch(plusProvider)
+                      ? const Icon(Icons.photo_camera_rounded)
+                      : const _Starred(Icons.photo_camera_rounded),
                   'Take a photo',
                   _working ? null : _takePhoto,
                 ),
@@ -1117,4 +1127,21 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       ),
     );
   }
+}
+
+/// [icon] with a small star at its corner: a YumSum Star feature, shown to
+/// people without it so they know it exists.
+class _Starred extends StatelessWidget {
+  const _Starred(this.icon);
+
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) => Stack(
+    clipBehavior: Clip.none,
+    children: [
+      Icon(icon),
+      const Positioned(right: -9, top: -9, child: PlusStar(size: 16)),
+    ],
+  );
 }

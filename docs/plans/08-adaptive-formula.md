@@ -354,7 +354,7 @@ A dialog titled **Adaptive formula**, subtitled *A target that learns from you*.
 - (trend) **Keeps you moving.** If your weight stalls, your target adjusts so you keep losing.
 - (scale) **Learns as you go.** The more you weigh in, the smarter it gets. Daily is best.
 
-*Reworded 5 November, at your request; the last line is unchanged. Changed 6 November: the subtitle is "A smarter calorie target, tailored to your body and adjusted week by week as it learns what you burn.", the first promise "Measures what you burn: A formula can only guess. This measures what your body really burns, from your weigh-ins and what you eat." and the second's line ends "not the average person."*
+*Reworded 5 November, at your request; the last line is unchanged. Changed 6 November: the subtitle is "A smarter calorie target, tailored to your body and adjusted week by week as it learns what you burn.", the first promise "Measures what you burn: A formula can only guess. This measures what your body really burns, from your weigh-ins and what you eat." and the second's line ends "not the average person." Changed again later that day, to the owner's copy: titled "Your calories, personalised" over "Feel more confident about how much to eat, with a smart formula that adapts to you every week.", with Understand what you burn, Built around your body, Stay on track as you change and Make every weigh-in count; the buttons are Maybe later and Log my weight, or Become a Star without YumSum Star (Enable is gone everywhere).*
 
 Buttons: **Close** and **Log weight now**, which opens the weigh-in dialog (`logWeightWithFeedback`), since weigh-ins are what it learns from.
 
@@ -380,7 +380,7 @@ The YumSum Star page says: "Adaptive Formula: Learns your real burn and tunes yo
 - The weigh-ins are the dots: hollow when set aside.
 - Under the chart, in its card, the Adaptive formula (no switch; it sells itself).
   - With YumSum Star: the title with a shining green "On" chip and the info button on the right, then "You burn 2440 kcal a day" (learnt from your weigh-ins and meals) and "Your target is 1620 kcal a day" (to lose 0.75 kg a week), then how well it knows you and this week's line.
-  - Free users: the name itself is a shining orange button with an arrow, over "A customised formula tailored just for you. Adapting with time and your weigh-ins." It opens the dialog, whose primary button is Enable, with the star.
+  - Free users: the name itself is a shining orange button with an arrow, over "A customised formula tailored just for you. Adapting with time and your weigh-ins." It opens the dialog, whose primary button is Become a Star, with the star.
   - The trend caption that was here is gone.
 
 ## What gets built

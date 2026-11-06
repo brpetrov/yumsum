@@ -96,7 +96,7 @@ The Adaptive formula's pattern, since it works:
 
   - Reworded on 5 November, at your request.
   - Rewritten on 4 November: each line now sells the feature in a full sentence, instead of finishing its headline ("3 short notes on the week just gone"). The third row was "One easy tip" before the notes gave several ways to improve (see The instruction).
-  - Free: Close and Enable with the star, which opens the paywall. YumSum Star: Close only.
+  - Free: Close and Become a Star with the star, which opens the paywall. YumSum Star: Close only.
 - **The YumSum Star page** says "AI Coach" with "Reads your week and tells you how to do better." (changed 4 November from "Spots your patterns every Monday."; it stays one line so the buy button stays in view on a phone) instead of "AI Assisted Coach" and "Weekly and monthly reviews, with advice." Monthly reviews are only a Later idea.
 - **No pop-up on Today** for free users.
 
@@ -396,7 +396,7 @@ Then check that the Play Data safety answers still match (plan 04).
   - The instruction mentions the minimum, medical advice and days off.
 - **`test/weekly_notes_test.dart` (new, widgets):**
   - With YumSum Star, the notes and footer show.
-  - A free user gets the AI Coach button; a tap opens the dialog, and Enable opens the paywall. A member's info button opens it with Close only.
+  - A free user gets the AI Coach button; a tap opens the dialog, and Become a Star opens the paywall. A member's info button opens it with Close only.
   - A thin week shows the line, and `weeklyReviewProvider` is never read (count the calls in the override).
   - An error shows the copy, and Try again reads again.
   - Today's line: shown with YumSum Star and 4 judged days last week, hidden once `weekly_review.seen` is last Monday, hidden for free users.

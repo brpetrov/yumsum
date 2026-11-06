@@ -279,7 +279,7 @@ void main() {
       await pumpToday(tester, profile: adapted('learning'), saved: const {});
       expect(find.text(adaptiveSubtitle), findsOneWidget);
       expect(prefs.getBool(adaptiveIntroShownKey), isTrue);
-      await tester.tap(find.text('Close'));
+      await tester.tap(find.text('Maybe later'));
       await tester.pumpAndSettle();
       expect(find.text(adaptiveSubtitle), findsNothing);
     });
@@ -299,9 +299,9 @@ void main() {
       expect(find.text(adaptiveSubtitle), findsNothing);
     });
 
-    testWidgets('"Log weight now" opens the weigh-in dialog', (tester) async {
+    testWidgets('"Log my weight" opens the weigh-in dialog', (tester) async {
       await pumpToday(tester, profile: adapted('learning'), saved: const {});
-      await tester.tap(find.text('Log weight now'));
+      await tester.tap(find.text('Log my weight'));
       await tester.pumpAndSettle();
       expect(find.text('Log your weight'), findsOneWidget);
     });
