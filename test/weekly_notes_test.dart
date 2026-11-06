@@ -84,6 +84,30 @@ void main() {
       expect(find.text('Home'), findsOneWidget);
     });
 
+    testWidgets('a week before YumSum Star began gets no card', (tester) async {
+      await pump(
+        tester,
+        WeeklyNotesCard(monday: _monday),
+        entitlement: Entitlement(
+          active: true,
+          source: EntitlementSource.play,
+          startedAt: DateTime(2026, 11, 4),
+        ),
+      );
+      expect(find.text('AI Coach'), findsNothing);
+
+      await pump(
+        tester,
+        WeeklyNotesCard(monday: DateTime(2026, 11, 2)),
+        entitlement: Entitlement(
+          active: true,
+          source: EntitlementSource.play,
+          startedAt: DateTime(2026, 11, 4),
+        ),
+      );
+      expect(find.text('AI Coach'), findsOneWidget);
+    });
+
     testWidgets('in the month view it says which week', (tester) async {
       await pump(tester, WeeklyNotesCard(monday: _monday, named: true));
       expect(find.text('Week of 26 October'), findsOneWidget);

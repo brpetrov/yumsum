@@ -6,6 +6,7 @@ import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
+import 'package:lean_streak/providers/weekly_review_provider.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/widgets/feature_intro.dart';
@@ -15,8 +16,10 @@ final _dateKey = DateFormat('yyyy-MM-dd');
 
 /// AI Coach in History, under the calendar in both views, on the week
 /// starting [monday]: a card that opens the AI Coach page on that week,
-/// swapping History for it so Back still lands on Home. Without YumSum
-/// Star: [CoachPrompt]. [named] adds the week's date, for the month view.
+/// swapping History for it so Back still lands on Home. Nothing for a week
+/// before YumSum Star began, which has no notes and never will. Without
+/// YumSum Star: [CoachPrompt]. [named] adds the week's date, for the month
+/// view.
 class WeeklyNotesCard extends ConsumerWidget {
   const WeeklyNotesCard({super.key, required this.monday, this.named = false});
 
@@ -26,6 +29,8 @@ class WeeklyNotesCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (!ref.watch(plusProvider)) return const CoachPrompt();
+    final first = firstCoachWeek(ref.watch(entitlementProvider).valueOrNull);
+    if (first != null && monday.isBefore(first)) return const SizedBox.shrink();
 
     final now = DateTime.now();
     final sunday = DateTime(monday.year, monday.month, monday.day + 6);
