@@ -13,8 +13,8 @@ const adaptiveLapseNoticeKey = 'adaptive.lapse_notice';
 
 /// The Adaptive formula in one line, under its name in the dialog.
 const adaptiveSubtitle =
-    'A smarter calorie target, tailored to your body and adjusted week by '
-    'week as it learns what you burn.';
+    'A smarter calorie estimation formula, tailored to your body and adjusted '
+    'weekly as it learns what you burn.';
 
 /// Sells the Adaptive formula: once after subscribing, and from Plan
 /// Settings and Weight & Progress. With YumSum

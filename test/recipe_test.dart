@@ -176,15 +176,6 @@ void main() {
     });
   });
 
-  test('a portion fits only once something is logged and it is under '
-      'what is left', () {
-    final recipe = _recipe('Soup', kcal: 400);
-    expect(fitsRemaining(recipe, null), isFalse);
-    expect(fitsRemaining(recipe, 0), isFalse);
-    expect(fitsRemaining(recipe, 400), isTrue);
-    expect(fitsRemaining(recipe, 399), isFalse);
-  });
-
   test('recipes match by name, any case', () {
     final recipes = [_recipe('Pasta bolognese'), _recipe('Chicken soup')];
     expect(matchingRecipes(recipes, 'PASTA').map((r) => r.name), [

@@ -98,7 +98,7 @@ The app sends feedback to a Formspree form (formspree.io, signed up with help.yu
 - [ ] **App content** forms (Claude can draft the answers): privacy policy https://yumsum.web.app/privacy, ads (none), app access (sign-in needed, so give Google a test email account with a password), content rating, target audience (18+), data safety, health apps, account deletion link.
 - [ ] **First closed test**: Claude builds the bundle; upload it under Test and release → Testing → Closed testing, accept Play App Signing, add the 12 testers, and send them the opt-in link. Add the same 12 to Settings → License testing too, and give each a YumSum Star manual grant so they can try it (`docs/plans/07-billing.md`).
 - [ ] Add the Play signing SHA-1 and SHA-256 (Test and release → App integrity → App signing) to **YumSum Android** in Firebase → Project settings (Google sign-in and App Check need them)
-- [ ] App Check → change **YumSum Android**'s provider from Fraud Defense (the website's reCAPTCHA key, registered by mistake) to **Play Integrity**, and link the Cloud project `lean-streak-project` under App integrity → Play Integrity API in Play Console. Without this, AI fails in Play installs.
+- [ ] Link the Cloud project `lean-streak-project` under App integrity → Play Integrity API in Play Console. Without this, AI fails in Play installs. (App Check's **YumSum Android** provider is Play Integrity since 6 November 2026, with the debug and upload keys' SHA-256.)
 - [ ] After 14 days with 12 testers: Play Console → Dashboard → **Apply for production**.
 - [ ] Once App Check metrics show nearly all requests verified: enforce App Check for **Cloud Firestore** and **Authentication**, not just AI Logic
 

@@ -2,11 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/recipe.dart';
-import 'package:lean_streak/providers/daily_summary_provider.dart';
 
 /// The recipe library, read once from the app's own files.
 final recipesProvider = FutureProvider<List<Recipe>>((ref) async {
@@ -21,19 +19,6 @@ final recipeImageProvider = Provider<ImageProvider Function(String url)>(
   (ref) =>
       (url) => CachedNetworkImageProvider(url, maxWidth: 640),
 );
-
-/// Calories left today, the same figure Today shows; null until something
-/// is logged, when every recipe would "fit" and saying so means nothing.
-final remainingCaloriesTodayProvider = Provider.autoDispose<int?>((ref) {
-  final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  final summary = ref.watch(dailySummaryForDateProvider(today)).valueOrNull;
-  if (summary == null || summary.mealCount == 0) return null;
-  return summary.targetCalories - summary.totalCalories;
-});
-
-/// Whether a portion of [recipe] fits in what's left of today.
-bool fitsRemaining(Recipe recipe, int? remaining) =>
-    remaining != null && remaining > 0 && recipe.kcalPerPortion <= remaining;
 
 /// Recipes whose name contains [query], in library order.
 List<Recipe> matchingRecipes(List<Recipe> recipes, String query) {

@@ -228,10 +228,6 @@ class _RecipeTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final showProtein = ref.watch(trackProteinProvider);
-    final fits = fitsRemaining(
-      recipe,
-      ref.watch(remainingCaloriesTodayProvider),
-    );
     final muted = TextStyle(fontSize: 12.5, color: AppColors.textSecondary);
     return AppCard(
       padding: EdgeInsets.zero,
@@ -310,25 +306,6 @@ class _RecipeTile extends ConsumerWidget {
                         style: muted,
                       ),
                     ),
-                    if (fits)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.veryGood.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Text(
-                          'Fits today',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.veryGood,
-                          ),
-                        ),
-                      ),
                   ],
                 ),
               ],

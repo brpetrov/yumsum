@@ -83,10 +83,6 @@ class _RecipeBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final showProtein = ref.watch(trackProteinProvider);
     final showMacros = ref.watch(showMacrosProvider);
-    final fits = fitsRemaining(
-      recipe,
-      ref.watch(remainingCaloriesTodayProvider),
-    );
     final muted = TextStyle(fontSize: 14.5, color: AppColors.textSecondary);
 
     final photo = ClipRRect(
@@ -134,13 +130,6 @@ class _RecipeBody extends ConsumerWidget {
         if (showMacros) ...[
           const SizedBox(height: 2),
           Text(macrosLine(recipe.macrosPerPortion), style: muted),
-        ],
-        if (fits) ...[
-          const SizedBox(height: 2),
-          Text(
-            'Fits what\'s left today',
-            style: muted.copyWith(color: AppColors.veryGood),
-          ),
         ],
         const SizedBox(height: 16),
         _Facts(recipe: recipe),

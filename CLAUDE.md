@@ -11,6 +11,7 @@ flutter test                   # All tests
 flutter test test/health_calculator_test.dart   # One file
 flutter test test/recipes_asset_test.dart       # The recipe library and its photos
 flutter analyze                # Lint (flutter_lints)
+flutter build apk --release --dart-define=APP_CHECK_DEBUG=true   # A release build for the phone from the PC (Play Integrity passes only Play installs)
 tools/build_hosting.ps1        # Build the website into build/hosting, before a hosting deploy
 firebase deploy --only hosting:app      # The website
 firebase deploy --only firestore:rules  # Firestore rules

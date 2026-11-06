@@ -15,6 +15,15 @@ function Reset-Directory($path) {
 
 Set-Location $root
 
+# Flutter keeps a web build cache per set of build options, with its own
+# copy of the plugin list, and doesn't always refresh that list when a
+# plugin is added: on 6 November the /app/ bundle was still built with an
+# 18 October list, without Cloud Functions, so AI failed in every browser
+# but Safari. Clearing the web caches makes each build start clean.
+Get-ChildItem (Join-Path $root '.dart_tool\flutter_build') -Directory -ErrorAction SilentlyContinue |
+  Where-Object { Test-Path (Join-Path $_.FullName 'web_plugin_registrant.dart') } |
+  ForEach-Object { Remove-Item -LiteralPath $_.FullName -Recurse -Force }
+
 Write-Host 'Building fast web bundle for Chrome, Edge, and Android browsers...'
 flutter build web `
   --release `

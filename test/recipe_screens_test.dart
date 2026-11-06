@@ -5,13 +5,11 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
-import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
-import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
@@ -97,16 +95,6 @@ final _noProteinProfile = UserProfile(
   updatedAt: DateTime(2026),
 );
 
-DailySummary _eaten(int kcal) => DailySummary(
-  date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-  totalCalories: kcal,
-  targetCalories: 1900,
-  calorieDelta: kcal - 1900,
-  mealCount: 1,
-  status: DailyStatus.green,
-  updatedAt: DateTime.now(),
-);
-
 Meal _meal(String name) => Meal(
   id: name,
   date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
@@ -124,7 +112,6 @@ void main() {
   Future<void> pump(
     WidgetTester tester, {
     String at = AppRoutes.recipes,
-    DailySummary? today,
     List<Meal> recent = const [],
     bool trackProtein = true,
     bool failing = false,
@@ -161,9 +148,6 @@ void main() {
           ),
           recipeImageProvider.overrideWithValue(pixelImage),
           recentMealsProvider.overrideWith((ref) => Stream.value(recent)),
-          dailySummaryForDateProvider.overrideWith(
-            (ref, date) => Stream.value(today),
-          ),
           currentUidProvider.overrideWithValue('user-1'),
           userProfileProvider.overrideWith(
             (ref) => Stream.value(trackProtein ? null : _noProteinProfile),
@@ -237,17 +221,6 @@ void main() {
     testWidgets('no protein on tiles when it is switched off', (tester) async {
       await pump(tester, trackProtein: false);
       expect(find.text('560 kcal'), findsOneWidget);
-    });
-
-    testWidgets('marks what fits only once something is logged', (
-      tester,
-    ) async {
-      await pump(tester);
-      expect(find.text('Fits today'), findsNothing);
-
-      // 1,500 of 1,900 eaten: 400 left, which only the oats (350) fit.
-      await pump(tester, today: _eaten(1500));
-      expect(find.text('Fits today'), findsOneWidget);
     });
 
     testWidgets('marks only the recipes high in fibre', (tester) async {

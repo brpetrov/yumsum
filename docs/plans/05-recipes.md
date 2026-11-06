@@ -4,7 +4,7 @@
 
 ## What it is
 
-- **Recipes** in the menu: a grid of photo tiles, filtered by Breakfast, Lunch, Dinner or Snack. Each tile shows calories and protein per portion and the time, and **Fits today** when a portion fits what's left of today's calories. Fits today only shows once something is logged, since before that everything "fits".
+- **Recipes** in the menu: a grid of photo tiles, filtered by Breakfast, Lunch, Dinner or Snack. Each tile shows calories and protein per portion and the time. *Changed 6 November:* the **Fits today** chip, and the recipe page's "Fits what's left today", are gone; they said little.
 - **Logging is the point.** Every tile has a round **+** that logs portions straight away, and the recipe page has a **Log a portion** button. Both ask how many portions, in halves from ½ to 10, then log the meal for today with the recipe's own protein, so no AI is used. More than one portion is logged as "Pasta bolognese × 1.5", so the day's list explains the calories.
 - **Cooked recently**, at the top of the page: recipes logged in the last two weeks, one tap to log another portion. Nothing extra is stored; it's worked out from the meals.
 - **In the quick-log bar,** typing a recipe's name offers it as a chip with a book icon, beside the user's own meals. The user's own meals keep at least two of the three places, and a matching recipe always gets one. With nothing typed, recipes never appear.
