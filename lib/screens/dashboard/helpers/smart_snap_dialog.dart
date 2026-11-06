@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/widgets/feature_intro.dart';
-import 'package:lean_streak/widgets/icon_bubble.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 
 /// Smart Snap (photo logging) in one line, under its name in the dialog.
-const smartSnapSubtitle = 'Snap your plate and let our AI do the counting.';
+const smartSnapSubtitle = 'Make food logging as easy as taking a photo.';
 
 /// Sells Smart Snap to someone without YumSum Star, from the bar's photo
-/// button. It is simple, so the dialog is small: a camera over the name and
+/// button. It is simple, so the dialog is small: the bowl with its camera
+/// (assets/smart_snap.webp, trimmed and shrunk to 720 px) over the name and
 /// the line, two promises, and Become a Star, which opens the YumSum Star
 /// page.
 Future<void> showSmartSnapIntro(BuildContext context) async {
@@ -19,8 +19,12 @@ Future<void> showSmartSnapIntro(BuildContext context) async {
     builder: (context) => AlertDialog(
       title: Column(
         children: [
-          const IconBubble(Icons.photo_camera_rounded, size: 64, raised: true),
-          const SizedBox(height: 14),
+          Image.asset(
+            'assets/smart_snap.webp',
+            width: 120,
+            filterQuality: FilterQuality.medium,
+          ),
+          const SizedBox(height: 10),
           const Text('Smart Snap'),
           const SizedBox(height: 4),
           Text(
@@ -36,15 +40,15 @@ Future<void> showSmartSnapIntro(BuildContext context) async {
       ),
       content: const FeaturePromises([
         (
-          Icons.format_list_bulleted_rounded,
-          'Every item, counted',
-          'Our AI names what\'s on your plate, with calories and protein '
-              'for each.',
+          Icons.auto_awesome_rounded,
+          'Skip the manual entry',
+          'Snap your meal and let AI identify the food, with estimated '
+              'calories and macros for each item.',
         ),
         (
-          Icons.edit_rounded,
-          'Yours to check',
-          'See the list before you save, and change anything it got wrong.',
+          Icons.fact_check_rounded,
+          'You\'re always in control',
+          'Review your meal, make any changes and save when you\'re happy.',
         ),
       ]),
       actions: [

@@ -47,6 +47,7 @@ flutter:
   assets:
     - assets/logo.png
     - assets/coach.webp
+    - assets/smart_snap.webp
     - assets/fonts/OFL.txt
     - assets/fonts/OFL-Fredoka.txt
     - assets/recipes/recipes.json
