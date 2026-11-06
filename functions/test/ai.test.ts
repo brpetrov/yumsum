@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import type { Firestore } from "firebase-admin/firestore";
+import { ThinkingLevel } from "@google/genai";
 import { HttpsError } from "firebase-functions/https";
 import {
   type Ask,
@@ -19,6 +20,7 @@ import {
   nutritionContext,
   photoPrompt,
   voicePrompt,
+  weeklyReviewConfig,
   weeklyReviewInstruction,
 } from "../src/prompts";
 
@@ -393,6 +395,10 @@ describe("the prompts", () => {
     assert.ok(nutritionContext({ country: "Germany", usualFood: "" }).startsWith(
       "You are a nutrition assistant. The user lives in Germany. Read",
     ));
+  });
+
+  test("AI Coach thinks only a little, so it answers in seconds", () => {
+    assert.deepEqual(weeklyReviewConfig.thinkingConfig, { thinkingLevel: ThinkingLevel.LOW });
   });
 
   test("AI Coach's instruction keeps to its rules", () => {

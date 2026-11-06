@@ -15,6 +15,7 @@ import { defineSecret } from "firebase-functions/params";
 import { isPlusAt, type Stored } from "./entitlement";
 import {
   aiModelId,
+  coachModelId,
   jsonReply,
   labelPrompt,
   mealConfig,
@@ -327,7 +328,7 @@ let client: GoogleGenAI | undefined;
 const gemini: Generate = async ({ use, contents, config }) => {
   client ??= new GoogleGenAI({ vertexai: false, apiKey: geminiApiKey.value() });
   const response = await client.models.generateContent({
-    model: aiModelId,
+    model: use === "coach" ? coachModelId : aiModelId,
     contents,
     config,
   });

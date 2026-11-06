@@ -1,11 +1,20 @@
-import { type GenerateContentConfig, type Schema, Type } from "@google/genai";
+import { type GenerateContentConfig, type Schema, ThinkingLevel, Type } from "@google/genai";
 
 // What Gemini is asked, moved from the app on 5 November 2026 word for word,
 // so the answers keep the shape the app reads (calorie_estimate_service.dart,
 // weekly_review_service.dart).
 
-/** The Gemini model every AI call uses. */
+/** The Gemini model every estimate uses. */
 export const aiModelId = "gemini-3.5-flash-lite";
+
+/**
+ * AI Coach's model, since 6 November 2026. On three real weeks Flash-Lite
+ * wrote 2 or 3 notes and missed patterns; 3.8 Flash wrote 5 and found the
+ * most. With its thinking low (weeklyReviewConfig) it took about 5 seconds
+ * rather than 20 to 40, with notes as good. It runs once a week per YumSum
+ * Star user, so its price hardly matters.
+ */
+export const coachModelId = "gemini-3.8-flash";
 
 /** Estimates reply in JSON whose shape their prompt spells out. */
 export const jsonReply: GenerateContentConfig = {
@@ -355,6 +364,7 @@ export const weeklyReviewInstruction =
  */
 export const weeklyReviewConfig: GenerateContentConfig = {
   systemInstruction: weeklyReviewInstruction,
+  thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
   responseMimeType: "application/json",
   // As the app's Schema.object sent it: every property required.
   responseSchema: {
