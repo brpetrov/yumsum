@@ -609,7 +609,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(cameraModes, isEmpty);
     expect(find.text('Smart Snap'), findsOneWidget);
-    expect(find.text('Point, snap, done'), findsOneWidget);
+    expect(find.text('Every item, counted'), findsOneWidget);
     expect(find.text('Become a Star'), findsOneWidget);
 
     await tester.tap(find.text('Maybe later'));

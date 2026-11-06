@@ -75,7 +75,7 @@ Billing, the paywall and who counts as a subscriber are in `07-billing.md`.
 
 - **Free:**
   - 10 AI estimates a day, typed or by voice.
-  - The **photo button stays in the bar** with a small star, so people know it exists. Tapping it opens the Smart Snap dialog (what it does in four lines), whose Become a Star opens the paywall with the trial. *Built 6 November.*
+  - The **photo button stays in the bar** with a small star, so people know it exists. Tapping it opens the Smart Snap dialog (a camera over the name and one line, then two short points: it's simple, so the dialog is small), whose Become a Star opens the paywall with the trial. *Built 6 November.*
 - **YumSum Star:**
   - **30 AI estimates a day**, photos included.
   - The photo button works as it does today.
