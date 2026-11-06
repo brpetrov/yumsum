@@ -266,8 +266,8 @@ void main() {
         find.descendant(of: find.byType(AlertDialog), matching: _coach),
         findsOneWidget,
       );
-      expect(find.text('Detects your patterns'), findsOneWidget);
-      expect(find.text('Fresh every Monday'), findsOneWidget);
+      expect(find.text('Spot what\'s holding you back'), findsOneWidget);
+      expect(find.text('Start every week with direction'), findsOneWidget);
       expect(find.text('Close'), findsOneWidget);
       expect(find.text('Become a Star'), findsNothing);
     });
@@ -410,10 +410,10 @@ void main() {
       await pump(tester, entitlement: null);
       expect(_coach, findsOneWidget);
       expect(find.text(coachSubtitle), findsOneWidget);
-      expect(find.text('Detects your patterns'), findsOneWidget);
-      expect(find.text('Looks past calories'), findsOneWidget);
-      expect(find.text('Tips written for you'), findsOneWidget);
-      expect(find.text('Fresh every Monday'), findsOneWidget);
+      expect(find.text('Spot what\'s holding you back'), findsOneWidget);
+      expect(find.text('Build a more balanced diet'), findsOneWidget);
+      expect(find.text('Get advice you can put into practice'), findsOneWidget);
+      expect(find.text('Start every week with direction'), findsOneWidget);
       expect(find.byTooltip('How it works'), findsNothing);
       expect(find.byTooltip('Previous'), findsNothing);
       expect(reads, 0);
@@ -462,7 +462,7 @@ void main() {
     testWidgets('ended with nothing saved: what it does', (tester) async {
       await pump(tester, entitlement: ended);
       expect(find.text(coachSubtitle), findsOneWidget);
-      expect(find.text('Detects your patterns'), findsOneWidget);
+      expect(find.text('Spot what\'s holding you back'), findsOneWidget);
       expect(find.text('Last week'), findsNothing);
     });
   });

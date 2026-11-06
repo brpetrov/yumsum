@@ -85,16 +85,16 @@ The Adaptive formula's pattern, since it works:
 
 - **History, both the Week and Month tabs, always (changed 4 November: you want AI Coach in both tabs, as the notes for Star members or this prompt for everyone else):** the free Adaptive formula's shining orange pill, shared rather than copied, reading "AI Coach" with the arrow. Under it (changed 4 November): "See what's working, what's holding you back, and get personal tips on how to improve." Tapping either opens the dialog. The notes themselves stay weekly.
 - **The dialog,** `showCoachIntro(context, {plus = true})`, laid out like `showAdaptiveIntro` (title with subtitle, four promise rows with an `IconBubble`):
-  - Title "AI Coach", subtitle "Your week, read for you"
+  - Title "Your AI Coach", subtitle "Get fresh advice tailored just for you, every Monday, to help you eat better and reach your goals." (your copy, 6 November; the same title and subtitle head the free page)
 
     | Headline | Line |
     |---|---|
-    | Detects your patterns | Finds what's quietly holding you back, so you can fix it. |
-    | Looks past calories | Checks your protein, fibre, salt and sugar against the recommended amounts, not just your calories. |
-    | Tips written for you | Personal advice based on your own meals, with fixes and recipes that help. |
-    | Fresh every Monday | A new review every week, so you keep getting better. |
+    | Spot what's holding you back | Discover the eating patterns that could be slowing your progress and find small changes that help. |
+    | Build a more balanced diet | See how your protein, fibre, salt and sugar compare with recommended amounts, so you know where to focus. |
+    | Get advice you can put into practice | Make your next meal easier with practical tips and recipe ideas based on what you already eat. |
+    | Start every week with direction | Every Monday, get a fresh review of what's working and what to change, so you can build on your progress. |
 
-  - Reworded on 5 November, at your request.
+  - Reworded on 5 November, at your request, and again on 6 November to the copy above.
   - Rewritten on 4 November: each line now sells the feature in a full sentence, instead of finishing its headline ("3 short notes on the week just gone"). The third row was "One easy tip" before the notes gave several ways to improve (see The instruction).
   - Free: Close and Become a Star with the star, which opens the paywall. YumSum Star: Close only.
 - **The YumSum Star page** says "AI Coach" with "Reads your week and tells you how to do better." (changed 4 November from "Spots your patterns every Monday."; it stays one line so the buy button stays in view on a phone) instead of "AI Assisted Coach" and "Weekly and monthly reviews, with advice." Monthly reviews are only a Later idea.

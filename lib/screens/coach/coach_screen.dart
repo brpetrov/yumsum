@@ -27,32 +27,37 @@ import 'package:lean_streak/widgets/responsive_page.dart';
 const coachPromises = <(IconData, String, String)>[
   (
     Icons.query_stats_rounded,
-    'Detects your patterns',
-    'Finds what\'s quietly holding you back, so you can fix it.',
+    'Spot what\'s holding you back',
+    'Discover the eating patterns that could be slowing your progress and '
+        'find small changes that help.',
   ),
   (
     Icons.eco_rounded,
-    'Looks past calories',
-    'Checks your protein, fibre, salt and sugar against the recommended '
-        'amounts, not just your calories.',
+    'Build a more balanced diet',
+    'See how your protein, fibre, salt and sugar compare with recommended '
+        'amounts, so you know where to focus.',
   ),
   (
     Icons.lightbulb_outline_rounded,
-    'Tips written for you',
-    'Personal advice based on your own meals, with fixes and recipes '
-        'that help.',
+    'Get advice you can put into practice',
+    'Make your next meal easier with practical tips and recipe ideas based '
+        'on what you already eat.',
   ),
   (
     Icons.event_available_rounded,
-    'Fresh every Monday',
-    'A new review every week, so you keep getting better.',
+    'Start every week with direction',
+    'Every Monday, get a fresh review of what\'s working and what to '
+        'change, so you can build on your progress.',
   ),
 ];
 
+/// The AI Coach dialog's title, and the free page's heading.
+const coachTitle = 'Your AI Coach';
+
 /// AI Coach in one line, under its name on the page and in the dialog.
 const coachSubtitle =
-    'Reads your week every Monday and tells you what\'s working and what '
-    'to change.';
+    'Get fresh advice tailored just for you, every Monday, to help you eat '
+    'better and reach your goals.';
 
 /// The coach illustration (assets/coach.webp, trimmed and shrunk to 720 px
 /// for the web) at [width].
@@ -73,7 +78,7 @@ class _CoachImage extends StatelessWidget {
 Future<void> showCoachIntro(BuildContext context) => showDialog<void>(
   context: context,
   builder: (context) => FeatureIntroDialog(
-    title: 'AI Coach',
+    title: coachTitle,
     subtitle: coachSubtitle,
     image: const _CoachImage(width: 52),
     promises: coachPromises,
@@ -380,7 +385,7 @@ class _CoachPitch extends StatelessWidget {
         const Center(child: _CoachImage(width: 156)),
         const SizedBox(height: 16),
         Text(
-          'AI Coach',
+          coachTitle,
           textAlign: TextAlign.center,
           style: AppTheme.display.copyWith(
             fontSize: 28,
