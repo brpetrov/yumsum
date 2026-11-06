@@ -31,6 +31,7 @@ import 'package:lean_streak/screens/dashboard/helpers/smart_snap_dialog.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
 import 'package:lean_streak/widgets/estimate_breakdown.dart';
+import 'package:lean_streak/widgets/estimate_choice_dialog.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 
 /// The microphone behind the bar's mic button; overridable in tests.
@@ -318,6 +319,15 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       _fill(text, result.kcal, result.protein, macros: result.macros);
       _aiItems = result.items;
     });
+    await _offerChoices();
+  }
+
+  /// Where the AI had to assume which version of an item the user had, it
+  /// asks (`offerEstimateChoices`); a pick swaps the item in and the boxes
+  /// follow, as for a corrected weight.
+  Future<void> _offerChoices() async {
+    final items = await offerEstimateChoices(context, _aiItems);
+    if (items != null && mounted) _itemsChanged(items);
   }
 
   /// Shared busy and error handling for the estimate and voice AI calls.
@@ -441,6 +451,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       _fill(result.name, result.kcal, result.protein, macros: result.macros);
       _aiItems = result.items;
     });
+    await _offerChoices();
   }
 
   /// A barcode the camera read is looked up in Open Food Facts (label

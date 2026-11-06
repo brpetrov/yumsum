@@ -14,6 +14,7 @@ import 'package:lean_streak/providers/past_day_edit_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/widgets/estimate_breakdown.dart';
+import 'package:lean_streak/widgets/estimate_choice_dialog.dart';
 
 /// Opens the meal form: edits [existingMeal], or adds a meal on [date]
 /// (yyyy-MM-dd, today by default). Resolves to true when the meal was saved.
@@ -130,7 +131,21 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
       _error = 'Could not reach the AI. Try again.';
     }
 
-    if (mounted) setState(() => _estimating = false);
+    if (!mounted) return;
+    setState(() => _estimating = false);
+    // Where the AI had to assume which version of an item it was, it asks.
+    final items = await offerEstimateChoices(context, _estimateItems);
+    if (items != null && mounted) _itemsChanged(items);
+  }
+
+  /// A weight corrected or a version picked: the boxes follow the items.
+  void _itemsChanged(List<EstimateItem> items) {
+    final total = totalOf(items);
+    _caloriesController.text = '${total.kcal}';
+    if (total.protein != null) {
+      _proteinController.text = '${total.protein}';
+    }
+    setState(() => _estimateItems = items);
   }
 
   Future<void> _submit() async {
@@ -285,14 +300,7 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
               EstimateBreakdown(
                 items: _estimateItems,
                 showProtein: showProtein,
-                onChanged: (items) {
-                  final total = totalOf(items);
-                  _caloriesController.text = '${total.kcal}';
-                  if (total.protein != null) {
-                    _proteinController.text = '${total.protein}';
-                  }
-                  setState(() => _estimateItems = items);
-                },
+                onChanged: _itemsChanged,
               ),
             if (_error != null) ...[
               const SizedBox(height: 8),

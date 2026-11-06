@@ -18,13 +18,16 @@ typedef _Saved = ({
   Nutrients? macros,
 });
 
+/// The breakdown the next estimate comes with; none by default.
+var _estimateItems = const <EstimateItem>[];
+
 class _FakeEstimates extends Fake implements CalorieEstimateService {
   @override
   Future<CalorieEstimate> estimate(String uid, String description) async => (
     kcal: 500,
     protein: 30,
     macros: const Nutrients(fat: 20, carbs: 40, salt: 2),
-    items: const <EstimateItem>[],
+    items: _estimateItems,
   );
 }
 
@@ -150,6 +153,40 @@ void main() {
     final macros = controller.saved.single.macros!;
     expect(macros.fat, closeTo(24, 1e-9));
     expect(macros.salt, closeTo(2.4, 1e-9));
+  });
+
+  testWidgets('where the AI had to assume the version of an item, it asks; '
+      'a pick swaps the item in', (tester) async {
+    _estimateItems = const [
+      EstimateItem(
+        name: 'Homemade chicken curry',
+        grams: 400,
+        kcal: 500,
+        protein: 30,
+        options: [
+          EstimateItem(
+            name: 'Takeaway chicken curry',
+            grams: 450,
+            kcal: 850,
+            protein: 32,
+          ),
+        ],
+      ),
+    ];
+    addTearDown(() => _estimateItems = const []);
+    await openSheet(tester);
+    await tester.enterText(find.widgetWithText(TextField, 'Meal'), 'Curry');
+    await tester.pump();
+    await tester.tap(find.text('Estimate from name'));
+    await tester.pumpAndSettle();
+    expect(find.text('Which did you have?'), findsOneWidget);
+
+    await tester.tap(find.text('Takeaway chicken curry'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text('850'), findsOneWidget);
+    expect(find.text('32'), findsOneWidget);
+    expect(find.text('Takeaway chicken curry 850'), findsOneWidget);
   });
 
   final banitsa = Meal(

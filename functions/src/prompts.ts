@@ -39,6 +39,34 @@ const weights =
   "meat, fish, rice and pasta say in the item whether that weight is " +
   "cooked or raw.\n";
 
+// What people leave out most (the size, the milk, takeaway or homemade)
+// swings the calories most. Naming what it assumed keeps the model's options
+// to versions of the same thing (asked only for "other versions", it offered
+// other foods: a satsuma for an apple), the examples keep it from arguing
+// with what the user did say, and the options' shape stays out of the item
+// template, which the model fills for every item when it's there. The app
+// doesn't read "assumed": the item's own name carries it.
+function choices(country: string): string {
+  return "When the user leaves out something that changes an item's " +
+    "calories a lot (its size, the milk or sugar in a drink, full-fat or " +
+    "diet, homemade, takeaway or shop-bought, fried or grilled), go with " +
+    `the most common choice in ${country}. In that item, give "assumed", ` +
+    `the choice in a few words, and "options", up to 3 other common ` +
+    "choices for the same food or drink, each a complete item named in " +
+    `full. So "cappuccino" is assumed regular with semi-skimmed milk, with ` +
+    `options for whole milk, oat milk and large; "large oat latte", ` +
+    `"grilled chicken breast" and "Tesco chicken tikka masala" have no ` +
+    "options, as the user said what they had; nor do a banana or a cup of " +
+    "tea, where the choices make little difference. Options are never a " +
+    "different food, and never about a part of what the user named (a " +
+    "sandwich's filling, not its butter). Most items have no options.\n";
+}
+
+const optionsJson =
+  `An item with options has two more keys: "assumed": "<the choice, a few ` +
+  `words>" and "options": [{"item": "<version in full>", "grams": ` +
+  `<integer>, "kcal": <integer>, "protein_g": <integer>}].\n`;
+
 // Six totals for the meal rather than per item, which would add about 60% to
 // a call (plan 10).
 function macros(ask: boolean): string {
@@ -69,11 +97,13 @@ export function mealPrompt(profile: Profile, ask: boolean, meal: string): string
     "typical home portion. For home-cooked dishes, include the oil or fat " +
     `they are usually cooked with. For branded or chain products use ${profile.country} ` +
     "nutrition figures. Then add them up.\n" +
+    choices(profile.country) +
     weights +
     macros(ask) +
     `Respond with ONLY a JSON object: {"items": [{"item": "<component>", "grams": <integer>, ` +
     `"kcal": <integer>, "protein_g": <integer>}], "kcal": <integer total>, ` +
     `"protein_g": <integer total>${macrosJson(ask)}}\n` +
+    optionsJson +
     "Do not include any other text.\n\n" +
     `Meal: ${meal}`;
 }
@@ -91,6 +121,7 @@ export function voicePrompt(profile: Profile, ask: boolean): string {
     "typical home portion if none, include the oil or fat home-cooked dishes " +
     `are usually cooked with, and use ${profile.country} nutrition figures for branded or ` +
     "chain products. Then add them up.\n" +
+    choices(profile.country) +
     "If the user gave calories but no protein, still estimate the protein " +
     `${ask ? "and macros " : ""}from the food. Only if nothing in ` +
     `the note says what the food was (e.g. "400 calories for lunch"), set ` +
@@ -103,6 +134,7 @@ export function voicePrompt(profile: Profile, ask: boolean): string {
     `<integer>, "protein_g": <integer or null>}], "kcal": <integer total>, ` +
     `"protein_g": <integer total or null>` +
     `${macrosJson(ask, true)}}\n` +
+    optionsJson +
     "Do not include any other text.";
 }
 

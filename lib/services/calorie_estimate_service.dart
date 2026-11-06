@@ -8,8 +8,49 @@ import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/repositories/ai_usage_repository.dart';
 
 /// One component of an AI estimate; [grams] is the weight the AI assumed
-/// (ml for drinks), null when it gave none.
-typedef EstimateItem = ({String name, int? grams, int kcal, int? protein});
+/// (ml for drinks), null when it gave none. Where the user left out what
+/// swings the calories (the size, the milk, takeaway or homemade), the AI
+/// went with the usual version and [options] are the other likely ones,
+/// complete, for `showEstimateChoice`; empty otherwise.
+class EstimateItem {
+  const EstimateItem({
+    required this.name,
+    this.grams,
+    required this.kcal,
+    this.protein,
+    this.options = const [],
+  });
+
+  final String name;
+  final int? grams;
+  final int kcal;
+  final int? protein;
+  final List<EstimateItem> options;
+
+  /// This item with nothing left to ask.
+  EstimateItem get settled =>
+      EstimateItem(name: name, grams: grams, kcal: kcal, protein: protein);
+
+  @override
+  bool operator ==(Object other) =>
+      other is EstimateItem &&
+      other.name == name &&
+      other.grams == grams &&
+      other.kcal == kcal &&
+      other.protein == protein &&
+      listEquals(other.options, options);
+
+  @override
+  int get hashCode =>
+      Object.hash(name, grams, kcal, protein, Object.hashAll(options));
+
+  @override
+  String toString() => 'EstimateItem($name, $kcal kcal)';
+}
+
+/// An option closer than this to the item's calories isn't worth asking
+/// about.
+const optionGap = 30;
 
 /// [macros] are for the whole meal, and only there when they were asked for.
 typedef CalorieEstimate = ({
@@ -82,25 +123,75 @@ LabelReading parseLabelReading(Map<String, dynamic> map) {
   );
 }
 
-/// Reads the model's `items` list, skipping anything malformed.
-List<EstimateItem> parseEstimateItems(Object? raw) {
+/// Reads the model's `items` list, skipping anything malformed. An item's
+/// options are kept at most 3, each at least [optionGap] kcal from the item
+/// and from each other, not the item or an earlier option under the same
+/// name, and keeping every word of the item's name the user [said]: the AI
+/// is told to offer them rarely, and this catches it asking about nothing,
+/// or arguing with the user (a soy latte for a large oat latte).
+List<EstimateItem> parseEstimateItems(Object? raw, {String said = ''}) {
   if (raw is! List) return const [];
+  final saidWords = _words(said);
   return [
     for (final entry in raw)
-      if (entry is Map &&
-          entry['item'] is String &&
-          (entry['item'] as String).trim().isNotEmpty &&
-          entry['kcal'] is num)
-        (
-          name: (entry['item'] as String).trim(),
-          grams: switch (entry['grams']) {
-            final num grams when grams > 0 => grams.round(),
-            _ => null,
-          },
-          kcal: (entry['kcal'] as num).round(),
-          protein: (entry['protein_g'] as num?)?.round(),
-        ),
+      if (_itemFrom(entry) case final item?)
+        _withOptions(item, (entry as Map)['options'], saidWords),
   ];
+}
+
+/// The words of [text] of three letters or more, in lower case.
+Set<String> _words(String text) => {
+  for (final word in text.toLowerCase().split(
+    RegExp(r'[^\p{L}\p{N}]+', unicode: true),
+  ))
+    if (word.length > 2) word,
+};
+
+/// An item's own figures; null when malformed.
+EstimateItem? _itemFrom(Object? entry) {
+  if (entry is! Map ||
+      entry['item'] is! String ||
+      (entry['item'] as String).trim().isEmpty ||
+      entry['kcal'] is! num) {
+    return null;
+  }
+  return EstimateItem(
+    name: (entry['item'] as String).trim(),
+    grams: switch (entry['grams']) {
+      final num grams when grams > 0 => grams.round(),
+      _ => null,
+    },
+    kcal: (entry['kcal'] as num).round(),
+    protein: (entry['protein_g'] as num?)?.round(),
+  );
+}
+
+EstimateItem _withOptions(EstimateItem item, Object? raw, Set<String> said) {
+  if (raw is! List) return item;
+  final kept = _words(item.name).intersection(said);
+  final names = {item.name.toLowerCase()};
+  final calories = [item.kcal];
+  final options = <EstimateItem>[];
+  for (final entry in raw) {
+    final option = _itemFrom(entry);
+    if (option == null ||
+        calories.any((kcal) => (option.kcal - kcal).abs() < optionGap) ||
+        !names.add(option.name.toLowerCase()) ||
+        !_words(option.name).containsAll(kept)) {
+      continue;
+    }
+    options.add(option);
+    calories.add(option.kcal);
+    if (options.length == 3) break;
+  }
+  if (options.isEmpty) return item;
+  return EstimateItem(
+    name: item.name,
+    grams: item.grams,
+    kcal: item.kcal,
+    protein: item.protein,
+    options: options,
+  );
 }
 
 /// Reads the model's `macros` object, keeping non-negative numbers only.
@@ -132,12 +223,13 @@ Nutrients? parseNutrients(Object? raw) {
 }
 
 /// [item] at [grams] instead of the AI's weight, its calories and protein
-/// scaled to match. Unchanged when the AI gave no weight to scale from.
+/// scaled to match, and settled. Unchanged when the AI gave no weight to
+/// scale from.
 EstimateItem resized(EstimateItem item, int grams) {
   final from = item.grams;
   if (from == null) return item;
   int scale(int value) => (value * grams / from).round();
-  return (
+  return EstimateItem(
     name: item.name,
     grams: grams,
     kcal: scale(item.kcal),
@@ -280,7 +372,7 @@ class CalorieEstimateService {
         kcal: kcal,
         protein: protein,
         macros: parseNutrients(map['macros']),
-        items: parseEstimateItems(map['items']),
+        items: parseEstimateItems(map['items'], said: description),
       );
     } catch (error, st) {
       debugPrint('CalorieEstimateService error: $error\n$st');
@@ -386,6 +478,12 @@ class CalorieEstimateService {
     kcal: (map['kcal'] as num).toInt(),
     protein: (map['protein_g'] as num?)?.round(),
     macros: parseNutrients(map['macros']),
-    items: parseEstimateItems(map['items']),
+    items: parseEstimateItems(
+      map['items'],
+      said: switch (map['transcript']) {
+        final String transcript => transcript,
+        _ => '',
+      },
+    ),
   );
 }

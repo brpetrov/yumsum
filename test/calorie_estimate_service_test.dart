@@ -277,9 +277,9 @@ void main() {
           {'item': 'Musaka', 'grams': 350, 'kcal': 520, 'protein_g': 28},
           {'item': ' Bread ', 'grams': 0, 'kcal': 80.4, 'protein_g': null},
         ]),
-        [
-          (name: 'Musaka', grams: 350, kcal: 520, protein: 28),
-          (name: 'Bread', grams: null, kcal: 80, protein: null),
+        const [
+          EstimateItem(name: 'Musaka', grams: 350, kcal: 520, protein: 28),
+          EstimateItem(name: 'Bread', kcal: 80),
         ],
       );
     });
@@ -293,32 +293,152 @@ void main() {
           {'item': 'Mystery', 'kcal': 'lots'},
           'not a map',
         ]),
-        [(name: 'Oil', grams: null, kcal: 120, protein: null)],
+        const [EstimateItem(name: 'Oil', kcal: 120)],
       );
       expect(parseEstimateItems(null), isEmpty);
       expect(parseEstimateItems('items'), isEmpty);
     });
 
     test('a corrected weight rescales the item, and the totals follow', () {
-      const chicken = (
+      const chicken = EstimateItem(
         name: 'Chicken breast, cooked',
         grams: 150,
         kcal: 248,
         protein: 46,
       );
-      const rice = (name: 'Rice, cooked', grams: 200, kcal: 260, protein: 5);
+      const rice = EstimateItem(
+        name: 'Rice, cooked',
+        grams: 200,
+        kcal: 260,
+        protein: 5,
+      );
       final bigger = resized(chicken, 220);
-      expect(bigger, (
-        name: 'Chicken breast, cooked',
-        grams: 220,
-        kcal: 364,
-        protein: 67,
-      ));
+      expect(
+        bigger,
+        const EstimateItem(
+          name: 'Chicken breast, cooked',
+          grams: 220,
+          kcal: 364,
+          protein: 67,
+        ),
+      );
       expect(totalOf([bigger, rice]), (kcal: 624, protein: 72));
 
-      const oil = (name: 'Oil', grams: null, kcal: 120, protein: null);
+      const oil = EstimateItem(name: 'Oil', kcal: 120);
       expect(resized(oil, 30), oil);
       expect(totalOf([oil]), (kcal: 120, protein: null));
+    });
+
+    test('keeps an item\'s options at least $optionGap kcal from it and from '
+        'each other, under new names, at most 3, as plain items', () {
+      EstimateItem parse(List<Object?> options) => parseEstimateItems([
+        {
+          'item': 'Cappuccino',
+          'grams': 250,
+          'kcal': 110,
+          'protein_g': 7,
+          'options': options,
+        },
+      ]).single;
+      final options = [
+        {
+          'item': 'Cappuccino with whole milk',
+          'grams': 250,
+          'kcal': 150,
+          'protein_g': 8,
+        },
+        // Too close to the item, and to the whole milk one.
+        {
+          'item': 'Cappuccino with skimmed milk',
+          'grams': 250,
+          'kcal': 90,
+          'protein_g': 7,
+        },
+        {
+          'item': 'Cappuccino with oat milk',
+          'grams': 250,
+          'kcal': 145,
+          'protein_g': 4,
+        },
+        {'item': '', 'kcal': 300},
+        // The item again, and a repeat, with other figures.
+        {'item': 'cappuccino', 'grams': 250, 'kcal': 160, 'protein_g': 7},
+        {'item': 'Cappuccino with whole milk', 'grams': 250, 'kcal': 200},
+        {
+          'item': 'Large cappuccino',
+          'grams': 350,
+          'kcal': 200,
+          'protein_g': 11,
+        },
+        {
+          'item': 'Cappuccino with syrup',
+          'grams': 250,
+          'kcal': 260,
+          'protein_g': 7,
+        },
+        // A fourth.
+        {
+          'item': 'Cappuccino with cream',
+          'grams': 280,
+          'kcal': 320,
+          'protein_g': 8,
+        },
+      ];
+
+      final item = parse(options);
+      expect(item.options, const [
+        EstimateItem(
+          name: 'Cappuccino with whole milk',
+          grams: 250,
+          kcal: 150,
+          protein: 8,
+        ),
+        EstimateItem(
+          name: 'Large cappuccino',
+          grams: 350,
+          kcal: 200,
+          protein: 11,
+        ),
+        EstimateItem(
+          name: 'Cappuccino with syrup',
+          grams: 250,
+          kcal: 260,
+          protein: 7,
+        ),
+      ]);
+      const plain = EstimateItem(
+        name: 'Cappuccino',
+        grams: 250,
+        kcal: 110,
+        protein: 7,
+      );
+      expect(item.settled, plain);
+      expect(resized(item, 250), plain);
+      expect(parse([options[1]]), plain);
+      expect(parse(['not a map']), plain);
+    });
+
+    test('an option that drops a word the user said is no option', () {
+      final items = parseEstimateItems([
+        {
+          'item': 'Large oat latte',
+          'grams': 450,
+          'kcal': 210,
+          'protein_g': 6,
+          'options': [
+            {
+              'item': 'Large soy latte',
+              'grams': 450,
+              'kcal': 150,
+              'protein_g': 9,
+            },
+            {'item': 'Large oat latte with syrup', 'grams': 470, 'kcal': 260},
+          ],
+        },
+      ], said: 'a large OAT latte');
+      expect(items.single.options.map((option) => option.name), [
+        'Large oat latte with syrup',
+      ]);
     });
   });
 }

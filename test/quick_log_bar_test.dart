@@ -52,18 +52,20 @@ class _FakeLogMealController extends LogMealController {
 
 class _FakeEstimateService implements CalorieEstimateService {
   int estimateCalls = 0;
+  List<EstimateItem> items = const [
+    EstimateItem(name: 'Chicken wrap', grams: 200, kcal: 400, protein: 30),
+    EstimateItem(name: 'Mayo', grams: 15, kcal: 120, protein: 2),
+  ];
 
   @override
   Future<CalorieEstimate> estimate(String uid, String description) async {
     estimateCalls++;
+    final total = totalOf(items);
     return (
-      kcal: 520,
-      protein: 32,
+      kcal: total.kcal,
+      protein: total.protein,
       macros: const Nutrients(fat: 26, saturates: 6, carbs: 48, salt: 2.6),
-      items: const [
-        (name: 'Chicken wrap', grams: 200, kcal: 400, protein: 30),
-        (name: 'Mayo', grams: 15, kcal: 120, protein: 2),
-      ],
+      items: items,
     );
   }
 
@@ -514,6 +516,71 @@ void main() {
     expect(macros.carbs, closeTo(66.46, 0.01));
     expect(macros.salt, closeTo(3.6, 0.01));
     expect(macros.fibre, isNull);
+  });
+
+  testWidgets('where the AI had to assume the version of an item, it asks; '
+      'a pick swaps the item in', (tester) async {
+    await pumpCard(tester);
+    estimateService.items = const [
+      EstimateItem(
+        name: 'Cappuccino with semi-skimmed milk',
+        grams: 250,
+        kcal: 110,
+        protein: 7,
+        options: [
+          EstimateItem(
+            name: 'Cappuccino with whole milk',
+            grams: 250,
+            kcal: 150,
+            protein: 8,
+          ),
+          EstimateItem(
+            name: 'Large cappuccino',
+            grams: 350,
+            kcal: 200,
+            protein: 11,
+          ),
+        ],
+      ),
+      EstimateItem(name: 'Croissant', grams: 60, kcal: 270, protein: 5),
+    ];
+    await tester.enterText(nameBox, 'cappuccino and a croissant');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Estimate'));
+    await tester.pump();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+
+    // The boxes are filled with the version the AI went with, and the dialog
+    // asks: that version ticked, the others under it, each with its calories.
+    expect(boxes(tester), ['cappuccino and a croissant', '380', '12']);
+    final dialog = find.byType(AlertDialog);
+    expect(dialog, findsOneWidget);
+    for (final text in [
+      'Which did you have?',
+      'We went with the first.',
+      'Cappuccino with semi-skimmed milk',
+      '110 kcal',
+      'Cappuccino with whole milk',
+      '150 kcal',
+      'Large cappuccino',
+    ]) {
+      expect(
+        find.descendant(of: dialog, matching: find.text(text)),
+        findsOneWidget,
+      );
+    }
+
+    await tester.tap(find.text('Cappuccino with whole milk'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    expect(dialog, findsNothing);
+    expect(boxes(tester), ['cappuccino and a croissant', '420', '13']);
+    expect(
+      find.text('Cappuccino with whole milk 150 · Croissant 270'),
+      findsOneWidget,
+    );
+    expect(estimateService.estimateCalls, 1);
   });
 
   testWidgets('a scanned barcode is looked up; the portion fills the box', (

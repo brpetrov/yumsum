@@ -350,6 +350,18 @@ describe("the prompts", () => {
     }
   });
 
+  test("typed and spoken meals may come with options; photos and the fill-in don't", () => {
+    const [meal, voice, photo, nutrients] = prompts(false);
+    for (const prompt of [meal, voice]) {
+      assert.ok(prompt.includes("go with the most common choice in United Kingdom"));
+      assert.ok(prompt.includes("Most items have no options."));
+      assert.ok(prompt.includes(`An item with options has two more keys`));
+    }
+    for (const prompt of [photo, nutrients]) {
+      assert.ok(!prompt.includes("options"));
+    }
+  });
+
   test("nutritionContext names the country and the usual food", () => {
     const context = nutritionContext({
       country: "Bulgaria",
