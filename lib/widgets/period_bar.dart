@@ -6,13 +6,13 @@ import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 
 /// A week from its Monday: "26 Oct – 1 Nov 2026", or "2 – 8 Nov 2026"
-/// within one month.
-String weekLabel(DateTime monday) {
+/// within one month; without the [year], "26 Oct – 1 Nov".
+String weekLabel(DateTime monday, {bool year = true}) {
   final end = DateTime(monday.year, monday.month, monday.day + 6);
   final start = monday.month == end.month
       ? DateFormat('d').format(monday)
       : DateFormat('d MMM').format(monday);
-  return '$start – ${DateFormat('d MMM yyyy').format(end)}';
+  return '$start – ${DateFormat(year ? 'd MMM yyyy' : 'd MMM').format(end)}';
 }
 
 /// Previous and Next round a period's name, with a button back to the

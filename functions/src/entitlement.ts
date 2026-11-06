@@ -11,6 +11,7 @@ type When = Date | { toDate(): Date };
 export interface Stored {
   active?: boolean;
   source?: string;
+  startedAt?: When | null;
   expiresAt?: When | null;
   endedAt?: When | null;
   purchaseId?: string;
@@ -28,6 +29,7 @@ export interface PlayFields {
   inTrial: boolean;
   productId: string;
   basePlan: string | null;
+  startedAt: Date | null;
   expiresAt: Date | null;
   endedAt: Date | null;
   source: "play";
@@ -73,11 +75,21 @@ export function entitlementFrom(
     inTrial: active && !!item?.offerPhase?.freeTrial,
     productId: item?.productId ?? "",
     basePlan: item?.offerDetails?.basePlanId ?? null,
+    startedAt: active ? startedAt(previous, now) : null,
     expiresAt,
     endedAt: active ? null : endedAt(previous, now),
     source: "play",
     updatedAt: now,
   };
+}
+
+/**
+ * When YumSum Star switched on: kept while it stays on, otherwise now (a
+ * first purchase, or back after a lapse). AI Coach writes notes only on
+ * weeks from then.
+ */
+function startedAt(previous: Stored | undefined, now: Date): Date {
+  return (previous?.active === true && dateOf(previous.startedAt)) || now;
 }
 
 /**

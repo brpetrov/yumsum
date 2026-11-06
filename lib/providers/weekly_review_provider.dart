@@ -4,10 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:lean_streak/helpers/week_facts.dart';
+import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/models/weekly_review.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/recipe_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
@@ -24,29 +26,79 @@ final weeklyReviewRepositoryProvider = Provider<WeeklyReviewRepository>((ref) {
 
 final _dateKey = DateFormat('yyyy-MM-dd');
 
+/// The Monday of the latest finished week: a week finishes on its Sunday,
+/// so last week's.
+DateTime latestFinishedWeek(DateTime today) =>
+    DateTime(today.year, today.month, today.day - today.weekday - 6);
+
+/// The Monday of the first week AI Coach can have notes on: the week YumSum
+/// Star began in. Null for a grant with no start, which counts from the
+/// beginning.
+DateTime? firstCoachWeek(Entitlement? entitlement) {
+  final started = entitlement?.startedAt;
+  if (started == null) return null;
+  return DateTime(
+    started.year,
+    started.month,
+    started.day - started.weekday + 1,
+  );
+}
+
+/// Whether the AI writes notes on the week starting [monday] today: it's
+/// the latest finished week, and YumSum Star is on and began by its Sunday.
+/// Every other week only shows what was saved, so paging back never costs a
+/// call, and someone who joins mid-week gets their first notes on Monday.
+bool reviewWritable(
+  Entitlement? entitlement, {
+  required DateTime monday,
+  required DateTime now,
+}) {
+  if (!(entitlement?.isPlusAt(now) ?? false)) return false;
+  if (monday != latestFinishedWeek(DateTime(now.year, now.month, now.day))) {
+    return false;
+  }
+  final first = firstCoachWeek(entitlement);
+  return first == null || !first.isAfter(monday);
+}
+
+/// Whether any notes are saved, for someone whose YumSum Star has ended:
+/// their notes stay readable.
+final hasWeeklyReviewsProvider = FutureProvider.autoDispose<bool>((ref) async {
+  final uid = ref.watch(currentUidProvider);
+  if (uid == null) return false;
+  return ref.watch(weeklyReviewRepositoryProvider).hasAny(uid);
+});
+
 /// The notes the AI is writing, by user, week and basis, so runs that
 /// overlap (the page rebuilt while the AI is still at it) share one call.
 final _writingProvider = Provider<Map<String, Future<List<ReviewPoint>>>>(
   (ref) => {},
 );
 
-/// The AI Coach's notes on the week starting [monday], for YumSum Star
-/// (plan 09). The facts are worked out afresh each time; the saved notes
-/// are shown while they still match, and the AI writes new ones only when
-/// they don't. None for a week still going or with fewer than 4 judged
-/// days.
+/// The AI Coach's notes on the week starting [monday] (plan 09): the saved
+/// ones, or null when there are none. The AI writes them only where
+/// [reviewWritable], and only when the saved notes don't match the facts,
+/// which are worked out afresh each time. Empty for a week still going or
+/// with fewer than 4 judged days.
 final weeklyReviewProvider = FutureProvider.autoDispose
-    .family<List<ReviewPoint>, DateTime>((ref, monday) async {
+    .family<List<ReviewPoint>?, DateTime>((ref, monday) async {
       final uid = ref.watch(currentUidProvider);
       final now = DateTime.now();
       final sunday = DateTime(monday.year, monday.month, monday.day + 6);
       final today = DateTime(now.year, now.month, now.day);
       if (uid == null || !sunday.isBefore(today)) return const [];
 
+      final repository = ref.watch(weeklyReviewRepositoryProvider);
+      final week = _dateKey.format(monday);
+      final entitlement = await ref.watch(entitlementProvider.future);
+      final saved = await repository.fetch(uid, week);
+      if (!reviewWritable(entitlement, monday: monday, now: now)) {
+        return saved?.points;
+      }
+
       final summaryRepository = ref.watch(dailySummaryRepositoryProvider);
       final mealRepository = ref.watch(mealRepositoryProvider);
       final weightRepository = ref.watch(weightEntryRepositoryProvider);
-      final repository = ref.watch(weeklyReviewRepositoryProvider);
       final service = ref.watch(weeklyReviewServiceProvider);
       final writing = ref.watch(_writingProvider);
       final (user, recipes) = await (
@@ -54,7 +106,6 @@ final weeklyReviewProvider = FutureProvider.autoDispose
         ref.watch(recipesProvider.future),
       ).wait;
       if (user == null) return const [];
-      final week = _dateKey.format(monday);
       final end = _dateKey.format(sunday);
       // Four weeks, for the usual big day and the nutrients over the weeks.
       final fourWeeks = _dateKey.format(
@@ -83,7 +134,6 @@ final weeklyReviewProvider = FutureProvider.autoDispose
       if (facts.judgedDays < 4) return const [];
 
       final basis = 'Prompt version $weeklyReviewPromptVersion\n${facts.text}';
-      final saved = await repository.fetch(uid, week);
       if (saved != null && saved.basis == basis) return saved.points;
 
       final key = '$uid $week $basis';

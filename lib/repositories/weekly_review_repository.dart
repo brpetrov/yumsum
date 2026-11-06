@@ -20,4 +20,15 @@ class WeeklyReviewRepository {
 
   Future<void> save(String uid, String week, WeeklyReview review) =>
       _doc(uid, week).set(review.toFirestore());
+
+  /// Whether any week's notes are saved.
+  Future<bool> hasAny(String uid) async {
+    final snapshot = await _db
+        .collection('users')
+        .doc(uid)
+        .collection('weekly_reviews')
+        .limit(1)
+        .get();
+    return snapshot.docs.isNotEmpty;
+  }
 }

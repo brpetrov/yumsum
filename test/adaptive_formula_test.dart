@@ -21,11 +21,15 @@ double _median(List<num> values) {
       : (sorted[mid - 1] + sorted[mid]) / 2;
 }
 
-/// Your plan, eating 1830 a day, weighing every morning and logging every
-/// day, from Monday 2 November.
-SimRun _yourPlan(double burnOffset, {int weeks = 8}) => simulate(
+/// Your plan (on the fast pace unless given), eating 1830 a day, weighing
+/// every morning and logging every day, from Monday 2 November.
+SimRun _yourPlan(
+  double burnOffset, {
+  int weeks = 8,
+  WeightLossPace pace = WeightLossPace.fast,
+}) => simulate(
   Scenario(
-    profile: planProfile(),
+    profile: planProfile(pace: pace),
     weeks: weeks,
     burnOffset: burnOffset,
     intake: 1830,
@@ -62,30 +66,59 @@ void main() {
       }
     });
 
-    test('(b) burning 225 less: a first sign, then small steps to −220', () {
-      final run = _yourPlan(-227);
+    test('(b) burning 225 less, on the moderate pace: a first sign, then '
+        'small steps to −220', () {
+      final run = _yourPlan(-227, pace: WeightLossPace.moderate);
       expect(run.mondays.take(6).map((m) => m.note), [
         _firstSign,
         ...List.filled(5, _lowered),
       ]);
       expect(run.mondays.take(6).map((m) => m.adjustment), [
         0,
-        -50,
+        -60,
         -110,
         -150,
         -180,
         -220,
       ]);
-      expect(run.on(11, 23).target, closeTo(1544, 2));
-      for (final monday in run.mondays.skip(3)) {
-        expect(monday.target, 1500);
-      }
-      final last = run.mondays.last.profile;
+      final last = run.mondays.last;
       expect(
-        AdaptiveFormula.planOf(last).targetDate.isAfter(
-          AdaptiveFormula.planOf(last, adaptiveKcal: 0).targetDate,
+        last.target,
+        closeTo(
+          AdaptiveFormula.planOf(
+                last.profile,
+                adaptiveKcal: 0,
+              ).dailyCalorieTarget -
+              220,
+          1,
         ),
-        isTrue,
+      );
+    });
+
+    test('(d) on the fast pace, a cut stops 50 under it, so the plan never '
+        'gets harsher than the harshest one offered', () {
+      final run = _yourPlan(-227);
+      expect(run.mondays.take(6).map((m) => m.note), [
+        _firstSign,
+        _lowered,
+        ...List.filled(4, _steady),
+      ]);
+      expect(
+        run.mondays.take(6).map((m) => m.adjustment),
+        everyElement(greaterThanOrEqualTo(-50)),
+      );
+      final second = run.mondays[1];
+      expect(second.adjustment, -50);
+      expect(
+        second.target,
+        closeTo(
+          AdaptiveFormula.planOf(
+                second.profile,
+                adaptiveKcal: 0,
+              ).dailyCalorieTarget -
+              50,
+          1,
+        ),
       );
     });
 
@@ -406,10 +439,10 @@ void main() {
       expect(result.adjustment, 0);
     });
 
-    test('the next Monday lowers it', () {
+    test('the next Monday lowers it, as far as the fast pace allows', () {
       final result = on(week: '2026-11-23', note: 'first_sign');
       expect(result.note, _lowered);
-      expect(result.adjustment, -80);
+      expect(result.adjustment, -50);
     });
 
     test('a steady Monday in between, or a missed one, starts again', () {
@@ -429,11 +462,13 @@ void main() {
       int aim, {
       int current = 0,
       bool cutPending = true,
+      int? floor,
     }) => AdaptiveFormula.decide(
       aim: aim,
       current: current,
       planTarget: 2000,
       cutPending: cutPending,
+      floor: floor,
     );
 
     test('a step is never more than 5% of the plan', () {
@@ -446,6 +481,31 @@ void main() {
       expect(decide(-390, current: -250).adjustment, -300);
       expect(decide(-390, current: -300).note, _steady);
       expect(decide(390, current: 250).adjustment, 300);
+    });
+
+    test('a cut stops at the floor, 50 under the plan at the fast pace', () {
+      expect(decide(-300, floor: -50).adjustment, -50);
+      expect(decide(-300, current: -50, floor: -50).note, _steady);
+      // A floor below the 15% limit changes nothing.
+      expect(decide(-390, current: -250, floor: -400).adjustment, -300);
+      expect(decide(300, floor: -50).adjustment, 100);
+    });
+
+    test('the floor from the plan: −50 on the fast pace, 50 under the fast '
+        'plan on the others', () {
+      expect(AdaptiveFormula.lowestAdjustment(planProfile()), -50);
+      expect(
+        AdaptiveFormula.lowestAdjustment(
+          planProfile(pace: WeightLossPace.moderate),
+        ),
+        -320,
+      );
+      expect(
+        AdaptiveFormula.lowestAdjustment(
+          planProfile(pace: WeightLossPace.slow),
+        ),
+        -600,
+      );
     });
 
     test('an aim over 20% of the plan is unusual, with no change', () {

@@ -130,10 +130,11 @@ void main() {
       final saved = profiles.saved.single;
       expect(saved.adaptiveWeek, thisWeek);
       expect(saved.adaptiveNote, 'lowered');
-      expect(saved.adaptiveKcal, -80);
+      // As far as the fast pace allows.
+      expect(saved.adaptiveKcal, -50);
       expect(
         saved.dailyCalorieTarget,
-        closeTo(profile.dailyCalorieTarget - 80, 1e-9),
+        closeTo(profile.dailyCalorieTarget - 50, 1e-9),
       );
       expect(saved.adaptiveChanges, [
         (

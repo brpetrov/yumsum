@@ -129,6 +129,9 @@ class AdaptiveFormula {
   static const unusualShare = 0.20;
   static const kcalPerKg = 7700;
 
+  /// How far under the plan at the fast pace the target may ever go.
+  static const belowFastest = 50;
+
   /// How long the adjustment stays frozen once YumSum Star ends.
   static const lapseDays = 14;
 
@@ -169,6 +172,20 @@ class AdaptiveFormula {
       adaptiveKcal: (adaptiveKcal ?? profile.adaptiveKcal).toDouble(),
       now: now,
     );
+  }
+
+  /// The lowest adjustment allowed: the target never goes more than
+  /// [belowFastest] kcal under what the plan would be at the fast pace, so a
+  /// cut can't make a plan harsher than the harshest one offered. On the
+  /// fast pace itself that's −50; on the others the 15% limit usually bites
+  /// first.
+  static int lowestAdjustment(UserProfile profile) {
+    final plan = planOf(profile, adaptiveKcal: 0).dailyCalorieTarget;
+    final fastest = planOf(
+      profile.copyWith(weightLossPace: WeightLossPace.fast),
+      adaptiveKcal: 0,
+    ).dailyCalorieTarget;
+    return ((fastest - belowFastest - plan) / 10).ceil() * 10;
   }
 
   /// [profile] re-planned with [adaptiveKcal], every other detail kept.
@@ -408,6 +425,7 @@ class AdaptiveFormula {
       aim: aim,
       current: current,
       planTarget: planOf(profile, adaptiveKcal: 0).dailyCalorieTarget,
+      floor: lowestAdjustment(profile),
       cutPending:
           profile.adaptiveWeek == lastMonday &&
           (lastNote == AdaptiveNote.firstSign ||
@@ -426,20 +444,23 @@ class AdaptiveFormula {
   /// Step 8, from the aim (gap × confidence): the limits, the dead band and
   /// the two Mondays a cut needs. [cutPending] is last Monday wanting one;
   /// [stepScale] shrinks the step limit while there are under 3 weeks of
-  /// data, so early weeks move the target only a little.
+  /// data, so early weeks move the target only a little. [floor] is the
+  /// lowest adjustment allowed ([lowestAdjustment]); the 15% limit without.
   static ({AdaptiveNote note, int adjustment}) decide({
     required int aim,
     required int current,
     required double planTarget,
     required bool cutPending,
     double stepScale = 1,
+    int? floor,
   }) {
     int tens(double kcal) => (kcal / 10).floor() * 10;
     if (aim.abs() > unusualShare * planTarget) {
       return (note: AdaptiveNote.unusual, adjustment: current);
     }
     final limit = tens(totalShare * planTarget);
-    final wanted = aim.clamp(-limit, limit) - current;
+    final lowest = math.max(-limit, floor ?? -limit);
+    final wanted = aim.clamp(lowest, limit) - current;
     if (wanted.abs() < deadBand) {
       return (note: AdaptiveNote.steady, adjustment: current);
     }

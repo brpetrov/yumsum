@@ -27,6 +27,7 @@ class Entitlement {
   const Entitlement({
     required this.active,
     required this.source,
+    this.startedAt,
     this.expiresAt,
     this.inTrial = false,
     this.state,
@@ -38,6 +39,10 @@ class Entitlement {
 
   final bool active;
   final EntitlementSource source;
+
+  /// When YumSum Star last switched on, from Play; none for a hand-typed
+  /// grant. AI Coach writes notes only on weeks from then.
+  final DateTime? startedAt;
 
   /// The end of the paid period or the trial; none for an open-ended grant.
   final DateTime? expiresAt;
@@ -65,6 +70,7 @@ class Entitlement {
     return Entitlement(
       active: data['active'] == true,
       source: EntitlementSource.fromString(data['source'] as String?),
+      startedAt: date('startedAt'),
       expiresAt: date('expiresAt'),
       inTrial: data['inTrial'] == true,
       state: data['state'] as String?,

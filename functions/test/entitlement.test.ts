@@ -60,6 +60,7 @@ describe("entitlementFrom", () => {
       inTrial: true,
       productId: "yumsum_plus",
       basePlan: "monthly",
+      startedAt: now,
       expiresAt: new Date("2026-11-11T11:58:00.000Z"),
       endedAt: null,
       source: "play",
@@ -136,6 +137,43 @@ describe("entitlementFrom", () => {
       assert.deepEqual(fields?.expiresAt, expiryTime ? new Date(expiryTime) : null);
     });
   }
+});
+
+describe("startedAt", () => {
+  const wasOn: Stored = {
+    active: true,
+    source: "play",
+    startedAt: stamp(past),
+    expiresAt: stamp(future),
+  };
+
+  test("kept while YumSum Star stays on", () => {
+    const fields = entitlementFrom(later("SUBSCRIPTION_STATE_ACTIVE", future), wasOn, now);
+    assert.deepEqual(fields?.startedAt, new Date(past));
+  });
+
+  test("now for a record that was on without one", () => {
+    const fields = entitlementFrom(
+      later("SUBSCRIPTION_STATE_ACTIVE", future),
+      { active: true, source: "play" },
+      now,
+    );
+    assert.deepEqual(fields?.startedAt, now);
+  });
+
+  test("cleared when it switches off", () => {
+    const fields = entitlementFrom(later("SUBSCRIPTION_STATE_EXPIRED", future), wasOn, now);
+    assert.equal(fields?.startedAt, null);
+  });
+
+  test("now when it comes back after a lapse", () => {
+    const fields = entitlementFrom(
+      later("SUBSCRIPTION_STATE_ACTIVE", future),
+      { ...wasOn, active: false, endedAt: stamp(past) },
+      now,
+    );
+    assert.deepEqual(fields?.startedAt, now);
+  });
 });
 
 describe("endedAt", () => {

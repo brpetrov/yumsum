@@ -11,8 +11,13 @@ import 'package:lean_streak/widgets/plus_mark.dart';
 const adaptiveIntroShownKey = 'adaptive.intro_shown';
 const adaptiveLapseNoticeKey = 'adaptive.lapse_notice';
 
-/// Sells the Adaptive formula ("A target that learns from you"): once after
-/// subscribing, and from Plan Settings and Weight & Progress. With YumSum
+/// The Adaptive formula in one line, under its name in the dialog.
+const adaptiveSubtitle =
+    'A smarter calorie target, tailored to your body and adjusted week by '
+    'week as it learns what you burn.';
+
+/// Sells the Adaptive formula: once after subscribing, and from Plan
+/// Settings and Weight & Progress. With YumSum
 /// Star ([plus]) its button opens the weigh-in dialog, since weigh-ins are
 /// what it learns from; without, Enable opens the YumSum Star page.
 Future<void> showAdaptiveIntro(BuildContext context, {bool plus = true}) async {
@@ -20,18 +25,19 @@ Future<void> showAdaptiveIntro(BuildContext context, {bool plus = true}) async {
     context: context,
     builder: (context) => FeatureIntroDialog(
       title: 'Adaptive formula',
-      subtitle: 'A target that learns from you',
+      subtitle: adaptiveSubtitle,
       promises: const [
         (
           Icons.insights_rounded,
-          'Knows what you burn',
-          'Worked out from your weigh-ins and what you log, not just a '
-              'formula.',
+          'Measures what you burn',
+          'A formula can only guess. This measures what your body really '
+              'burns, from your weigh-ins and what you eat.',
         ),
         (
           Icons.tune_rounded,
           'Tailored to you',
-          'A target built around your body and your habits.',
+          'A target built around your body and your habits, not the '
+              'average person.',
         ),
         (
           Icons.trending_down_rounded,

@@ -24,6 +24,7 @@ enum DebugAccount {
       active: true,
       source: EntitlementSource.play,
       state: 'active',
+      startedAt: now.subtract(const Duration(days: 30)),
       expiresAt: now.add(const Duration(days: 30)),
     ),
     trialEnding => Entitlement(
@@ -31,6 +32,7 @@ enum DebugAccount {
       source: EntitlementSource.play,
       state: 'active',
       inTrial: true,
+      startedAt: now.subtract(const Duration(days: 5)),
       expiresAt: now.add(const Duration(days: 2)),
     ),
     ended => Entitlement(

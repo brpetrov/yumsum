@@ -30,6 +30,19 @@ void main() {
     expect(managedInPlay(grant, _now), isFalse);
   });
 
+  test('startedAt is read when Play wrote it', () {
+    final bought = Entitlement.fromMap({
+      'active': true,
+      'source': 'play',
+      'startedAt': Timestamp.fromDate(_earlier),
+    });
+    expect(bought.startedAt, _earlier);
+    expect(
+      Entitlement.fromMap({'active': true, 'source': 'manual'}).startedAt,
+      isNull,
+    );
+  });
+
   test('YumSum Star ends at expiresAt, which then counts as the end', () {
     final grant = Entitlement.fromMap({
       'active': true,

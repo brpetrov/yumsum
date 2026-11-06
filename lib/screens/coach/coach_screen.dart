@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
@@ -48,17 +49,33 @@ const coachPromises = <(IconData, String, String)>[
   ),
 ];
 
-/// The Monday of the latest finished week: a week finishes on its Sunday,
-/// so last week's.
-DateTime latestFinishedWeek(DateTime today) =>
-    DateTime(today.year, today.month, today.day - today.weekday - 6);
+/// AI Coach in one line, under its name on the page and in the dialog.
+const coachSubtitle =
+    'Reads your week every Monday and tells you what\'s working and what '
+    'to change.';
+
+/// The coach illustration (assets/coach.webp, trimmed and shrunk to 720 px
+/// for the web) at [width].
+class _CoachImage extends StatelessWidget {
+  const _CoachImage({required this.width});
+
+  final double width;
+
+  @override
+  Widget build(BuildContext context) => Image.asset(
+    'assets/coach.webp',
+    width: width,
+    filterQuality: FilterQuality.medium,
+  );
+}
 
 /// What AI Coach does, from the page's info button, with Close only.
 Future<void> showCoachIntro(BuildContext context) => showDialog<void>(
   context: context,
   builder: (context) => FeatureIntroDialog(
     title: 'AI Coach',
-    subtitle: 'Your week, read for you',
+    subtitle: coachSubtitle,
+    image: const _CoachImage(width: 52),
     promises: coachPromises,
     actions: [
       TextButton(
@@ -69,10 +86,13 @@ Future<void> showCoachIntro(BuildContext context) => showDialog<void>(
   ),
 );
 
-/// The AI Coach page, `/coach`: a week bar over the notes the AI wrote on
-/// each finished week, back to the first logged one. Free users get what
-/// it does and Enable. [week] is a Monday as `yyyy-MM-dd`; anything else,
-/// or a week still going, opens the latest finished week.
+/// The AI Coach page, `/coach`: the week's name over the notes the AI wrote
+/// on it, paging back through the finished weeks since YumSum Star began.
+/// Only the latest finished week is ever written; the others show what was
+/// saved. Someone whose YumSum Star has ended keeps their notes; anyone
+/// else without it gets what it does and Enable. [week] is a Monday as
+/// `yyyy-MM-dd`; anything else, or a week still going, opens the latest
+/// finished week.
 class CoachScreen extends ConsumerStatefulWidget {
   const CoachScreen({super.key, this.week});
 
@@ -101,6 +121,9 @@ class _CoachScreenState extends ConsumerState<CoachScreen> {
   @override
   Widget build(BuildContext context) {
     final plus = ref.watch(plusProvider);
+    // Notes written earlier stay readable once YumSum Star has ended.
+    final kept =
+        !plus && (ref.watch(hasWeeklyReviewsProvider).valueOrNull ?? false);
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(),
@@ -127,44 +150,217 @@ class _CoachScreenState extends ConsumerState<CoachScreen> {
               20,
               28 + MediaQuery.paddingOf(context).bottom,
             ),
-            child: plus ? _weeks() : const _CoachPitch(),
+            child: plus || kept ? _weeks(plus) : const _CoachPitch(),
           ),
         ],
       ),
     );
   }
 
-  Widget _weeks() {
-    final latest = latestFinishedWeek(DateTime.now());
+  Widget _weeks(bool plus) {
+    final now = DateTime.now();
+    final latest = latestFinishedWeek(now);
+    final firstWeek = firstCoachWeek(
+      ref.watch(entitlementProvider).valueOrNull,
+    );
+    if (plus && firstWeek != null && firstWeek.isAfter(latest)) {
+      return _FirstNotes(now: now);
+    }
     final firstDay = ref.watch(firstLoggedDayProvider).valueOrNull;
-    final first = firstDay == null
+    var first = firstDay == null
         ? _monday
         : DateTime(
             firstDay.year,
             firstDay.month,
             firstDay.day - firstDay.weekday + 1,
           );
+    if (firstWeek != null && firstWeek.isAfter(first)) first = firstWeek;
     DateTime shift(int weeks) =>
         DateTime(_monday.year, _monday.month, _monday.day + 7 * weeks);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        PeriodBar(
-          label: weekLabel(_monday),
+        _WeekHeader(
+          monday: _monday,
+          latest: latest,
           onPrevious: _monday.isAfter(first)
               ? () => setState(() => _monday = shift(-1))
               : null,
           onNext: _monday.isBefore(latest)
               ? () => setState(() => _monday = shift(1))
               : null,
-          onToday: _monday == latest
-              ? null
-              : () => setState(() => _monday = latest),
-          todayLabel: 'Latest',
         ),
         const SizedBox(height: 18),
-        _WeekNotes(monday: _monday),
+        if (!plus) ...[const _Ended(), const SizedBox(height: 18)],
+        _WeekNotes(monday: _monday, plus: plus),
       ],
+    );
+  }
+}
+
+/// The week's name beside the coach, with Previous and Next: "Last week"
+/// over its dates for the latest finished week, or just the dates for an
+/// earlier one (with the year once it isn't this one).
+class _WeekHeader extends StatelessWidget {
+  const _WeekHeader({
+    required this.monday,
+    required this.latest,
+    required this.onPrevious,
+    required this.onNext,
+  });
+
+  final DateTime monday;
+  final DateTime latest;
+  final VoidCallback? onPrevious;
+  final VoidCallback? onNext;
+
+  @override
+  Widget build(BuildContext context) {
+    final last = monday == latest;
+    final dates = weekLabel(
+      monday,
+      year:
+          DateTime(monday.year, monday.month, monday.day + 6).year !=
+          DateTime.now().year,
+    );
+    return AppCard(
+      padding: const EdgeInsets.fromLTRB(14, 10, 2, 10),
+      child: Row(
+        children: [
+          const _CoachImage(width: 48),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  last ? 'Last week' : dates,
+                  style: AppTheme.display.copyWith(
+                    fontSize: 18,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                if (last)
+                  Text(
+                    dates,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          IconButton(
+            tooltip: 'Previous',
+            onPressed: onPrevious,
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.chevron_left_rounded),
+          ),
+          IconButton(
+            tooltip: 'Next',
+            onPressed: onNext,
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.chevron_right_rounded),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// For a new subscriber, until a week finished with YumSum Star is in:
+/// when the first notes come, and what the coach is doing meanwhile.
+class _FirstNotes extends StatelessWidget {
+  const _FirstNotes({required this.now});
+
+  final DateTime now;
+
+  @override
+  Widget build(BuildContext context) {
+    final days = 8 - now.weekday;
+    final monday = DateTime(now.year, now.month, now.day + days);
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const _CoachImage(width: 52),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Your first notes come on Monday',
+                      style: AppTheme.display.copyWith(
+                        fontSize: 18,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      days == 1 ? '1 day to go' : '$days days to go',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            'AI Coach reads a whole week at a time, so it\'s going over this '
+            'one as you log it. On Monday ${DateFormat('d MMMM').format(monday)} '
+            'it\'ll tell you what went well, what held you back and what to '
+            'try next week.',
+            style: TextStyle(
+              fontSize: 14.5,
+              height: 1.45,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Once YumSum Star has ended: the notes stay, and Enable brings new ones.
+class _Ended extends StatelessWidget {
+  const _Ended();
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'YumSum Star has ended, so no new notes are written. The ones '
+            'you have stay.',
+            style: TextStyle(
+              fontSize: 13.5,
+              height: 1.4,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 44,
+            child: FilledButton.icon(
+              onPressed: () => showPlusPaywall(context),
+              icon: const PlusStar(size: 22),
+              label: const Text('Enable'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -178,16 +374,10 @@ class _CoachPitch extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 12),
-        // The coach illustration, trimmed and shrunk to 720 px for the web.
-        Center(
-          child: Image.asset(
-            'assets/coach.webp',
-            width: 220,
-            filterQuality: FilterQuality.medium,
-          ),
-        ),
-        const SizedBox(height: 22),
+        const SizedBox(height: 4),
+        // Small enough for Enable to be on screen on a phone.
+        const Center(child: _CoachImage(width: 156)),
+        const SizedBox(height: 16),
         Text(
           'AI Coach',
           textAlign: TextAlign.center,
@@ -196,19 +386,20 @@ class _CoachPitch extends StatelessWidget {
             color: AppColors.textPrimary,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 6),
         Text(
-          'Your week, read for you',
+          coachSubtitle,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 14.5,
+            height: 1.35,
             fontWeight: FontWeight.w600,
             color: AppColors.textSecondary,
           ),
         ),
-        const SizedBox(height: 22),
+        const SizedBox(height: 18),
         const AppCard(child: FeaturePromises(coachPromises)),
-        const SizedBox(height: 22),
+        const SizedBox(height: 18),
         SizedBox(
           height: 54,
           child: FilledButton.icon(
@@ -224,11 +415,12 @@ class _CoachPitch extends StatelessWidget {
 
 /// The notes on the week starting [monday]: the AI's notes, or why there
 /// are none for a thin week (notes need 4 judged days: logged, not days
-/// off), a spinner, or a failure with Try again.
+/// off) or a week it never wrote, a spinner, or a failure with Try again.
 class _WeekNotes extends ConsumerWidget {
-  const _WeekNotes({required this.monday});
+  const _WeekNotes({required this.monday, required this.plus});
 
   final DateTime monday;
+  final bool plus;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -256,7 +448,7 @@ class _WeekNotes extends ConsumerWidget {
     }
 
     final notes = summaries == null
-        ? const AsyncLoading<List<ReviewPoint>>()
+        ? const AsyncLoading<List<ReviewPoint>?>()
         : ref.watch(weeklyReviewProvider(monday));
     return notes.when(
       loading: () => AppCard(
@@ -292,6 +484,17 @@ class _WeekNotes extends ConsumerWidget {
         ),
       ),
       data: (points) {
+        if (points == null) {
+          return AppCard(
+            child: Text(
+              plus
+                  ? 'No notes on this week. AI Coach writes them during the '
+                        'week after, when you open this page.'
+                  : 'No notes on this week.',
+              style: muted,
+            ),
+          );
+        }
         final recipes = ref.watch(recipesProvider).valueOrNull ?? const [];
         final names = ref.watch(_recipeNamesProvider);
         return Column(

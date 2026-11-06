@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
@@ -51,6 +52,21 @@ String _key(DateTime day) =>
     '${day.year}-${'${day.month}'.padLeft(2, '0')}-'
     '${'${day.day}'.padLeft(2, '0')}';
 
+DateTime _days(DateTime from, int days) =>
+    DateTime(from.year, from.month, from.day + days);
+
+/// The week's dates as the page shows them.
+String _dates(DateTime monday) =>
+    weekLabel(monday, year: _days(monday, 6).year != DateTime.now().year);
+
+/// The coach illustration, wherever it's shown.
+final _coach = find.byWidgetPredicate(
+  (widget) =>
+      widget is Image &&
+      widget.image is AssetImage &&
+      (widget.image as AssetImage).assetName == 'assets/coach.webp',
+);
+
 /// The dots before the notes, by colour.
 Finder _dots(Color color) => find.byWidgetPredicate(
   (widget) =>
@@ -69,19 +85,24 @@ const _previous = Icons.chevron_left_rounded;
 const _next = Icons.chevron_right_rounded;
 
 void main() {
+  final latest = latestFinishedWeek(DateTime.now());
   late int reads;
   late List<DateTime> asked;
 
-  /// The page on [week]. [notes] is what each read of the notes gives, in
-  /// turn; a [Completer] keeps it loading and an [Exception] fails it.
-  /// Every week has [judgedDays] logged, and [recipes] is the library.
+  /// The page on [week], the latest finished one unless given. [notes] is
+  /// what each read of the notes gives, in turn; a [Completer] keeps it
+  /// loading, an [Exception] fails it and null is a week never written.
+  /// Every week has [judgedDays] logged, [recipes] is the library, and
+  /// [kept] says whether any notes are saved, for an account without
+  /// YumSum Star.
   Future<void> pump(
     WidgetTester tester, {
-    String? week = '2026-10-26',
+    String? week = '',
     Entitlement? entitlement = _plus,
-    List<Object> notes = const [_notes],
+    List<Object?> notes = const [_notes],
     int judgedDays = 6,
     List<Recipe> recipes = const [],
+    bool kept = false,
     bool settle = true,
   }) async {
     tester.view.physicalSize = const Size(360, 800);
@@ -97,9 +118,10 @@ void main() {
           sharedPreferencesProvider.overrideWithValue(prefs),
           entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
           recipesProvider.overrideWith((ref) async => recipes),
-          // A Wednesday, so the first week is the one of 12 October.
+          hasWeeklyReviewsProvider.overrideWith((ref) async => kept),
+          // A Wednesday, so the first week is two before the latest.
           firstLoggedDayProvider.overrideWith(
-            (ref) async => DateTime(2026, 10, 14),
+            (ref) async => _days(latest, -12),
           ),
           weeklyReviewProvider.overrideWith((ref, monday) async {
             asked.add(monday);
@@ -107,18 +129,13 @@ void main() {
             return switch (result) {
               final Completer<List<ReviewPoint>> wait => wait.future,
               final Exception error => throw error,
-              _ => result as List<ReviewPoint>,
+              _ => result as List<ReviewPoint>?,
             };
           }),
           reviewSummariesProvider.overrideWith(
             (ref, range) => Stream.value({
               for (var day = 0; day < judgedDays; day++)
-                if (DateTime(
-                      range.startDate.year,
-                      range.startDate.month,
-                      range.startDate.day + day,
-                    )
-                    case final date)
+                if (_days(range.startDate, day) case final date)
                   _key(date): DailySummary(
                     date: _key(date),
                     totalCalories: 1900,
@@ -134,9 +151,11 @@ void main() {
         child: MaterialApp.router(
           theme: AppTheme.light,
           routerConfig: GoRouter(
-            initialLocation: week == null
-                ? AppRoutes.coach
-                : '${AppRoutes.coach}?week=$week',
+            initialLocation: switch (week) {
+              null => AppRoutes.coach,
+              '' => '${AppRoutes.coach}?week=${_key(latest)}',
+              _ => '${AppRoutes.coach}?week=$week',
+            },
             routes: [
               GoRoute(
                 path: AppRoutes.coach,
@@ -170,14 +189,18 @@ void main() {
   });
 
   group('with YumSum Star', () {
-    testWidgets('the notes, with their titles', (tester) async {
+    testWidgets('the notes, with their titles, under Last week and the coach', (
+      tester,
+    ) async {
       await pump(tester);
-      expect(find.text('26 Oct – 1 Nov 2026'), findsOneWidget);
+      expect(find.text('Last week'), findsOneWidget);
+      expect(find.text(_dates(latest)), findsOneWidget);
+      expect(_coach, findsOneWidget);
       expect(find.text('Weekends run high'), findsOneWidget);
       // Each number keeps its unit on its line.
       expect(
         find.text(
-          'Weekdays were steady at about 1,890 kcal, but the weekend '
+          'Weekdays were steady at about 1,890\u00A0kcal, but the weekend '
           'averaged 2,580.',
         ),
         findsOneWidget,
@@ -185,15 +208,15 @@ void main() {
       expect(find.text('A light first meal'), findsOneWidget);
       expect(
         find.text(
-          'Your first meal of the day averaged 14 g of protein. A '
-          '"Greek yoghurt berry bowl" gives 30 g for 332 kcal.',
+          'Your first meal of the day averaged 14\u00A0g of protein. A '
+          '"Greek yoghurt berry bowl" gives 30\u00A0g for 332\u00A0kcal.',
         ),
         findsOneWidget,
       );
       expect(find.text('Fibre on track'), findsOneWidget);
       expect(find.text('Fibre met the guide all week.'), findsOneWidget);
       expect(reads, 1);
-      expect(asked, [DateTime(2026, 10, 26)]);
+      expect(asked, [latest]);
     });
 
     testWidgets('a note on something that went well has a green dot', (
@@ -233,11 +256,16 @@ void main() {
       expect(find.text('Recipe greek-yoghurt-berry-bowl'), findsOneWidget);
     });
 
-    testWidgets('the info button explains it, with Close only', (tester) async {
+    testWidgets('the info button explains it beside the coach, with Close '
+        'only', (tester) async {
       await pump(tester);
       await tester.tap(find.byTooltip('How it works'));
       await tester.pumpAndSettle();
-      expect(find.text('Your week, read for you'), findsOneWidget);
+      expect(find.text(coachSubtitle), findsOneWidget);
+      expect(
+        find.descendant(of: find.byType(AlertDialog), matching: _coach),
+        findsOneWidget,
+      );
       expect(find.text('Detects your patterns'), findsOneWidget);
       expect(find.text('Fresh every Monday'), findsOneWidget);
       expect(find.text('Close'), findsOneWidget);
@@ -256,6 +284,17 @@ void main() {
         findsOneWidget,
       );
       expect(reads, 0);
+    });
+
+    testWidgets('a week never written says so', (tester) async {
+      await pump(tester, notes: [null]);
+      expect(
+        find.text(
+          'No notes on this week. AI Coach writes them during the week '
+          'after, when you open this page.',
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('while it writes: Looking over your week', (tester) async {
@@ -280,52 +319,95 @@ void main() {
       expect(find.text('Weekends run high'), findsOneWidget);
     });
 
-    testWidgets('Previous and Next page through the finished weeks, back to '
-        'the first logged one; Latest returns', (tester) async {
+    testWidgets('Previous and Next page through the finished weeks by their '
+        'dates, back to the first logged one', (tester) async {
       await pump(tester);
-      final latest = latestFinishedWeek(DateTime.now());
 
       await tester.tap(find.byTooltip('Previous'));
       await tester.pumpAndSettle();
-      expect(find.text('19 – 25 Oct 2026'), findsOneWidget);
+      expect(find.text('Last week'), findsNothing);
+      expect(find.text(_dates(_days(latest, -7))), findsOneWidget);
       await tester.tap(find.byTooltip('Previous'));
       await tester.pumpAndSettle();
-      expect(find.text('12 – 18 Oct 2026'), findsOneWidget);
+      expect(find.text(_dates(_days(latest, -14))), findsOneWidget);
       expect(_enabled(tester, _previous), isFalse);
-      expect(asked, [
-        DateTime(2026, 10, 26),
-        DateTime(2026, 10, 19),
-        DateTime(2026, 10, 12),
-      ]);
-
-      await tester.tap(find.text('Latest'));
-      await tester.pumpAndSettle();
-      expect(find.text(weekLabel(latest)), findsOneWidget);
+      expect(asked, [latest, _days(latest, -7), _days(latest, -14)]);
       expect(find.text('Latest'), findsNothing);
+
+      await tester.tap(find.byTooltip('Next'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Next'));
+      await tester.pumpAndSettle();
+      expect(find.text('Last week'), findsOneWidget);
       expect(_enabled(tester, _next), isFalse);
       expect(_enabled(tester, _previous), isTrue);
+    });
+
+    testWidgets('the weeks go back only to the one YumSum Star began in', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        entitlement: Entitlement(
+          active: true,
+          source: EntitlementSource.play,
+          startedAt: _days(latest, 2),
+        ),
+      );
+      expect(find.text('Last week'), findsOneWidget);
+      expect(find.text('Weekends run high'), findsOneWidget);
+      expect(_enabled(tester, _previous), isFalse);
+    });
+
+    testWidgets('a new subscriber is told when the first notes come, with '
+        'nothing to page through', (tester) async {
+      final now = DateTime.now();
+      await pump(
+        tester,
+        entitlement: Entitlement(
+          active: true,
+          source: EntitlementSource.play,
+          startedAt: now,
+        ),
+      );
+      expect(find.text('Your first notes come on Monday'), findsOneWidget);
+      final days = 8 - now.weekday;
+      expect(
+        find.text(days == 1 ? '1 day to go' : '$days days to go'),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining(
+          'On Monday ${DateFormat('d MMMM').format(_days(now, days))} '
+          'it\'ll tell you what went well',
+        ),
+        findsOneWidget,
+      );
+      expect(_coach, findsOneWidget);
+      expect(find.byTooltip('Previous'), findsNothing);
+      expect(find.text('Last week'), findsNothing);
+      expect(reads, 0);
     });
 
     testWidgets('an unknown or unfinished week opens the latest', (
       tester,
     ) async {
-      final latest = latestFinishedWeek(DateTime.now());
       await pump(tester, week: 'not a date');
-      expect(find.text(weekLabel(latest)), findsOneWidget);
+      expect(find.text('Last week'), findsOneWidget);
 
-      final thisMonday = DateTime(latest.year, latest.month, latest.day + 7);
-      await pump(tester, week: _key(thisMonday));
-      expect(find.text(weekLabel(latest)), findsOneWidget);
+      await pump(tester, week: _key(_days(latest, 7)));
+      expect(find.text('Last week'), findsOneWidget);
 
       await pump(tester, week: null);
-      expect(find.text(weekLabel(latest)), findsOneWidget);
+      expect(find.text('Last week'), findsOneWidget);
     });
   });
 
   group('without YumSum Star', () {
     testWidgets('what it does, and Enable opens the paywall', (tester) async {
       await pump(tester, entitlement: null);
-      expect(find.text('Your week, read for you'), findsOneWidget);
+      expect(_coach, findsOneWidget);
+      expect(find.text(coachSubtitle), findsOneWidget);
       expect(find.text('Detects your patterns'), findsOneWidget);
       expect(find.text('Looks past calories'), findsOneWidget);
       expect(find.text('Tips written for you'), findsOneWidget);
@@ -339,6 +421,47 @@ void main() {
       await tester.tap(find.text('Enable'));
       await tester.pumpAndSettle();
       expect(find.text('The paywall'), findsOneWidget);
+    });
+
+    final ended = Entitlement(
+      active: false,
+      source: EntitlementSource.play,
+      state: 'expired',
+      expiresAt: _days(DateTime.now(), -3),
+    );
+
+    testWidgets('once it has ended, the notes stay, with Enable', (
+      tester,
+    ) async {
+      await pump(tester, entitlement: ended, kept: true);
+      expect(
+        find.text(
+          'YumSum Star has ended, so no new notes are written. The ones you '
+          'have stay.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Last week'), findsOneWidget);
+      expect(find.text('Weekends run high'), findsOneWidget);
+      expect(find.byTooltip('How it works'), findsNothing);
+
+      await tester.tap(find.text('Enable'));
+      await tester.pumpAndSettle();
+      expect(find.text('The paywall'), findsOneWidget);
+    });
+
+    testWidgets('a week without notes, once it has ended, says only that', (
+      tester,
+    ) async {
+      await pump(tester, entitlement: ended, kept: true, notes: [null]);
+      expect(find.text('No notes on this week.'), findsOneWidget);
+    });
+
+    testWidgets('ended with nothing saved: what it does', (tester) async {
+      await pump(tester, entitlement: ended);
+      expect(find.text(coachSubtitle), findsOneWidget);
+      expect(find.text('Detects your patterns'), findsOneWidget);
+      expect(find.text('Last week'), findsNothing);
     });
   });
 }

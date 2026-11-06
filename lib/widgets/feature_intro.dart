@@ -76,19 +76,22 @@ class TryButton extends StatelessWidget {
   }
 }
 
-/// A YumSum Star feature's dialog: its name over a short subtitle, then
-/// four bold promises, each with one short line, to take in at a glance.
+/// A YumSum Star feature's dialog: its name over a short subtitle, with its
+/// [image] beside them if it has one, then four bold promises, each with one
+/// short line, to take in at a glance.
 class FeatureIntroDialog extends StatelessWidget {
   const FeatureIntroDialog({
     super.key,
     required this.title,
     required this.subtitle,
+    this.image,
     required this.promises,
     required this.actions,
   });
 
   final String title;
   final String subtitle;
+  final Widget? image;
 
   /// Icon, headline and line.
   final List<(IconData, String, String)> promises;
@@ -96,22 +99,32 @@ class FeatureIntroDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-              fontSize: 14.5,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-            ),
+    final heading = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title),
+        const SizedBox(height: 4),
+        Text(
+          subtitle,
+          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+            fontSize: 14.5,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textSecondary,
           ),
-        ],
-      ),
+        ),
+      ],
+    );
+    return AlertDialog(
+      title: image == null
+          ? heading
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                image!,
+                const SizedBox(width: 14),
+                Expanded(child: heading),
+              ],
+            ),
       content: SingleChildScrollView(child: FeaturePromises(promises)),
       actions: actions,
     );

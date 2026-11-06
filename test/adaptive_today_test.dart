@@ -277,16 +277,16 @@ void main() {
 
     testWidgets('How it works shows after subscribing', (tester) async {
       await pumpToday(tester, profile: adapted('learning'), saved: const {});
-      expect(find.text('A target that learns from you'), findsOneWidget);
+      expect(find.text(adaptiveSubtitle), findsOneWidget);
       expect(prefs.getBool(adaptiveIntroShownKey), isTrue);
       await tester.tap(find.text('Close'));
       await tester.pumpAndSettle();
-      expect(find.text('A target that learns from you'), findsNothing);
+      expect(find.text(adaptiveSubtitle), findsNothing);
     });
 
     testWidgets('and only once', (tester) async {
       await pumpToday(tester, profile: adapted('learning'));
-      expect(find.text('A target that learns from you'), findsNothing);
+      expect(find.text(adaptiveSubtitle), findsNothing);
     });
 
     testWidgets('not for free users', (tester) async {
@@ -296,7 +296,7 @@ void main() {
         entitlement: null,
         saved: const {},
       );
-      expect(find.text('A target that learns from you'), findsNothing);
+      expect(find.text(adaptiveSubtitle), findsNothing);
     });
 
     testWidgets('"Log weight now" opens the weigh-in dialog', (tester) async {

@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/models/daily_summary.dart';
+import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/weekly_review.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
+import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/recipe_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weekly_review_provider.dart';
@@ -105,6 +107,14 @@ const _points = <ReviewPoint>[
   (title: 'Steady', text: 'Steady all week.', good: true),
 ];
 
+const _plus = Entitlement(active: true, source: EntitlementSource.manual);
+
+final _oldNotes = WeeklyReview(
+  points: _points,
+  basis: 'Prompt version 1\nOld facts.',
+  createdAt: DateTime(2026, 10, 5),
+);
+
 void main() {
   final now = DateTime.now();
   // Last week, so it's over.
@@ -116,14 +126,21 @@ void main() {
   late _FakeReviews reviews;
   late _FakeCoach coach;
 
-  ProviderContainer container() {
+  /// Listening to the notes on [week] (last week unless given), with
+  /// [saved] already written, for an account with [entitlement].
+  ProviderContainer container({
+    Entitlement? entitlement = _plus,
+    DateTime? week,
+    Map<String, WeeklyReview> saved = const {},
+  }) {
     meals = _FakeMeals();
     weighIns = _FakeWeighIns();
-    reviews = _FakeReviews();
+    reviews = _FakeReviews()..saved.addAll(saved);
     coach = _FakeCoach();
     final container = ProviderContainer(
       overrides: [
         currentUidProvider.overrideWithValue('user-1'),
+        entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
         userProfileProvider.overrideWith((ref) => Stream.value(planProfile())),
         recipesProvider.overrideWith((ref) async => const []),
         dailySummaryRepositoryProvider.overrideWithValue(
@@ -136,9 +153,15 @@ void main() {
       ],
     );
     addTearDown(container.dispose);
-    container.listen(weeklyReviewProvider(monday), (_, _) {});
+    container.listen(weeklyReviewProvider(week ?? monday), (_, _) {});
     return container;
   }
+
+  /// What the notes on [week] (last week unless given) come to.
+  Future<List<ReviewPoint>?> notesOn(
+    ProviderContainer notes, [
+    DateTime? week,
+  ]) => notes.read(weeklyReviewProvider(week ?? monday).future);
 
   test('counts the weigh-ins from a read of that week only', () async {
     container();
@@ -154,6 +177,69 @@ void main() {
       DateTime(monday.year, monday.month, monday.day - 21),
     );
     expect(meals.ranges, [(fourWeeksAgo, sunday)]);
+  });
+
+  test('the saved notes are shown while they match the facts', () async {
+    container();
+    await pumpEventQueue();
+    coach.calls.single.complete(_points);
+    await pumpEventQueue();
+    final basis = reviews.saved[week]!.basis;
+
+    final again = container(saved: {week: reviews.saved[week]!});
+    expect(await notesOn(again), _points);
+    expect(coach.calls, isEmpty);
+    expect(basis, startsWith('Prompt version $weeklyReviewPromptVersion\n'));
+  });
+
+  test(
+    'an earlier week only shows what was saved: no facts, no call',
+    () async {
+      final earlier = DateTime(monday.year, monday.month, monday.day - 7);
+      final earlierWeek = _key(earlier);
+      final notes = container(week: earlier, saved: {earlierWeek: _oldNotes});
+      expect(await notesOn(notes, earlier), _points);
+      expect(coach.calls, isEmpty);
+      expect(meals.ranges, isEmpty);
+
+      final none = container(week: earlier);
+      expect(await notesOn(none, earlier), isNull);
+      expect(coach.calls, isEmpty);
+    },
+  );
+
+  test('without YumSum Star, the saved notes only', () async {
+    final notes = container(entitlement: null, saved: {week: _oldNotes});
+    expect(await notesOn(notes), _points);
+    expect(coach.calls, isEmpty);
+    expect(meals.ranges, isEmpty);
+
+    final none = container(entitlement: null);
+    expect(await notesOn(none), isNull);
+  });
+
+  test('YumSum Star that began after the week: nothing yet', () async {
+    final notes = container(
+      entitlement: Entitlement(
+        active: true,
+        source: EntitlementSource.play,
+        startedAt: DateTime.now(),
+      ),
+    );
+    expect(await notesOn(notes), isNull);
+    expect(coach.calls, isEmpty);
+  });
+
+  test('YumSum Star that began during the week counts it', () async {
+    container(
+      entitlement: Entitlement(
+        active: true,
+        source: EntitlementSource.play,
+        startedAt: DateTime(monday.year, monday.month, monday.day + 6, 20),
+      ),
+    );
+    await pumpEventQueue();
+    expect(coach.calls, hasLength(1));
   });
 
   test('a run that overlaps one still writing shares its call', () async {

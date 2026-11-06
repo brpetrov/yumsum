@@ -46,6 +46,7 @@ The rest of this plan has the new numbers.
 1. **Your target = your plan + a personal adjustment.** The formula stays exactly as it is. The Adaptive formula adds one number, for example −80 kcal a day, learnt from your weigh-ins and the food you log.
 2. **It only changes your target on Mondays.** It looks back over the last 1 to 6 weeks (never older) and asks: given what you actually ate, did your weight do what the formula predicted? If yes, nothing changes. If not, the formula has your burn wrong, so it corrects it. Eating over target isn't punished; it's counted.
 3. **It moves in small, careful steps.** Each move is at most 5% of your plan (less in the first 3 weeks), and it can never move more than 15% in total. A cut needs two Mondays in a row agreeing; a raise needs one. Your minimum (1,500 kcal for men, 1,200 for women) never changes. At the minimum, your goal date moves later instead.
+   *Changed 6 November:* a cut never takes the target more than 50 kcal under what the plan would be at the fast pace (`lowestAdjustment`), so the formula can't make a plan harsher than the harshest one offered. On the fast pace that leaves 50 kcal of room for cuts; on the others the 15% limit usually bites first. Raises are unchanged. Your own simulation (b) now stops at −50 on the fast pace, and reaches −220 on the moderate one.
 4. **Bad data can't push it around.** One heavy weigh-in is one dot on a line. A typo is set aside. Half-logged days are left out, and so are breaks in logging. With too little data it changes nothing and says why.
 5. **Weigh-ins are the fuel.** It needs at least 2 a week, and daily is best. With weekly weigh-ins it never acts, and it says so.
 6. **Free users get the weight trend line** on Weight & Progress. It can ship on its own, first.
@@ -353,7 +354,7 @@ A dialog titled **Adaptive formula**, subtitled *A target that learns from you*.
 - (trend) **Keeps you moving.** If your weight stalls, your target adjusts so you keep losing.
 - (scale) **Learns as you go.** The more you weigh in, the smarter it gets. Daily is best.
 
-*Reworded 5 November, at your request; the last line is unchanged.*
+*Reworded 5 November, at your request; the last line is unchanged. Changed 6 November: the subtitle is "A smarter calorie target, tailored to your body and adjusted week by week as it learns what you burn.", the first promise "Measures what you burn: A formula can only guess. This measures what your body really burns, from your weigh-ins and what you eat." and the second's line ends "not the average person."*
 
 Buttons: **Close** and **Log weight now**, which opens the weigh-in dialog (`logWeightWithFeedback`), since weigh-ins are what it learns from.
 
