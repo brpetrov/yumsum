@@ -17,6 +17,7 @@ import {
   aiModelId,
   jsonReply,
   labelPrompt,
+  mealConfig,
   mealPrompt,
   nutrientsPrompt,
   photoPrompt,
@@ -122,7 +123,10 @@ export function estimateAsk(raw: unknown): Ask {
 
   switch (data.kind) {
     case "meal":
-      return estimate(mealPrompt(profile, macros, filled(text(data.text, 1000).trim())));
+      return {
+        ...estimate(mealPrompt(profile, macros, filled(text(data.text, 1000).trim()))),
+        config: mealConfig(macros),
+      };
     case "voice":
       return estimate(
         withMedia(voicePrompt(profile, macros), [media(data.audio, "audio/wav", maxAudioBytes)]),

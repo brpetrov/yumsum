@@ -13,6 +13,7 @@ import {
   weeklyReviewAsk,
 } from "../src/ai";
 import {
+  mealConfig,
   mealPrompt,
   nutrientsPrompt,
   nutritionContext,
@@ -264,7 +265,19 @@ describe("estimateAsk", () => {
     assert.equal(typeof ask.contents, "string");
     assert.ok((ask.contents as string).endsWith("Meal: Musaka"));
     assert.ok((ask.contents as string).includes("use Bulgaria nutrition figures"));
-    assert.deepEqual(ask.config, { responseMimeType: "application/json" });
+    assert.deepEqual(ask.config, mealConfig(false));
+  });
+
+  test("a typed meal's schema has the macros only when asked, and options on each item", () => {
+    const schema = (ask: boolean) => mealConfig(ask).responseSchema as {
+      properties: Record<string, { items?: { properties: Record<string, unknown> } }>;
+      required: string[];
+    };
+    assert.deepEqual(schema(false).required, ["items", "kcal", "protein_g"]);
+    assert.deepEqual(schema(true).required, ["items", "kcal", "protein_g", "macros"]);
+    assert.ok("options" in schema(false).properties.items.items!.properties);
+    const meal = estimateAsk({ kind: "meal", text: "Musaka", macros: true });
+    assert.deepEqual(meal.config, mealConfig(true));
   });
 
   test("the UK when no country is sent", () => {
@@ -340,9 +353,10 @@ describe("the prompts", () => {
   ];
 
   test("mention macros only when asked", () => {
-    for (const prompt of prompts(true)) {
+    for (const [index, prompt] of prompts(true).entries()) {
       assert.ok(prompt.includes("fat, saturates, carbohydrate, sugars"));
-      assert.ok(prompt.includes(`"macros": {"fat": <number>`));
+      // A typed meal's shape is its schema.
+      if (index > 0) assert.ok(prompt.includes(`"macros": {"fat": <number>`));
     }
     for (const prompt of prompts(false)) {
       assert.ok(!prompt.includes("macros"));
@@ -355,8 +369,9 @@ describe("the prompts", () => {
     for (const prompt of [meal, voice]) {
       assert.ok(prompt.includes("go with the most common choice in United Kingdom"));
       assert.ok(prompt.includes("Most items have no options."));
-      assert.ok(prompt.includes(`An item with options has two more keys`));
+      assert.ok(prompt.includes("Add nothing the user didn't name"));
     }
+    assert.ok(voice.includes(`An item with options has two more keys`));
     for (const prompt of [photo, nutrients]) {
       assert.ok(!prompt.includes("options"));
     }

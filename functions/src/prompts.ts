@@ -1,4 +1,4 @@
-import { type GenerateContentConfig, Type } from "@google/genai";
+import { type GenerateContentConfig, type Schema, Type } from "@google/genai";
 
 // What Gemini is asked, moved from the app on 5 November 2026 word for word,
 // so the answers keep the shape the app reads (calorie_estimate_service.dart,
@@ -39,27 +39,54 @@ const weights =
   "meat, fish, rice and pasta say in the item whether that weight is " +
   "cooked or raw.\n";
 
+// How a typed or spoken meal is listed. One item per food, as the user
+// would name it, keeps the same words to the same numbers: left to itself
+// the model split a dish into five parts one time and kept it whole the
+// next. Nothing unnamed is added: it gave a Big Mac fries and a Coke, and
+// fish and chips tartare sauce, mushy peas and its frying oil again
+// (eval/meals.json, 6 November 2026).
+function itemRules(country: string): string {
+  return "List each food or drink the user named as one item, the way " +
+    "they would name it: a curry, a sandwich or a slice of pizza is one " +
+    "item; fish and chips is two; a full English is each of its foods. " +
+    "Count the oil or fat a dish is usually cooked with in that item, " +
+    "never as an item of its own. Add nothing the user didn't name: no " +
+    "side, sauce, topping, drink or extra dish. The one exception is a " +
+    `side a dish is almost always eaten with in ${country}, such as rice ` +
+    "with a curry, when the user gave no amount and no brand: it goes in " +
+    `the same item, and its name says so ("chicken curry with rice"). Use ` +
+    "any amount the user gives; otherwise " +
+    `one standard single portion, as ${country} nutrition guides give it. ` +
+    `For branded and chain products, use ${country} nutrition figures.\n`;
+}
+
 // What people leave out most (the size, the milk, takeaway or homemade)
 // swings the calories most. Naming what it assumed keeps the model's options
 // to versions of the same thing (asked only for "other versions", it offered
-// other foods: a satsuma for an apple), the examples keep it from arguing
-// with what the user did say, and the options' shape stays out of the item
-// template, which the model fills for every item when it's there. The app
-// doesn't read "assumed": the item's own name carries it.
+// other foods: a satsuma for an apple), the examples keep it from asking
+// about what the user did say or about a named product, and the options'
+// shape stays out of the item template, which the model fills for every
+// item when it's there. The app doesn't read "assumed": the item's own name
+// carries it.
 function choices(country: string): string {
   return "When the user leaves out something that changes an item's " +
     "calories a lot (its size, the milk or sugar in a drink, full-fat or " +
-    "diet, homemade, takeaway or shop-bought, fried or grilled), go with " +
-    `the most common choice in ${country}. In that item, give "assumed", ` +
-    `the choice in a few words, and "options", up to 3 other common ` +
-    "choices for the same food or drink, each a complete item named in " +
-    `full. So "cappuccino" is assumed regular with semi-skimmed milk, with ` +
-    `options for whole milk, oat milk and large; "large oat latte", ` +
-    `"grilled chicken breast" and "Tesco chicken tikka masala" have no ` +
-    "options, as the user said what they had; nor do a banana or a cup of " +
-    "tea, where the choices make little difference. Options are never a " +
-    "different food, and never about a part of what the user named (a " +
-    "sandwich's filling, not its butter). Most items have no options.\n";
+    "diet, homemade or takeaway, fried or grilled), go with the most " +
+    `common choice in ${country}. In that item, give "assumed", the ` +
+    `choice in a few words, and "options", up to 3 other common choices ` +
+    "for the same food or drink, each a complete item named in full. When " +
+    "the size is what's missing, as with chips, a coffee or a glass of " +
+    "wine, assume the regular size, and the options are the small and the " +
+    `large one. So "cappuccino" is assumed regular with semi-skimmed milk, ` +
+    `with options for whole milk, oat milk and large, and "chicken curry" ` +
+    "is assumed homemade with rice, with options without rice and from a " +
+    "takeaway. No options when the user said what they had (a large oat " +
+    "latte, 200 g of chicken breast), for a size they gave (a pint, a " +
+    "bowl, two slices), for a branded or chain product (a Big Mac, a " +
+    "Greggs sausage roll), where the choices make little " +
+    "difference (a banana, a cup of tea), or for an item's parts (its " +
+    "bread, butter or sauce). An option is never a different food, a meal " +
+    "deal or a bigger dish. Most items have no options.\n";
 }
 
 const optionsJson =
@@ -87,25 +114,71 @@ function macrosJson(ask: boolean, orNull = false): string {
     : "";
 }
 
-// Listing each component before the total stops the model skipping the oil,
-// butter or gravy.
+// Listing each item before the total keeps the model from skipping the oil,
+// butter or gravy. The reply's shape is mealConfig's schema.
 export function mealPrompt(profile: Profile, ask: boolean, meal: string): string {
   return nutritionContext(profile) +
-    "The user will describe a meal. List every component with its calories " +
-    "and protein, including cooking oil, butter, gravy, sauces, bread and " +
-    "drinks if mentioned. Use any amounts the user gives; otherwise assume a " +
-    "typical home portion. For home-cooked dishes, include the oil or fat " +
-    `they are usually cooked with. For branded or chain products use ${profile.country} ` +
-    "nutrition figures. Then add them up.\n" +
+    "The user will describe a meal. " +
+    itemRules(profile.country) +
+    "Give each item's calories and protein, then add them up.\n" +
     choices(profile.country) +
     weights +
     macros(ask) +
-    `Respond with ONLY a JSON object: {"items": [{"item": "<component>", "grams": <integer>, ` +
-    `"kcal": <integer>, "protein_g": <integer>}], "kcal": <integer total>, ` +
-    `"protein_g": <integer total>${macrosJson(ask)}}\n` +
-    optionsJson +
-    "Do not include any other text.\n\n" +
-    `Meal: ${meal}`;
+    `\nMeal: ${meal}`;
+}
+
+const figures: Record<string, Schema> = {
+  item: { type: Type.STRING },
+  grams: { type: Type.INTEGER },
+  kcal: { type: Type.INTEGER },
+  protein_g: { type: Type.INTEGER },
+};
+const option: Schema = {
+  type: Type.OBJECT,
+  properties: figures,
+  required: Object.keys(figures),
+  propertyOrdering: Object.keys(figures),
+};
+const item: Schema = {
+  type: Type.OBJECT,
+  properties: {
+    ...figures,
+    assumed: { type: Type.STRING },
+    options: { type: Type.ARRAY, items: option, maxItems: "3" },
+  },
+  required: Object.keys(figures),
+  propertyOrdering: [...Object.keys(figures), "assumed", "options"],
+};
+const nutrients = ["fat", "saturates", "carbs", "sugars", "fibre", "salt"];
+
+/**
+ * A typed meal's reply, as a schema rather than a template in the prompt,
+ * so the model can't send broken JSON: it did once in 99 on a long full
+ * English. The items come before the totals, as the prompt asks.
+ */
+export function mealConfig(ask: boolean): GenerateContentConfig {
+  const properties: Record<string, Schema> = {
+    items: { type: Type.ARRAY, items: item },
+    kcal: { type: Type.INTEGER },
+    protein_g: { type: Type.INTEGER },
+  };
+  if (ask) {
+    properties.macros = {
+      type: Type.OBJECT,
+      properties: Object.fromEntries(nutrients.map((key) => [key, { type: Type.NUMBER }])),
+      required: nutrients,
+      propertyOrdering: nutrients,
+    };
+  }
+  return {
+    responseMimeType: "application/json",
+    responseSchema: {
+      type: Type.OBJECT,
+      properties,
+      required: Object.keys(properties),
+      propertyOrdering: Object.keys(properties),
+    },
+  };
 }
 
 export function voicePrompt(profile: Profile, ask: boolean): string {
@@ -115,12 +188,10 @@ export function voicePrompt(profile: Profile, ask: boolean): string {
     "calories and the total protein. Keep any count or amount the user " +
     `said in the name, e.g. "500 г мусака" or "3 пилешки филета", so the ` +
     "name says what the figures are for.\n" +
-    "List every component with its calories and protein. If the user stated " +
-    "a calorie or protein amount for something, use that exact number for " +
-    "it. Otherwise estimate it: use any amounts the user gives, assume a " +
-    "typical home portion if none, include the oil or fat home-cooked dishes " +
-    `are usually cooked with, and use ${profile.country} nutrition figures for branded or ` +
-    "chain products. Then add them up.\n" +
+    itemRules(profile.country) +
+    "Give each item's calories and protein; if the user stated a calorie " +
+    "or protein amount for something, use that exact number for it. Then " +
+    "add them up.\n" +
     choices(profile.country) +
     "If the user gave calories but no protein, still estimate the protein " +
     `${ask ? "and macros " : ""}from the food. Only if nothing in ` +
