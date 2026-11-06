@@ -54,7 +54,7 @@ Run the deploys a change needs yourself, straight after it: rules, then the webs
 
 Short and plain, in British English, saying "you":
 - Sentence case for buttons and messages; page names like Plan Settings stay as titled.
-- No "Please", and no exclamation marks except the contribution's "Thank you!".
+- No "Please", and no exclamation marks except the contribution's "Thank you!" and onboarding's "Your plan is ready!".
 - Errors say what failed and what to do next: "Could not X. Try again.", or "Could not load X." for a page.
 - Plain words over jargon: "adjusts", not "recalculates".
 - Keep lines and button labels short enough for a 360dp phone.

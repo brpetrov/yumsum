@@ -162,7 +162,10 @@ void main() {
     await tester.pump();
     await next(tester);
 
-    expect(find.text('Your plan is ready'), findsOneWidget);
+    expect(find.text('Track protein too?'), findsOneWidget);
+    await next(tester);
+
+    expect(find.text('Your plan is ready!'), findsOneWidget);
     expect(find.byType(HealthPlanPreviewCard), findsOneWidget);
     expect(find.textContaining('in Plan Settings'), findsOneWidget);
     await tester.tap(find.text('Start'));
@@ -194,6 +197,7 @@ void main() {
     await next(tester);
 
     expect(find.text('How active is your normal day?'), findsOneWidget);
+    await next(tester);
     await next(tester);
     await next(tester);
     await tester.tap(find.text('Start'));
@@ -283,11 +287,29 @@ void main() {
     await tester.tap(find.text('1 to 2 sessions/week'));
     await tester.pump();
     await next(tester);
+    await next(tester);
     await tester.tap(find.text('Start'));
     await tester.pumpAndSettle();
     expect(find.text('Debug tools'), findsOneWidget);
     expect(onboarding.submitted, isEmpty);
     expect(container.read(onboardingPreviewProvider), isFalse);
+  });
+
+  testWidgets('protein tracking can be turned off', (tester) async {
+    await pump(tester);
+    await answerAboutYou(tester);
+    await tester.tap(find.text('Keep my weight'));
+    await tester.pump();
+    await next(tester);
+    await next(tester);
+    await next(tester);
+    expect(find.text('Track protein too?'), findsOneWidget);
+    await tester.tap(find.text('No'));
+    await tester.pump();
+    await next(tester);
+    await tester.tap(find.text('Start'));
+    await tester.pumpAndSettle();
+    expect(onboarding.submitted.single.trackProtein, isFalse);
   });
 
   test('the country from the phone\'s region', () {

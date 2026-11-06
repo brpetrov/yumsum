@@ -9,10 +9,12 @@ import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/debug_provider.dart';
 import 'package:lean_streak/providers/onboarding_controller.dart';
+import 'package:lean_streak/widgets/app_logo_mark.dart';
 import 'package:lean_streak/widgets/health_plan_preview_card.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
 import 'package:lean_streak/widgets/pill_toggle.dart';
 import 'package:lean_streak/widgets/plan_choices.dart';
+import 'package:lean_streak/widgets/shine.dart';
 
 /// The questions, one card each, in order. [target] is skipped when keeping
 /// weight.
@@ -26,12 +28,13 @@ enum _Step {
   target,
   activity,
   training,
+  protein,
   plan,
 }
 
 /// First run: one question per card, then the plan. The country comes from
-/// the phone's region, usual food is left blank, protein tracking is on and
-/// the pace is moderate; Plan Settings changes any of them.
+/// the phone's region, usual food is left blank and the pace is moderate;
+/// Plan Settings changes any of them.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -55,6 +58,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   ActivityLevel _activityLevel = ActivityLevel.sedentary;
   TrainingFrequency _trainingFrequency = TrainingFrequency.none;
   WeightLossPace _weightLossPace = WeightLossPace.moderate;
+  bool _trackProtein = true;
   int _index = 0;
 
   @override
@@ -114,7 +118,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     _Step.height => _heightError(_heightCtrl.text) == null,
     _Step.weight => _weightError(_currentWeightCtrl.text) == null,
     _Step.target => _targetError(_targetWeightCtrl.text) == null,
-    _Step.goal || _Step.activity || _Step.training => true,
+    _Step.goal || _Step.activity || _Step.training || _Step.protein => true,
     _Step.plan => _preview != null,
   };
 
@@ -207,7 +211,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           weightLossPace: _weightLossPace,
           country: _country,
           usualFood: '',
-          trackProtein: true,
+          trackProtein: _trackProtein,
         );
   }
 
@@ -363,18 +367,36 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         ],
       ),
     ),
+    _Step.protein => (
+      'Track protein too?',
+      'Protein keeps you full and looks after your muscle. YumSum works it '
+          'out for each meal you log.',
+      PillToggle<bool>(
+        options: const [(true, 'Yes'), (false, 'No')],
+        selected: _trackProtein,
+        onChanged: (track) => setState(() => _trackProtein = track),
+      ),
+    ),
     _Step.plan => (
-      'Your plan is ready',
+      'Your plan is ready!',
       null,
       Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // The celebration illustration goes here once it's drawn.
+          const Center(child: AppLogoMark(size: 96)),
+          const SizedBox(height: 20),
           if (_preview case final preview?)
-            HealthPlanPreviewCard(preview: preview, title: 'Your plan'),
+            Shine(
+              child: HealthPlanPreviewCard(
+                preview: preview,
+                title: 'Your plan',
+              ),
+            ),
           const SizedBox(height: 16),
           Text(
-            'Protein tracking is on, and your country is set from your '
-            'phone. Change these, your pace and more in Plan Settings.',
+            'You can go over all of this again, and get into more detail, '
+            'in Plan Settings.',
             style: TextStyle(
               fontSize: 14,
               height: 1.4,
