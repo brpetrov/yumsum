@@ -44,7 +44,7 @@
 ```
 
 - An `AppCard`. Title "AI Coach" in the display font with `IconBubble(Icons.auto_awesome_rounded)`, the sparkle the bar's Estimate button already uses, and an info button on the right ('How it works') that opens the AI Coach dialog with Close only.
-- Each note is a row with a small orange dot and body text (14.5, line height 1.4).
+- Each note is a row with a small orange dot and body text (14.5, line height 1.4). *Changed 6 November (prompt version 7):* the AI writes each note in pieces, `text` (what the facts show), `why` (one sentence), `tips` (1 or 2, starting with a verb) and `recipes` (by name, only there), and the card lays them out: the title, the text with recipe names as links, the why in a quieter italic line, the tips behind arrows under "Try this" ("Keep going" for a good note), and the recipes as chips with their photos that open them (`_Tips`, `_RecipeChip`). Older saved notes keep the one-paragraph look.
 - The muted footer is there so nobody mistakes the notes for advice from a person.
 
 ### Every state

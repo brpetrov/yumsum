@@ -8,7 +8,7 @@ import 'package:lean_streak/services/calorie_estimate_service.dart';
 /// of each cached review's `basis`, so the notes are written again. The
 /// instruction (plan 09) is `weeklyReviewInstruction` in
 /// `functions/src/prompts.ts`, on the server with its response schema.
-const weeklyReviewPromptVersion = 6;
+const weeklyReviewPromptVersion = 7;
 
 /// The AI's answer had no note worth showing.
 class WeeklyReviewException implements Exception {
@@ -35,16 +35,23 @@ Set<double> _numbersIn(String text) => {
 
 /// The notes worth showing from the AI's `points`, at most 8, in order:
 /// each a `{title, text, good}` (or a bare string, untitled and not good)
-/// whose text is non-empty and at most 600 characters (450 asked for) and
+/// whose text is non-empty and at most 600 characters (220 asked for) and
 /// whose title is at most 80 (40 asked for), with every number in [facts]
-/// and no shaming word in either. Throws [WeeklyReviewException] when none
-/// is left.
+/// and no shaming word in either. The `why` (at most 300) and each of the
+/// `tips` (at most 200, 3 kept) are held to the same and dropped on their
+/// own; `recipes` are kept as named, 3 at most. Throws
+/// [WeeklyReviewException] when no note is left.
 List<ReviewPoint> parseReviewPoints(Object? raw, {required String facts}) {
   final known = _numbersIn(facts);
   bool fine(String note, int max) =>
       note.length <= max &&
       _numbersIn(note).every(known.contains) &&
       !_shaming.hasMatch(note);
+  List<String> kept(List<String> lines, int max) => [
+    for (final line in lines)
+      if (line.trim() case final line when line.isNotEmpty && fine(line, max))
+        line,
+  ].take(3).toList();
   final points = [
     if (raw is List)
       for (final entry in raw)
@@ -53,7 +60,17 @@ List<ReviewPoint> parseReviewPoints(Object? raw, {required String facts}) {
             final title,
             final note,
           ) when note.isNotEmpty && fine(note, 600) && fine(title, 80))
-            (title: title, text: note, good: point.good),
+            ReviewPoint(
+              title: title,
+              text: note,
+              good: point.good,
+              why: fine(point.why.trim(), 300) ? point.why.trim() : '',
+              tips: kept(point.tips, 200),
+              recipes: [
+                for (final name in point.recipes)
+                  if (name.trim().isNotEmpty) name.trim(),
+              ].take(3).toList(),
+            ),
   ].take(8).toList();
   if (points.isEmpty) throw const WeeklyReviewException();
   return points;

@@ -20,6 +20,7 @@ import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/widgets/feature_intro.dart';
 import 'package:lean_streak/widgets/period_bar.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
+import 'package:lean_streak/widgets/recipe_photo.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 
 /// What AI Coach does (plan 09): on the page for free users, and in the
@@ -518,7 +519,10 @@ class _WeekNotes extends ConsumerWidget {
 }
 
 /// One note: a dot (green for something that went well), its title in the
-/// display font, and the text under it, with library recipes as links.
+/// display font, and under it what the facts show, with library recipes as
+/// links; then, for a note written in pieces, why it matters in a quieter
+/// line, the tips under "Try this" (or "Keep going" for a good one), and
+/// the recipes that fit as chips with their photos.
 class _NoteCard extends StatelessWidget {
   const _NoteCard(this.point, {required this.recipes, required this.names});
 
@@ -538,40 +542,177 @@ class _NoteCard extends StatelessWidget {
       ),
     );
     final text = _NoteText(point.text, recipes: recipes, names: names);
+    final found = [
+      for (final name in point.recipes)
+        for (final recipe in recipes)
+          if (recipe.name.toLowerCase() == name.toLowerCase()) recipe,
+    ];
+    final rest = [
+      if (point.why.isNotEmpty)
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Text(
+            point.why,
+            style: TextStyle(
+              fontSize: 13.5,
+              height: 1.4,
+              fontStyle: FontStyle.italic,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ),
+      if (point.tips.isNotEmpty)
+        Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: _Tips(point.tips, good: point.good),
+        ),
+      if (found.isNotEmpty)
+        Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [for (final recipe in found) _RecipeChip(recipe)],
+          ),
+        ),
+    ];
     return AppCard(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
-      child: point.title.isEmpty
-          ? Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                dot,
-                const SizedBox(width: 12),
-                Expanded(child: text),
-              ],
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    dot,
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              dot,
+              const SizedBox(width: 12),
+              Expanded(
+                child: point.title.isEmpty
+                    ? text
+                    : Text(
                         point.title,
                         style: AppTheme.display.copyWith(
                           fontSize: 18,
                           color: AppColors.textPrimary,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Padding(padding: const EdgeInsets.only(left: 20), child: text),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (point.title.isNotEmpty)
+                  Padding(padding: const EdgeInsets.only(top: 8), child: text),
+                ...rest,
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A note's tips, one short line each behind an arrow, under a small
+/// heading.
+class _Tips extends StatelessWidget {
+  const _Tips(this.tips, {required this.good});
+
+  final List<String> tips;
+  final bool good;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          good ? 'Keep going' : 'Try this',
+          style: TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.3,
+            color: good ? AppColors.veryGood : AppColors.primary,
+          ),
+        ),
+        for (final tip in tips)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 3),
+                  child: Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 15,
+                    color: good ? AppColors.veryGood : AppColors.primary,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _keepUnits(tip),
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      height: 1.4,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// A recipe the note recommends: its photo in a small round and its name on
+/// a pill, which opens the recipe.
+class _RecipeChip extends StatelessWidget {
+  const _RecipeChip(this.recipe);
+
+  final Recipe recipe;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.primaryContainer,
+      shape: const StadiumBorder(),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () =>
+            context.push(AppRoutes.recipePath(recipe.id), extra: recipe),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(4, 4, 12, 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ClipOval(
+                child: SizedBox.square(
+                  dimension: 26,
+                  child: RecipePhoto(recipe),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  recipe.name,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTheme.display.copyWith(
+                    fontSize: 13.5,
+                    color: AppColors.onPrimaryContainer,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

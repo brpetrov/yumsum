@@ -1,5 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lean_streak/models/weekly_review.dart';
 import 'package:lean_streak/services/weekly_review_service.dart';
 
 import 'ai_fixtures.dart';
@@ -34,9 +35,53 @@ void main() {
         {'text': 'Steady weekdays.', 'good': 'yes'},
       ], facts: _facts),
       [
-        (title: 'Fibre on track', text: 'Fibre met the guide.', good: true),
-        (title: '', text: 'Salt averaged 7.4 g.', good: false),
-        (title: '', text: 'Steady weekdays.', good: false),
+        ReviewPoint(
+          title: 'Fibre on track',
+          text: 'Fibre met the guide.',
+          good: true,
+        ),
+        ReviewPoint(title: '', text: 'Salt averaged 7.4 g.', good: false),
+        ReviewPoint(title: '', text: 'Steady weekdays.', good: false),
+      ],
+    );
+  });
+
+  test('keeps the why, the tips and the recipes, dropping a why or a tip '
+      'with a stray number or a shaming word on its own', () {
+    expect(
+      parseReviewPoints([
+        {
+          'title': 'Salt over the guide',
+          'text': 'Salt averaged 7.4 g.',
+          'good': false,
+          'why': ' Salt pushes blood pressure up. ',
+          'tips': ['Rinse tinned beans.', 'Cut 900 mg a day.', ' ', 'No junk.'],
+          'recipes': ['Lentil soup', '', 'Greek yoghurt berry bowl'],
+        },
+        {
+          'title': 'Fibre on track',
+          'text': 'Fibre met the guide.',
+          'good': true,
+          'why': 'That is 3 cheat days.',
+          'tips': 7,
+          'recipes': [1, 'Oats'],
+        },
+      ], facts: _facts),
+      [
+        const ReviewPoint(
+          title: 'Salt over the guide',
+          text: 'Salt averaged 7.4 g.',
+          good: false,
+          why: 'Salt pushes blood pressure up.',
+          tips: ['Rinse tinned beans.'],
+          recipes: ['Lentil soup', 'Greek yoghurt berry bowl'],
+        ),
+        const ReviewPoint(
+          title: 'Fibre on track',
+          text: 'Fibre met the guide.',
+          good: true,
+          recipes: ['Oats'],
+        ),
       ],
     );
   });
@@ -113,8 +158,8 @@ void main() {
         _note(' Weekends ', 'Higher.'),
       ], facts: _facts),
       [
-        (title: '', text: 'Steady weekdays.', good: false),
-        (title: 'Weekends', text: 'Higher.', good: false),
+        ReviewPoint(title: '', text: 'Steady weekdays.', good: false),
+        ReviewPoint(title: 'Weekends', text: 'Higher.', good: false),
       ],
     );
   });
@@ -144,7 +189,11 @@ void main() {
     final points = await WeeklyReviewService(functions).write(_facts);
 
     expect(points, [
-      (title: 'Salt over the guide', text: 'Salt averaged 7.4 g.', good: false),
+      ReviewPoint(
+        title: 'Salt over the guide',
+        text: 'Salt averaged 7.4 g.',
+        good: false,
+      ),
     ]);
     expect(functions.calls.single.$1, 'aiWeeklyReview');
     expect(functions.calls.single.$2.keys, ['facts', 'dateKey']);

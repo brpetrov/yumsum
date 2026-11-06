@@ -78,10 +78,22 @@ service cloud.firestore {
     // The AI Coach's notes on a week, with the facts they were written from.
     function validReviewPoint(p) {
       return p is map
-        && p.keys().hasOnly(['title', 'text', 'good'])
+        && p.keys().hasOnly(['title', 'text', 'good', 'why', 'tips', 'recipes'])
         && text(p.title, 80)
         && text(p.text, 600)
-        && p.good is bool;
+        && p.good is bool
+        && (!('why' in p) || (p.why is string && p.why.size() <= 300))
+        && (!('tips' in p) || shortStrings(p.tips, 200))
+        && (!('recipes' in p) || shortStrings(p.recipes, 80));
+    }
+
+    // At most three strings of at most [max] characters each.
+    function shortStrings(l, max) {
+      return l is list
+        && l.size() <= 3
+        && (l.size() < 1 || (l[0] is string && l[0].size() <= max))
+        && (l.size() < 2 || (l[1] is string && l[1].size() <= max))
+        && (l.size() < 3 || (l[2] is string && l[2].size() <= max));
     }
 
     function validWeeklyReview(d) {

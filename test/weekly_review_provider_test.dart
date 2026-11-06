@@ -104,7 +104,7 @@ class _FakeCoach extends Fake implements WeeklyReviewService {
 }
 
 const _points = <ReviewPoint>[
-  (title: 'Steady', text: 'Steady all week.', good: true),
+  ReviewPoint(title: 'Steady', text: 'Steady all week.', good: true),
 ];
 
 const _plus = Entitlement(active: true, source: EntitlementSource.manual);

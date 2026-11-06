@@ -26,26 +26,36 @@ import 'recipe_fixtures.dart';
 const _plus = Entitlement(active: true, source: EntitlementSource.manual);
 
 const _notes = <ReviewPoint>[
-  (
+  ReviewPoint(
     title: 'Weekends run high',
     text:
         'Weekdays were steady at about 1,890 kcal, but the weekend averaged '
         '2,580.',
     good: false,
   ),
-  (
+  ReviewPoint(
     title: 'A light first meal',
     text:
         'Your first meal of the day averaged 14 g of protein. A "Greek '
         'yoghurt berry bowl" gives 30 g for 332 kcal.',
     good: false,
   ),
-  (
+  ReviewPoint(
     title: 'Salt over the guide',
     text: 'Salt averaged 7.4 g against the 6 g guide.',
     good: false,
+    why: 'Too much salt pushes blood pressure up over time.',
+    tips: [
+      'Swap crisps for unsalted nuts or fruit between meals.',
+      'Rinse tinned beans and go easy on stock cubes.',
+    ],
+    recipes: ['Lentil soup', 'Not in the library'],
   ),
-  (title: 'Fibre on track', text: 'Fibre met the guide all week.', good: true),
+  ReviewPoint(
+    title: 'Fibre on track',
+    text: 'Fibre met the guide all week.',
+    good: true,
+  ),
 ];
 
 String _key(DateTime day) =>
@@ -118,6 +128,7 @@ void main() {
           sharedPreferencesProvider.overrideWithValue(prefs),
           entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
           recipesProvider.overrideWith((ref) async => recipes),
+          recipeImageProvider.overrideWithValue(pixelImage),
           hasWeeklyReviewsProvider.overrideWith((ref) async => kept),
           // A Wednesday, so the first week is two before the latest.
           firstLoggedDayProvider.overrideWith(
@@ -177,9 +188,20 @@ void main() {
         ),
       ),
     );
-    // A spinner never settles; two frames bring the account and the notes.
-    settle ? await tester.pumpAndSettle() : await tester.pump();
-    await tester.pump();
+    // A spinner never settles; a few frames bring the account, the notes
+    // and the library.
+    for (var i = 0; i < 4; i++) {
+      await tester.pump();
+    }
+    if (recipes.isNotEmpty) {
+      // Recipe photos decode outside the fake clock; until they have, their
+      // spinners keep pumpAndSettle busy.
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 300)),
+      );
+      await tester.pump();
+    }
+    if (settle) await tester.pumpAndSettle();
   }
 
   test('the latest finished week is last week', () {
@@ -217,6 +239,35 @@ void main() {
       expect(find.text('Fibre met the guide all week.'), findsOneWidget);
       expect(reads, 1);
       expect(asked, [latest]);
+    });
+
+    testWidgets('a note written in pieces shows why it matters, its tips '
+        'under Try this, and the recipes it names as chips that open '
+        'them', (tester) async {
+      await pump(tester, recipes: [testRecipe('Lentil soup')]);
+      expect(
+        find.text('Too much salt pushes blood pressure up over time.'),
+        findsOneWidget,
+      );
+      expect(find.text('Try this'), findsOneWidget);
+      expect(find.text('Keep going'), findsNothing);
+      expect(
+        find.text('Swap crisps for unsalted nuts or fruit between meals.'),
+        findsOneWidget,
+      );
+      expect(find.text('Not in the library'), findsNothing);
+
+      // The chip's own InkWell, inside the row of chips, not the card's.
+      final chip = find.descendant(
+        of: find.byType(Wrap),
+        matching: find.widgetWithText(InkWell, 'Lentil soup'),
+      );
+      expect(chip, findsOneWidget);
+      await tester.ensureVisible(chip);
+      await tester.pumpAndSettle();
+      await tester.tap(chip);
+      await tester.pumpAndSettle();
+      expect(find.text('Recipe lentil-soup'), findsOneWidget);
     });
 
     testWidgets('a note on something that went well has a green dot', (
