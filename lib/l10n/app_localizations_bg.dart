@@ -9,7 +9,7 @@ class AppLocalizationsBg extends AppLocalizations {
   AppLocalizationsBg([String locale = 'bg']) : super(locale);
 
   @override
-  String get languageChoose => 'Изберете език';
+  String get languageChoose => 'Избери език';
 
   @override
   String get languageEnglish => 'English';
@@ -21,47 +21,46 @@ class AppLocalizationsBg extends AppLocalizations {
   String get languageSetting => 'Език';
 
   @override
-  String get reminderMealTitle => 'Запишете днешните хранения';
+  String get reminderMealTitle => 'Запиши днешните хранения';
 
   @override
-  String get reminderMealBody =>
-      'Добавете какво сте яли, преди денят да свърши.';
+  String get reminderMealBody => 'Добави храненията си, преди денят да свърши.';
 
   @override
   String get reminderMealChannel => 'Дневно напомняне за храненията';
 
   @override
   String get reminderMealChannelDescription =>
-      'Напомня ви всяка вечер да запишете храненията си.';
+      'Напомня ти всяка вечер да запишеш храненията си.';
 
   @override
   String get reminderWeightTitle => 'Време е за претегляне';
 
   @override
   String get reminderWeightBodyDaily =>
-      'Запишете днешното си тегло, за да остане планът ви точен.';
+      'Запиши днешното си тегло, за да остане планът ти точен.';
 
   @override
   String get reminderWeightBodyWeekly =>
-      'Запишете теглото си за тази седмица, за да остане планът ви точен.';
+      'Запиши теглото си за тази седмица, за да остане планът ти точен.';
 
   @override
   String get reminderWeightChannel => 'Седмично напомняне за теглото';
 
   @override
   String get reminderWeightChannelDescription =>
-      'Напомня ви веднъж седмично да запишете теглото си.';
+      'Напомня ти веднъж седмично да запишеш теглото си.';
 
   @override
   String get reminderCreatineTitle => 'Време за креатин';
 
   @override
-  String get reminderCreatineBody => 'Вземете днешния си креатин.';
+  String get reminderCreatineBody => 'Вземи днешния си креатин.';
 
   @override
   String get reminderCreatineChannel => 'Напомняне за креатин';
 
   @override
   String get reminderCreatineChannelDescription =>
-      'Напомня ви веднъж дневно да вземете креатин.';
+      'Напомня ти веднъж дневно да вземеш креатин.';
 }

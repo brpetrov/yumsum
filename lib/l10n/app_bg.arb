@@ -1,22 +1,22 @@
 {
   "@@locale": "bg",
 
-  "languageChoose": "Изберете език",
+  "languageChoose": "Избери език",
   "languageEnglish": "English",
   "languageBulgarian": "Български",
   "languageSetting": "Език",
 
-  "reminderMealTitle": "Запишете днешните хранения",
-  "reminderMealBody": "Добавете какво сте яли, преди денят да свърши.",
+  "reminderMealTitle": "Запиши днешните хранения",
+  "reminderMealBody": "Добави храненията си, преди денят да свърши.",
   "reminderMealChannel": "Дневно напомняне за храненията",
-  "reminderMealChannelDescription": "Напомня ви всяка вечер да запишете храненията си.",
+  "reminderMealChannelDescription": "Напомня ти всяка вечер да запишеш храненията си.",
   "reminderWeightTitle": "Време е за претегляне",
-  "reminderWeightBodyDaily": "Запишете днешното си тегло, за да остане планът ви точен.",
-  "reminderWeightBodyWeekly": "Запишете теглото си за тази седмица, за да остане планът ви точен.",
+  "reminderWeightBodyDaily": "Запиши днешното си тегло, за да остане планът ти точен.",
+  "reminderWeightBodyWeekly": "Запиши теглото си за тази седмица, за да остане планът ти точен.",
   "reminderWeightChannel": "Седмично напомняне за теглото",
-  "reminderWeightChannelDescription": "Напомня ви веднъж седмично да запишете теглото си.",
+  "reminderWeightChannelDescription": "Напомня ти веднъж седмично да запишеш теглото си.",
   "reminderCreatineTitle": "Време за креатин",
-  "reminderCreatineBody": "Вземете днешния си креатин.",
+  "reminderCreatineBody": "Вземи днешния си креатин.",
   "reminderCreatineChannel": "Напомняне за креатин",
-  "reminderCreatineChannelDescription": "Напомня ви веднъж дневно да вземете креатин."
+  "reminderCreatineChannelDescription": "Напомня ти веднъж дневно да вземеш креатин."
 }

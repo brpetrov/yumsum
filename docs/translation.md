@@ -93,8 +93,9 @@ Bulgarian day and month names are lower case; wrap one that starts a line in `ca
 
 ## Notes for translators
 
-- Address the user with the polite plural ("Запишете", "вашият"). Keep `CLAUDE.md`'s copy rules: sentence case, no exclamation marks (but "Благодарим ви!" and "Планът ви е готов!"), errors as "Не можахме да … Опитайте отново.", short enough for a 360dp phone.
-- YumSum, YumSum Star, AI Coach and Smart Snap are names: keep them in Latin letters. Units: kcal → ккал, g → г, kg → кг.
+- Address the user informally, with "ти" ("Запиши", "твоят", "планът ти"), as a friendly app would; never "Вие". Write it as a good Bulgarian app would say it, not word for word from the English. Keep `CLAUDE.md`'s copy rules: sentence case, no exclamation marks (but "Благодарим ти!" and "Планът ти е готов!"), errors as "Не успяхме да … Опитай отново.", short enough for a 360dp phone.
+- Bulgarian past forms and adjectives about the user carry gender ("ял/яла", "готов/готова"). Phrase around them so every line suits anyone: "Добави храненията си", not "Добави какво си ял".
+- YumSum, YumSum Star and Smart Snap are names: keep them in Latin letters. AI Coach is "AI треньор". Units: kcal → ккал, g → г, kg → кг.
 - Menu and page names (Plan Settings, Weight & Progress) are titles in English; in Bulgarian, write them as ordinary sentence-case phrases ("Настройки на плана").
 - Static lists of labels (`const _pages = [...]` in `AppDrawer`, enums with labels such as `DayStatus` in `lib/models/daily_summary.dart` and `MealType` in `lib/models/recipe.dart`) can't call `context.l10n`: turn the label into a getter or a function that takes the `AppLocalizations`.
 - Exceptions thrown with English text (`Exception('Not authenticated')`) only need a key where the text reaches the screen; check how the screen shows the error first.

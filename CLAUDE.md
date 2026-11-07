@@ -70,7 +70,7 @@ The app is in English and Bulgarian (`docs/translation.md` has the how-to and wh
 - Dates and decimals go through the `AppFormats` helpers in `lib/l10n/l10n.dart` (`l10n.dayMonth(date)`, `l10n.decimal(kg)`), not `DateFormat` or `toStringAsFixed` in shown text. Date keys (`yyyy-MM-dd`) and what the AI is sent stay as they are.
 - The language sent to the Cloud Functions comes from `languageCodeProvider` only.
 - Owner-only Debug tools (`lib/screens/debug/`, `debug_provider.dart`) stay English. So do the AI's facts and prompts, log lines and exceptions nobody sees.
-- Bulgarian copy addresses the user with the polite plural ("Запишете", "вашият"), keeps the rules above (sentence case, no exclamation marks, "Не можахме да … Опитайте отново."), and must fit a 360dp phone: Bulgarian runs about a fifth longer.
+- Bulgarian copy says "ти", never "Вие" ("Запиши", "планът ти"), keeps the rules above (sentence case, no exclamation marks, "Не успяхме да … Опитай отново."), and must fit a 360dp phone: Bulgarian runs about a fifth longer.
 
 ## Where things live
 

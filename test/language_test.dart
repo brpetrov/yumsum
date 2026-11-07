@@ -95,7 +95,7 @@ void main() {
 
         expect(find.byType(LanguageScreen), findsOneWidget);
         expect(find.text('Choose your language'), findsOneWidget);
-        expect(find.text('Изберете език'), findsOneWidget);
+        expect(find.text('Избери език'), findsOneWidget);
         expect(find.byType(AuthScreen), findsNothing);
       });
     }
