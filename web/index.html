@@ -157,6 +157,58 @@
       self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
     }
   </script>
+  <script>
+    // On phones and in Safari, Firebase Auth waits at start-up for Google's
+    // pop-up helper (a script from apis.google.com and a frame from
+    // firebaseapp.com) before it says who is signed in, with no time limit:
+    // when the helper is slow the app sits on its logo (7 November, iPhones).
+    // This lets Auth start without it and loads the helper straight after,
+    // so the Google sign-in pop-up is still ready by the time someone taps.
+    // FlutterFire puts the Auth module on window.firebase_auth; the names
+    // are Firebase's own, checked in JS SDK 13.1.0, and if they change,
+    // Firebase's usual behaviour is kept.
+    (function () {
+      let auth;
+      Object.defineProperty(window, 'firebase_auth', {
+        configurable: true,
+        get: () => auth,
+        set(module) {
+          auth = withHelperAfterStart(module);
+        },
+      });
+
+      function withHelperAfterStart(module) {
+        const resolver = module && module.browserPopupRedirectResolver;
+        const proto = resolver && resolver.prototype;
+        if (
+          !proto ||
+          !('_shouldInitProactively' in proto) ||
+          typeof proto._initialize !== 'function' ||
+          typeof module.initializeAuth !== 'function'
+        ) {
+          return module;
+        }
+        Object.defineProperty(proto, '_shouldInitProactively', {
+          configurable: true,
+          get: () => false,
+        });
+        const patched = Object.assign({}, module);
+        patched.initializeAuth = function () {
+          const instance = module.initializeAuth.apply(this, arguments);
+          const started = instance && instance._initializationPromise;
+          Promise.resolve(started)
+            .catch(() => {})
+            .then(() => {
+              const helper = instance && instance._popupRedirectResolver;
+              if (helper) return helper._initialize(instance);
+            })
+            .catch(() => {});
+          return instance;
+        };
+        return patched;
+      }
+    })();
+  </script>
   <!-- The camera page's back camera and barcodes; the barcode reader itself
        loads when first used. -->
   <script src="camera.js" defer></script>
