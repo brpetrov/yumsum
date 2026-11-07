@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/widgets/recipe_photo.dart';
 
@@ -33,11 +34,9 @@ class _PortionsSheetState extends State<_PortionsSheet> {
 
   double _portions = 1;
 
-  String get _count =>
-      _portions % 1 == 0 ? '${_portions.toInt()}' : '$_portions';
-
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final recipe = widget.recipe;
     final kcal = recipe.kcalFor(_portions);
     final protein = recipe.proteinFor(_portions);
@@ -88,7 +87,7 @@ class _PortionsSheetState extends State<_PortionsSheet> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text('How many portions?', style: muted),
+                    Text(l10n.recipesHowMany, style: muted),
                   ],
                 ),
               ),
@@ -98,11 +97,11 @@ class _PortionsSheetState extends State<_PortionsSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              step(Icons.remove_rounded, 'Less', -0.5),
+              step(Icons.remove_rounded, l10n.recipesLess, -0.5),
               SizedBox(
                 width: 72,
                 child: Text(
-                  _count,
+                  l10n.decimal(_portions, _portions % 1 == 0 ? 0 : 1),
                   key: const ValueKey('recipe-portions'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -112,14 +111,15 @@ class _PortionsSheetState extends State<_PortionsSheet> {
                   ),
                 ),
               ),
-              step(Icons.add_rounded, 'More', 0.5),
+              step(Icons.add_rounded, l10n.recipesMore, 0.5),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            widget.showProtein
-                ? '$kcal kcal · $protein g protein'
-                : '$kcal kcal',
+            [
+              l10n.recipesKcal(kcal),
+              if (widget.showProtein) l10n.recipesProtein(protein),
+            ].join(' · '),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 18,
@@ -133,7 +133,7 @@ class _PortionsSheetState extends State<_PortionsSheet> {
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(52),
             ),
-            child: const Text('Log'),
+            child: Text(l10n.recipesLog),
           ),
         ],
       ),

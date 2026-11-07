@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/reminder_provider.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
@@ -12,31 +13,37 @@ import 'package:lean_streak/widgets/responsive_page.dart';
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
 
-  /// By weekday number; 0 is [ReminderSettings.everyDay].
-  static const _dayNames = [
-    'Every day',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
+  /// For [notificationsWeeklyAt], by weekday number.
+  static const _weekdays = [
+    '',
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
   ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    // By weekday number; 0 is [ReminderSettings.everyDay]. 1 January 2024
+    // was a Monday.
+    final dayNames = [
+      l10n.notificationsEveryDay,
+      for (var day = 1; day <= 7; day++)
+        capitalised(l10n.date(DateTime(2024, 1, day), 'EEEE')),
+    ];
     final settings = ref.watch(reminderSettingsProvider);
     final notifier = ref.read(reminderSettingsProvider.notifier);
 
     Future<void> apply(Future<bool> Function() change) async {
       final ok = await change();
       if (ok || !context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Allow notifications for YumSum in system settings.'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.notificationsDenied)));
     }
 
     Future<TimeOfDay?> pickTime(TimeOfDay initial) => showTimePicker(
@@ -51,7 +58,7 @@ class NotificationsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(),
-      appBar: AppBar(title: const Text('Notifications')),
+      appBar: AppBar(title: Text(l10n.notificationsTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           child: ResponsivePage(
@@ -62,25 +69,33 @@ class NotificationsScreen extends ConsumerWidget {
               children: [
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Daily meal reminder'),
-                  subtitle: const Text('Every evening at 20:30'),
+                  title: Text(l10n.notificationsMeal),
+                  subtitle: Text(l10n.notificationsMealTime('20:30')),
                   value: settings.dailyMeal,
                   onChanged: (on) => apply(() => notifier.setDailyMeal(on)),
                 ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Weigh-in reminder'),
+                  title: Text(l10n.notificationsWeight),
                   subtitle: Text(
                     settings.weeklyDay == ReminderSettings.everyDay
-                        ? 'Every day at ${clockLabel(settings.weeklyTime)}'
-                        : '${_dayNames[settings.weeklyDay]}s at '
-                              '${clockLabel(settings.weeklyTime)}',
+                        ? l10n.notificationsEveryDayAt(
+                            clockLabel(settings.weeklyTime),
+                          )
+                        : l10n.notificationsWeeklyAt(
+                            _weekdays[settings.weeklyDay],
+                            clockLabel(settings.weeklyTime),
+                          ),
                   ),
                   value: settings.weeklyWeight,
                   onChanged: (on) => apply(() => notifier.setWeeklyWeight(on)),
                 ),
                 if (settings.weeklyWeight)
-                  Row(
+                  // The time goes under the day where a long day name
+                  // leaves no room.
+                  Wrap(
+                    spacing: 12,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       DropdownButton<int>(
                         value: settings.weeklyDay,
@@ -93,7 +108,7 @@ class NotificationsScreen extends ConsumerWidget {
                           )
                             DropdownMenuItem(
                               value: day,
-                              child: Text(_dayNames[day]),
+                              child: Text(dayNames[day]),
                             ),
                         ],
                         onChanged: (day) {
@@ -105,7 +120,6 @@ class NotificationsScreen extends ConsumerWidget {
                           }
                         },
                       ),
-                      const SizedBox(width: 12),
                       TextButton.icon(
                         onPressed: () async {
                           final picked = await pickTime(settings.weeklyTime);
@@ -123,9 +137,11 @@ class NotificationsScreen extends ConsumerWidget {
                   ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Daily creatine reminder'),
+                  title: Text(l10n.notificationsCreatine),
                   subtitle: Text(
-                    'Every day at ${clockLabel(settings.creatineTime)}',
+                    l10n.notificationsEveryDayAt(
+                      clockLabel(settings.creatineTime),
+                    ),
                   ),
                   value: settings.creatine,
                   onChanged: (on) => apply(() => notifier.setCreatine(on)),

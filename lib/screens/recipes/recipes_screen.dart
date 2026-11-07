@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
@@ -41,7 +42,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
   @override
   Widget build(BuildContext context) {
     return AppFrame(
-      title: 'Recipes',
+      title: context.l10n.recipesTitle,
       body: ref
           .watch(recipesProvider)
           .when(
@@ -49,15 +50,16 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
             loading: () => Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             ),
-            error: (_, _) => const Padding(
-              padding: EdgeInsets.all(24),
-              child: BowlNote('Could not load the recipes.'),
+            error: (_, _) => Padding(
+              padding: const EdgeInsets.all(24),
+              child: BowlNote(context.l10n.recipesErrorLoad),
             ),
           ),
     );
   }
 
   Widget _buildLibrary(List<Recipe> recipes) {
+    final l10n = context.l10n;
     final meals = ref.watch(recentMealsProvider).valueOrNull ?? const <Meal>[];
     final cooked = recentlyCookedRecipes(recipes, meals, DateTime.now());
     final query = _search.text.trim();
@@ -101,12 +103,12 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
                   onChanged: (_) => setState(() {}),
                   textInputAction: TextInputAction.search,
                   decoration: InputDecoration(
-                    hintText: 'Search recipes or ingredients',
+                    hintText: l10n.recipesSearchHint,
                     prefixIcon: const Icon(Icons.search_rounded),
                     suffixIcon: _search.text.isEmpty
                         ? null
                         : IconButton(
-                            tooltip: 'Clear',
+                            tooltip: l10n.recipesClear,
                             icon: const Icon(Icons.close_rounded),
                             onPressed: () => setState(_search.clear),
                           ),
@@ -116,7 +118,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
               if (cooked.isNotEmpty && query.isEmpty) ...[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
-                  child: Text('Cooked recently', style: label),
+                  child: Text(l10n.recipesCookedRecently, style: label),
                 ),
                 row([
                   for (final recipe in cooked)
@@ -131,7 +133,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
               row([
                 for (final category in [null, ...RecipeCategory.values])
                   ChoiceChip(
-                    label: Text(category?.label ?? 'All'),
+                    label: Text(category?.shownLabel(l10n) ?? l10n.recipesAll),
                     selected: _category == category,
                     showCheckmark: false,
                     onSelected: (_) => setState(() => _category = category),
@@ -146,9 +148,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: BowlNote(
-                query.isEmpty
-                    ? 'No recipes here yet.'
-                    : 'No recipes match that. Try other words.',
+                query.isEmpty ? l10n.recipesEmpty : l10n.recipesNoMatch,
               ),
             ),
           )
@@ -160,7 +160,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
                 child: Text(
-                  category.label,
+                  category.shownLabel(l10n),
                   style: AppTheme.display.copyWith(
                     fontSize: 19,
                     color: AppColors.textPrimary,
@@ -227,6 +227,7 @@ class _RecipeTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final showProtein = ref.watch(trackProteinProvider);
     final muted = TextStyle(fontSize: 12.5, color: AppColors.textSecondary);
     return AppCard(
@@ -247,7 +248,7 @@ class _RecipeTile extends ConsumerWidget {
                   right: 8,
                   bottom: 8,
                   child: IconButton.filled(
-                    tooltip: 'Log a portion',
+                    tooltip: l10n.recipesLogPortion,
                     onPressed: () => logRecipePortion(context, ref, recipe),
                     iconSize: 20,
                     style: IconButton.styleFrom(
@@ -282,8 +283,9 @@ class _RecipeTile extends ConsumerWidget {
                 const SizedBox(height: 4),
                 Text(
                   [
-                    '${recipe.kcalPerPortion} kcal',
-                    if (showProtein) '${recipe.proteinPerPortion} g protein',
+                    l10n.recipesKcal(recipe.kcalPerPortion),
+                    if (showProtein)
+                      l10n.recipesProtein(recipe.proteinPerPortion),
                   ].join(' · '),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -300,7 +302,7 @@ class _RecipeTile extends ConsumerWidget {
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        '${recipe.minutes} min',
+                        l10n.recipesMinutes(recipe.minutes),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: muted,

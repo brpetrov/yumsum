@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/widgets/shine.dart';
 
@@ -89,7 +90,7 @@ class StarBadge extends ConsumerWidget {
               const SizedBox(width: 4),
               Flexible(
                 child: Text(
-                  'Become a Star',
+                  context.l10n.starBecome,
                   overflow: TextOverflow.ellipsis,
                   style: AppTheme.display.copyWith(
                     fontSize: 14,

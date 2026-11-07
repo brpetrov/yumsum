@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/providers/recipe_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
@@ -33,14 +34,14 @@ class RecipeScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Recipe')),
+      appBar: AppBar(title: Text(context.l10n.recipesRecipeTitle)),
       body: found != null
           ? _RecipeBody(recipe: found)
           : library.isLoading
           ? Center(child: CircularProgressIndicator(color: AppColors.primary))
           : Center(
               child: Text(
-                'Could not load the recipe.',
+                context.l10n.recipesErrorLoadOne,
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             ),
@@ -57,7 +58,7 @@ class RecipeScreen extends ConsumerWidget {
                     child: FilledButton.icon(
                       onPressed: () => logRecipePortion(context, ref, found),
                       icon: const Icon(Icons.add_rounded),
-                      label: const Text('Log a portion'),
+                      label: Text(context.l10n.recipesLogPortion),
                       style: FilledButton.styleFrom(
                         minimumSize: const Size.fromHeight(52),
                       ),
@@ -81,6 +82,7 @@ class _RecipeBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final showProtein = ref.watch(trackProteinProvider);
     final showMacros = ref.watch(showMacrosProvider);
     final muted = TextStyle(fontSize: 14.5, color: AppColors.textSecondary);
@@ -118,9 +120,11 @@ class _RecipeBody extends ConsumerWidget {
         const SizedBox(height: 12),
         Text(
           showProtein
-              ? '${recipe.kcalPerPortion} kcal · '
-                    '${recipe.proteinPerPortion} g protein per portion'
-              : '${recipe.kcalPerPortion} kcal per portion',
+              ? l10n.recipesPerPortionProtein(
+                  recipe.kcalPerPortion,
+                  recipe.proteinPerPortion,
+                )
+              : l10n.recipesPerPortion(recipe.kcalPerPortion),
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -194,6 +198,7 @@ class _Facts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     Widget fact(IconData icon, String value, String label) => Expanded(
       child: Column(
         children: [
@@ -218,13 +223,23 @@ class _Facts extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          fact(Icons.timer_outlined, '${recipe.prepMinutes} min', 'Prep'),
+          fact(
+            Icons.timer_outlined,
+            l10n.recipesMinutes(recipe.prepMinutes),
+            l10n.recipesPrep,
+          ),
           fact(
             Icons.local_fire_department_outlined,
-            recipe.cookMinutes == 0 ? 'None' : '${recipe.cookMinutes} min',
-            'Cook',
+            recipe.cookMinutes == 0
+                ? l10n.recipesNoCooking
+                : l10n.recipesMinutes(recipe.cookMinutes),
+            l10n.recipesCook,
           ),
-          fact(Icons.people_outline_rounded, '${recipe.servings}', 'Serves'),
+          fact(
+            Icons.people_outline_rounded,
+            '${recipe.servings}',
+            l10n.recipesServes,
+          ),
         ],
       ),
     );
@@ -244,11 +259,9 @@ class _Ingredients extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Ingredients', style: _heading),
+          Text(context.l10n.recipesIngredients, style: _heading),
           Text(
-            recipe.servings == 1
-                ? 'For 1 portion'
-                : 'For ${recipe.servings} portions',
+            context.l10n.recipesForPortions(recipe.servings),
             style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 8),
@@ -330,7 +343,7 @@ class _Steps extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('How to make it', style: _heading),
+          Text(context.l10n.recipesHowToMake, style: _heading),
           const SizedBox(height: 14),
           for (final (i, step) in recipe.steps.indexed)
             Padding(

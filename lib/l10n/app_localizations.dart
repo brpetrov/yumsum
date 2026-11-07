@@ -1687,6 +1687,1026 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rich in fibre'**
   String get macroFibreBadge;
+
+  /// History: the page title.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get historyTitle;
+
+  /// History: shown when the page doesn't load.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your history.'**
+  String get historyErrorLoad;
+
+  /// History: the week option of the Week / Month switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get historyWeek;
+
+  /// History: the month option of the Week / Month switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get historyMonth;
+
+  /// History: tooltip on the arrow to the previous week or month.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get historyPrevious;
+
+  /// History: tooltip on the arrow to the next week or month.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get historyNext;
+
+  /// History: the button back to the current week or month.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get historyToday;
+
+  /// A day's status, on the calendar's key and a day's pill: calories within 10% of the target.
+  ///
+  /// In en, this message translates to:
+  /// **'On track'**
+  String get historyStatusOnTrack;
+
+  /// A day's status, on the calendar's key and a day's pill: calories within 20% of the target.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get historyStatusClose;
+
+  /// A day's status, on the calendar's key and a day's pill: calories more than 20% from the target.
+  ///
+  /// In en, this message translates to:
+  /// **'Off track'**
+  String get historyStatusOffTrack;
+
+  /// History: the calendar key's grey dot, a day with nothing logged.
+  ///
+  /// In en, this message translates to:
+  /// **'Not logged'**
+  String get historyNotLogged;
+
+  /// History: under the calendar on the first day of a week or month, before any day of it is finished.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review starts tomorrow, once today is over.'**
+  String get historyReviewTomorrow;
+
+  /// History: the review card when no day of the week or month has a log.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing logged in this period yet.'**
+  String get historyNothingLogged;
+
+  /// History: pill with the number of days on track.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} on track'**
+  String historyOnTrackCount(int count);
+
+  /// History: pill with the number of days close to the target.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} close'**
+  String historyCloseCount(int count);
+
+  /// History: pill with the number of days off track.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} off track'**
+  String historyOffTrackCount(int count);
+
+  /// History: pill with the number of days off.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 day off} other{{count} days off}}'**
+  String historyDaysOffCount(int count);
+
+  /// History: under the big percentage, the share of logged days on track.
+  ///
+  /// In en, this message translates to:
+  /// **'of logged days on track'**
+  String get historyOnTrackShare;
+
+  /// History: how many days of the week or month have a log.
+  ///
+  /// In en, this message translates to:
+  /// **'{logged} of {days} days logged'**
+  String historyDaysLogged(int logged, int days);
+
+  /// History: the average calories of the logged days.
+  ///
+  /// In en, this message translates to:
+  /// **'Average {kcal} kcal a day'**
+  String historyAverageKcal(int kcal);
+
+  /// History: review note when nothing was logged.
+  ///
+  /// In en, this message translates to:
+  /// **'No meals logged in this period.'**
+  String get historyGuidanceNoMeals;
+
+  /// History: review note when 70% or more of the logged days were on track.
+  ///
+  /// In en, this message translates to:
+  /// **'Most logged days stayed close to target.'**
+  String get historyGuidanceMostClose;
+
+  /// History: review note when 40-70% of the logged days were on track.
+  ///
+  /// In en, this message translates to:
+  /// **'Some logged days stayed close to target; a few were well off.'**
+  String get historyGuidanceSomeClose;
+
+  /// History: review note when under 40% of the logged days were on track.
+  ///
+  /// In en, this message translates to:
+  /// **'Most logged days were well above or below target.'**
+  String get historyGuidanceMostOff;
+
+  /// History: review note when too few days were logged.
+  ///
+  /// In en, this message translates to:
+  /// **'Some days weren\'t logged. Log more days for a clearer review.'**
+  String get historyGuidanceLogMore;
+
+  /// History: tooltip on a day's calorie bar with nothing logged. The date is like 7 Nov.
+  ///
+  /// In en, this message translates to:
+  /// **'{date}: no calories logged'**
+  String historyBarNoCalories(String date);
+
+  /// History: tooltip on a day's calorie bar.
+  ///
+  /// In en, this message translates to:
+  /// **'{date}: {kcal} kcal'**
+  String historyBarKcal(String date, int kcal);
+
+  /// History: tooltip on a day's calorie bar, with protein.
+  ///
+  /// In en, this message translates to:
+  /// **'{date}: {kcal} kcal · {protein} g protein'**
+  String historyBarKcalProtein(String date, int kcal, int protein);
+
+  /// A day's meals (opened from History): under the date when the day has no log.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing logged'**
+  String get historyDayNothingLogged;
+
+  /// A day's meals: the day's calories against its target.
+  ///
+  /// In en, this message translates to:
+  /// **'{total} of {target} kcal'**
+  String historyDayKcal(int total, int target);
+
+  /// A day's meals: the day's calories against its target, and protein.
+  ///
+  /// In en, this message translates to:
+  /// **'{total} of {target} kcal · {protein} g protein'**
+  String historyDayKcalProtein(int total, int target, int protein);
+
+  /// A day's meals: the pill on a day taken off.
+  ///
+  /// In en, this message translates to:
+  /// **'Day off'**
+  String get historyDayOff;
+
+  /// A day's meals: in place of the macro totals when no meal has them.
+  ///
+  /// In en, this message translates to:
+  /// **'No macro info for this day\'s meals'**
+  String get historyDayNoMacros;
+
+  /// A day's meals, on a past day: how many changes to past days are left this month.
+  ///
+  /// In en, this message translates to:
+  /// **'{left, plural, other{{left} of {limit} past-day changes left this month}}'**
+  String historyChangesLeft(int left, int limit);
+
+  /// A day's meals: error when the month's changes to past days are used up.
+  ///
+  /// In en, this message translates to:
+  /// **'No past-day changes left this month.'**
+  String get historyNoChangesLeft;
+
+  /// A day's meals: the empty list.
+  ///
+  /// In en, this message translates to:
+  /// **'No meals logged on this day.'**
+  String get historyDayNoMeals;
+
+  /// A day's meals: the button that adds a meal to that day.
+  ///
+  /// In en, this message translates to:
+  /// **'Add meal'**
+  String get historyAddMeal;
+
+  /// A day's meals: the delete confirmation's title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete meal?'**
+  String get historyDeleteMealTitle;
+
+  /// A day's meals: the delete confirmation's text, with the meal's name.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from this day?'**
+  String historyDeleteMealNamed(String name);
+
+  /// A day's meals: the delete confirmation's text, for a meal without a name.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this meal from this day?'**
+  String get historyDeleteMealUnnamed;
+
+  /// A day's meals: cancels the delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get historyCancel;
+
+  /// A day's meals: confirms the delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get historyDelete;
+
+  /// A day's meals: the delete failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete the meal. Try again.'**
+  String get historyErrorDeleteMeal;
+
+  /// AI Coach: the page title, and the card's name in History.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Coach'**
+  String get coachTitle;
+
+  /// AI Coach: the heading for people without YumSum Star, and the title of the How it works dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Your AI Coach'**
+  String get coachIntroTitle;
+
+  /// AI Coach: what it is in one line, under the heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Get fresh advice tailored just for you, every Monday, to help you eat better and reach your goals.'**
+  String get coachSubtitle;
+
+  /// AI Coach: the first promise's title.
+  ///
+  /// In en, this message translates to:
+  /// **'Spot what\'s holding you back'**
+  String get coachPromiseHoldingBackTitle;
+
+  /// AI Coach: the first promise's text.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover the eating patterns that could be slowing your progress and find small changes that help.'**
+  String get coachPromiseHoldingBackBody;
+
+  /// AI Coach: the second promise's title.
+  ///
+  /// In en, this message translates to:
+  /// **'Build a more balanced diet'**
+  String get coachPromiseBalanceTitle;
+
+  /// AI Coach: the second promise's text.
+  ///
+  /// In en, this message translates to:
+  /// **'See how your protein, fibre, salt and sugar compare with recommended amounts, so you know where to focus.'**
+  String get coachPromiseBalanceBody;
+
+  /// AI Coach: the third promise's title.
+  ///
+  /// In en, this message translates to:
+  /// **'Get advice you can put into practice'**
+  String get coachPromiseAdviceTitle;
+
+  /// AI Coach: the third promise's text.
+  ///
+  /// In en, this message translates to:
+  /// **'Make your next meal easier with practical tips and recipe ideas based on what you already eat.'**
+  String get coachPromiseAdviceBody;
+
+  /// AI Coach: the fourth promise's title.
+  ///
+  /// In en, this message translates to:
+  /// **'Start every week with direction'**
+  String get coachPromiseWeeklyTitle;
+
+  /// AI Coach: the fourth promise's text.
+  ///
+  /// In en, this message translates to:
+  /// **'Every Monday, get a fresh review of what\'s working and what to change, so you can build on your progress.'**
+  String get coachPromiseWeeklyBody;
+
+  /// AI Coach: closes the How it works dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get coachClose;
+
+  /// AI Coach: tooltip on the info button.
+  ///
+  /// In en, this message translates to:
+  /// **'How it works'**
+  String get coachHowItWorks;
+
+  /// AI Coach: the heading over the dates of the latest finished week.
+  ///
+  /// In en, this message translates to:
+  /// **'Last week'**
+  String get coachLastWeek;
+
+  /// AI Coach: tooltip on the arrow to the week before.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get coachPrevious;
+
+  /// AI Coach: tooltip on the arrow to the week after.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get coachNext;
+
+  /// AI Coach: for a new member before a full week is in.
+  ///
+  /// In en, this message translates to:
+  /// **'Your first notes come on Monday'**
+  String get coachFirstNotesTitle;
+
+  /// AI Coach: days left until the first notes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 day to go} other{{count} days to go}}'**
+  String coachDaysToGo(int count);
+
+  /// AI Coach: for a new member, what happens until the first notes. The date is like 16 November.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Coach reads a whole week at a time, so it\'s going over this one as you log it. On Monday {date} it\'ll tell you what went well, what held you back and what to try next week.'**
+  String coachFirstNotesBody(String date);
+
+  /// AI Coach: once YumSum Star has ended.
+  ///
+  /// In en, this message translates to:
+  /// **'YumSum Star has ended, so no new notes are written. The ones you have stay.'**
+  String get coachEnded;
+
+  /// AI Coach: a week with too few logged days for notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough logged this week for notes. They need 4 days logged, not counting days off.'**
+  String get coachNotEnough;
+
+  /// AI Coach: while the notes are written.
+  ///
+  /// In en, this message translates to:
+  /// **'Looking over your week'**
+  String get coachLooking;
+
+  /// AI Coach: the notes failed to come.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not get this week\'s notes. Try again.'**
+  String get coachErrorLoad;
+
+  /// AI Coach: the button after the notes failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get coachTryAgain;
+
+  /// AI Coach: a past week the coach never wrote notes on, for a member.
+  ///
+  /// In en, this message translates to:
+  /// **'No notes on this week. AI Coach writes them during the week after, when you open this page.'**
+  String get coachNoNotesPlus;
+
+  /// AI Coach: a past week without notes, once YumSum Star has ended.
+  ///
+  /// In en, this message translates to:
+  /// **'No notes on this week.'**
+  String get coachNoNotes;
+
+  /// AI Coach: the small heading over the tips of a note on something that went well.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep going'**
+  String get coachKeepGoing;
+
+  /// AI Coach: the small heading over the tips of a note on something to improve.
+  ///
+  /// In en, this message translates to:
+  /// **'Try this'**
+  String get coachTryThis;
+
+  /// History: the AI Coach card on a week that isn't over.
+  ///
+  /// In en, this message translates to:
+  /// **'Your notes on this week come on Monday.'**
+  String get coachNotesComing;
+
+  /// History, month view: the AI Coach card, under the week's date.
+  ///
+  /// In en, this message translates to:
+  /// **'Read your notes on that week.'**
+  String get coachNotesReadThat;
+
+  /// History, week view: the AI Coach card.
+  ///
+  /// In en, this message translates to:
+  /// **'Read your notes on this week.'**
+  String get coachNotesReadThis;
+
+  /// History, month view: which week the AI Coach card is on. The date is like 2 November.
+  ///
+  /// In en, this message translates to:
+  /// **'Week of {date}'**
+  String coachWeekOf(String date);
+
+  /// History, without YumSum Star: the line under the AI Coach button.
+  ///
+  /// In en, this message translates to:
+  /// **'See what\'s working, what\'s holding you back, and get personal tips on how to improve.'**
+  String get coachPromptLine;
+
+  /// Recipes: the page title.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipes'**
+  String get recipesTitle;
+
+  /// Recipes: the library didn't load.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the recipes.'**
+  String get recipesErrorLoad;
+
+  /// Recipes: the search box's hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search recipes or ingredients'**
+  String get recipesSearchHint;
+
+  /// Recipes: tooltip on the button that empties the search box.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get recipesClear;
+
+  /// Recipes: the label over recently logged recipes.
+  ///
+  /// In en, this message translates to:
+  /// **'Cooked recently'**
+  String get recipesCookedRecently;
+
+  /// Recipes: the filter chip for every meal.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get recipesAll;
+
+  /// Recipes: a meal, as a filter chip and a heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakfast'**
+  String get recipesBreakfast;
+
+  /// Recipes: a meal, as a filter chip and a heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunch'**
+  String get recipesLunch;
+
+  /// Recipes: a meal, as a filter chip and a heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Dinner'**
+  String get recipesDinner;
+
+  /// Recipes: a meal, as a filter chip and a heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Snack'**
+  String get recipesSnack;
+
+  /// Recipes: no recipe for the chosen meal.
+  ///
+  /// In en, this message translates to:
+  /// **'No recipes here yet.'**
+  String get recipesEmpty;
+
+  /// Recipes: the search found nothing.
+  ///
+  /// In en, this message translates to:
+  /// **'No recipes match that. Try other words.'**
+  String get recipesNoMatch;
+
+  /// Recipes: the button that logs a portion, and the tooltip on a tile's +.
+  ///
+  /// In en, this message translates to:
+  /// **'Log a portion'**
+  String get recipesLogPortion;
+
+  /// Recipes: calories on a tile and in the portions sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'{kcal} kcal'**
+  String recipesKcal(int kcal);
+
+  /// Recipes: protein on a tile and in the portions sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'{grams} g protein'**
+  String recipesProtein(int grams);
+
+  /// Recipes: a time in minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String recipesMinutes(int minutes);
+
+  /// A recipe: the page title.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipe'**
+  String get recipesRecipeTitle;
+
+  /// A recipe: it didn't load.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the recipe.'**
+  String get recipesErrorLoadOne;
+
+  /// A recipe: its calories.
+  ///
+  /// In en, this message translates to:
+  /// **'{kcal} kcal per portion'**
+  String recipesPerPortion(int kcal);
+
+  /// A recipe: its calories and protein.
+  ///
+  /// In en, this message translates to:
+  /// **'{kcal} kcal · {protein} g protein per portion'**
+  String recipesPerPortionProtein(int kcal, int protein);
+
+  /// A recipe: label under the prep time.
+  ///
+  /// In en, this message translates to:
+  /// **'Prep'**
+  String get recipesPrep;
+
+  /// A recipe: label under the cooking time.
+  ///
+  /// In en, this message translates to:
+  /// **'Cook'**
+  String get recipesCook;
+
+  /// A recipe: label under the number of portions it makes.
+  ///
+  /// In en, this message translates to:
+  /// **'Serves'**
+  String get recipesServes;
+
+  /// A recipe: the cooking time of a dish that isn't cooked.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get recipesNoCooking;
+
+  /// A recipe: the ingredients' heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredients'**
+  String get recipesIngredients;
+
+  /// A recipe: under Ingredients, how many portions they make.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{For 1 portion} other{For {count} portions}}'**
+  String recipesForPortions(int count);
+
+  /// A recipe: the steps' heading.
+  ///
+  /// In en, this message translates to:
+  /// **'How to make it'**
+  String get recipesHowToMake;
+
+  /// Portions sheet: the question under the recipe's name.
+  ///
+  /// In en, this message translates to:
+  /// **'How many portions?'**
+  String get recipesHowMany;
+
+  /// Portions sheet: tooltip on the minus button.
+  ///
+  /// In en, this message translates to:
+  /// **'Less'**
+  String get recipesLess;
+
+  /// Portions sheet: tooltip on the plus button.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get recipesMore;
+
+  /// Portions sheet: the button that logs the portions.
+  ///
+  /// In en, this message translates to:
+  /// **'Log'**
+  String get recipesLog;
+
+  /// Recipes: logging a portion failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not log the meal. Try again.'**
+  String get recipesErrorLog;
+
+  /// Recipes: a portion was logged. The meal is the recipe's name, with the portions when not 1.
+  ///
+  /// In en, this message translates to:
+  /// **'{meal} logged.'**
+  String recipesLogged(String meal);
+
+  /// Notifications: the page title.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationsTitle;
+
+  /// Notifications: the system refused permission.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow notifications for YumSum in system settings.'**
+  String get notificationsDenied;
+
+  /// Notifications: the evening meal reminder's switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily meal reminder'**
+  String get notificationsMeal;
+
+  /// Notifications: when the meal reminder comes. The time is like 20:30.
+  ///
+  /// In en, this message translates to:
+  /// **'Every evening at {time}'**
+  String notificationsMealTime(String time);
+
+  /// Notifications: the weigh-in reminder's switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Weigh-in reminder'**
+  String get notificationsWeight;
+
+  /// Notifications: a reminder that comes daily. The time is like 08:00.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day at {time}'**
+  String notificationsEveryDayAt(String time);
+
+  /// Notifications: when the weekly weigh-in reminder comes. day is the weekday in English (monday to sunday); the time is like 08:00.
+  ///
+  /// In en, this message translates to:
+  /// **'{day, select, monday{Mondays at {time}} tuesday{Tuesdays at {time}} wednesday{Wednesdays at {time}} thursday{Thursdays at {time}} friday{Fridays at {time}} saturday{Saturdays at {time}} other{Sundays at {time}}}'**
+  String notificationsWeeklyAt(String day, String time);
+
+  /// Notifications: the weigh-in day picker's daily option, over the weekdays.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day'**
+  String get notificationsEveryDay;
+
+  /// Notifications: the creatine reminder's switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily creatine reminder'**
+  String get notificationsCreatine;
+
+  /// YumSum Star's button and chip for people without it (the star icon beside it).
+  ///
+  /// In en, this message translates to:
+  /// **'Become a Star'**
+  String get starBecome;
+
+  /// YumSum Star page: the line under the name, for people without it.
+  ///
+  /// In en, this message translates to:
+  /// **'Shine bright with these smart perks.'**
+  String get starHeaderPitch;
+
+  /// YumSum Star page: the line under the name, for members.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything here is yours.'**
+  String get starHeaderMember;
+
+  /// YumSum Star page: a feature's name (a name, the same in every language).
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Snap'**
+  String get starFeatureSnapTitle;
+
+  /// YumSum Star page: what Smart Snap does.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture your meal. The AI does the rest.'**
+  String get starFeatureSnapBody;
+
+  /// YumSum Star page: a feature's name.
+  ///
+  /// In en, this message translates to:
+  /// **'Triple the AI estimates'**
+  String get starFeatureEstimatesTitle;
+
+  /// YumSum Star page: the AI estimates feature.
+  ///
+  /// In en, this message translates to:
+  /// **'30 a day, so you never run out.'**
+  String get starFeatureEstimatesBody;
+
+  /// YumSum Star page: a feature's name.
+  ///
+  /// In en, this message translates to:
+  /// **'Adaptive Formula'**
+  String get starFeatureAdaptiveTitle;
+
+  /// YumSum Star page: the Adaptive formula feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Learns your real burn and tunes your target.'**
+  String get starFeatureAdaptiveBody;
+
+  /// YumSum Star page: a feature's name.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Coach'**
+  String get starFeatureCoachTitle;
+
+  /// YumSum Star page: the AI Coach feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Reads your week and tells you how to do better.'**
+  String get starFeatureCoachBody;
+
+  /// YumSum Star page: a feature's name.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed Macros'**
+  String get starFeatureMacrosTitle;
+
+  /// YumSum Star page: the macros feature.
+  ///
+  /// In en, this message translates to:
+  /// **'The full label: fat, carbs, sugars, fibre, salt.'**
+  String get starFeatureMacrosBody;
+
+  /// YumSum Star page: the yearly plan's tile.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get starYearly;
+
+  /// YumSum Star page: the monthly plan's tile.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get starMonthly;
+
+  /// YumSum Star page: under the yearly price.
+  ///
+  /// In en, this message translates to:
+  /// **'a year'**
+  String get starPerYear;
+
+  /// YumSum Star page: under the monthly price.
+  ///
+  /// In en, this message translates to:
+  /// **'a month'**
+  String get starPerMonth;
+
+  /// YumSum Star page: the yearly price worked out a month. The price has its currency, like £3.33.
+  ///
+  /// In en, this message translates to:
+  /// **'{price} a month'**
+  String starMonthlyEquivalent(String price);
+
+  /// YumSum Star page: the badge on the yearly plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Save {percent}%'**
+  String starSave(int percent);
+
+  /// YumSum Star page: the button while a purchase is checked.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking with Google Play'**
+  String get starChecking;
+
+  /// YumSum Star page: the button when there's no free trial.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe'**
+  String get starSubscribe;
+
+  /// YumSum Star page: the button with a free trial.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, one{Start 1 day free} other{Start {days} days free}}'**
+  String starStartTrial(int days);
+
+  /// YumSum Star page: the yearly plan's terms, under the button.
+  ///
+  /// In en, this message translates to:
+  /// **'{price} a year. Renews every year until you cancel. Cancel any time in Google Play.'**
+  String starTermsYearly(String price);
+
+  /// YumSum Star page: the monthly plan's terms, under the button.
+  ///
+  /// In en, this message translates to:
+  /// **'{price} a month. Renews every month until you cancel. Cancel any time in Google Play.'**
+  String starTermsMonthly(String price);
+
+  /// YumSum Star page: the yearly plan's terms with a free trial.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, one{1 day free, then {price} a year. Renews every year until you cancel. Cancel any time in Google Play.} other{{days} days free, then {price} a year. Renews every year until you cancel. Cancel any time in Google Play.}}'**
+  String starTrialTermsYearly(int days, String price);
+
+  /// YumSum Star page: the monthly plan's terms with a free trial.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, one{1 day free, then {price} a month. Renews every month until you cancel. Cancel any time in Google Play.} other{{days} days free, then {price} a month. Renews every month until you cancel. Cancel any time in Google Play.}}'**
+  String starTrialTermsMonthly(int days, String price);
+
+  /// YumSum Star page: closes a purchase message.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get starOk;
+
+  /// Snackbar once YumSum Star is bought or restored.
+  ///
+  /// In en, this message translates to:
+  /// **'YumSum Star is on.'**
+  String get starOn;
+
+  /// Snackbar once a free trial starts. The date is like 14 November.
+  ///
+  /// In en, this message translates to:
+  /// **'YumSum Star is on. Your free week ends on {date}.'**
+  String starOnTrial(String date);
+
+  /// YumSum Star page, for members: the card's title.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re already a bright YumSum Star'**
+  String get starAlreadyTitle;
+
+  /// YumSum Star page, for members: under the title.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for helping YumSum grow.'**
+  String get starThanks;
+
+  /// YumSum Star page on the web, where it can't be bought.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe in the YumSum app for Android. YumSum Star then works here too, when you sign in with the same account.'**
+  String get starWeb;
+
+  /// YumSum Star page on iPhone, where it can't be bought yet.
+  ///
+  /// In en, this message translates to:
+  /// **'YumSum Star can\'t be bought on iPhone yet.'**
+  String get starNoIphone;
+
+  /// YumSum Star page: after the plans failed to load.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get starTryAgain;
+
+  /// YumSum Star page: the link that restores a subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchase'**
+  String get starRestore;
+
+  /// YumSum Star page: the link to the terms.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms'**
+  String get starTerms;
+
+  /// YumSum Star page: the link to the privacy policy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get starPrivacy;
+
+  /// YumSum Star page: tooltip on the close button.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get starClose;
+
+  /// Account Settings: the YumSum Star row for someone without it.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Snap, 30 AI estimates a day and more'**
+  String get starStatusPitch;
+
+  /// Account Settings: YumSum Star on hold for a failed payment.
+  ///
+  /// In en, this message translates to:
+  /// **'Off until the payment problem is fixed in Google Play'**
+  String get starStatusHold;
+
+  /// Account Settings: the owner's YumSum Star.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin: everything on, no daily limits'**
+  String get starStatusAdmin;
+
+  /// Account Settings: YumSum Star is on, with no end date.
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get starStatusOn;
+
+  /// Account Settings: YumSum Star given until a date. The date is like 3 December.
+  ///
+  /// In en, this message translates to:
+  /// **'On until {date}'**
+  String starStatusOnUntil(String date);
+
+  /// Account Settings: YumSum Star's free trial. The date is like 9 November.
+  ///
+  /// In en, this message translates to:
+  /// **'Free trial until {date}'**
+  String starStatusTrial(String date);
+
+  /// Account Settings: a cancelled YumSum Star that runs to a date.
+  ///
+  /// In en, this message translates to:
+  /// **'Ends on {date}'**
+  String starStatusEnds(String date);
+
+  /// Account Settings: YumSum Star's next renewal.
+  ///
+  /// In en, this message translates to:
+  /// **'Renews on {date}'**
+  String starStatusRenews(String date);
+
+  /// Account Settings: a renewal payment failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment problem. Fix it in Google Play to keep YumSum Star.'**
+  String get starStatusGrace;
+
+  /// YumSum Star page: Google Play couldn't be reached.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reach Google Play. Check your connection and try again.'**
+  String get starErrorPlay;
+
+  /// YumSum Star page: the server couldn't check a purchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not confirm your purchase. Try Restore purchase in a few minutes. If it still fails, Google Play refunds you automatically within 3 days.'**
+  String get starErrorNotConfirmed;
+
+  /// YumSum Star page: the subscription belongs to another YumSum account.
+  ///
+  /// In en, this message translates to:
+  /// **'This Google Play subscription is linked to another YumSum account. Sign in with that account to use it.'**
+  String get starErrorOtherAccount;
+
+  /// YumSum Star page: Restore purchase found nothing.
+  ///
+  /// In en, this message translates to:
+  /// **'No YumSum Star subscription found on this Google account.'**
+  String get starNothingToRestore;
+
+  /// YumSum Star page: the payment is pending.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Play is waiting for your payment. YumSum Star switches on once it goes through.'**
+  String get starPaymentPending;
 }
 
 class _AppLocalizationsDelegate

@@ -6,24 +6,27 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
+import 'package:lean_streak/l10n/app_localizations.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/services/billing_service.dart';
 
-const playUnreachable =
-    'Could not reach Google Play. Check your connection and try again.';
-const purchaseNotConfirmed =
-    'Could not confirm your purchase. Try Restore purchase in a few '
-    'minutes. If it still fails, Google Play refunds you automatically '
-    'within 3 days.';
-const purchaseOnAnotherAccount =
-    'This Google Play subscription is linked to another YumSum account. '
-    'Sign in with that account to use it.';
-const nothingToRestore =
-    'No YumSum Star subscription found on this Google account.';
-const paymentPending =
-    'Google Play is waiting for your payment. YumSum Star switches on once '
-    'it goes through.';
+/// What the YumSum Star page tells the person about a purchase.
+enum PurchaseMessage {
+  playUnreachable,
+  notConfirmed,
+  onAnotherAccount,
+  nothingToRestore,
+  paymentPending;
+
+  String text(AppLocalizations l10n) => switch (this) {
+    playUnreachable => l10n.starErrorPlay,
+    notConfirmed => l10n.starErrorNotConfirmed,
+    onAnotherAccount => l10n.starErrorOtherAccount,
+    nothingToRestore => l10n.starNothingToRestore,
+    paymentPending => l10n.starPaymentPending,
+  };
+}
 
 /// Where buying YumSum Star is: [checking] the purchase with the server, or
 /// a [message] for the YumSum Star page to show.
@@ -31,7 +34,7 @@ class PlusPurchase {
   const PlusPurchase({this.checking = false, this.message});
 
   final bool checking;
-  final String? message;
+  final PurchaseMessage? message;
 }
 
 /// Buys and restores YumSum Star on Android, and hands every purchase Play
@@ -85,7 +88,7 @@ class PlusPurchaseController extends Notifier<PlusPurchase> {
           .buy(plan, account: sha256.convert(utf8.encode(uid)).toString());
     } catch (error) {
       debugPrint('Could not start the purchase: $error');
-      _say(playUnreachable);
+      _say(PurchaseMessage.playUnreachable);
     }
   }
 
@@ -99,14 +102,14 @@ class PlusPurchaseController extends Notifier<PlusPurchase> {
     } catch (error) {
       _restoring = null;
       debugPrint('Could not restore purchases: $error');
-      if (!quiet) _say(playUnreachable);
+      if (!quiet) _say(PurchaseMessage.playUnreachable);
     }
   }
 
   Future<void> _onPurchases(List<PurchaseDetails> purchases) async {
     final quiet = _restoring ?? false;
     if (_restoring == false && !purchases.any(_isOurs)) {
-      _say(nothingToRestore);
+      _say(PurchaseMessage.nothingToRestore);
     }
     _restoring = null;
     for (final purchase in purchases) {
@@ -114,13 +117,13 @@ class PlusPurchaseController extends Notifier<PlusPurchase> {
         case PurchaseStatus.purchased || PurchaseStatus.restored:
           if (_isOurs(purchase)) await _verify(purchase, quiet: quiet);
         case PurchaseStatus.pending:
-          _say(paymentPending);
+          _say(PurchaseMessage.paymentPending);
         case PurchaseStatus.error:
           debugPrint('Purchase failed: ${purchase.error}');
           if (alreadyOwned(purchase)) {
             await restore();
           } else {
-            _say(playUnreachable);
+            _say(PurchaseMessage.playUnreachable);
           }
         case PurchaseStatus.canceled:
           state = const PlusPurchase();
@@ -144,7 +147,11 @@ class PlusPurchaseController extends Notifier<PlusPurchase> {
       if (quiet) return;
       final linked =
           error is FirebaseFunctionsException && error.code == 'already-exists';
-      _say(linked ? purchaseOnAnotherAccount : purchaseNotConfirmed);
+      _say(
+        linked
+            ? PurchaseMessage.onAnotherAccount
+            : PurchaseMessage.notConfirmed,
+      );
       return;
     }
     if (!quiet) state = const PlusPurchase();
@@ -158,5 +165,5 @@ class PlusPurchaseController extends Notifier<PlusPurchase> {
     }
   }
 
-  void _say(String message) => state = PlusPurchase(message: message);
+  void _say(PurchaseMessage message) => state = PlusPurchase(message: message);
 }

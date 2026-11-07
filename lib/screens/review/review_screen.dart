@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/period_review.dart';
 import 'package:lean_streak/providers/period_review_provider.dart';
@@ -42,14 +43,14 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(),
-      appBar: AppBar(title: const Text('History')),
+      appBar: AppBar(title: Text(context.l10n.historyTitle)),
       body: firstDayAsync.when(
         data: _buildContent,
         loading: () =>
             Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (_, _) => Center(
           child: Text(
-            'Could not load your history.',
+            context.l10n.historyErrorLoad,
             style: TextStyle(color: AppColors.textSecondary),
           ),
         ),
@@ -58,6 +59,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   }
 
   Widget _buildContent(DateTime? firstDay) {
+    final l10n = context.l10n;
     final today = _dateOnly(DateTime.now());
     final start = _periodStart(_anchor, _mode);
     final end = _periodEnd(_anchor, _mode);
@@ -90,16 +92,16 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               PillToggle<_ReviewMode>(
-                options: const [
-                  (_ReviewMode.week, 'Week'),
-                  (_ReviewMode.month, 'Month'),
+                options: [
+                  (_ReviewMode.week, l10n.historyWeek),
+                  (_ReviewMode.month, l10n.historyMonth),
                 ],
                 selected: _mode,
                 onChanged: (mode) => setState(() => _mode = mode),
               ),
               const SizedBox(height: 18),
               PeriodBar(
-                label: _periodLabel(start, _mode),
+                label: _periodLabel(l10n, start, _mode),
                 onPrevious: start.isAfter(firstStart)
                     ? () => setState(() => _anchor = _shift(start, -1, _mode))
                     : null,
@@ -130,11 +132,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                 named: _mode == _ReviewMode.month,
               ),
               if (reviewEnd.isBefore(start))
-                const AppCard(
-                  child: BowlNote(
-                    'Your review starts tomorrow, once today is over.',
-                  ),
-                )
+                AppCard(child: BowlNote(l10n.historyReviewTomorrow))
               else
                 _PeriodReviewCard(
                   range: PeriodReviewRange(
@@ -178,6 +176,7 @@ class _Calendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final days = [
       for (
         var day = start;
@@ -199,18 +198,11 @@ class _Calendar extends StatelessWidget {
       children: [
         Row(
           children: [
-            for (final label in [
-              'Mon',
-              'Tue',
-              'Wed',
-              'Thu',
-              'Fri',
-              'Sat',
-              'Sun',
-            ])
+            // 1 January 2024 was a Monday.
+            for (var day = 1; day <= 7; day++)
               Expanded(
                 child: Text(
-                  label,
+                  capitalised(l10n.date(DateTime(2024, 1, day), 'EEE')),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
@@ -257,10 +249,16 @@ class _Calendar extends StatelessWidget {
           spacing: 14,
           runSpacing: 8,
           children: [
-            _LegendDot(label: 'On track', color: AppColors.veryGood),
-            _LegendDot(label: 'Close', color: AppColors.bad),
-            _LegendDot(label: 'Off track', color: AppColors.veryBad),
-            _LegendDot(label: 'Not logged', color: AppColors.divider),
+            _LegendDot(
+              label: l10n.historyStatusOnTrack,
+              color: AppColors.veryGood,
+            ),
+            _LegendDot(label: l10n.historyStatusClose, color: AppColors.bad),
+            _LegendDot(
+              label: l10n.historyStatusOffTrack,
+              color: AppColors.veryBad,
+            ),
+            _LegendDot(label: l10n.historyNotLogged, color: AppColors.divider),
           ],
         ),
       ],
@@ -383,6 +381,7 @@ class _PeriodReviewCard extends ConsumerWidget {
         ),
       );
     }
+    final l10n = context.l10n;
     final endKey = _dateKey(range.endDate);
     final review = ref
         .watch(periodReviewServiceProvider)
@@ -393,6 +392,7 @@ class _PeriodReviewCard extends ConsumerWidget {
             for (final summary in summariesByDate.values)
               if (summary.date.compareTo(endKey) <= 0) summary,
           ],
+          l10n: l10n,
         );
 
     return Column(
@@ -403,7 +403,7 @@ class _PeriodReviewCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (review.loggedDays == 0)
-                const BowlNote('Nothing logged in this period yet.')
+                BowlNote(l10n.historyNothingLogged)
               else
                 _ReviewHeadline(review: review),
               const SizedBox(height: 20),
@@ -423,22 +423,20 @@ class _PeriodReviewCard extends ConsumerWidget {
                   runSpacing: 8,
                   children: [
                     StatusPill(
-                      label: '${review.greenDays} on track',
+                      label: l10n.historyOnTrackCount(review.greenDays),
                       color: AppColors.veryGood,
                     ),
                     StatusPill(
-                      label: '${review.yellowDays} close',
+                      label: l10n.historyCloseCount(review.yellowDays),
                       color: AppColors.bad,
                     ),
                     StatusPill(
-                      label: '${review.redDays} off track',
+                      label: l10n.historyOffTrackCount(review.redDays),
                       color: AppColors.veryBad,
                     ),
                     if (review.daysOff > 0)
                       StatusPill(
-                        label:
-                            '${review.daysOff} '
-                            '${review.daysOff == 1 ? 'day' : 'days'} off',
+                        label: l10n.historyDaysOffCount(review.daysOff),
                         color: AppColors.primary,
                       ),
                   ],
@@ -470,6 +468,7 @@ class _ReviewHeadline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final onTrack = (review.calorieConsistencyRate * 100).round();
 
     return Row(
@@ -490,7 +489,7 @@ class _ReviewHeadline extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                'of logged days on track',
+                l10n.historyOnTrackShare,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -500,23 +499,30 @@ class _ReviewHeadline extends StatelessWidget {
             ],
           ),
         ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              '${review.loggedDays} of ${review.daysInPeriod} days logged',
-              style: AppTheme.display.copyWith(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
+        // Its natural width, but wrapping before it crowds the percentage
+        // on a narrow phone.
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 176),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                l10n.historyDaysLogged(review.loggedDays, review.daysInPeriod),
+                textAlign: TextAlign.end,
+                style: AppTheme.display.copyWith(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimary,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Average ${review.averageCaloriesPerDay.round()} kcal a day',
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
-            ),
-          ],
+              const SizedBox(height: 4),
+              Text(
+                l10n.historyAverageKcal(review.averageCaloriesPerDay.round()),
+                textAlign: TextAlign.end,
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -560,9 +566,9 @@ DateTime _shift(DateTime start, int by, _ReviewMode mode) {
       : DateTime(start.year, start.month, start.day + 7 * by);
 }
 
-String _periodLabel(DateTime start, _ReviewMode mode) {
+String _periodLabel(AppLocalizations l10n, DateTime start, _ReviewMode mode) {
   if (mode == _ReviewMode.month) {
-    return DateFormat('MMMM yyyy').format(start);
+    return capitalised(l10n.monthYear(start));
   }
-  return weekLabel(start);
+  return weekLabel(l10n, start);
 }

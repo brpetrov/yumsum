@@ -6,13 +6,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
-import 'package:lean_streak/providers/plus_purchase_controller.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
 
 import 'billing_fixtures.dart';
+
+final _en = lookupAppLocalizations(const Locale('en'));
 
 void main() {
   late FakeBillingService play;
@@ -134,10 +136,10 @@ void main() {
     server.error = Exception('down');
     play.send([purchase(PurchaseStatus.purchased)]);
     await tester.pumpAndSettle();
-    expect(find.text(purchaseNotConfirmed), findsOneWidget);
+    expect(find.text(_en.starErrorNotConfirmed), findsOneWidget);
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
-    expect(find.text(purchaseNotConfirmed), findsNothing);
+    expect(find.text(_en.starErrorNotConfirmed), findsNothing);
     expect(find.byType(PlusScreen), findsOneWidget);
   });
 
@@ -150,14 +152,14 @@ void main() {
     await tester.tap(find.text('Restore purchase'));
     await tester.pumpAndSettle();
     expect(play.restores, atStart + 1);
-    expect(find.text(nothingToRestore), findsOneWidget);
+    expect(find.text(_en.starNothingToRestore), findsOneWidget);
   });
 
   testWidgets("says so when Play can't be reached, and tries again", (
     tester,
   ) async {
     await pumpScreen(tester, null, billing: FakeBillingService(fails: true));
-    expect(find.text(playUnreachable), findsOneWidget);
+    expect(find.text(_en.starErrorPlay), findsOneWidget);
     expect(find.text('Start 7 days free'), findsNothing);
 
     play.fails = false;

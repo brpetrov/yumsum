@@ -1,6 +1,5 @@
 {
   "@@locale": "en",
-
   "languageChoose": "Choose your language",
   "@languageChoose": {
     "description": "First-launch language screen: its heading, shown in English and in Bulgarian at once."
@@ -17,7 +16,6 @@
   "@languageSetting": {
     "description": "Menu: the heading over the English / Български switch."
   },
-
   "reminderMealTitle": "Log today's meals",
   "@reminderMealTitle": {
     "description": "Evening reminder notification: title."
@@ -70,7 +68,6 @@
   "@reminderCreatineChannelDescription": {
     "description": "Android's notification settings: what the creatine reminder is for."
   },
-
   "commonCancel": "Cancel",
   "@commonCancel": {
     "description": "Button that closes a dialog without doing anything."
@@ -118,7 +115,11 @@
   "commonKcal": "{kcal} kcal",
   "@commonKcal": {
     "description": "An amount of calories, e.g. on a meal row or an option in the which-did-you-have dialog.",
-    "placeholders": { "kcal": { "type": "int" } }
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
   },
   "commonKcalUnit": "kcal",
   "@commonKcalUnit": {
@@ -131,14 +132,24 @@
   "commonGrams": "{grams} g",
   "@commonGrams": {
     "description": "An amount in grams, e.g. a food's weight or a macro ring's figure. grams is already formatted, maybe with a decimal.",
-    "placeholders": { "grams": { "type": "String" } }
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      }
+    }
   },
   "commonKcalProtein": "{kcal} kcal · {protein} g protein",
   "@commonKcalProtein": {
     "description": "Calories and protein of a portion of a packaged food.",
-    "placeholders": { "kcal": { "type": "int" }, "protein": { "type": "int" } }
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      },
+      "protein": {
+        "type": "int"
+      }
+    }
   },
-
   "homeTitle": "Home",
   "@homeTitle": {
     "description": "Home: the page title while the user's first name hasn't loaded."
@@ -198,7 +209,14 @@
   "homeKcalEaten": "{eaten} of {target} kcal eaten",
   "@homeKcalEaten": {
     "description": "Home: under the big number, today's calories so far against the target.",
-    "placeholders": { "eaten": { "type": "int" }, "target": { "type": "int" } }
+    "placeholders": {
+      "eaten": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
   },
   "homeTargetsTooltip": "About your targets",
   "@homeTargetsTooltip": {
@@ -211,7 +229,11 @@
   "homeMealsLogged": "{count, plural, other{{count} logged}}",
   "@homeMealsLogged": {
     "description": "Home: pill beside Today's meals with how many meals are logged today.",
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "homeNothingLogged": "Nothing logged yet. Type or tap the mic below.",
   "@homeNothingLogged": {
@@ -228,7 +250,11 @@
   "homeDaysLogged": "{count, plural, other{{count} days logged}}",
   "@homeDaysLogged": {
     "description": "Home: in the month card, how many days this month have meals.",
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "homeWeight": "Weight",
   "@homeWeight": {
@@ -241,12 +267,23 @@
   "homeWeightLatest": "Latest: {weight}",
   "@homeWeightLatest": {
     "description": "Home: in the weight card, the latest weight, formatted in the user's unit (\"82.4 kg\", \"12 st 4 lb\").",
-    "placeholders": { "weight": { "type": "String" } }
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
   },
   "homeWeightLatestAgo": "{days, plural, other{Latest: {weight} · {days} days ago}}",
   "@homeWeightLatestAgo": {
     "description": "Home: in the weight card, the latest weight when it is over a week old, formatted in the user's unit.",
-    "placeholders": { "weight": { "type": "String" }, "days": { "type": "int" } }
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
   },
   "homeWeightLog": "Log",
   "@homeWeightLog": {
@@ -267,7 +304,11 @@
   "homeCreatineBody": "Get a daily reminder at {time}. You can change the time later.",
   "@homeCreatineBody": {
     "description": "Home: text of the creatine reminder offer. time is e.g. 09:00.",
-    "placeholders": { "time": { "type": "String" } }
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "homeCreatineNo": "No thanks",
   "@homeCreatineNo": {
@@ -280,7 +321,11 @@
   "homeCreatineOn": "Creatine reminder on for {time}. Change it under Notifications in the menu.",
   "@homeCreatineOn": {
     "description": "Home: snack bar once the creatine reminder is on. time is e.g. 09:00; Notifications is the menu page.",
-    "placeholders": { "time": { "type": "String" } }
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "homeCreatineBlocked": "Allow notifications in your phone's Settings, then turn it on under Notifications in the menu.",
   "@homeCreatineBlocked": {
@@ -330,7 +375,6 @@
   "@homeDayOffTakeButton": {
     "description": "Day off dialog: button taking today off."
   },
-
   "adaptiveIntroTitle": "Your calories, personalised",
   "@adaptiveIntroTitle": {
     "description": "Adaptive formula dialog: title."
@@ -382,13 +426,20 @@
   "adaptiveLapseBody": "Your target goes back to your standard plan on {date}.",
   "@adaptiveLapseBody": {
     "description": "Notice once YumSum Star ends: when the target returns to the plan's. date is e.g. 7 November.",
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
-
   "quickLogLimit": "Today's {limit} AI estimates are used up. Type the calories yourself.",
   "@quickLogLimit": {
     "description": "Quick-log bar: error when the day's AI estimates are used up.",
-    "placeholders": { "limit": { "type": "int" } }
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
   },
   "quickLogErrorSave": "Could not save meal. Try again.",
   "@quickLogErrorSave": {
@@ -417,7 +468,11 @@
   "quickLogAiLeft": "{count, plural, =0{No AI estimates left today} =1{1 AI estimate left today} other{{count} AI estimates left today}}",
   "@quickLogAiLeft": {
     "description": "Quick-log bar: quiet line above the box once half of the day's AI estimates are used.",
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "quickLogHint": "Type a meal",
   "@quickLogHint": {
@@ -442,7 +497,14 @@
   "quickLogChip": "{name} · {kcal} kcal",
   "@quickLogChip": {
     "description": "Quick-log bar: a chip offering a recent meal or a recipe portion.",
-    "placeholders": { "name": { "type": "String" }, "kcal": { "type": "int" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "kcal": {
+        "type": "int"
+      }
+    }
   },
   "quickLogStop": "Stop",
   "@quickLogStop": {
@@ -472,7 +534,6 @@
   "@quickLogWorking": {
     "description": "Quick-log bar: status line while the AI or the food database is busy."
   },
-
   "mealAiOff": "AI estimates aren't switched on yet.",
   "@mealAiOff": {
     "description": "AI error: the AI isn't switched on on the server."
@@ -588,7 +649,11 @@
   "mealProteinGrams": "{grams} g protein",
   "@mealProteinGrams": {
     "description": "Meal row: the meal's protein, under its calories.",
-    "placeholders": { "grams": { "type": "int" } }
+    "placeholders": {
+      "grams": {
+        "type": "int"
+      }
+    }
   },
   "mealOptions": "Meal options",
   "@mealOptions": {
@@ -609,7 +674,14 @@
   "mealKcalGrams": "{kcal} kcal · {grams} g",
   "@mealKcalGrams": {
     "description": "AI breakdown: an item's calories and protein grams.",
-    "placeholders": { "kcal": { "type": "int" }, "grams": { "type": "int" } }
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      },
+      "grams": {
+        "type": "int"
+      }
+    }
   },
   "mealChoiceTitle": "Which did you have?",
   "@mealChoiceTitle": {
@@ -619,7 +691,6 @@
   "@mealChoiceNote": {
     "description": "Which-did-you-have dialog: the first option, ticked, is the AI's guess."
   },
-
   "cameraNotFound": "No camera found.",
   "@cameraNotFound": {
     "description": "Camera page: the device has no camera."
@@ -655,7 +726,14 @@
   "cameraStep": "Step {number} of {total}",
   "@cameraStep": {
     "description": "Camera page: which photo of several this is.",
-    "placeholders": { "number": { "type": "int" }, "total": { "type": "int" } }
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
   },
   "cameraBarcodeTitle": "Point at the barcode",
   "@cameraBarcodeTitle": {
@@ -713,7 +791,6 @@
   "@cameraSmartSnapControlBody": {
     "description": "Smart Snap dialog: second promise, its line."
   },
-
   "foodSearchSource": "Packaged foods · Open Food Facts",
   "@foodSearchSource": {
     "description": "Food search sheet: under the words searched for."
@@ -729,12 +806,20 @@
   "foodPer100g": "{kcal} kcal per 100 g",
   "@foodPer100g": {
     "description": "Food search sheet: a product's calories, after its brand.",
-    "placeholders": { "kcal": { "type": "int" } }
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
   },
   "foodPortionSource": "{amounts} per 100 g · Open Food Facts",
   "@foodPortionSource": {
     "description": "Portion sheet: the product's figures per 100 g. amounts is e.g. 215 kcal · 9 g protein.",
-    "placeholders": { "amounts": { "type": "String" } }
+    "placeholders": {
+      "amounts": {
+        "type": "String"
+      }
+    }
   },
   "foodPortionAmount": "Amount",
   "@foodPortionAmount": {
@@ -748,7 +833,6 @@
   "@foodErrorOffline": {
     "description": "Barcode lookup or food search: no connection."
   },
-
   "contributeAddNutritionTitle": "Add its nutrition",
   "@contributeAddNutritionTitle": {
     "description": "Contribute invitation: title when the product is listed without its nutrition."
@@ -780,7 +864,11 @@
   "contributeAiRead": "{count, plural, =1{The AI read these from your photo. Check them against the packet: they will be public.} other{The AI read these from your photos. Check them against the packet: they will be public.}}",
   "@contributeAiRead": {
     "description": "Contribute form: note once the AI has filled the form from the packet photos.",
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "contributeAiLimit": "Daily AI limit reached. Copy the details from the packet yourself.",
   "@contributeAiLimit": {
@@ -837,17 +925,29 @@
   "contributeThanksProduct": "{product} is now on Open Food Facts for everyone who scans it next.",
   "@contributeThanksProduct": {
     "description": "Contribute: thank-you text after adding a new product.",
-    "placeholders": { "product": { "type": "String" } }
+    "placeholders": {
+      "product": {
+        "type": "String"
+      }
+    }
   },
   "contributeThanksNutrition": "{product} now has its nutrition on Open Food Facts for everyone who scans it next.",
   "@contributeThanksNutrition": {
     "description": "Contribute: thank-you text after adding a listed product's nutrition.",
-    "placeholders": { "product": { "type": "String" } }
+    "placeholders": {
+      "product": {
+        "type": "String"
+      }
+    }
   },
   "contributeThanksCount": "{count, plural, other{That's {count} products you've added.}}",
   "@contributeThanksCount": {
     "description": "Contribute: after the thank-you text, from the second product on.",
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "contributeLogIt": "Log it",
   "@contributeLogIt": {
@@ -864,7 +964,11 @@
   "contributeBarcode": "Barcode {barcode}",
   "@contributeBarcode": {
     "description": "Contribute form: under the title.",
-    "placeholders": { "barcode": { "type": "String" } }
+    "placeholders": {
+      "barcode": {
+        "type": "String"
+      }
+    }
   },
   "contributeReading": "Reading the label...",
   "@contributeReading": {
@@ -914,7 +1018,6 @@
   "@contributeErrorOffline": {
     "description": "Contribute form: sending failed."
   },
-
   "macroProtein": "Protein",
   "@macroProtein": {
     "description": "Protein: a macro ring's label, a macro guide heading, and in a meal's macro line."
@@ -954,22 +1057,38 @@
   "macroRingMax": "max {grams} g",
   "@macroRingMax": {
     "description": "Under a macro ring with a limit (sugars, saturates, salt): the most for the day.",
-    "placeholders": { "grams": { "type": "int" } }
+    "placeholders": {
+      "grams": {
+        "type": "int"
+      }
+    }
   },
   "macroRingOf": "of {grams} g",
   "@macroRingOf": {
     "description": "Under a macro ring with a target: the day's target.",
-    "placeholders": { "grams": { "type": "int" } }
+    "placeholders": {
+      "grams": {
+        "type": "int"
+      }
+    }
   },
   "macroNotCountedProtein": "{count, plural, =1{1 meal not counted (no protein info)} other{{count} meals not counted (no protein info)}}",
   "@macroNotCountedProtein": {
     "description": "Under the macro rings: meals whose protein isn't known.",
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "macroNotCountedMacros": "{count, plural, =1{1 meal not counted (no macro info)} other{{count} meals not counted (no macro info)}}",
   "@macroNotCountedMacros": {
     "description": "Under the macro rings or the day's totals: meals whose macros aren't known.",
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "macroUnlockLabel": "Unlock full macros with YumSum Star",
   "@macroUnlockLabel": {
@@ -990,7 +1109,11 @@
   "macroAtLeast": "at least {grams}",
   "@macroAtLeast": {
     "description": "The day's macro totals: where some meals don't give the figure. grams is e.g. 12 g.",
-    "placeholders": { "grams": { "type": "String" } }
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      }
+    }
   },
   "macroGuideTargets": "Your targets",
   "@macroGuideTargets": {
@@ -1099,5 +1222,911 @@
   "macroFibreBadge": "Rich in fibre",
   "@macroFibreBadge": {
     "description": "Badge on a recipe high in fibre: its tooltip on the photo, and a pill on the recipe page."
+  },
+  "historyTitle": "History",
+  "@historyTitle": {
+    "description": "History: the page title."
+  },
+  "historyErrorLoad": "Could not load your history.",
+  "@historyErrorLoad": {
+    "description": "History: shown when the page doesn't load."
+  },
+  "historyWeek": "Week",
+  "@historyWeek": {
+    "description": "History: the week option of the Week / Month switch."
+  },
+  "historyMonth": "Month",
+  "@historyMonth": {
+    "description": "History: the month option of the Week / Month switch."
+  },
+  "historyPrevious": "Previous",
+  "@historyPrevious": {
+    "description": "History: tooltip on the arrow to the previous week or month."
+  },
+  "historyNext": "Next",
+  "@historyNext": {
+    "description": "History: tooltip on the arrow to the next week or month."
+  },
+  "historyToday": "Today",
+  "@historyToday": {
+    "description": "History: the button back to the current week or month."
+  },
+  "historyStatusOnTrack": "On track",
+  "@historyStatusOnTrack": {
+    "description": "A day's status, on the calendar's key and a day's pill: calories within 10% of the target."
+  },
+  "historyStatusClose": "Close",
+  "@historyStatusClose": {
+    "description": "A day's status, on the calendar's key and a day's pill: calories within 20% of the target."
+  },
+  "historyStatusOffTrack": "Off track",
+  "@historyStatusOffTrack": {
+    "description": "A day's status, on the calendar's key and a day's pill: calories more than 20% from the target."
+  },
+  "historyNotLogged": "Not logged",
+  "@historyNotLogged": {
+    "description": "History: the calendar key's grey dot, a day with nothing logged."
+  },
+  "historyReviewTomorrow": "Your review starts tomorrow, once today is over.",
+  "@historyReviewTomorrow": {
+    "description": "History: under the calendar on the first day of a week or month, before any day of it is finished."
+  },
+  "historyNothingLogged": "Nothing logged in this period yet.",
+  "@historyNothingLogged": {
+    "description": "History: the review card when no day of the week or month has a log."
+  },
+  "historyOnTrackCount": "{count} on track",
+  "@historyOnTrackCount": {
+    "description": "History: pill with the number of days on track.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historyCloseCount": "{count} close",
+  "@historyCloseCount": {
+    "description": "History: pill with the number of days close to the target.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historyOffTrackCount": "{count} off track",
+  "@historyOffTrackCount": {
+    "description": "History: pill with the number of days off track.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historyDaysOffCount": "{count, plural, one{1 day off} other{{count} days off}}",
+  "@historyDaysOffCount": {
+    "description": "History: pill with the number of days off.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historyOnTrackShare": "of logged days on track",
+  "@historyOnTrackShare": {
+    "description": "History: under the big percentage, the share of logged days on track."
+  },
+  "historyDaysLogged": "{logged} of {days} days logged",
+  "@historyDaysLogged": {
+    "description": "History: how many days of the week or month have a log.",
+    "placeholders": {
+      "logged": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "historyAverageKcal": "Average {kcal} kcal a day",
+  "@historyAverageKcal": {
+    "description": "History: the average calories of the logged days.",
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
+  },
+  "historyGuidanceNoMeals": "No meals logged in this period.",
+  "@historyGuidanceNoMeals": {
+    "description": "History: review note when nothing was logged."
+  },
+  "historyGuidanceMostClose": "Most logged days stayed close to target.",
+  "@historyGuidanceMostClose": {
+    "description": "History: review note when 70% or more of the logged days were on track."
+  },
+  "historyGuidanceSomeClose": "Some logged days stayed close to target; a few were well off.",
+  "@historyGuidanceSomeClose": {
+    "description": "History: review note when 40-70% of the logged days were on track."
+  },
+  "historyGuidanceMostOff": "Most logged days were well above or below target.",
+  "@historyGuidanceMostOff": {
+    "description": "History: review note when under 40% of the logged days were on track."
+  },
+  "historyGuidanceLogMore": "Some days weren't logged. Log more days for a clearer review.",
+  "@historyGuidanceLogMore": {
+    "description": "History: review note when too few days were logged."
+  },
+  "historyBarNoCalories": "{date}: no calories logged",
+  "@historyBarNoCalories": {
+    "description": "History: tooltip on a day's calorie bar with nothing logged. The date is like 7 Nov.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "historyBarKcal": "{date}: {kcal} kcal",
+  "@historyBarKcal": {
+    "description": "History: tooltip on a day's calorie bar.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "kcal": {
+        "type": "int"
+      }
+    }
+  },
+  "historyBarKcalProtein": "{date}: {kcal} kcal · {protein} g protein",
+  "@historyBarKcalProtein": {
+    "description": "History: tooltip on a day's calorie bar, with protein.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "kcal": {
+        "type": "int"
+      },
+      "protein": {
+        "type": "int"
+      }
+    }
+  },
+  "historyDayNothingLogged": "Nothing logged",
+  "@historyDayNothingLogged": {
+    "description": "A day's meals (opened from History): under the date when the day has no log."
+  },
+  "historyDayKcal": "{total} of {target} kcal",
+  "@historyDayKcal": {
+    "description": "A day's meals: the day's calories against its target.",
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "historyDayKcalProtein": "{total} of {target} kcal · {protein} g protein",
+  "@historyDayKcalProtein": {
+    "description": "A day's meals: the day's calories against its target, and protein.",
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      },
+      "protein": {
+        "type": "int"
+      }
+    }
+  },
+  "historyDayOff": "Day off",
+  "@historyDayOff": {
+    "description": "A day's meals: the pill on a day taken off."
+  },
+  "historyDayNoMacros": "No macro info for this day's meals",
+  "@historyDayNoMacros": {
+    "description": "A day's meals: in place of the macro totals when no meal has them."
+  },
+  "historyChangesLeft": "{left, plural, other{{left} of {limit} past-day changes left this month}}",
+  "@historyChangesLeft": {
+    "description": "A day's meals, on a past day: how many changes to past days are left this month.",
+    "placeholders": {
+      "left": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "historyNoChangesLeft": "No past-day changes left this month.",
+  "@historyNoChangesLeft": {
+    "description": "A day's meals: error when the month's changes to past days are used up."
+  },
+  "historyDayNoMeals": "No meals logged on this day.",
+  "@historyDayNoMeals": {
+    "description": "A day's meals: the empty list."
+  },
+  "historyAddMeal": "Add meal",
+  "@historyAddMeal": {
+    "description": "A day's meals: the button that adds a meal to that day."
+  },
+  "historyDeleteMealTitle": "Delete meal?",
+  "@historyDeleteMealTitle": {
+    "description": "A day's meals: the delete confirmation's title."
+  },
+  "historyDeleteMealNamed": "Remove {name} from this day?",
+  "@historyDeleteMealNamed": {
+    "description": "A day's meals: the delete confirmation's text, with the meal's name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "historyDeleteMealUnnamed": "Remove this meal from this day?",
+  "@historyDeleteMealUnnamed": {
+    "description": "A day's meals: the delete confirmation's text, for a meal without a name."
+  },
+  "historyCancel": "Cancel",
+  "@historyCancel": {
+    "description": "A day's meals: cancels the delete."
+  },
+  "historyDelete": "Delete",
+  "@historyDelete": {
+    "description": "A day's meals: confirms the delete."
+  },
+  "historyErrorDeleteMeal": "Could not delete the meal. Try again.",
+  "@historyErrorDeleteMeal": {
+    "description": "A day's meals: the delete failed."
+  },
+  "coachTitle": "AI Coach",
+  "@coachTitle": {
+    "description": "AI Coach: the page title, and the card's name in History."
+  },
+  "coachIntroTitle": "Your AI Coach",
+  "@coachIntroTitle": {
+    "description": "AI Coach: the heading for people without YumSum Star, and the title of the How it works dialog."
+  },
+  "coachSubtitle": "Get fresh advice tailored just for you, every Monday, to help you eat better and reach your goals.",
+  "@coachSubtitle": {
+    "description": "AI Coach: what it is in one line, under the heading."
+  },
+  "coachPromiseHoldingBackTitle": "Spot what's holding you back",
+  "@coachPromiseHoldingBackTitle": {
+    "description": "AI Coach: the first promise's title."
+  },
+  "coachPromiseHoldingBackBody": "Discover the eating patterns that could be slowing your progress and find small changes that help.",
+  "@coachPromiseHoldingBackBody": {
+    "description": "AI Coach: the first promise's text."
+  },
+  "coachPromiseBalanceTitle": "Build a more balanced diet",
+  "@coachPromiseBalanceTitle": {
+    "description": "AI Coach: the second promise's title."
+  },
+  "coachPromiseBalanceBody": "See how your protein, fibre, salt and sugar compare with recommended amounts, so you know where to focus.",
+  "@coachPromiseBalanceBody": {
+    "description": "AI Coach: the second promise's text."
+  },
+  "coachPromiseAdviceTitle": "Get advice you can put into practice",
+  "@coachPromiseAdviceTitle": {
+    "description": "AI Coach: the third promise's title."
+  },
+  "coachPromiseAdviceBody": "Make your next meal easier with practical tips and recipe ideas based on what you already eat.",
+  "@coachPromiseAdviceBody": {
+    "description": "AI Coach: the third promise's text."
+  },
+  "coachPromiseWeeklyTitle": "Start every week with direction",
+  "@coachPromiseWeeklyTitle": {
+    "description": "AI Coach: the fourth promise's title."
+  },
+  "coachPromiseWeeklyBody": "Every Monday, get a fresh review of what's working and what to change, so you can build on your progress.",
+  "@coachPromiseWeeklyBody": {
+    "description": "AI Coach: the fourth promise's text."
+  },
+  "coachClose": "Close",
+  "@coachClose": {
+    "description": "AI Coach: closes the How it works dialog."
+  },
+  "coachHowItWorks": "How it works",
+  "@coachHowItWorks": {
+    "description": "AI Coach: tooltip on the info button."
+  },
+  "coachLastWeek": "Last week",
+  "@coachLastWeek": {
+    "description": "AI Coach: the heading over the dates of the latest finished week."
+  },
+  "coachPrevious": "Previous",
+  "@coachPrevious": {
+    "description": "AI Coach: tooltip on the arrow to the week before."
+  },
+  "coachNext": "Next",
+  "@coachNext": {
+    "description": "AI Coach: tooltip on the arrow to the week after."
+  },
+  "coachFirstNotesTitle": "Your first notes come on Monday",
+  "@coachFirstNotesTitle": {
+    "description": "AI Coach: for a new member before a full week is in."
+  },
+  "coachDaysToGo": "{count, plural, one{1 day to go} other{{count} days to go}}",
+  "@coachDaysToGo": {
+    "description": "AI Coach: days left until the first notes.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "coachFirstNotesBody": "AI Coach reads a whole week at a time, so it's going over this one as you log it. On Monday {date} it'll tell you what went well, what held you back and what to try next week.",
+  "@coachFirstNotesBody": {
+    "description": "AI Coach: for a new member, what happens until the first notes. The date is like 16 November.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "coachEnded": "YumSum Star has ended, so no new notes are written. The ones you have stay.",
+  "@coachEnded": {
+    "description": "AI Coach: once YumSum Star has ended."
+  },
+  "coachNotEnough": "Not enough logged this week for notes. They need 4 days logged, not counting days off.",
+  "@coachNotEnough": {
+    "description": "AI Coach: a week with too few logged days for notes."
+  },
+  "coachLooking": "Looking over your week",
+  "@coachLooking": {
+    "description": "AI Coach: while the notes are written."
+  },
+  "coachErrorLoad": "Could not get this week's notes. Try again.",
+  "@coachErrorLoad": {
+    "description": "AI Coach: the notes failed to come."
+  },
+  "coachTryAgain": "Try again",
+  "@coachTryAgain": {
+    "description": "AI Coach: the button after the notes failed."
+  },
+  "coachNoNotesPlus": "No notes on this week. AI Coach writes them during the week after, when you open this page.",
+  "@coachNoNotesPlus": {
+    "description": "AI Coach: a past week the coach never wrote notes on, for a member."
+  },
+  "coachNoNotes": "No notes on this week.",
+  "@coachNoNotes": {
+    "description": "AI Coach: a past week without notes, once YumSum Star has ended."
+  },
+  "coachKeepGoing": "Keep going",
+  "@coachKeepGoing": {
+    "description": "AI Coach: the small heading over the tips of a note on something that went well."
+  },
+  "coachTryThis": "Try this",
+  "@coachTryThis": {
+    "description": "AI Coach: the small heading over the tips of a note on something to improve."
+  },
+  "coachNotesComing": "Your notes on this week come on Monday.",
+  "@coachNotesComing": {
+    "description": "History: the AI Coach card on a week that isn't over."
+  },
+  "coachNotesReadThat": "Read your notes on that week.",
+  "@coachNotesReadThat": {
+    "description": "History, month view: the AI Coach card, under the week's date."
+  },
+  "coachNotesReadThis": "Read your notes on this week.",
+  "@coachNotesReadThis": {
+    "description": "History, week view: the AI Coach card."
+  },
+  "coachWeekOf": "Week of {date}",
+  "@coachWeekOf": {
+    "description": "History, month view: which week the AI Coach card is on. The date is like 2 November.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "coachPromptLine": "See what's working, what's holding you back, and get personal tips on how to improve.",
+  "@coachPromptLine": {
+    "description": "History, without YumSum Star: the line under the AI Coach button."
+  },
+  "recipesTitle": "Recipes",
+  "@recipesTitle": {
+    "description": "Recipes: the page title."
+  },
+  "recipesErrorLoad": "Could not load the recipes.",
+  "@recipesErrorLoad": {
+    "description": "Recipes: the library didn't load."
+  },
+  "recipesSearchHint": "Search recipes or ingredients",
+  "@recipesSearchHint": {
+    "description": "Recipes: the search box's hint."
+  },
+  "recipesClear": "Clear",
+  "@recipesClear": {
+    "description": "Recipes: tooltip on the button that empties the search box."
+  },
+  "recipesCookedRecently": "Cooked recently",
+  "@recipesCookedRecently": {
+    "description": "Recipes: the label over recently logged recipes."
+  },
+  "recipesAll": "All",
+  "@recipesAll": {
+    "description": "Recipes: the filter chip for every meal."
+  },
+  "recipesBreakfast": "Breakfast",
+  "@recipesBreakfast": {
+    "description": "Recipes: a meal, as a filter chip and a heading."
+  },
+  "recipesLunch": "Lunch",
+  "@recipesLunch": {
+    "description": "Recipes: a meal, as a filter chip and a heading."
+  },
+  "recipesDinner": "Dinner",
+  "@recipesDinner": {
+    "description": "Recipes: a meal, as a filter chip and a heading."
+  },
+  "recipesSnack": "Snack",
+  "@recipesSnack": {
+    "description": "Recipes: a meal, as a filter chip and a heading."
+  },
+  "recipesEmpty": "No recipes here yet.",
+  "@recipesEmpty": {
+    "description": "Recipes: no recipe for the chosen meal."
+  },
+  "recipesNoMatch": "No recipes match that. Try other words.",
+  "@recipesNoMatch": {
+    "description": "Recipes: the search found nothing."
+  },
+  "recipesLogPortion": "Log a portion",
+  "@recipesLogPortion": {
+    "description": "Recipes: the button that logs a portion, and the tooltip on a tile's +."
+  },
+  "recipesKcal": "{kcal} kcal",
+  "@recipesKcal": {
+    "description": "Recipes: calories on a tile and in the portions sheet.",
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
+  },
+  "recipesProtein": "{grams} g protein",
+  "@recipesProtein": {
+    "description": "Recipes: protein on a tile and in the portions sheet.",
+    "placeholders": {
+      "grams": {
+        "type": "int"
+      }
+    }
+  },
+  "recipesMinutes": "{minutes} min",
+  "@recipesMinutes": {
+    "description": "Recipes: a time in minutes.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "recipesRecipeTitle": "Recipe",
+  "@recipesRecipeTitle": {
+    "description": "A recipe: the page title."
+  },
+  "recipesErrorLoadOne": "Could not load the recipe.",
+  "@recipesErrorLoadOne": {
+    "description": "A recipe: it didn't load."
+  },
+  "recipesPerPortion": "{kcal} kcal per portion",
+  "@recipesPerPortion": {
+    "description": "A recipe: its calories.",
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
+  },
+  "recipesPerPortionProtein": "{kcal} kcal · {protein} g protein per portion",
+  "@recipesPerPortionProtein": {
+    "description": "A recipe: its calories and protein.",
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      },
+      "protein": {
+        "type": "int"
+      }
+    }
+  },
+  "recipesPrep": "Prep",
+  "@recipesPrep": {
+    "description": "A recipe: label under the prep time."
+  },
+  "recipesCook": "Cook",
+  "@recipesCook": {
+    "description": "A recipe: label under the cooking time."
+  },
+  "recipesServes": "Serves",
+  "@recipesServes": {
+    "description": "A recipe: label under the number of portions it makes."
+  },
+  "recipesNoCooking": "None",
+  "@recipesNoCooking": {
+    "description": "A recipe: the cooking time of a dish that isn't cooked."
+  },
+  "recipesIngredients": "Ingredients",
+  "@recipesIngredients": {
+    "description": "A recipe: the ingredients' heading."
+  },
+  "recipesForPortions": "{count, plural, one{For 1 portion} other{For {count} portions}}",
+  "@recipesForPortions": {
+    "description": "A recipe: under Ingredients, how many portions they make.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recipesHowToMake": "How to make it",
+  "@recipesHowToMake": {
+    "description": "A recipe: the steps' heading."
+  },
+  "recipesHowMany": "How many portions?",
+  "@recipesHowMany": {
+    "description": "Portions sheet: the question under the recipe's name."
+  },
+  "recipesLess": "Less",
+  "@recipesLess": {
+    "description": "Portions sheet: tooltip on the minus button."
+  },
+  "recipesMore": "More",
+  "@recipesMore": {
+    "description": "Portions sheet: tooltip on the plus button."
+  },
+  "recipesLog": "Log",
+  "@recipesLog": {
+    "description": "Portions sheet: the button that logs the portions."
+  },
+  "recipesErrorLog": "Could not log the meal. Try again.",
+  "@recipesErrorLog": {
+    "description": "Recipes: logging a portion failed."
+  },
+  "recipesLogged": "{meal} logged.",
+  "@recipesLogged": {
+    "description": "Recipes: a portion was logged. The meal is the recipe's name, with the portions when not 1.",
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationsTitle": "Notifications",
+  "@notificationsTitle": {
+    "description": "Notifications: the page title."
+  },
+  "notificationsDenied": "Allow notifications for YumSum in system settings.",
+  "@notificationsDenied": {
+    "description": "Notifications: the system refused permission."
+  },
+  "notificationsMeal": "Daily meal reminder",
+  "@notificationsMeal": {
+    "description": "Notifications: the evening meal reminder's switch."
+  },
+  "notificationsMealTime": "Every evening at {time}",
+  "@notificationsMealTime": {
+    "description": "Notifications: when the meal reminder comes. The time is like 20:30.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationsWeight": "Weigh-in reminder",
+  "@notificationsWeight": {
+    "description": "Notifications: the weigh-in reminder's switch."
+  },
+  "notificationsEveryDayAt": "Every day at {time}",
+  "@notificationsEveryDayAt": {
+    "description": "Notifications: a reminder that comes daily. The time is like 08:00.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationsWeeklyAt": "{day, select, monday{Mondays at {time}} tuesday{Tuesdays at {time}} wednesday{Wednesdays at {time}} thursday{Thursdays at {time}} friday{Fridays at {time}} saturday{Saturdays at {time}} other{Sundays at {time}}}",
+  "@notificationsWeeklyAt": {
+    "description": "Notifications: when the weekly weigh-in reminder comes. day is the weekday in English (monday to sunday); the time is like 08:00.",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationsEveryDay": "Every day",
+  "@notificationsEveryDay": {
+    "description": "Notifications: the weigh-in day picker's daily option, over the weekdays."
+  },
+  "notificationsCreatine": "Daily creatine reminder",
+  "@notificationsCreatine": {
+    "description": "Notifications: the creatine reminder's switch."
+  },
+  "starBecome": "Become a Star",
+  "@starBecome": {
+    "description": "YumSum Star's button and chip for people without it (the star icon beside it)."
+  },
+  "starHeaderPitch": "Shine bright with these smart perks.",
+  "@starHeaderPitch": {
+    "description": "YumSum Star page: the line under the name, for people without it."
+  },
+  "starHeaderMember": "Everything here is yours.",
+  "@starHeaderMember": {
+    "description": "YumSum Star page: the line under the name, for members."
+  },
+  "starFeatureSnapTitle": "Smart Snap",
+  "@starFeatureSnapTitle": {
+    "description": "YumSum Star page: a feature's name (a name, the same in every language)."
+  },
+  "starFeatureSnapBody": "Capture your meal. The AI does the rest.",
+  "@starFeatureSnapBody": {
+    "description": "YumSum Star page: what Smart Snap does."
+  },
+  "starFeatureEstimatesTitle": "Triple the AI estimates",
+  "@starFeatureEstimatesTitle": {
+    "description": "YumSum Star page: a feature's name."
+  },
+  "starFeatureEstimatesBody": "30 a day, so you never run out.",
+  "@starFeatureEstimatesBody": {
+    "description": "YumSum Star page: the AI estimates feature."
+  },
+  "starFeatureAdaptiveTitle": "Adaptive Formula",
+  "@starFeatureAdaptiveTitle": {
+    "description": "YumSum Star page: a feature's name."
+  },
+  "starFeatureAdaptiveBody": "Learns your real burn and tunes your target.",
+  "@starFeatureAdaptiveBody": {
+    "description": "YumSum Star page: the Adaptive formula feature."
+  },
+  "starFeatureCoachTitle": "AI Coach",
+  "@starFeatureCoachTitle": {
+    "description": "YumSum Star page: a feature's name."
+  },
+  "starFeatureCoachBody": "Reads your week and tells you how to do better.",
+  "@starFeatureCoachBody": {
+    "description": "YumSum Star page: the AI Coach feature."
+  },
+  "starFeatureMacrosTitle": "Detailed Macros",
+  "@starFeatureMacrosTitle": {
+    "description": "YumSum Star page: a feature's name."
+  },
+  "starFeatureMacrosBody": "The full label: fat, carbs, sugars, fibre, salt.",
+  "@starFeatureMacrosBody": {
+    "description": "YumSum Star page: the macros feature."
+  },
+  "starYearly": "Yearly",
+  "@starYearly": {
+    "description": "YumSum Star page: the yearly plan's tile."
+  },
+  "starMonthly": "Monthly",
+  "@starMonthly": {
+    "description": "YumSum Star page: the monthly plan's tile."
+  },
+  "starPerYear": "a year",
+  "@starPerYear": {
+    "description": "YumSum Star page: under the yearly price."
+  },
+  "starPerMonth": "a month",
+  "@starPerMonth": {
+    "description": "YumSum Star page: under the monthly price."
+  },
+  "starMonthlyEquivalent": "{price} a month",
+  "@starMonthlyEquivalent": {
+    "description": "YumSum Star page: the yearly price worked out a month. The price has its currency, like £3.33.",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "starSave": "Save {percent}%",
+  "@starSave": {
+    "description": "YumSum Star page: the badge on the yearly plan.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "starChecking": "Checking with Google Play",
+  "@starChecking": {
+    "description": "YumSum Star page: the button while a purchase is checked."
+  },
+  "starSubscribe": "Subscribe",
+  "@starSubscribe": {
+    "description": "YumSum Star page: the button when there's no free trial."
+  },
+  "starStartTrial": "{days, plural, one{Start 1 day free} other{Start {days} days free}}",
+  "@starStartTrial": {
+    "description": "YumSum Star page: the button with a free trial.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "starTermsYearly": "{price} a year. Renews every year until you cancel. Cancel any time in Google Play.",
+  "@starTermsYearly": {
+    "description": "YumSum Star page: the yearly plan's terms, under the button.",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "starTermsMonthly": "{price} a month. Renews every month until you cancel. Cancel any time in Google Play.",
+  "@starTermsMonthly": {
+    "description": "YumSum Star page: the monthly plan's terms, under the button.",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "starTrialTermsYearly": "{days, plural, one{1 day free, then {price} a year. Renews every year until you cancel. Cancel any time in Google Play.} other{{days} days free, then {price} a year. Renews every year until you cancel. Cancel any time in Google Play.}}",
+  "@starTrialTermsYearly": {
+    "description": "YumSum Star page: the yearly plan's terms with a free trial.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "starTrialTermsMonthly": "{days, plural, one{1 day free, then {price} a month. Renews every month until you cancel. Cancel any time in Google Play.} other{{days} days free, then {price} a month. Renews every month until you cancel. Cancel any time in Google Play.}}",
+  "@starTrialTermsMonthly": {
+    "description": "YumSum Star page: the monthly plan's terms with a free trial.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "starOk": "OK",
+  "@starOk": {
+    "description": "YumSum Star page: closes a purchase message."
+  },
+  "starOn": "YumSum Star is on.",
+  "@starOn": {
+    "description": "Snackbar once YumSum Star is bought or restored."
+  },
+  "starOnTrial": "YumSum Star is on. Your free week ends on {date}.",
+  "@starOnTrial": {
+    "description": "Snackbar once a free trial starts. The date is like 14 November.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "starAlreadyTitle": "You're already a bright YumSum Star",
+  "@starAlreadyTitle": {
+    "description": "YumSum Star page, for members: the card's title."
+  },
+  "starThanks": "Thank you for helping YumSum grow.",
+  "@starThanks": {
+    "description": "YumSum Star page, for members: under the title."
+  },
+  "starWeb": "Subscribe in the YumSum app for Android. YumSum Star then works here too, when you sign in with the same account.",
+  "@starWeb": {
+    "description": "YumSum Star page on the web, where it can't be bought."
+  },
+  "starNoIphone": "YumSum Star can't be bought on iPhone yet.",
+  "@starNoIphone": {
+    "description": "YumSum Star page on iPhone, where it can't be bought yet."
+  },
+  "starTryAgain": "Try again",
+  "@starTryAgain": {
+    "description": "YumSum Star page: after the plans failed to load."
+  },
+  "starRestore": "Restore purchase",
+  "@starRestore": {
+    "description": "YumSum Star page: the link that restores a subscription."
+  },
+  "starTerms": "Terms",
+  "@starTerms": {
+    "description": "YumSum Star page: the link to the terms."
+  },
+  "starPrivacy": "Privacy",
+  "@starPrivacy": {
+    "description": "YumSum Star page: the link to the privacy policy."
+  },
+  "starClose": "Close",
+  "@starClose": {
+    "description": "YumSum Star page: tooltip on the close button."
+  },
+  "starStatusPitch": "Smart Snap, 30 AI estimates a day and more",
+  "@starStatusPitch": {
+    "description": "Account Settings: the YumSum Star row for someone without it."
+  },
+  "starStatusHold": "Off until the payment problem is fixed in Google Play",
+  "@starStatusHold": {
+    "description": "Account Settings: YumSum Star on hold for a failed payment."
+  },
+  "starStatusAdmin": "Admin: everything on, no daily limits",
+  "@starStatusAdmin": {
+    "description": "Account Settings: the owner's YumSum Star."
+  },
+  "starStatusOn": "On",
+  "@starStatusOn": {
+    "description": "Account Settings: YumSum Star is on, with no end date."
+  },
+  "starStatusOnUntil": "On until {date}",
+  "@starStatusOnUntil": {
+    "description": "Account Settings: YumSum Star given until a date. The date is like 3 December.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "starStatusTrial": "Free trial until {date}",
+  "@starStatusTrial": {
+    "description": "Account Settings: YumSum Star's free trial. The date is like 9 November.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "starStatusEnds": "Ends on {date}",
+  "@starStatusEnds": {
+    "description": "Account Settings: a cancelled YumSum Star that runs to a date.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "starStatusRenews": "Renews on {date}",
+  "@starStatusRenews": {
+    "description": "Account Settings: YumSum Star's next renewal.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "starStatusGrace": "Payment problem. Fix it in Google Play to keep YumSum Star.",
+  "@starStatusGrace": {
+    "description": "Account Settings: a renewal payment failed."
+  },
+  "starErrorPlay": "Could not reach Google Play. Check your connection and try again.",
+  "@starErrorPlay": {
+    "description": "YumSum Star page: Google Play couldn't be reached."
+  },
+  "starErrorNotConfirmed": "Could not confirm your purchase. Try Restore purchase in a few minutes. If it still fails, Google Play refunds you automatically within 3 days.",
+  "@starErrorNotConfirmed": {
+    "description": "YumSum Star page: the server couldn't check a purchase."
+  },
+  "starErrorOtherAccount": "This Google Play subscription is linked to another YumSum account. Sign in with that account to use it.",
+  "@starErrorOtherAccount": {
+    "description": "YumSum Star page: the subscription belongs to another YumSum account."
+  },
+  "starNothingToRestore": "No YumSum Star subscription found on this Google account.",
+  "@starNothingToRestore": {
+    "description": "YumSum Star page: Restore purchase found nothing."
+  },
+  "starPaymentPending": "Google Play is waiting for your payment. YumSum Star switches on once it goes through.",
+  "@starPaymentPending": {
+    "description": "YumSum Star page: the payment is pending."
   }
 }

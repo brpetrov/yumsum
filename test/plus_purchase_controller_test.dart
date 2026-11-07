@@ -78,7 +78,7 @@ void main() {
     play.send([purchase(PurchaseStatus.purchased)]);
     await settle();
 
-    expect(stateOf(c).message, purchaseNotConfirmed);
+    expect(stateOf(c).message, PurchaseMessage.notConfirmed);
     expect(play.completed, isEmpty);
   });
 
@@ -92,7 +92,7 @@ void main() {
     play.send([purchase(PurchaseStatus.purchased)]);
     await settle();
 
-    expect(stateOf(c).message, purchaseOnAnotherAccount);
+    expect(stateOf(c).message, PurchaseMessage.onAnotherAccount);
   });
 
   test('a pending payment grants nothing yet', () async {
@@ -102,7 +102,7 @@ void main() {
     await settle();
 
     expect(server.verified, isEmpty);
-    expect(stateOf(c).message, paymentPending);
+    expect(stateOf(c).message, PurchaseMessage.paymentPending);
   });
 
   test('buying hashes the account for Play', () async {
@@ -138,7 +138,7 @@ void main() {
     await c.read(plusPurchaseControllerProvider.notifier).restore();
     await settle();
 
-    expect(stateOf(c).message, nothingToRestore);
+    expect(stateOf(c).message, PurchaseMessage.nothingToRestore);
   });
 
   test('already owned in Play restores instead', () async {

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/weekly_review_provider.dart';
 import 'package:lean_streak/widgets/app_card.dart';
@@ -35,11 +36,12 @@ class WeeklyNotesCard extends ConsumerWidget {
     final now = DateTime.now();
     final sunday = DateTime(monday.year, monday.month, monday.day + 6);
     final finished = sunday.isBefore(DateTime(now.year, now.month, now.day));
+    final l10n = context.l10n;
     final line = !finished
-        ? 'Your notes on this week come on Monday.'
+        ? l10n.coachNotesComing
         : named
-        ? 'Read your notes on that week.'
-        : 'Read your notes on this week.';
+        ? l10n.coachNotesReadThat
+        : l10n.coachNotesReadThis;
     return _Spaced(
       AppCard(
         padding: const EdgeInsets.fromLTRB(22, 14, 10, 16),
@@ -58,7 +60,7 @@ class WeeklyNotesCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'AI Coach',
+                    l10n.coachTitle,
                     style: AppTheme.display.copyWith(
                       fontSize: 19,
                       color: AppColors.textPrimary,
@@ -66,7 +68,7 @@ class WeeklyNotesCard extends ConsumerWidget {
                   ),
                   if (named)
                     Text(
-                      'Week of ${DateFormat('d MMMM').format(monday)}',
+                      l10n.coachWeekOf(l10n.dayMonth(monday)),
                       style: TextStyle(
                         fontSize: 13,
                         color: AppColors.textSecondary,
@@ -107,11 +109,10 @@ class CoachPrompt extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TryButton(label: 'AI Coach', onTap: open),
+            TryButton(label: context.l10n.coachTitle, onTap: open),
             const SizedBox(height: 12),
             Text(
-              'See what\'s working, what\'s holding you back, and get '
-              'personal tips on how to improve.',
+              context.l10n.coachPromptLine,
               style: TextStyle(
                 fontSize: 14,
                 height: 1.35,

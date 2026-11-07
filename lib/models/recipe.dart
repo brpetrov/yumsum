@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:lean_streak/l10n/app_localizations.dart';
 import 'package:lean_streak/models/nutrients.dart';
 
 /// Where the recipe photos are served from. They ship with the website
@@ -13,7 +14,18 @@ enum RecipeCategory {
   snack('Snack');
 
   const RecipeCategory(this.label);
+
+  /// In English, for search and the AI's facts; [shownLabel] is the one on
+  /// screen.
   final String label;
+
+  /// The meal as the app shows it, in [l10n]'s language.
+  String shownLabel(AppLocalizations l10n) => switch (this) {
+    RecipeCategory.breakfast => l10n.recipesBreakfast,
+    RecipeCategory.lunch => l10n.recipesLunch,
+    RecipeCategory.dinner => l10n.recipesDinner,
+    RecipeCategory.snack => l10n.recipesSnack,
+  };
 }
 
 enum RecipeTag {

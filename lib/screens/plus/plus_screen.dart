@@ -8,6 +8,7 @@ import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/constants/legal_links.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/plus_purchase_controller.dart';
@@ -34,25 +35,29 @@ bool managedInPlay(Entitlement? entitlement, DateTime now) =>
     (entitlement!.isPlusAt(now) || entitlement.state == 'hold');
 
 /// The account's YumSum Star in one line: "Renews on 3 December", "Free
-/// trial until 9 November", or what it adds for someone without it.
-String plusStatusLine(Entitlement? entitlement, DateTime now) {
+/// trial until 9 November", or what it adds for someone without it. In
+/// [l10n]'s language, English when not given.
+String plusStatusLine(
+  Entitlement? entitlement,
+  DateTime now, {
+  AppLocalizations? l10n,
+}) {
+  final t = l10n ?? lookupAppLocalizations(const Locale('en'));
   final e = entitlement;
   if (e == null || !e.isPlusAt(now)) {
     return e?.state == 'hold' && e?.source == EntitlementSource.play
-        ? 'Off until the payment problem is fixed in Google Play'
-        : 'Smart Snap, 30 AI estimates a day and more';
+        ? t.starStatusHold
+        : t.starStatusPitch;
   }
-  if (e.admin) return 'Admin: everything on, no daily limits';
-  final until = e.expiresAt == null
-      ? null
-      : DateFormat('d MMMM').format(e.expiresAt!);
-  if (until == null) return 'On';
-  if (e.source == EntitlementSource.manual) return 'On until $until';
-  if (e.inTrial) return 'Free trial until $until';
+  if (e.admin) return t.starStatusAdmin;
+  final until = e.expiresAt == null ? null : t.dayMonth(e.expiresAt!);
+  if (until == null) return t.starStatusOn;
+  if (e.source == EntitlementSource.manual) return t.starStatusOnUntil(until);
+  if (e.inTrial) return t.starStatusTrial(until);
   return switch (e.state) {
-    'cancelled' => 'Ends on $until',
-    'grace' => 'Payment problem. Fix it in Google Play to keep YumSum Star.',
-    _ => 'Renews on $until',
+    'cancelled' => t.starStatusEnds(until),
+    'grace' => t.starStatusGrace,
+    _ => t.starStatusRenews(until),
   };
 }
 
@@ -81,31 +86,31 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
   /// result (and not just the record loading).
   bool _started = false;
 
-  static const _features = [
+  static List<(IconData, String, String)> _features(AppLocalizations l10n) => [
     (
       Icons.photo_camera_rounded,
-      'Smart Snap',
-      'Capture your meal. The AI does the rest.',
+      l10n.starFeatureSnapTitle,
+      l10n.starFeatureSnapBody,
     ),
     (
       Icons.auto_awesome_rounded,
-      'Triple the AI estimates',
-      '30 a day, so you never run out.',
+      l10n.starFeatureEstimatesTitle,
+      l10n.starFeatureEstimatesBody,
     ),
     (
       Icons.tune_rounded,
-      'Adaptive Formula',
-      'Learns your real burn and tunes your target.',
+      l10n.starFeatureAdaptiveTitle,
+      l10n.starFeatureAdaptiveBody,
     ),
     (
       Icons.insights_rounded,
-      'AI Coach',
-      'Reads your week and tells you how to do better.',
+      l10n.starFeatureCoachTitle,
+      l10n.starFeatureCoachBody,
     ),
     (
       Icons.pie_chart_outline_rounded,
-      'Detailed Macros',
-      'The full label: fat, carbs, sugars, fibre, salt.',
+      l10n.starFeatureMacrosTitle,
+      l10n.starFeatureMacrosBody,
     ),
   ];
 
@@ -121,14 +126,21 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
 
   /// The yearly and monthly tiles, the button and the terms under it.
   Widget _plans(List<StarPlan> plans, PlusPurchase purchase, TextStyle muted) {
+    final l10n = context.l10n;
     final [yearly, monthly] = plans;
     final chosen = _yearly ? yearly : monthly;
-    final period = _yearly ? 'year' : 'month';
     final saving = (100 * (1 - yearly.micros / (12 * monthly.micros))).round();
     final trial = chosen.trialDays;
-    final terms =
-        '${chosen.price} a $period. Renews every $period until you cancel. '
-        'Cancel any time in Google Play.';
+    final terms = switch ((trial, _yearly)) {
+      (null, true) => l10n.starTermsYearly(chosen.price),
+      (null, false) => l10n.starTermsMonthly(chosen.price),
+      (final days?, true) => l10n.starTrialTermsYearly(days, chosen.price),
+      (final days?, false) => l10n.starTrialTermsMonthly(days, chosen.price),
+    };
+    final perMonth = NumberFormat.simpleCurrency(
+      locale: l10n.localeName,
+      name: yearly.currency,
+    ).format(yearly.micros / 12e6);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -139,13 +151,11 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
             children: [
               Expanded(
                 child: _PlanTile(
-                  title: 'Yearly',
+                  title: l10n.starYearly,
                   price: yearly.price,
-                  per: 'a year',
-                  note:
-                      '${NumberFormat.simpleCurrency(name: yearly.currency).format(yearly.micros / 12e6)}'
-                      ' a month',
-                  badge: saving > 0 ? 'Save $saving%' : null,
+                  per: l10n.starPerYear,
+                  note: l10n.starMonthlyEquivalent(perMonth),
+                  badge: saving > 0 ? l10n.starSave(saving) : null,
                   selected: _yearly,
                   onTap: () => setState(() => _yearly = true),
                 ),
@@ -153,9 +163,9 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: _PlanTile(
-                  title: 'Monthly',
+                  title: l10n.starMonthly,
                   price: monthly.price,
-                  per: 'a month',
+                  per: l10n.starPerMonth,
                   selected: !_yearly,
                   onTap: () => setState(() => _yearly = false),
                 ),
@@ -166,38 +176,31 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
         const SizedBox(height: 16),
         _StartButton(
           label: purchase.checking
-              ? 'Checking with Google Play'
+              ? l10n.starChecking
               : trial == null
-              ? 'Subscribe'
-              : 'Start $trial days free',
+              ? l10n.starSubscribe
+              : l10n.starStartTrial(trial),
           onPressed: purchase.checking ? null : () => _buy(chosen),
         ),
         const SizedBox(height: 8),
-        Text(
-          trial == null
-              ? terms
-              : '$trial days free, then ${chosen.price} a $period. Renews '
-                    'every $period until you cancel. Cancel any time in '
-                    'Google Play.',
-          textAlign: TextAlign.center,
-          style: muted,
-        ),
+        Text(terms, textAlign: TextAlign.center, style: muted),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     ref.listen(plusPurchaseControllerProvider, (_, next) {
       if (next.message case final message?) {
         showDialog<void>(
           context: context,
           builder: (context) => AlertDialog(
-            content: Text(message),
+            content: Text(message.text(l10n)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('OK'),
+                child: Text(l10n.starOk),
               ),
             ],
           ),
@@ -216,9 +219,8 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
         SnackBar(
           content: Text(
             e != null && e.inTrial && e.expiresAt != null
-                ? 'YumSum Star is on. Your free week ends on '
-                      '${DateFormat('d MMMM').format(e.expiresAt!)}.'
-                : 'YumSum Star is on.',
+                ? l10n.starOnTrial(l10n.dayMonth(e.expiresAt!))
+                : l10n.starOn,
           ),
         ),
       );
@@ -235,7 +237,7 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
 
     final Widget offer;
     if (plus) {
-      final status = plusStatusLine(entitlement, now);
+      final status = plusStatusLine(entitlement, now, l10n: l10n);
       offer = AppCard(
         child: Row(
           children: [
@@ -246,19 +248,16 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'You\'re already a bright YumSum Star',
+                    l10n.starAlreadyTitle,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  Text(
-                    'Thank you for helping YumSum grow.',
-                    style: muted.copyWith(fontSize: 14),
-                  ),
+                  Text(l10n.starThanks, style: muted.copyWith(fontSize: 14)),
                   // A plain "On" adds nothing to the line above.
-                  if (status != 'On') Text(status, style: muted),
+                  if (status != l10n.starStatusOn) Text(status, style: muted),
                 ],
               ),
             ),
@@ -268,8 +267,7 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
     } else if (kIsWeb) {
       offer = AppCard(
         child: Text(
-          'Subscribe in the YumSum app for Android. YumSum Star then works '
-          'here too, when you sign in with the same account.',
+          l10n.starWeb,
           textAlign: TextAlign.center,
           style: muted.copyWith(fontSize: 15),
         ),
@@ -278,7 +276,7 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
       // Apple's rules don't let the iPhone app point to another way to pay.
       offer = AppCard(
         child: Text(
-          'YumSum Star can\'t be bought on iPhone yet.',
+          l10n.starNoIphone,
           textAlign: TextAlign.center,
           style: muted.copyWith(fontSize: 15),
         ),
@@ -297,13 +295,13 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
               child: Column(
                 children: [
                   Text(
-                    playUnreachable,
+                    l10n.starErrorPlay,
                     textAlign: TextAlign.center,
                     style: muted.copyWith(fontSize: 15),
                   ),
                   TextButton(
                     onPressed: () => ref.invalidate(starPlansProvider),
-                    child: const Text('Try again'),
+                    child: Text(l10n.starTryAgain),
                   ),
                 ],
               ),
@@ -349,11 +347,11 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
                             _Header(
                               compact: compact,
                               line: plus
-                                  ? 'Everything here is yours.'
-                                  : 'Shine bright with these smart perks.',
+                                  ? l10n.starHeaderMember
+                                  : l10n.starHeaderPitch,
                               onClose: () => Navigator.of(context).maybePop(),
                             ),
-                            for (final (icon, name, line) in _features)
+                            for (final (icon, name, line) in _features(l10n))
                               Padding(
                                 padding: EdgeInsets.only(
                                   bottom: compact ? 8 : 14,
@@ -397,8 +395,8 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
                                   TextButton(
                                     style: link,
                                     onPressed: _restore,
-                                    child: const Text(
-                                      'Restore purchase',
+                                    child: Text(
+                                      l10n.starRestore,
                                       style: linkSize,
                                     ),
                                   ),
@@ -406,13 +404,16 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
                                   style: link,
                                   onPressed: () =>
                                       openLegalPage(LegalLinks.terms),
-                                  child: const Text('Terms', style: linkSize),
+                                  child: Text(l10n.starTerms, style: linkSize),
                                 ),
                                 TextButton(
                                   style: link,
                                   onPressed: () =>
                                       openLegalPage(LegalLinks.privacyPolicy),
-                                  child: const Text('Privacy', style: linkSize),
+                                  child: Text(
+                                    l10n.starPrivacy,
+                                    style: linkSize,
+                                  ),
                                 ),
                               ],
                             ),
@@ -471,7 +472,7 @@ class _Header extends StatelessWidget {
           top: 4,
           left: -16,
           child: IconButton(
-            tooltip: 'Close',
+            tooltip: context.l10n.starClose,
             icon: const Icon(Icons.close_rounded),
             onPressed: onClose,
           ),

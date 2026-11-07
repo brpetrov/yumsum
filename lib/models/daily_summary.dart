@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:lean_streak/l10n/app_localizations.dart';
 import 'package:lean_streak/models/nutrients.dart';
 
 enum DailyStatus {
@@ -10,7 +11,16 @@ enum DailyStatus {
   const DailyStatus(this.value, this.label);
 
   final String value;
+
+  /// In English, for the AI's facts; [shownLabel] is the one on screen.
   final String label;
+
+  /// The status as the app shows it, in [l10n]'s language.
+  String shownLabel(AppLocalizations l10n) => switch (this) {
+    DailyStatus.green => l10n.historyStatusOnTrack,
+    DailyStatus.yellow => l10n.historyStatusClose,
+    DailyStatus.red => l10n.historyStatusOffTrack,
+  };
 
   static DailyStatus fromString(String value) {
     return DailyStatus.values.firstWhere((status) => status.value == value);

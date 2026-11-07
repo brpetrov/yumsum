@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/models/recipe.dart';
@@ -66,9 +67,11 @@ String _key(DateTime day) =>
 DateTime _days(DateTime from, int days) =>
     DateTime(from.year, from.month, from.day + days);
 
+final _en = lookupAppLocalizations(const Locale('en'));
+
 /// The week's dates as the page shows them.
 String _dates(DateTime monday) =>
-    weekLabel(monday, year: _days(monday, 6).year != DateTime.now().year);
+    weekLabel(_en, monday, year: _days(monday, 6).year != DateTime.now().year);
 
 /// The coach illustration, wherever it's shown.
 final _coach = find.byWidgetPredicate(
@@ -313,7 +316,7 @@ void main() {
       await pump(tester);
       await tester.tap(find.byTooltip('How it works'));
       await tester.pumpAndSettle();
-      expect(find.text(coachSubtitle), findsOneWidget);
+      expect(find.text(_en.coachSubtitle), findsOneWidget);
       expect(
         find.descendant(of: find.byType(AlertDialog), matching: _coach),
         findsOneWidget,
@@ -530,7 +533,7 @@ void main() {
     ) async {
       await pump(tester, entitlement: null);
       expect(_coach, findsOneWidget);
-      expect(find.text(coachSubtitle), findsOneWidget);
+      expect(find.text(_en.coachSubtitle), findsOneWidget);
       expect(find.text('Spot what\'s holding you back'), findsOneWidget);
       expect(find.text('Build a more balanced diet'), findsOneWidget);
       expect(find.text('Get advice you can put into practice'), findsOneWidget);
@@ -582,7 +585,7 @@ void main() {
 
     testWidgets('ended with nothing saved: what it does', (tester) async {
       await pump(tester, entitlement: ended);
-      expect(find.text(coachSubtitle), findsOneWidget);
+      expect(find.text(_en.coachSubtitle), findsOneWidget);
       expect(find.text('Spot what\'s holding you back'), findsOneWidget);
       expect(find.text('Last week'), findsNothing);
     });

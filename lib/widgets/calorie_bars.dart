@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/widgets/day_status.dart';
 
@@ -96,13 +97,20 @@ class _CalorieBar extends StatelessWidget {
                       .clamp(0.15, 1.25) /
                   1.25)
               .toDouble();
-    final dayLabel = DateFormat('d MMM').format(day);
+    final l10n = context.l10n;
+    final dayLabel = l10n.shortDayMonth(day);
+    final protein = showProtein ? summary?.proteinGrams : null;
 
     return Tooltip(
       message: summary == null
-          ? '$dayLabel: no calories logged'
-          : '$dayLabel: ${summary.totalCalories} kcal'
-                '${summary.proteinGrams == null || !showProtein ? '' : ' · ${summary.proteinGrams} g protein'}',
+          ? l10n.historyBarNoCalories(dayLabel)
+          : protein == null
+          ? l10n.historyBarKcal(dayLabel, summary.totalCalories)
+          : l10n.historyBarKcalProtein(
+              dayLabel,
+              summary.totalCalories,
+              protein,
+            ),
       waitDuration: const Duration(milliseconds: 250),
       child: Align(
         alignment: Alignment.bottomCenter,

@@ -966,4 +966,670 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get macroFibreBadge => 'Rich in fibre';
+
+  @override
+  String get historyTitle => 'History';
+
+  @override
+  String get historyErrorLoad => 'Could not load your history.';
+
+  @override
+  String get historyWeek => 'Week';
+
+  @override
+  String get historyMonth => 'Month';
+
+  @override
+  String get historyPrevious => 'Previous';
+
+  @override
+  String get historyNext => 'Next';
+
+  @override
+  String get historyToday => 'Today';
+
+  @override
+  String get historyStatusOnTrack => 'On track';
+
+  @override
+  String get historyStatusClose => 'Close';
+
+  @override
+  String get historyStatusOffTrack => 'Off track';
+
+  @override
+  String get historyNotLogged => 'Not logged';
+
+  @override
+  String get historyReviewTomorrow =>
+      'Your review starts tomorrow, once today is over.';
+
+  @override
+  String get historyNothingLogged => 'Nothing logged in this period yet.';
+
+  @override
+  String historyOnTrackCount(int count) {
+    return '$count on track';
+  }
+
+  @override
+  String historyCloseCount(int count) {
+    return '$count close';
+  }
+
+  @override
+  String historyOffTrackCount(int count) {
+    return '$count off track';
+  }
+
+  @override
+  String historyDaysOffCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days off',
+      one: '1 day off',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get historyOnTrackShare => 'of logged days on track';
+
+  @override
+  String historyDaysLogged(int logged, int days) {
+    return '$logged of $days days logged';
+  }
+
+  @override
+  String historyAverageKcal(int kcal) {
+    return 'Average $kcal kcal a day';
+  }
+
+  @override
+  String get historyGuidanceNoMeals => 'No meals logged in this period.';
+
+  @override
+  String get historyGuidanceMostClose =>
+      'Most logged days stayed close to target.';
+
+  @override
+  String get historyGuidanceSomeClose =>
+      'Some logged days stayed close to target; a few were well off.';
+
+  @override
+  String get historyGuidanceMostOff =>
+      'Most logged days were well above or below target.';
+
+  @override
+  String get historyGuidanceLogMore =>
+      'Some days weren\'t logged. Log more days for a clearer review.';
+
+  @override
+  String historyBarNoCalories(String date) {
+    return '$date: no calories logged';
+  }
+
+  @override
+  String historyBarKcal(String date, int kcal) {
+    return '$date: $kcal kcal';
+  }
+
+  @override
+  String historyBarKcalProtein(String date, int kcal, int protein) {
+    return '$date: $kcal kcal · $protein g protein';
+  }
+
+  @override
+  String get historyDayNothingLogged => 'Nothing logged';
+
+  @override
+  String historyDayKcal(int total, int target) {
+    return '$total of $target kcal';
+  }
+
+  @override
+  String historyDayKcalProtein(int total, int target, int protein) {
+    return '$total of $target kcal · $protein g protein';
+  }
+
+  @override
+  String get historyDayOff => 'Day off';
+
+  @override
+  String get historyDayNoMacros => 'No macro info for this day\'s meals';
+
+  @override
+  String historyChangesLeft(int left, int limit) {
+    String _temp0 = intl.Intl.pluralLogic(
+      left,
+      locale: localeName,
+      other: '$left of $limit past-day changes left this month',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get historyNoChangesLeft => 'No past-day changes left this month.';
+
+  @override
+  String get historyDayNoMeals => 'No meals logged on this day.';
+
+  @override
+  String get historyAddMeal => 'Add meal';
+
+  @override
+  String get historyDeleteMealTitle => 'Delete meal?';
+
+  @override
+  String historyDeleteMealNamed(String name) {
+    return 'Remove $name from this day?';
+  }
+
+  @override
+  String get historyDeleteMealUnnamed => 'Remove this meal from this day?';
+
+  @override
+  String get historyCancel => 'Cancel';
+
+  @override
+  String get historyDelete => 'Delete';
+
+  @override
+  String get historyErrorDeleteMeal => 'Could not delete the meal. Try again.';
+
+  @override
+  String get coachTitle => 'AI Coach';
+
+  @override
+  String get coachIntroTitle => 'Your AI Coach';
+
+  @override
+  String get coachSubtitle =>
+      'Get fresh advice tailored just for you, every Monday, to help you eat better and reach your goals.';
+
+  @override
+  String get coachPromiseHoldingBackTitle => 'Spot what\'s holding you back';
+
+  @override
+  String get coachPromiseHoldingBackBody =>
+      'Discover the eating patterns that could be slowing your progress and find small changes that help.';
+
+  @override
+  String get coachPromiseBalanceTitle => 'Build a more balanced diet';
+
+  @override
+  String get coachPromiseBalanceBody =>
+      'See how your protein, fibre, salt and sugar compare with recommended amounts, so you know where to focus.';
+
+  @override
+  String get coachPromiseAdviceTitle => 'Get advice you can put into practice';
+
+  @override
+  String get coachPromiseAdviceBody =>
+      'Make your next meal easier with practical tips and recipe ideas based on what you already eat.';
+
+  @override
+  String get coachPromiseWeeklyTitle => 'Start every week with direction';
+
+  @override
+  String get coachPromiseWeeklyBody =>
+      'Every Monday, get a fresh review of what\'s working and what to change, so you can build on your progress.';
+
+  @override
+  String get coachClose => 'Close';
+
+  @override
+  String get coachHowItWorks => 'How it works';
+
+  @override
+  String get coachLastWeek => 'Last week';
+
+  @override
+  String get coachPrevious => 'Previous';
+
+  @override
+  String get coachNext => 'Next';
+
+  @override
+  String get coachFirstNotesTitle => 'Your first notes come on Monday';
+
+  @override
+  String coachDaysToGo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days to go',
+      one: '1 day to go',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String coachFirstNotesBody(String date) {
+    return 'AI Coach reads a whole week at a time, so it\'s going over this one as you log it. On Monday $date it\'ll tell you what went well, what held you back and what to try next week.';
+  }
+
+  @override
+  String get coachEnded =>
+      'YumSum Star has ended, so no new notes are written. The ones you have stay.';
+
+  @override
+  String get coachNotEnough =>
+      'Not enough logged this week for notes. They need 4 days logged, not counting days off.';
+
+  @override
+  String get coachLooking => 'Looking over your week';
+
+  @override
+  String get coachErrorLoad => 'Could not get this week\'s notes. Try again.';
+
+  @override
+  String get coachTryAgain => 'Try again';
+
+  @override
+  String get coachNoNotesPlus =>
+      'No notes on this week. AI Coach writes them during the week after, when you open this page.';
+
+  @override
+  String get coachNoNotes => 'No notes on this week.';
+
+  @override
+  String get coachKeepGoing => 'Keep going';
+
+  @override
+  String get coachTryThis => 'Try this';
+
+  @override
+  String get coachNotesComing => 'Your notes on this week come on Monday.';
+
+  @override
+  String get coachNotesReadThat => 'Read your notes on that week.';
+
+  @override
+  String get coachNotesReadThis => 'Read your notes on this week.';
+
+  @override
+  String coachWeekOf(String date) {
+    return 'Week of $date';
+  }
+
+  @override
+  String get coachPromptLine =>
+      'See what\'s working, what\'s holding you back, and get personal tips on how to improve.';
+
+  @override
+  String get recipesTitle => 'Recipes';
+
+  @override
+  String get recipesErrorLoad => 'Could not load the recipes.';
+
+  @override
+  String get recipesSearchHint => 'Search recipes or ingredients';
+
+  @override
+  String get recipesClear => 'Clear';
+
+  @override
+  String get recipesCookedRecently => 'Cooked recently';
+
+  @override
+  String get recipesAll => 'All';
+
+  @override
+  String get recipesBreakfast => 'Breakfast';
+
+  @override
+  String get recipesLunch => 'Lunch';
+
+  @override
+  String get recipesDinner => 'Dinner';
+
+  @override
+  String get recipesSnack => 'Snack';
+
+  @override
+  String get recipesEmpty => 'No recipes here yet.';
+
+  @override
+  String get recipesNoMatch => 'No recipes match that. Try other words.';
+
+  @override
+  String get recipesLogPortion => 'Log a portion';
+
+  @override
+  String recipesKcal(int kcal) {
+    return '$kcal kcal';
+  }
+
+  @override
+  String recipesProtein(int grams) {
+    return '$grams g protein';
+  }
+
+  @override
+  String recipesMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get recipesRecipeTitle => 'Recipe';
+
+  @override
+  String get recipesErrorLoadOne => 'Could not load the recipe.';
+
+  @override
+  String recipesPerPortion(int kcal) {
+    return '$kcal kcal per portion';
+  }
+
+  @override
+  String recipesPerPortionProtein(int kcal, int protein) {
+    return '$kcal kcal · $protein g protein per portion';
+  }
+
+  @override
+  String get recipesPrep => 'Prep';
+
+  @override
+  String get recipesCook => 'Cook';
+
+  @override
+  String get recipesServes => 'Serves';
+
+  @override
+  String get recipesNoCooking => 'None';
+
+  @override
+  String get recipesIngredients => 'Ingredients';
+
+  @override
+  String recipesForPortions(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'For $count portions',
+      one: 'For 1 portion',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recipesHowToMake => 'How to make it';
+
+  @override
+  String get recipesHowMany => 'How many portions?';
+
+  @override
+  String get recipesLess => 'Less';
+
+  @override
+  String get recipesMore => 'More';
+
+  @override
+  String get recipesLog => 'Log';
+
+  @override
+  String get recipesErrorLog => 'Could not log the meal. Try again.';
+
+  @override
+  String recipesLogged(String meal) {
+    return '$meal logged.';
+  }
+
+  @override
+  String get notificationsTitle => 'Notifications';
+
+  @override
+  String get notificationsDenied =>
+      'Allow notifications for YumSum in system settings.';
+
+  @override
+  String get notificationsMeal => 'Daily meal reminder';
+
+  @override
+  String notificationsMealTime(String time) {
+    return 'Every evening at $time';
+  }
+
+  @override
+  String get notificationsWeight => 'Weigh-in reminder';
+
+  @override
+  String notificationsEveryDayAt(String time) {
+    return 'Every day at $time';
+  }
+
+  @override
+  String notificationsWeeklyAt(String day, String time) {
+    String _temp0 = intl.Intl.selectLogic(day, {
+      'monday': 'Mondays at $time',
+      'tuesday': 'Tuesdays at $time',
+      'wednesday': 'Wednesdays at $time',
+      'thursday': 'Thursdays at $time',
+      'friday': 'Fridays at $time',
+      'saturday': 'Saturdays at $time',
+      'other': 'Sundays at $time',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get notificationsEveryDay => 'Every day';
+
+  @override
+  String get notificationsCreatine => 'Daily creatine reminder';
+
+  @override
+  String get starBecome => 'Become a Star';
+
+  @override
+  String get starHeaderPitch => 'Shine bright with these smart perks.';
+
+  @override
+  String get starHeaderMember => 'Everything here is yours.';
+
+  @override
+  String get starFeatureSnapTitle => 'Smart Snap';
+
+  @override
+  String get starFeatureSnapBody => 'Capture your meal. The AI does the rest.';
+
+  @override
+  String get starFeatureEstimatesTitle => 'Triple the AI estimates';
+
+  @override
+  String get starFeatureEstimatesBody => '30 a day, so you never run out.';
+
+  @override
+  String get starFeatureAdaptiveTitle => 'Adaptive Formula';
+
+  @override
+  String get starFeatureAdaptiveBody =>
+      'Learns your real burn and tunes your target.';
+
+  @override
+  String get starFeatureCoachTitle => 'AI Coach';
+
+  @override
+  String get starFeatureCoachBody =>
+      'Reads your week and tells you how to do better.';
+
+  @override
+  String get starFeatureMacrosTitle => 'Detailed Macros';
+
+  @override
+  String get starFeatureMacrosBody =>
+      'The full label: fat, carbs, sugars, fibre, salt.';
+
+  @override
+  String get starYearly => 'Yearly';
+
+  @override
+  String get starMonthly => 'Monthly';
+
+  @override
+  String get starPerYear => 'a year';
+
+  @override
+  String get starPerMonth => 'a month';
+
+  @override
+  String starMonthlyEquivalent(String price) {
+    return '$price a month';
+  }
+
+  @override
+  String starSave(int percent) {
+    return 'Save $percent%';
+  }
+
+  @override
+  String get starChecking => 'Checking with Google Play';
+
+  @override
+  String get starSubscribe => 'Subscribe';
+
+  @override
+  String starStartTrial(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Start $days days free',
+      one: 'Start 1 day free',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String starTermsYearly(String price) {
+    return '$price a year. Renews every year until you cancel. Cancel any time in Google Play.';
+  }
+
+  @override
+  String starTermsMonthly(String price) {
+    return '$price a month. Renews every month until you cancel. Cancel any time in Google Play.';
+  }
+
+  @override
+  String starTrialTermsYearly(int days, String price) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other:
+          '$days days free, then $price a year. Renews every year until you cancel. Cancel any time in Google Play.',
+      one:
+          '1 day free, then $price a year. Renews every year until you cancel. Cancel any time in Google Play.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String starTrialTermsMonthly(int days, String price) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other:
+          '$days days free, then $price a month. Renews every month until you cancel. Cancel any time in Google Play.',
+      one:
+          '1 day free, then $price a month. Renews every month until you cancel. Cancel any time in Google Play.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get starOk => 'OK';
+
+  @override
+  String get starOn => 'YumSum Star is on.';
+
+  @override
+  String starOnTrial(String date) {
+    return 'YumSum Star is on. Your free week ends on $date.';
+  }
+
+  @override
+  String get starAlreadyTitle => 'You\'re already a bright YumSum Star';
+
+  @override
+  String get starThanks => 'Thank you for helping YumSum grow.';
+
+  @override
+  String get starWeb =>
+      'Subscribe in the YumSum app for Android. YumSum Star then works here too, when you sign in with the same account.';
+
+  @override
+  String get starNoIphone => 'YumSum Star can\'t be bought on iPhone yet.';
+
+  @override
+  String get starTryAgain => 'Try again';
+
+  @override
+  String get starRestore => 'Restore purchase';
+
+  @override
+  String get starTerms => 'Terms';
+
+  @override
+  String get starPrivacy => 'Privacy';
+
+  @override
+  String get starClose => 'Close';
+
+  @override
+  String get starStatusPitch => 'Smart Snap, 30 AI estimates a day and more';
+
+  @override
+  String get starStatusHold =>
+      'Off until the payment problem is fixed in Google Play';
+
+  @override
+  String get starStatusAdmin => 'Admin: everything on, no daily limits';
+
+  @override
+  String get starStatusOn => 'On';
+
+  @override
+  String starStatusOnUntil(String date) {
+    return 'On until $date';
+  }
+
+  @override
+  String starStatusTrial(String date) {
+    return 'Free trial until $date';
+  }
+
+  @override
+  String starStatusEnds(String date) {
+    return 'Ends on $date';
+  }
+
+  @override
+  String starStatusRenews(String date) {
+    return 'Renews on $date';
+  }
+
+  @override
+  String get starStatusGrace =>
+      'Payment problem. Fix it in Google Play to keep YumSum Star.';
+
+  @override
+  String get starErrorPlay =>
+      'Could not reach Google Play. Check your connection and try again.';
+
+  @override
+  String get starErrorNotConfirmed =>
+      'Could not confirm your purchase. Try Restore purchase in a few minutes. If it still fails, Google Play refunds you automatically within 3 days.';
+
+  @override
+  String get starErrorOtherAccount =>
+      'This Google Play subscription is linked to another YumSum account. Sign in with that account to use it.';
+
+  @override
+  String get starNothingToRestore =>
+      'No YumSum Star subscription found on this Google account.';
+
+  @override
+  String get starPaymentPending =>
+      'Google Play is waiting for your payment. YumSum Star switches on once it goes through.';
 }

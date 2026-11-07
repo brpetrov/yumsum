@@ -1,11 +1,17 @@
+import 'package:flutter/widgets.dart';
+
+import 'package:lean_streak/l10n/app_localizations.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/period_review.dart';
 
 class PeriodReviewService {
+  /// The [PeriodReview.guidance] is in [l10n]'s language, English when not
+  /// given.
   PeriodReview buildReview({
     required DateTime startDate,
     required DateTime endDate,
     required List<DailySummary> summaries,
+    AppLocalizations? l10n,
   }) {
     final sortedSummaries = [...summaries]
       ..sort((a, b) => a.date.compareTo(b.date));
@@ -70,6 +76,7 @@ class PeriodReviewService {
       bestDay: bestDay,
       worstDay: worstDay,
       guidance: _buildGuidance(
+        l10n ?? lookupAppLocalizations(const Locale('en')),
         calorieConsistencyRate: calorieConsistencyRate,
         daysInPeriod: daysInPeriod,
         loggedDays: loggedDays,
@@ -81,7 +88,8 @@ class PeriodReviewService {
     return summary.mealCount > 0 || summary.totalCalories > 0;
   }
 
-  List<String> _buildGuidance({
+  List<String> _buildGuidance(
+    AppLocalizations l10n, {
     required double calorieConsistencyRate,
     required int daysInPeriod,
     required int loggedDays,
@@ -89,18 +97,16 @@ class PeriodReviewService {
     final guidance = <String>[];
 
     if (loggedDays == 0) {
-      guidance.add('No meals logged in this period.');
+      guidance.add(l10n.historyGuidanceNoMeals);
       return guidance;
     }
 
     if (calorieConsistencyRate >= 0.70) {
-      guidance.add('Most logged days stayed close to target.');
+      guidance.add(l10n.historyGuidanceMostClose);
     } else if (calorieConsistencyRate >= 0.40) {
-      guidance.add(
-        'Some logged days stayed close to target; a few were well off.',
-      );
+      guidance.add(l10n.historyGuidanceSomeClose);
     } else {
-      guidance.add('Most logged days were well above or below target.');
+      guidance.add(l10n.historyGuidanceMostOff);
     }
 
     // About 4 days in 7 for weeks, half for months, scaled to the days that
@@ -109,9 +115,7 @@ class PeriodReviewService {
         ? (daysInPeriod * 4 / 7).ceil()
         : (daysInPeriod * 0.5).ceil();
     if (loggedDays < minimumLoggedDays) {
-      guidance.add(
-        'Some days weren\'t logged. Log more days for a clearer review.',
-      );
+      guidance.add(l10n.historyGuidanceLogMore);
     }
 
     return guidance.take(4).toList();

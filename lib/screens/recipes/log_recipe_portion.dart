@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
@@ -35,8 +36,8 @@ Future<void> logRecipePortion(
     SnackBar(
       content: Text(
         failed
-            ? 'Could not log the meal. Try again.'
-            : '${recipe.mealName(portions)} logged.',
+            ? context.l10n.recipesErrorLog
+            : context.l10n.recipesLogged(recipe.mealName(portions)),
       ),
     ),
   );

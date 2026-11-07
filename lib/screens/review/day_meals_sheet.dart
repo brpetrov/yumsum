@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
@@ -44,20 +45,26 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
   String get _dateKey => DateFormat('yyyy-MM-dd').format(widget.date);
 
   Future<void> _delete(Meal meal) async {
+    final l10n = context.l10n;
+    final name = meal.name;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete meal?'),
-        content: Text('Remove ${meal.name ?? 'this meal'} from this day?'),
+        title: Text(l10n.historyDeleteMealTitle),
+        content: Text(
+          name == null
+              ? l10n.historyDeleteMealUnnamed
+              : l10n.historyDeleteMealNamed(name),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(l10n.historyCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Delete'),
+            child: Text(l10n.historyDelete),
           ),
         ],
       ),
@@ -71,13 +78,14 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
       () => _error = !result.hasError
           ? null
           : result.error is EditLimitExceededException
-          ? 'No past-day changes left this month.'
-          : 'Could not delete the meal. Try again.',
+          ? l10n.historyNoChangesLeft
+          : l10n.historyErrorDeleteMeal,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final meals = ref.watch(mealsForDateProvider(_dateKey)).valueOrNull;
     final summary = ref
         .watch(dailySummaryForDateProvider(_dateKey))
@@ -126,7 +134,7 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          DateFormat('EEEE, d MMMM').format(widget.date),
+                          capitalised(l10n.weekdayDayMonth(widget.date)),
                           style: AppTheme.display.copyWith(
                             fontSize: 22,
                             color: AppColors.textPrimary,
@@ -135,10 +143,17 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
                         const SizedBox(height: 2),
                         Text(
                           summary == null
-                              ? 'Nothing logged'
-                              : '${summary.totalCalories} of '
-                                    '${summary.targetCalories} kcal'
-                                    '${protein == null ? '' : ' · $protein g protein'}',
+                              ? l10n.historyDayNothingLogged
+                              : protein == null
+                              ? l10n.historyDayKcal(
+                                  summary.totalCalories,
+                                  summary.targetCalories,
+                                )
+                              : l10n.historyDayKcalProtein(
+                                  summary.totalCalories,
+                                  summary.targetCalories,
+                                  protein,
+                                ),
                           style: TextStyle(
                             fontSize: 14,
                             color: AppColors.textSecondary,
@@ -149,7 +164,9 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
                   ),
                   if (summary != null)
                     StatusPill(
-                      label: summary.dayOff ? 'Day off' : summary.status.label,
+                      label: summary.dayOff
+                          ? l10n.historyDayOff
+                          : summary.status.shownLabel(l10n),
                       color: summary.dayOff
                           ? AppColors.primary
                           : dayStatusColor(summary.status),
@@ -163,15 +180,17 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
                 padding: const EdgeInsets.only(right: 12),
                 child: MacroTotals(
                   meals: meals,
-                  noneNote: 'No macro info for this day\'s meals',
+                  noneNote: l10n.historyDayNoMacros,
                 ),
               ),
             ],
             if (changesLeft != null) ...[
               const SizedBox(height: 6),
               Text(
-                '${changesLeft.clamp(0, DayEditRepository.monthlyLimit)} of '
-                '${DayEditRepository.monthlyLimit} past-day changes left this month',
+                l10n.historyChangesLeft(
+                  changesLeft.clamp(0, DayEditRepository.monthlyLimit),
+                  DayEditRepository.monthlyLimit,
+                ),
                 style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             ],
@@ -184,9 +203,9 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
                 ),
               )
             else if (meals.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: BowlNote('No meals logged on this day.'),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: BowlNote(l10n.historyDayNoMeals),
               )
             else
               Flexible(
@@ -203,8 +222,7 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
                       onEdit: canChange
                           ? () => showLogMealSheet(context, existingMeal: meal)
                           : () => setState(
-                              () => _error =
-                                  'No past-day changes left this month.',
+                              () => _error = l10n.historyNoChangesLeft,
                             ),
                       onDelete: () => _delete(meal),
                     );
@@ -226,7 +244,7 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
                     ? () => showLogMealSheet(context, date: _dateKey)
                     : null,
                 icon: const Icon(Icons.add_rounded),
-                label: const Text('Add meal'),
+                label: Text(l10n.historyAddMeal),
               ),
             ),
           ],

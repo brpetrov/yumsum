@@ -2,12 +2,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/week_facts.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/models/weekly_review.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
@@ -24,41 +24,30 @@ import 'package:lean_streak/widgets/recipe_photo.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 
 /// What AI Coach does (plan 09): on the page for free users, and in the
-/// dialog behind the info button.
-const coachPromises = <(IconData, String, String)>[
+/// dialog behind the info button, under [AppLocalizations.coachIntroTitle]
+/// and [AppLocalizations.coachSubtitle].
+List<(IconData, String, String)> coachPromises(AppLocalizations l10n) => [
   (
     Icons.query_stats_rounded,
-    'Spot what\'s holding you back',
-    'Discover the eating patterns that could be slowing your progress and '
-        'find small changes that help.',
+    l10n.coachPromiseHoldingBackTitle,
+    l10n.coachPromiseHoldingBackBody,
   ),
   (
     Icons.eco_rounded,
-    'Build a more balanced diet',
-    'See how your protein, fibre, salt and sugar compare with recommended '
-        'amounts, so you know where to focus.',
+    l10n.coachPromiseBalanceTitle,
+    l10n.coachPromiseBalanceBody,
   ),
   (
     Icons.lightbulb_outline_rounded,
-    'Get advice you can put into practice',
-    'Make your next meal easier with practical tips and recipe ideas based '
-        'on what you already eat.',
+    l10n.coachPromiseAdviceTitle,
+    l10n.coachPromiseAdviceBody,
   ),
   (
     Icons.event_available_rounded,
-    'Start every week with direction',
-    'Every Monday, get a fresh review of what\'s working and what to '
-        'change, so you can build on your progress.',
+    l10n.coachPromiseWeeklyTitle,
+    l10n.coachPromiseWeeklyBody,
   ),
 ];
-
-/// The AI Coach dialog's title, and the free page's heading.
-const coachTitle = 'Your AI Coach';
-
-/// AI Coach in one line, under its name on the page and in the dialog.
-const coachSubtitle =
-    'Get fresh advice tailored just for you, every Monday, to help you eat '
-    'better and reach your goals.';
 
 /// The coach illustration (assets/coach.webp, trimmed and shrunk to 720 px
 /// for the web) at [width].
@@ -79,14 +68,14 @@ class _CoachImage extends StatelessWidget {
 Future<void> showCoachIntro(BuildContext context) => showDialog<void>(
   context: context,
   builder: (context) => FeatureIntroDialog(
-    title: coachTitle,
-    subtitle: coachSubtitle,
+    title: context.l10n.coachIntroTitle,
+    subtitle: context.l10n.coachSubtitle,
     image: const _CoachImage(width: 52),
-    promises: coachPromises,
+    promises: coachPromises(context.l10n),
     actions: [
       TextButton(
         onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Close'),
+        child: Text(context.l10n.coachClose),
       ),
     ],
   ),
@@ -137,11 +126,11 @@ class _CoachScreenState extends ConsumerState<CoachScreen> {
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(),
       appBar: AppBar(
-        title: const Text('AI Coach'),
+        title: Text(context.l10n.coachTitle),
         actions: [
           if (plus)
             IconButton(
-              tooltip: 'How it works',
+              tooltip: context.l10n.coachHowItWorks,
               onPressed: () => showCoachIntro(context),
               icon: const Icon(Icons.info_outline_rounded),
             ),
@@ -272,8 +261,10 @@ class _WeekHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final last = monday == latest;
     final dates = weekLabel(
+      l10n,
       monday,
       year:
           DateTime(monday.year, monday.month, monday.day + 6).year !=
@@ -290,7 +281,7 @@ class _WeekHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  last ? 'Last week' : dates,
+                  last ? l10n.coachLastWeek : dates,
                   style: AppTheme.display.copyWith(
                     fontSize: 18,
                     color: AppColors.textPrimary,
@@ -308,13 +299,13 @@ class _WeekHeader extends StatelessWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Previous',
+            tooltip: l10n.coachPrevious,
             onPressed: onPrevious,
             visualDensity: VisualDensity.compact,
             icon: const Icon(Icons.chevron_left_rounded),
           ),
           IconButton(
-            tooltip: 'Next',
+            tooltip: l10n.coachNext,
             onPressed: onNext,
             visualDensity: VisualDensity.compact,
             icon: const Icon(Icons.chevron_right_rounded),
@@ -334,6 +325,7 @@ class _FirstNotes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final days = 8 - now.weekday;
     final monday = DateTime(now.year, now.month, now.day + days);
     return AppCard(
@@ -349,7 +341,7 @@ class _FirstNotes extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Your first notes come on Monday',
+                      l10n.coachFirstNotesTitle,
                       style: AppTheme.display.copyWith(
                         fontSize: 18,
                         color: AppColors.textPrimary,
@@ -357,7 +349,7 @@ class _FirstNotes extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      days == 1 ? '1 day to go' : '$days days to go',
+                      l10n.coachDaysToGo(days),
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -371,10 +363,7 @@ class _FirstNotes extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            'AI Coach reads a whole week at a time, so it\'s going over this '
-            'one as you log it. On Monday ${DateFormat('d MMMM').format(monday)} '
-            'it\'ll tell you what went well, what held you back and what to '
-            'try next week.',
+            l10n.coachFirstNotesBody(l10n.dayMonth(monday)),
             style: TextStyle(
               fontSize: 14.5,
               height: 1.45,
@@ -399,8 +388,7 @@ class _Ended extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'YumSum Star has ended, so no new notes are written. The ones '
-            'you have stay.',
+            context.l10n.coachEnded,
             style: TextStyle(
               fontSize: 13.5,
               height: 1.4,
@@ -413,7 +401,7 @@ class _Ended extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: () => showPlusPaywall(context),
               icon: const PlusStar(size: 22),
-              label: const Text('Become a Star'),
+              label: Text(context.l10n.starBecome),
             ),
           ),
         ],
@@ -428,6 +416,7 @@ class _CoachPitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -436,7 +425,7 @@ class _CoachPitch extends StatelessWidget {
         const Center(child: _CoachImage(width: 156)),
         const SizedBox(height: 16),
         Text(
-          coachTitle,
+          l10n.coachIntroTitle,
           textAlign: TextAlign.center,
           style: AppTheme.display.copyWith(
             fontSize: 28,
@@ -445,7 +434,7 @@ class _CoachPitch extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          coachSubtitle,
+          l10n.coachSubtitle,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14.5,
@@ -455,14 +444,14 @@ class _CoachPitch extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 18),
-        const AppCard(child: FeaturePromises(coachPromises)),
+        AppCard(child: FeaturePromises(coachPromises(l10n))),
         const SizedBox(height: 18),
         SizedBox(
           height: 54,
           child: FilledButton.icon(
             onPressed: () => showPlusPaywall(context),
             icon: const PlusStar(size: 24),
-            label: const Text('Become a Star'),
+            label: Text(l10n.starBecome),
           ),
         ),
       ],
@@ -481,6 +470,7 @@ class _WeekNotes extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final muted = TextStyle(
       fontSize: 13.5,
       height: 1.4,
@@ -495,13 +485,7 @@ class _WeekNotes extends ConsumerWidget {
         )
         .valueOrNull;
     if (summaries != null && summaries.values.where(isJudgedDay).length < 4) {
-      return AppCard(
-        child: Text(
-          'Not enough logged this week for notes. They need 4 days logged, '
-          'not counting days off.',
-          style: muted,
-        ),
-      );
+      return AppCard(child: Text(l10n.coachNotEnough, style: muted));
     }
 
     final notes = summaries == null
@@ -519,7 +503,7 @@ class _WeekNotes extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Expanded(child: Text('Looking over your week', style: muted)),
+            Expanded(child: Text(l10n.coachLooking, style: muted)),
           ],
         ),
       ),
@@ -527,7 +511,7 @@ class _WeekNotes extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Could not get this week\'s notes. Try again.', style: muted),
+            Text(l10n.coachErrorLoad, style: muted),
             const SizedBox(height: 4),
             TextButton(
               onPressed: () => ref.invalidate(weeklyReviewProvider(monday)),
@@ -535,7 +519,7 @@ class _WeekNotes extends ConsumerWidget {
                 padding: EdgeInsets.zero,
                 visualDensity: VisualDensity.compact,
               ),
-              child: const Text('Try again'),
+              child: Text(l10n.coachTryAgain),
             ),
           ],
         ),
@@ -544,10 +528,7 @@ class _WeekNotes extends ConsumerWidget {
         if (points == null) {
           return AppCard(
             child: Text(
-              plus
-                  ? 'No notes on this week. AI Coach writes them during the '
-                        'week after, when you open this page.'
-                  : 'No notes on this week.',
+              plus ? l10n.coachNoNotesPlus : l10n.coachNoNotes,
               style: muted,
             ),
           );
@@ -680,7 +661,7 @@ class _Tips extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          good ? 'Keep going' : 'Try this',
+          good ? context.l10n.coachKeepGoing : context.l10n.coachTryThis,
           style: TextStyle(
             fontSize: 12.5,
             fontWeight: FontWeight.w800,
@@ -767,9 +748,10 @@ class _RecipeChip extends StatelessWidget {
   }
 }
 
-/// A number and its unit on the same line: "14 g", never "14" then "g".
+/// A number and its unit on the same line: "14 g", never "14" then "g";
+/// "14 г" and "300 ккал" in Bulgarian.
 String _keepUnits(String note) => note.replaceAllMapped(
-  RegExp(r'(\d) (g|kcal)\b'),
+  RegExp(r'(\d) (g|kcal|г|ккал)(?![\p{L}\p{N}_])', unicode: true),
   (match) => '${match[1]} ${match[2]}',
 );
 
