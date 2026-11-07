@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import 'package:lean_streak/helpers/adaptive_formula.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
+import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
@@ -24,6 +25,8 @@ class ProfileController extends AsyncNotifier<void> {
     required TrainingFrequency trainingFrequency,
     required WeightLossPace weightLossPace,
     required bool trackProtein,
+    required WeightUnit weightUnit,
+    required HeightUnit heightUnit,
   }) async {
     state = const AsyncLoading();
 
@@ -68,6 +71,8 @@ class ProfileController extends AsyncNotifier<void> {
       final updatedProfile = currentProfile.copyWith(
         name: name.trim(),
         trackProtein: trackProtein,
+        weightUnit: weightUnit,
+        heightUnit: heightUnit,
         age: age,
         gender: gender,
         heightCm: heightCm,

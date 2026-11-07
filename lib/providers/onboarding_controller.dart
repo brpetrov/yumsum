@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/helpers/health_calculator.dart';
+import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
@@ -21,6 +22,8 @@ class OnboardingController extends AsyncNotifier<void> {
     required WeightLossPace weightLossPace,
     required String country,
     required bool trackProtein,
+    required WeightUnit weightUnit,
+    required HeightUnit heightUnit,
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
@@ -46,6 +49,8 @@ class OnboardingController extends AsyncNotifier<void> {
         name: name.trim(),
         country: country.trim(),
         trackProtein: trackProtein,
+        weightUnit: weightUnit,
+        heightUnit: heightUnit,
         age: age,
         gender: gender,
         heightCm: heightCm,

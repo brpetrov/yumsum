@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
+import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/country_provider.dart';
@@ -13,6 +14,7 @@ import 'package:lean_streak/providers/onboarding_controller.dart';
 import 'package:lean_streak/widgets/app_logo_mark.dart';
 import 'package:lean_streak/widgets/health_plan_preview_card.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
+import 'package:lean_streak/widgets/measure_field.dart';
 import 'package:lean_streak/widgets/pill_toggle.dart';
 import 'package:lean_streak/widgets/plan_choices.dart';
 import 'package:lean_streak/widgets/shine.dart';
@@ -35,7 +37,9 @@ enum _Step {
 
 /// First run: one question per card, then the plan. The pace is moderate
 /// until Plan Settings changes it; the country is stored from the phone's
-/// region, as `countryProvider`'s fallback.
+/// region, as `countryProvider`'s fallback. Height and weight are typed in
+/// the units for that region until a card's toggle changes them, and the
+/// units are stored too.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -46,9 +50,11 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _nameCtrl = TextEditingController();
   final _ageCtrl = TextEditingController();
-  final _heightCtrl = TextEditingController();
-  final _currentWeightCtrl = TextEditingController();
-  final _targetWeightCtrl = TextEditingController();
+  late HeightUnit _heightUnit;
+  late WeightUnit _weightUnit;
+  late final HeightInput _height;
+  late final WeightInput _currentWeight;
+  late final WeightInput _targetWeight;
 
   Gender? _gender;
   ActivityLevel _activityLevel = ActivityLevel.sedentary;
@@ -58,12 +64,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   int _index = 0;
 
   @override
+  void initState() {
+    super.initState();
+    final country = countryNameFor(ref.read(deviceRegionProvider));
+    _heightUnit = defaultHeightUnitFor(country);
+    _weightUnit = defaultWeightUnitFor(country);
+    _height = HeightInput(_heightUnit);
+    _currentWeight = WeightInput(_weightUnit);
+    _targetWeight = WeightInput(_weightUnit);
+  }
+
+  @override
   void dispose() {
     _nameCtrl.dispose();
     _ageCtrl.dispose();
-    _heightCtrl.dispose();
-    _currentWeightCtrl.dispose();
-    _targetWeightCtrl.dispose();
+    _height.dispose();
+    _currentWeight.dispose();
+    _targetWeight.dispose();
     super.dispose();
   }
 
@@ -83,25 +100,25 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     return null;
   }
 
-  String? _heightError(String text) {
-    final n = double.tryParse(text);
-    if (n == null) return 'Enter your height.';
-    if (n < 100 || n > 250) return '100–250 cm';
+  String? _heightError() {
+    final cm = _height.value;
+    if (cm == null) return 'Enter your height.';
+    if (cm < 100 || cm > 250) return heightRange(100, 250, _heightUnit);
     return null;
   }
 
-  String? _weightError(String text) {
-    final n = double.tryParse(text);
-    if (n == null) return 'Enter your weight.';
-    if (n < 30 || n > 300) return '30–300 kg';
+  String? _weightError(WeightInput input) {
+    final kg = input.value;
+    if (kg == null) return 'Enter your weight.';
+    if (kg < 30 || kg > 300) return weightRange(30, 300, _weightUnit);
     return null;
   }
 
-  String? _targetError(String text) {
-    final error = _weightError(text);
+  String? _targetError() {
+    final error = _weightError(_targetWeight);
     if (error != null) return error;
-    final current = double.tryParse(_currentWeightCtrl.text);
-    if (current != null && double.parse(text) >= current) {
+    final current = _currentWeight.value;
+    if (current != null && _targetWeight.value! >= current) {
       return 'Must be less than your current weight';
     }
     return null;
@@ -111,9 +128,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     _Step.name => _nameCtrl.text.trim().isNotEmpty,
     _Step.gender => _gender != null,
     _Step.age => _ageError(_ageCtrl.text) == null,
-    _Step.height => _heightError(_heightCtrl.text) == null,
-    _Step.weight => _weightError(_currentWeightCtrl.text) == null,
-    _Step.target => _targetError(_targetWeightCtrl.text) == null,
+    _Step.height => _heightError() == null,
+    _Step.weight => _weightError(_currentWeight) == null,
+    _Step.target => _targetError() == null,
     _Step.goal || _Step.activity || _Step.training || _Step.protein => true,
     _Step.plan => _preview != null,
   };
@@ -121,8 +138,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   // ── Live preview ─────────────────────────────────────────────────────────
 
   HealthPlanCalculation? get _preview {
-    final currentWeight = double.tryParse(_currentWeightCtrl.text);
-    final height = double.tryParse(_heightCtrl.text);
+    final currentWeight = _currentWeight.value;
+    final height = _height.value;
     final age = int.tryParse(_ageCtrl.text);
 
     if (currentWeight == null ||
@@ -132,9 +149,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       return null;
     }
 
-    final targetWeight = _maintaining
-        ? null
-        : double.tryParse(_targetWeightCtrl.text);
+    final targetWeight = _maintaining ? null : _targetWeight.value;
     if (!_maintaining &&
         (targetWeight == null || targetWeight >= currentWeight)) {
       return null;
@@ -197,16 +212,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           name: _nameCtrl.text,
           age: int.parse(_ageCtrl.text),
           gender: _gender!,
-          heightCm: double.parse(_heightCtrl.text),
-          currentWeightKg: double.parse(_currentWeightCtrl.text),
-          targetWeightKg: _maintaining
-              ? null
-              : double.parse(_targetWeightCtrl.text),
+          heightCm: _height.value!,
+          currentWeightKg: _currentWeight.value!,
+          targetWeightKg: _maintaining ? null : _targetWeight.value!,
           activityLevel: _activityLevel,
           trainingFrequency: _trainingFrequency,
           weightLossPace: _weightLossPace,
           country: countryNameFor(ref.read(deviceRegionProvider)),
           trackProtein: _trackProtein,
+          weightUnit: _weightUnit,
+          heightUnit: _heightUnit,
         );
   }
 
@@ -217,12 +232,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget _field(
     TextEditingController controller, {
     required String label,
-    String? suffix,
     String? Function(String)? error,
-    TextInputType keyboard = const TextInputType.numberWithOptions(
-      decimal: true,
-    ),
-    List<TextInputFormatter>? formatters,
+    required TextInputType keyboard,
+    required List<TextInputFormatter> formatters,
     TextCapitalization capitalization = TextCapitalization.none,
   }) {
     return TextField(
@@ -231,12 +243,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       keyboardType: keyboard,
       textCapitalization: capitalization,
       textInputAction: TextInputAction.next,
-      inputFormatters:
-          formatters ??
-          [FilteringTextInputFormatter.allow(RegExp(r'^\d{0,3}\.?\d{0,1}'))],
+      inputFormatters: formatters,
       decoration: InputDecoration(
         labelText: label,
-        suffixText: suffix,
         errorText: controller.text.isEmpty
             ? null
             : error?.call(controller.text),
@@ -245,6 +254,42 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       onSubmitted: (_) => _next(),
     );
   }
+
+  /// A height or weight: its unit toggle, then the boxes, as [_field].
+  Widget _measure(
+    MeasureInput input, {
+    required String label,
+    required String? Function() error,
+    required Widget toggle,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Align(alignment: Alignment.centerRight, child: toggle),
+        const SizedBox(height: 16),
+        MeasureField(
+          input: input,
+          label: label,
+          autofocus: true,
+          error: input.isEmpty ? null : error(),
+          onChanged: () => setState(() {}),
+          onSubmitted: _next,
+        ),
+      ],
+    );
+  }
+
+  Widget get _weightToggle => SizedBox(
+    width: 220,
+    child: WeightUnitToggle(
+      unit: _weightUnit,
+      onChanged: (unit) => setState(() {
+        _weightUnit = unit;
+        _currentWeight.switchTo(unit);
+        _targetWeight.switchTo(unit);
+      }),
+    ),
+  );
 
   /// The heading, the line under it (if any) and the answer for [step].
   (String, String?, Widget) _card(_Step step) => switch (step) {
@@ -293,16 +338,30 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     _Step.height => (
       'How tall are you?',
       null,
-      _field(_heightCtrl, label: 'Height', suffix: 'cm', error: _heightError),
+      _measure(
+        _height,
+        label: 'Height',
+        error: _heightError,
+        toggle: SizedBox(
+          width: 160,
+          child: HeightUnitToggle(
+            unit: _heightUnit,
+            onChanged: (unit) => setState(() {
+              _heightUnit = unit;
+              _height.switchTo(unit);
+            }),
+          ),
+        ),
+      ),
     ),
     _Step.weight => (
       'What do you weigh now?',
       null,
-      _field(
-        _currentWeightCtrl,
+      _measure(
+        _currentWeight,
         label: 'Current weight',
-        suffix: 'kg',
-        error: _weightError,
+        error: () => _weightError(_currentWeight),
+        toggle: _weightToggle,
       ),
     ),
     _Step.goal => (
@@ -321,11 +380,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     _Step.target => (
       'What weight are you aiming for?',
       null,
-      _field(
-        _targetWeightCtrl,
+      _measure(
+        _targetWeight,
         label: 'Target weight',
-        suffix: 'kg',
         error: _targetError,
+        toggle: _weightToggle,
       ),
     ),
     _Step.activity => (
@@ -386,6 +445,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               child: HealthPlanPreviewCard(
                 preview: preview,
                 title: 'Your plan',
+                weightUnit: _weightUnit,
               ),
             ),
           const SizedBox(height: 16),

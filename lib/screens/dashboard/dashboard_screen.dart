@@ -11,6 +11,7 @@ import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/meal.dart';
+import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
@@ -21,6 +22,7 @@ import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/reminder_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
+import 'package:lean_streak/providers/units_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
 import 'package:lean_streak/screens/dashboard/helpers/adaptive_dialogs.dart';
@@ -796,6 +798,7 @@ class _WeightCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final latest = ref.watch(latestWeightEntryProvider).valueOrNull;
+    final unit = ref.watch(weightUnitProvider);
     final daysAgo = latest == null
         ? 0
         : DateTime.now().difference(latest.date).inDays;
@@ -823,9 +826,9 @@ class _WeightCard extends ConsumerWidget {
                   latest == null
                       ? 'Log your weight to track progress'
                       : daysAgo > 7
-                      ? 'Latest: ${latest.weightKg.toStringAsFixed(1)} kg'
+                      ? 'Latest: ${formatWeight(latest.weightKg, unit)}'
                             ' · $daysAgo days ago'
-                      : 'Latest: ${latest.weightKg.toStringAsFixed(1)} kg',
+                      : 'Latest: ${formatWeight(latest.weightKg, unit)}',
                   style: TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,

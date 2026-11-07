@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/helpers/adaptive_formula.dart';
+import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
@@ -59,6 +60,8 @@ void main() {
           trainingFrequency: training,
           weightLossPace: pace,
           trackProtein: profile.trackProtein,
+          weightUnit: WeightUnit.kg,
+          heightUnit: HeightUnit.cm,
         );
     expect(saved, isTrue);
     return profiles.saved!;

@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/entitlement.dart';
+import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/models/weight_entry.dart';
 import 'package:lean_streak/providers/adaptive_formula_provider.dart';
+import 'package:lean_streak/providers/country_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
@@ -56,6 +58,7 @@ void main() {
     UserProfile? profile,
     Entitlement? entitlement,
     List<WeightEntry>? entries,
+    String region = 'DE',
   }) async {
     controller = _FakeWeightLogController();
     SharedPreferences.setMockInitialValues({});
@@ -64,6 +67,7 @@ void main() {
       ProviderScope(
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
+          deviceRegionProvider.overrideWithValue(region),
           weightEntriesProvider.overrideWith(
             (ref) => Stream.value(
               entries ??
@@ -288,5 +292,47 @@ void main() {
     await tester.pumpAndSettle();
     expect(controller.resets, 1);
     expect(find.text('Weight history cleared.'), findsOneWidget);
+  });
+
+  testWidgets('in pounds: the numbers, the chart and the delete question', (
+    tester,
+  ) async {
+    await pumpScreen(tester, region: 'US');
+    expect(find.text('187.8 lb'), findsWidgets);
+    expect(find.text('-1.8 lb'), findsOneWidget);
+    final chart = tester.widget<LineChart>(find.byType(LineChart));
+    final weighIns = chart.data.lineBarsData[1];
+    expect(weighIns.spots.last.y, closeTo(kgToLb(85.2), 1e-9));
+
+    final delete = find.byTooltip('Delete weigh-in').first;
+    await tester.ensureVisible(delete);
+    await tester.pumpAndSettle();
+    await tester.tap(delete);
+    await tester.pumpAndSettle();
+    expect(
+      find.text(
+        'Remove 187.8 lb from Thu, 8 Oct? Your plan adjusts back to 189.6 lb.',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('in stones: stones and pounds, and the axis in stones', (
+    tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      profile: planProfile().copyWith(weightUnit: WeightUnit.st),
+    );
+    // 85.2 kg is 187.8 lb; the target, 73 kg, 160.9 lb.
+    expect(find.text('13 st 6 lb'), findsWidgets);
+    expect(find.text('11 st 7 lb'), findsOneWidget);
+    expect(find.text('-1.8 lb'), findsOneWidget);
+    final chart = tester.widget<LineChart>(find.byType(LineChart));
+    final axis = chart.data.titlesData.leftTitles.sideTitles;
+    // About 157 to 194 lb: a line a stone.
+    expect(axis.interval, 14);
+    expect(find.text('12 st'), findsOneWidget);
+    expect(find.text('13 st'), findsOneWidget);
   });
 }

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/models/units.dart';
+import 'package:lean_streak/providers/units_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_log_controller.dart';
 import 'package:lean_streak/services/weight_log_service.dart';
+import 'package:lean_streak/widgets/measure_field.dart';
 
 /// Opens the ad-hoc "log your weight" dialog. Resolves with the recalculation
 /// result when a weight is saved, or null if the user cancels.
@@ -34,30 +37,32 @@ class _LogWeightDialog extends ConsumerStatefulWidget {
 }
 
 class _LogWeightDialogState extends ConsumerState<_LogWeightDialog> {
-  late final TextEditingController _weightCtrl;
+  late final WeightUnit _unit;
+  late final WeightInput _weight;
   String? _error;
 
   @override
   void initState() {
     super.initState();
     final current = ref.read(userProfileProvider).valueOrNull?.currentWeightKg;
-    _weightCtrl = TextEditingController(
-      text: current != null ? current.toStringAsFixed(1) : '',
-    );
+    _unit = ref.read(weightUnitProvider);
+    _weight = WeightInput(_unit)..show(current);
   }
 
   @override
   void dispose() {
-    _weightCtrl.dispose();
+    _weight.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
-    final weight = double.tryParse(
-      _weightCtrl.text.trim().replaceAll(',', '.'),
-    );
+    final weight = _weight.value;
     if (weight == null || weight < 25 || weight > 400) {
-      setState(() => _error = 'Enter a weight between 25 and 400 kg.');
+      setState(
+        () => _error =
+            'Enter a weight between '
+            '${weightRange(25, 400, _unit, between: ' and ')}.',
+      );
       return;
     }
     setState(() => _error = null);
@@ -89,16 +94,13 @@ class _LogWeightDialogState extends ConsumerState<_LogWeightDialog> {
             style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 16),
-          TextField(
-            controller: _weightCtrl,
+          MeasureField(
+            input: _weight,
+            label: 'Current weight',
             autofocus: true,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(
-              labelText: 'Current weight',
-              suffixText: 'kg',
-              errorText: _error,
-            ),
-            onSubmitted: (_) => isSaving ? null : _save(),
+            error: _error,
+            textInputAction: TextInputAction.done,
+            onSubmitted: isSaving ? null : _save,
           ),
         ],
       ),

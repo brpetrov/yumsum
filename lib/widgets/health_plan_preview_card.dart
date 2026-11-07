@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
+import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 
 class HealthPlanPreviewCard extends StatelessWidget {
@@ -11,10 +12,12 @@ class HealthPlanPreviewCard extends StatelessWidget {
     super.key,
     required this.preview,
     required this.title,
+    required this.weightUnit,
   });
 
   final HealthPlanCalculation preview;
   final String title;
+  final WeightUnit weightUnit;
 
   Color get _color => switch (preview.goalPaceLevel) {
     GoalPaceLevel.safe => AppColors.veryGood,
@@ -55,7 +58,7 @@ class HealthPlanPreviewCard extends StatelessWidget {
 
   String get _weeklyLossLabel {
     if (preview.isMaintaining) return 'Maintain';
-    return '${preview.goalPaceKgPerWeek.toStringAsFixed(2)} kg/wk';
+    return '${formatPace(preview.goalPaceKgPerWeek, weightUnit)}/wk';
   }
 
   @override

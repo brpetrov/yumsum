@@ -6,10 +6,12 @@ import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
+import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/profile_controller.dart';
+import 'package:lean_streak/providers/units_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/dashboard/helpers/adaptive_dialogs.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
@@ -18,6 +20,7 @@ import 'package:lean_streak/widgets/day_status.dart';
 import 'package:lean_streak/widgets/health_plan_preview_card.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
+import 'package:lean_streak/widgets/measure_field.dart';
 import 'package:lean_streak/widgets/pill_toggle.dart';
 import 'package:lean_streak/widgets/plan_choices.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
@@ -32,9 +35,11 @@ class PlanSettingsScreen extends ConsumerStatefulWidget {
 class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
   final _formKey = GlobalKey<FormState>();
   final _ageCtrl = TextEditingController();
-  final _heightCtrl = TextEditingController();
-  final _currentWeightCtrl = TextEditingController();
-  final _targetWeightCtrl = TextEditingController();
+  final _height = HeightInput(HeightUnit.cm);
+  final _currentWeight = WeightInput(WeightUnit.kg);
+  final _targetWeight = WeightInput(WeightUnit.kg);
+  WeightUnit _weightUnit = WeightUnit.kg;
+  HeightUnit _heightUnit = HeightUnit.cm;
 
   String? _loadedProfileUid;
   Gender? _gender;
@@ -44,8 +49,8 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
   bool _trackProtein = true;
 
   double? get _currentBmi {
-    final currentWeight = double.tryParse(_currentWeightCtrl.text);
-    final height = double.tryParse(_heightCtrl.text);
+    final currentWeight = _currentWeight.value;
+    final height = _height.value;
     if (currentWeight == null || height == null) return null;
     if (currentWeight <= 0 || height <= 0) return null;
     return HealthCalculator.bmi(currentWeight, height);
@@ -54,9 +59,9 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
   @override
   void dispose() {
     _ageCtrl.dispose();
-    _heightCtrl.dispose();
-    _currentWeightCtrl.dispose();
-    _targetWeightCtrl.dispose();
+    _height.dispose();
+    _currentWeight.dispose();
+    _targetWeight.dispose();
     super.dispose();
   }
 
@@ -64,14 +69,14 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
   /// saving starts it again.
   bool _detailsChanged(UserProfile profile) =>
       int.tryParse(_ageCtrl.text) != profile.age ||
-      double.tryParse(_heightCtrl.text) != profile.heightCm ||
+      _height.value != profile.heightCm ||
       _gender != profile.gender ||
       _activityLevel != profile.activityLevel ||
       _trainingFrequency != profile.trainingFrequency;
 
   HealthPlanCalculation? _preview(UserProfile profile) {
-    final currentWeight = double.tryParse(_currentWeightCtrl.text);
-    final height = double.tryParse(_heightCtrl.text);
+    final currentWeight = _currentWeight.value;
+    final height = _height.value;
     final age = int.tryParse(_ageCtrl.text);
 
     if (currentWeight == null ||
@@ -82,9 +87,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
     }
 
     final isMaintaining = _weightLossPace == WeightLossPace.maintain;
-    final targetWeight = isMaintaining
-        ? null
-        : double.tryParse(_targetWeightCtrl.text);
+    final targetWeight = isMaintaining ? null : _targetWeight.value;
     if (!isMaintaining &&
         (targetWeight == null || targetWeight >= currentWeight)) {
       return null;
@@ -110,9 +113,17 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
 
     _loadedProfileUid = profile.uid;
     _ageCtrl.text = profile.age.toString();
-    _heightCtrl.text = _formatDouble(profile.heightCm);
-    _currentWeightCtrl.text = _formatDouble(profile.currentWeightKg);
-    _targetWeightCtrl.text = _formatDouble(profile.targetWeightKg);
+    _weightUnit = ref.read(weightUnitProvider);
+    _heightUnit = ref.read(heightUnitProvider);
+    _height
+      ..unit = _heightUnit
+      ..show(profile.heightCm);
+    _currentWeight
+      ..unit = _weightUnit
+      ..show(profile.currentWeightKg);
+    _targetWeight
+      ..unit = _weightUnit
+      ..show(profile.targetWeightKg);
     _gender = profile.gender;
     _activityLevel = profile.activityLevel;
     _trainingFrequency = profile.trainingFrequency;
@@ -134,15 +145,17 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
           name: profile.name,
           age: int.parse(_ageCtrl.text),
           gender: _gender!,
-          heightCm: double.parse(_heightCtrl.text),
-          currentWeightKg: double.parse(_currentWeightCtrl.text),
+          heightCm: _height.value!,
+          currentWeightKg: _currentWeight.value!,
           targetWeightKg: _weightLossPace == WeightLossPace.maintain
               ? null
-              : double.parse(_targetWeightCtrl.text),
+              : _targetWeight.value!,
           activityLevel: _activityLevel,
           trainingFrequency: _trainingFrequency,
           weightLossPace: _weightLossPace,
           trackProtein: _trackProtein,
+          weightUnit: _weightUnit,
+          heightUnit: _heightUnit,
         );
 
     if (!mounted) return;
@@ -156,6 +169,13 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
     }
 
     _showSnack('Could not save your plan. Try again.');
+  }
+
+  String? _weightError(WeightInput input) {
+    final kg = input.value;
+    if (kg == null) return 'Required';
+    if (kg < 30 || kg > 300) return weightRange(30, 300, _weightUnit);
+    return null;
   }
 
   void _showSnack(String message) {
@@ -187,6 +207,28 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
           _seedForm(profile);
           final preview = _preview(profile);
           final currentBmi = _currentBmi;
+          final heightField = MeasureField(
+            input: _height,
+            label: 'Height',
+            validator: () {
+              final cm = _height.value;
+              if (cm == null) return 'Required';
+              if (cm < 100 || cm > 250) {
+                return heightRange(100, 250, _heightUnit);
+              }
+              return null;
+            },
+          );
+          final weightField = MeasureField(
+            input: _currentWeight,
+            label: 'Current weight',
+            validator: () => _weightError(_currentWeight),
+          );
+          final unitLabel = TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textSecondary,
+          );
 
           return SafeArea(
             child: SingleChildScrollView(
@@ -270,66 +312,45 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                         ],
                       ),
                       SizedBox(height: 28),
-                      const SectionLabel('YOUR BODY'),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              controller: _heightCtrl,
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              textInputAction: TextInputAction.next,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                  RegExp(r'^\d{0,3}\.?\d{0,1}'),
-                                ),
-                              ],
-                              decoration: InputDecoration(
-                                labelText: 'Height',
-                                suffixText: 'cm',
-                              ),
-                              validator: (value) {
-                                final height = double.tryParse(value ?? '');
-                                if (height == null) return 'Required';
-                                if (height < 100 || height > 250) {
-                                  return '100-250 cm';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: TextFormField(
-                              controller: _currentWeightCtrl,
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              textInputAction: TextInputAction.next,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                  RegExp(r'^\d{0,3}\.?\d{0,1}'),
-                                ),
-                              ],
-                              decoration: InputDecoration(
-                                labelText: 'Current weight',
-                                suffixText: 'kg',
-                              ),
-                              validator: (value) {
-                                final weight = double.tryParse(value ?? '');
-                                if (weight == null) return 'Required';
-                                if (weight < 30 || weight > 300) {
-                                  return '30-300 kg';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                        ],
+                      const SectionLabel('UNITS'),
+                      Text('Weight', style: unitLabel),
+                      SizedBox(height: 10),
+                      WeightUnitToggle(
+                        unit: _weightUnit,
+                        onChanged: (unit) => setState(() {
+                          _weightUnit = unit;
+                          _currentWeight.switchTo(unit);
+                          _targetWeight.switchTo(unit);
+                        }),
                       ),
+                      SizedBox(height: 18),
+                      Text('Height', style: unitLabel),
+                      SizedBox(height: 10),
+                      HeightUnitToggle(
+                        unit: _heightUnit,
+                        onChanged: (unit) => setState(() {
+                          _heightUnit = unit;
+                          _height.switchTo(unit);
+                        }),
+                      ),
+                      SizedBox(height: 28),
+                      const SectionLabel('YOUR BODY'),
+                      // Side by side when each is one box; stones or feet
+                      // need the width.
+                      if (!_height.twoBoxes && !_currentWeight.twoBoxes)
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: heightField),
+                            SizedBox(width: 12),
+                            Expanded(child: weightField),
+                          ],
+                        )
+                      else ...[
+                        heightField,
+                        SizedBox(height: 18),
+                        weightField,
+                      ],
                       SizedBox(height: 28),
                       if (currentBmi != null) ...[
                         const SectionLabel('YOUR BMI'),
@@ -338,32 +359,17 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                       ],
                       const SectionLabel('YOUR GOAL'),
                       if (_weightLossPace != WeightLossPace.maintain) ...[
-                        TextFormField(
-                          controller: _targetWeightCtrl,
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
+                        MeasureField(
+                          input: _targetWeight,
+                          label: 'Target weight',
+                          prefixIcon: Icon(Icons.flag_outlined),
                           textInputAction: TextInputAction.done,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d{0,3}\.?\d{0,1}'),
-                            ),
-                          ],
-                          decoration: InputDecoration(
-                            labelText: 'Target weight',
-                            suffixText: 'kg',
-                            prefixIcon: Icon(Icons.flag_outlined),
-                          ),
-                          validator: (value) {
-                            final target = double.tryParse(value ?? '');
-                            if (target == null) return 'Required';
-                            if (target < 30 || target > 300) {
-                              return '30-300 kg';
-                            }
-                            final current = double.tryParse(
-                              _currentWeightCtrl.text,
-                            );
-                            if (current != null && target >= current) {
+                          validator: () {
+                            final error = _weightError(_targetWeight);
+                            if (error != null) return error;
+                            final current = _currentWeight.value;
+                            if (current != null &&
+                                _targetWeight.value! >= current) {
                               return 'Must be less than your current weight';
                             }
                             return null;
@@ -462,6 +468,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                           padding: const EdgeInsets.only(bottom: 10),
                           child: PaceCard(
                             pace: pace,
+                            weightUnit: _weightUnit,
                             selected: _weightLossPace == pace,
                             onTap: () => setState(() => _weightLossPace = pace),
                           ),
@@ -478,6 +485,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                         HealthPlanPreviewCard(
                           preview: preview,
                           title: 'Updated plan',
+                          weightUnit: _weightUnit,
                         ),
                         SizedBox(height: 20),
                       ],
@@ -819,11 +827,4 @@ class _BmiCategory {
 
   final String label;
   final Color color;
-}
-
-String _formatDouble(double value) {
-  if (value == value.roundToDouble()) {
-    return value.round().toString();
-  }
-  return value.toStringAsFixed(1);
 }

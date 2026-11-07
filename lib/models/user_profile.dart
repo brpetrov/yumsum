@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:lean_streak/models/units.dart';
+
 // ---------------------------------------------------------------------------
 // Enums
 // ---------------------------------------------------------------------------
@@ -144,6 +146,8 @@ class UserProfile {
     this.country = defaultCountry,
     this.usualFood = '',
     this.trackProtein = true,
+    this.weightUnit,
+    this.heightUnit,
     required this.age,
     required this.gender,
     required this.heightCm,
@@ -184,6 +188,12 @@ class UserProfile {
   /// Off hides protein everywhere (Today, the bar, meals, History) and
   /// skips the automatic protein estimate; calories alone are tracked.
   final bool trackProtein;
+
+  /// How weights and heights show and are typed; null until chosen, when
+  /// `weightUnitProvider` and `heightUnitProvider` default them from the
+  /// country. Stored values stay in kg and cm.
+  final WeightUnit? weightUnit;
+  final HeightUnit? heightUnit;
 
   final int age;
   final Gender gender;
@@ -250,6 +260,8 @@ class UserProfile {
       country: d['country'] as String? ?? defaultCountry,
       usualFood: d['usualFood'] as String? ?? legacyUsualFood,
       trackProtein: d['trackProtein'] as bool? ?? true,
+      weightUnit: WeightUnit.tryParse(d['weightUnit'] as String?),
+      heightUnit: HeightUnit.tryParse(d['heightUnit'] as String?),
       age: d['age'] as int,
       gender: Gender.fromString(d['gender'] as String),
       heightCm: (d['heightCm'] as num).toDouble(),
@@ -296,6 +308,8 @@ class UserProfile {
     'country': country,
     'usualFood': usualFood,
     'trackProtein': trackProtein,
+    if (weightUnit != null) 'weightUnit': weightUnit!.value,
+    if (heightUnit != null) 'heightUnit': heightUnit!.value,
     'age': age,
     'gender': gender.value,
     'heightCm': heightCm,
@@ -335,6 +349,8 @@ class UserProfile {
     String? country,
     String? usualFood,
     bool? trackProtein,
+    WeightUnit? weightUnit,
+    HeightUnit? heightUnit,
     int? age,
     Gender? gender,
     double? heightCm,
@@ -368,6 +384,8 @@ class UserProfile {
       country: country ?? this.country,
       usualFood: usualFood ?? this.usualFood,
       trackProtein: trackProtein ?? this.trackProtein,
+      weightUnit: weightUnit ?? this.weightUnit,
+      heightUnit: heightUnit ?? this.heightUnit,
       age: age ?? this.age,
       gender: gender ?? this.gender,
       heightCm: heightCm ?? this.heightCm,

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
+import 'package:lean_streak/providers/units_provider.dart';
 import 'package:lean_streak/screens/dashboard/helpers/adaptive_dialogs.dart';
 import 'package:lean_streak/widgets/day_status.dart';
 import 'package:lean_streak/widgets/feature_intro.dart';
@@ -114,8 +115,8 @@ class AdaptiveSection extends ConsumerWidget {
           note: profile.weightLossPace == WeightLossPace.maintain
               ? 'To keep your weight steady.'
               : 'To lose '
-                    '${NumberFormat('0.0#').format(profile.goalPaceKgPerWeek)}'
-                    ' kg a week.',
+                    '${formatPace(profile.goalPaceKgPerWeek, ref.watch(weightUnitProvider))}'
+                    ' a week.',
         ),
         if (progress != null) ...[
           if (adaptivePausedLine(progress) case final paused?) ...[

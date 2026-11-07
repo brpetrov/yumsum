@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/debug_provider.dart';
@@ -21,6 +22,8 @@ typedef _Answers = ({
   WeightLossPace weightLossPace,
   String country,
   bool trackProtein,
+  WeightUnit weightUnit,
+  HeightUnit heightUnit,
 });
 
 class _FakeOnboardingController extends OnboardingController {
@@ -39,6 +42,8 @@ class _FakeOnboardingController extends OnboardingController {
     required WeightLossPace weightLossPace,
     required String country,
     required bool trackProtein,
+    required WeightUnit weightUnit,
+    required HeightUnit heightUnit,
   }) async {
     submitted.add((
       name: name,
@@ -52,6 +57,8 @@ class _FakeOnboardingController extends OnboardingController {
       weightLossPace: weightLossPace,
       country: country,
       trackProtein: trackProtein,
+      weightUnit: weightUnit,
+      heightUnit: heightUnit,
     ));
   }
 }
@@ -181,6 +188,8 @@ void main() {
         weightLossPace: WeightLossPace.moderate,
         country: 'Bulgaria',
         trackProtein: true,
+        weightUnit: WeightUnit.kg,
+        heightUnit: HeightUnit.cm,
       ),
     ]);
   });
@@ -240,6 +249,8 @@ void main() {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
+    tester.platformDispatcher.localeTestValue = const Locale('bg', 'BG');
+    addTearDown(tester.platformDispatcher.clearLocaleTestValue);
     onboarding = _FakeOnboardingController();
     auth = _FakeAuthController();
     await tester.pumpWidget(

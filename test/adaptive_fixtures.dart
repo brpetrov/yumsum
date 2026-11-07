@@ -3,12 +3,14 @@ import 'dart:math' as math;
 import 'package:lean_streak/helpers/adaptive_formula.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
 import 'package:lean_streak/models/daily_summary.dart';
+import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/models/weight_entry.dart';
 
 /// The plan's own example (docs/plans/08-adaptive-formula.md, "Your plan"):
 /// male, 29, 170 cm, 79.8 kg, goal 73 kg at the faster pace, movement and
-/// training ×1.45, so a formula burn of 2495 and a target of 1670.
+/// training ×1.45, so a formula burn of 2495 and a target of 1670. Metric,
+/// whatever the test's locale.
 UserProfile planProfile({
   double weightKg = 79.8,
   double targetKg = 73,
@@ -29,6 +31,8 @@ UserProfile planProfile({
     uid: 'user-1',
     email: 'a@b.com',
     name: 'Test',
+    weightUnit: WeightUnit.kg,
+    heightUnit: HeightUnit.cm,
     age: age,
     gender: gender,
     heightCm: heightCm,

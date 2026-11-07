@@ -6,6 +6,7 @@ import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/adaptive_formula.dart';
 import 'package:lean_streak/models/entitlement.dart';
+import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
@@ -32,6 +33,8 @@ class _FakeProfileController extends ProfileController {
     required TrainingFrequency trainingFrequency,
     required WeightLossPace weightLossPace,
     required bool trackProtein,
+    required WeightUnit weightUnit,
+    required HeightUnit heightUnit,
   }) async {
     saved.add(trainingFrequency);
     return true;

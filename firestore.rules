@@ -150,8 +150,8 @@ service cloud.firestore {
     match /users/{userId} {
       // The profile is set whole at onboarding and partly updated later, and
       // old profiles may carry fields the app no longer writes, so there is
-      // no hasOnly: only the free-text fields and the switches and Adaptive
-      // formula fields added since are checked.
+      // no hasOnly: only the free-text fields and the switches, units and
+      // Adaptive formula fields added since are checked.
       allow read, delete: if isOwner(userId);
       allow create, update: if isOwner(userId)
         && text(request.resource.data.get('name', ''), 200)
@@ -159,6 +159,8 @@ service cloud.firestore {
         && text(request.resource.data.get('country', ''), 100)
         && text(request.resource.data.get('usualFood', ''), 500)
         && request.resource.data.get('trackProtein', true) is bool
+        && request.resource.data.get('weightUnit', 'kg') in ['kg', 'lb', 'st']
+        && request.resource.data.get('heightUnit', 'cm') in ['cm', 'ftin']
         && request.resource.data.get('adaptiveKcal', 0) is number
         && optionalDateKey(request.resource.data.get('adaptiveWeek', null))
         && optionalDateKey(request.resource.data.get('adaptiveFrom', null))

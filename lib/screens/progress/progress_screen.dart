@@ -9,8 +9,10 @@ import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/weight_trend.dart';
+import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/models/weight_entry.dart';
+import 'package:lean_streak/providers/units_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
 import 'package:lean_streak/providers/weight_log_controller.dart';
@@ -26,6 +28,7 @@ class ProgressScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final entriesAsync = ref.watch(weightEntriesProvider);
     final profile = ref.watch(userProfileProvider).valueOrNull;
+    final unit = ref.watch(weightUnitProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -75,9 +78,17 @@ class ProgressScreen extends ConsumerWidget {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _StatsHeader(entries: entries, profile: profile),
+                        _StatsHeader(
+                          entries: entries,
+                          profile: profile,
+                          unit: unit,
+                        ),
                         const SizedBox(height: 18),
-                        _WeightChartCard(entries: entries, profile: profile),
+                        _WeightChartCard(
+                          entries: entries,
+                          profile: profile,
+                          unit: unit,
+                        ),
                         const SizedBox(height: 22),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
@@ -111,6 +122,7 @@ class ProgressScreen extends ConsumerWidget {
                   final entry = entries[entries.length - i];
                   return _WeighInRow(
                     entry: entry,
+                    unit: unit,
                     onDelete: () => _deleteEntry(context, ref, entries, entry),
                   );
                 },
@@ -153,15 +165,16 @@ class ProgressScreen extends ConsumerWidget {
     final previous = entries.length > 1 && entries.last.dateKey == entry.dateKey
         ? entries[entries.length - 2]
         : null;
+    final unit = ref.read(weightUnitProvider);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete weigh-in?'),
         content: Text(
-          'Remove ${entry.weightKg.toStringAsFixed(1)} kg from '
+          'Remove ${formatWeight(entry.weightKg, unit)} from '
           '${DateFormat('EEE, d MMM').format(entry.date)}?'
           '${previous == null ? '' : ' Your plan adjusts back to '
-                    '${previous.weightKg.toStringAsFixed(1)} kg.'}',
+                    '${formatWeight(previous.weightKg, unit)}.'}',
         ),
         actions: [
           TextButton(
@@ -235,10 +248,15 @@ class ProgressScreen extends ConsumerWidget {
 }
 
 class _StatsHeader extends StatelessWidget {
-  const _StatsHeader({required this.entries, required this.profile});
+  const _StatsHeader({
+    required this.entries,
+    required this.profile,
+    required this.unit,
+  });
 
   final List<WeightEntry> entries;
   final UserProfile? profile;
+  final WeightUnit unit;
 
   @override
   Widget build(BuildContext context) {
@@ -253,20 +271,20 @@ class _StatsHeader extends StatelessWidget {
           Expanded(
             child: _StatBlock(
               label: 'Current',
-              value: '${current.toStringAsFixed(1)} kg',
+              value: formatWeight(current, unit),
             ),
           ),
           Expanded(
             child: _StatBlock(
               label: 'Change',
-              value: '${delta >= 0 ? '+' : ''}${delta.toStringAsFixed(1)} kg',
+              value: formatWeightChange(delta, unit),
               highlight: delta <= 0 ? AppColors.veryGood : AppColors.bad,
             ),
           ),
           Expanded(
             child: _StatBlock(
               label: 'Target',
-              value: target != null ? '${target.toStringAsFixed(1)} kg' : '—',
+              value: target != null ? formatWeight(target, unit) : '—',
             ),
           ),
         ],
@@ -312,10 +330,15 @@ class _StatBlock extends StatelessWidget {
 }
 
 class _WeightChartCard extends StatelessWidget {
-  const _WeightChartCard({required this.entries, required this.profile});
+  const _WeightChartCard({
+    required this.entries,
+    required this.profile,
+    required this.unit,
+  });
 
   final List<WeightEntry> entries;
   final UserProfile? profile;
+  final WeightUnit unit;
 
   @override
   Widget build(BuildContext context) {
@@ -324,17 +347,23 @@ class _WeightChartCard extends StatelessWidget {
     double xFor(WeightEntry entry) =>
         entry.date.difference(firstDate).inDays.toDouble();
 
+    // Drawn in kg, or in pounds for pounds and stones.
+    final metric = unit == WeightUnit.kg;
+    double yFor(double kg) => metric ? kg : kgToLb(kg);
+    String weightAt(double y) => formatWeight(metric ? y : lbToKg(y), unit);
+
     final spots = entries
-        .map((entry) => FlSpot(xFor(entry), entry.weightKg))
+        .map((entry) => FlSpot(xFor(entry), yFor(entry.weightKg)))
         .toList();
     final trend = weightTrend(entries);
     final trendSpots = [
       for (var i = 0; i < entries.length; i++)
-        FlSpot(spots[i].x, trend[i].trendKg),
+        FlSpot(spots[i].x, yFor(trend[i].trendKg)),
     ];
 
-    final target = profile?.targetWeightKg;
-    final weights = entries.map((e) => e.weightKg).toList();
+    final targetKg = profile?.targetWeightKg;
+    final target = targetKg == null ? null : yFor(targetKg);
+    final weights = spots.map((spot) => spot.y).toList();
     var minY = weights.reduce(math.min);
     var maxY = weights.reduce(math.max);
     if (target != null) {
@@ -342,9 +371,21 @@ class _WeightChartCard extends StatelessWidget {
       maxY = math.max(maxY, target);
     }
     // Pad the range so the line and target never hug the edges.
-    final pad = math.max(1.0, (maxY - minY) * 0.15);
+    final pad = math.max(yFor(1), (maxY - minY) * 0.15);
     minY -= pad;
     maxY += pad;
+    // Stones are labelled on whole and half stones, or every pound or two
+    // when the range is small: at most 5 lines.
+    final stoneStep = unit == WeightUnit.st
+        ? const [
+            1.0,
+            2.0,
+            7.0,
+            14.0,
+            28.0,
+            70.0,
+          ].firstWhere((step) => (maxY - minY) / step <= 5, orElse: () => 140.0)
+        : null;
 
     final maxX = spots.last.x == 0 ? 1.0 : spots.last.x;
     final labelInterval = math.max(1.0, (maxX / 4).floorToDouble());
@@ -366,6 +407,7 @@ class _WeightChartCard extends StatelessWidget {
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
+                  horizontalInterval: stoneStep,
                   getDrawingHorizontalLine: (_) =>
                       FlLine(color: AppColors.divider, strokeWidth: 1),
                 ),
@@ -380,13 +422,19 @@ class _WeightChartCard extends StatelessWidget {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 40,
+                      reservedSize: stoneStep == null ? 40 : 52,
+                      interval: stoneStep,
                       getTitlesWidget: (value, meta) {
                         if (value == meta.min || value == meta.max) {
                           return const SizedBox.shrink();
                         }
+                        final pounds = value.round();
                         return Text(
-                          value.toStringAsFixed(0),
+                          stoneStep == null
+                              ? value.toStringAsFixed(0)
+                              : pounds % 14 == 0
+                              ? '${pounds ~/ 14} st'
+                              : '${pounds ~/ 14} st ${pounds % 14}',
                           style: TextStyle(
                             fontSize: 11,
                             color: AppColors.textSecondary,
@@ -455,8 +503,8 @@ class _WeightChartCard extends StatelessWidget {
                       for (final spot in touched)
                         LineTooltipItem(
                           spot.barIndex == 0
-                              ? 'Trend ${spot.y.toStringAsFixed(1)} kg'
-                              : '${spot.y.toStringAsFixed(1)} kg',
+                              ? 'Trend ${weightAt(spot.y)}'
+                              : weightAt(spot.y),
                           TextStyle(
                             color: AppColors.veryGood,
                             fontWeight: FontWeight.bold,
@@ -533,9 +581,14 @@ class _WeightChartCard extends StatelessWidget {
 }
 
 class _WeighInRow extends StatelessWidget {
-  const _WeighInRow({required this.entry, required this.onDelete});
+  const _WeighInRow({
+    required this.entry,
+    required this.unit,
+    required this.onDelete,
+  });
 
   final WeightEntry entry;
+  final WeightUnit unit;
   final VoidCallback onDelete;
 
   @override
@@ -565,7 +618,7 @@ class _WeighInRow extends StatelessWidget {
               const SizedBox(width: 8),
             ],
             Text(
-              '${entry.weightKg.toStringAsFixed(1)} kg',
+              formatWeight(entry.weightKg, unit),
               style: AppTheme.display.copyWith(
                 fontSize: 18,
                 color: AppColors.textPrimary,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/widgets/clickable.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
@@ -176,20 +177,25 @@ class PaceCard extends StatelessWidget {
   const PaceCard({
     super.key,
     required this.pace,
+    required this.weightUnit,
     required this.selected,
     required this.onTap,
   });
 
   final WeightLossPace pace;
+  final WeightUnit weightUnit;
   final bool selected;
   final VoidCallback onTap;
 
-  static String _title(WeightLossPace pace) => switch (pace) {
-    WeightLossPace.slow => 'Slow - 0.25 kg/week',
-    WeightLossPace.moderate => 'Moderate - 0.5 kg/week',
-    WeightLossPace.fast => 'Fast - 0.75 kg/week',
-    WeightLossPace.maintain => 'Maintain weight',
-  };
+  String _title(WeightLossPace pace) {
+    String perWeek(double kg) => '${formatPace(kg, weightUnit)}/week';
+    return switch (pace) {
+      WeightLossPace.slow => 'Slow - ${perWeek(0.25)}',
+      WeightLossPace.moderate => 'Moderate - ${perWeek(0.5)}',
+      WeightLossPace.fast => 'Fast - ${perWeek(0.75)}',
+      WeightLossPace.maintain => 'Maintain weight',
+    };
+  }
 
   static String _description(WeightLossPace pace) => switch (pace) {
     WeightLossPace.slow =>
