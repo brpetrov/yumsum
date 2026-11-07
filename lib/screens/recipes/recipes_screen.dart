@@ -124,7 +124,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
                   for (final recipe in cooked)
                     ActionChip(
                       avatar: const Icon(Icons.add_rounded, size: 18),
-                      label: Text(recipe.name),
+                      label: Text(recipe.nameIn(l10n.localeName)),
                       onPressed: () => logRecipePortion(context, ref, recipe),
                     ),
                 ]),
@@ -270,7 +270,7 @@ class _RecipeTile extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  recipe.name,
+                  recipe.nameIn(l10n.localeName),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(

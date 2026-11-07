@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:lean_streak/l10n/app_localizations.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/nutrients.dart';
 
 /// Where the recipe photos are served from. They ship with the website
@@ -50,6 +50,17 @@ typedef Ingredient = ({
   Nutrients? macros,
 });
 
+/// A recipe's words in one language: what the list and the recipe page
+/// show. The ingredients are in the library's order, one for each English
+/// one, whose figures they share.
+typedef RecipeText = ({
+  String name,
+  String? description,
+  String cuisine,
+  List<({String item, String amount})> ingredients,
+  List<String> steps,
+});
+
 final _idPattern = RegExp(r'^[a-z0-9]+(-[a-z0-9]+)*$');
 
 const _macroKeys = ['fat', 'saturates', 'carbs', 'sugars', 'fibre', 'salt'];
@@ -72,6 +83,7 @@ class Recipe {
     required this.macrosPerPortion,
     required this.ingredients,
     required this.steps,
+    this.bg,
   });
 
   final String id;
@@ -95,6 +107,10 @@ class Recipe {
   final List<Ingredient> ingredients;
   final List<String> steps;
 
+  /// The Bulgarian, shown when the app is in Bulgarian. Every library
+  /// recipe has it; the fields above are the English.
+  final RecipeText? bg;
+
   /// Reads one recipe strictly: anything missing or out of range throws a
   /// [FormatException] naming the recipe and the field, so a bad library
   /// fails its test instead of showing odd numbers.
@@ -103,13 +119,32 @@ class Recipe {
     final label = 'recipe ${id is String ? id : '?'}';
     Never bad(String field) => throw FormatException('$label: $field');
 
-    String text(String field, int max, {bool optional = false}) {
-      final value = json[field];
+    String textIn(
+      Map<String, dynamic> from,
+      String field,
+      int max, {
+      bool optional = false,
+    }) {
+      final value = from[field];
       if (value == null && optional) return '';
       if (value is! String || value.trim().isEmpty || value.length > max) {
-        bad(field);
+        bad(from == json ? field : 'bg.$field');
       }
       return value.trim();
+    }
+
+    String text(String field, int max, {bool optional = false}) =>
+        textIn(json, field, max, optional: optional);
+
+    List<String> lines(Object? raw, String field) {
+      if (raw is! List || raw.isEmpty) bad(field);
+      return [
+        for (final line in raw)
+          if (line is String && line.trim().isNotEmpty)
+            line.trim()
+          else
+            bad(field),
+      ];
     }
 
     int number(String field, int min, int max) {
@@ -175,15 +210,36 @@ class Recipe {
           bad('ingredients'),
     ];
 
-    final rawSteps = json['steps'];
-    if (rawSteps is! List || rawSteps.isEmpty) bad('steps');
-    final steps = [
-      for (final step in rawSteps)
-        if (step is String && step.trim().isNotEmpty)
-          step.trim()
-        else
-          bad('steps'),
-    ];
+    final steps = lines(json['steps'], 'steps');
+
+    // The Bulgarian: the same words, and an item and amount for each
+    // ingredient, in the same order.
+    RecipeText? bulgarian() {
+      final raw = json['bg'];
+      if (raw == null) return null;
+      if (raw is! Map<String, dynamic>) bad('bg');
+      final items = raw['ingredients'];
+      if (items is! List || items.length != ingredients.length) {
+        bad('bg.ingredients');
+      }
+      final description = textIn(raw, 'description', 140, optional: true);
+      return (
+        name: textIn(raw, 'name', 60),
+        description: description.isEmpty ? null : description,
+        cuisine: textIn(raw, 'cuisine', 30),
+        ingredients: [
+          for (final entry in items)
+            if (entry is Map<String, dynamic>)
+              (
+                item: textIn(entry, 'item', 80),
+                amount: textIn(entry, 'amount', 40),
+              )
+            else
+              bad('bg.ingredients'),
+        ],
+        steps: lines(raw['steps'], 'bg.steps'),
+      );
+    }
 
     final description = text('description', 140, optional: true);
     final minutes = number('minutes', 1, 600);
@@ -211,6 +267,7 @@ class Recipe {
       ),
       ingredients: ingredients,
       steps: steps,
+      bg: bulgarian(),
     );
   }
 
@@ -226,11 +283,40 @@ class Recipe {
   int proteinFor(double portions) => (proteinPerPortion * portions).round();
   Nutrients macrosFor(double portions) => macrosPerPortion.scaled(portions);
 
-  /// What a logged meal of [portions] is called, so the day's list explains
-  /// its calories: "Pasta bolognese", or "Pasta bolognese × 1.5".
-  String mealName(double portions) => portions == 1
-      ? name
-      : '$name × ${portions % 1 == 0 ? portions.toInt() : portions}';
+  /// Its words in [language] ('en' or 'bg'): the Bulgarian where it has
+  /// them, else the English.
+  RecipeText textIn(String language) => language == 'bg' && bg != null
+      ? bg!
+      : (
+          name: name,
+          description: description,
+          cuisine: cuisine,
+          ingredients: [
+            for (final i in ingredients) (item: i.item, amount: i.amount),
+          ],
+          steps: steps,
+        );
+
+  /// Its name in [language].
+  String nameIn(String language) => language == 'bg' ? bg?.name ?? name : name;
+
+  /// Whether [text] is its name in any language, whatever the case: a meal
+  /// logged in English is still this recipe once the app is in Bulgarian,
+  /// and the other way round.
+  bool isNamed(String text) {
+    final wanted = text.trim().toLowerCase();
+    return wanted == name.toLowerCase() || wanted == bg?.name.toLowerCase();
+  }
+
+  /// What a logged meal of [portions] is called, in [l10n]'s language, so
+  /// the day's list explains its calories: "Pasta bolognese", or "Pasta
+  /// bolognese × 1.5", "Паста болонезе × 1,5".
+  String mealName(double portions, AppLocalizations l10n) {
+    final shown = nameIn(l10n.localeName);
+    if (portions == 1) return shown;
+    return '$shown × '
+        '${portions % 1 == 0 ? portions.toInt() : l10n.decimal(portions)}';
+  }
 }
 
 /// The library file, a JSON array of recipes, in its own order.

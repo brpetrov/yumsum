@@ -132,6 +132,40 @@ void main() {
     );
   });
 
+  test('in Bulgarian, a recipe is found by either name and offered by its '
+      'Bulgarian one, unless logged under either', () {
+    final bulgarian = [
+      testRecipe('Pasta bolognese', bgName: 'Паста болонезе'),
+      testRecipe('Chicken soup', bgName: 'Пилешка супа'),
+    ];
+    List<String> offered(String query, [List<Meal> recents = const []]) =>
+        _names(
+          suggestionsFor(
+            recents: recents,
+            recipes: bulgarian,
+            query: query,
+            now: _now,
+            language: 'bg',
+          ),
+        );
+
+    expect(offered('болон'), ['Паста болонезе (recipe)']);
+    expect(offered('bolog'), ['Паста болонезе (recipe)']);
+    expect(offered('паста', [_meal('Паста болонезе')]), ['Паста болонезе']);
+    expect(offered('bolog', [_meal('Pasta bolognese')]), ['Pasta bolognese']);
+    expect(
+      _names(
+        suggestionsFor(
+          recents: const [],
+          recipes: bulgarian,
+          query: 'супа',
+          now: _now,
+        ),
+      ),
+      ['Chicken soup (recipe)'],
+    );
+  });
+
   test('with no own meals, recipes fill the row', () {
     expect(
       _names(

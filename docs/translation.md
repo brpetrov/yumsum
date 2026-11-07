@@ -145,10 +145,19 @@ The Bulgarian the app uses for its own words. Keep to it in new text.
 
 Address the user as "ти" and keep lines free of the user's gender: „Колко тежиш сега?“ and „Какъв е ръстът ти?“, not „Колко си висок?“; „Не може да се отмени.“ rather than „Сигурен ли си?“.
 
+## Recipes
+
+The library's words are content, not ARB strings: each recipe in `assets/recipes/recipes.json` has a `bg` object with its `name`, `description`, `cuisine`, `ingredients` (`item` and `amount`, one for each English ingredient, in order) and `steps`. `Recipe.textIn(context.l10n.localeName)` picks the language; `test/recipes_asset_test.dart` fails a recipe without complete Bulgarian. A new recipe needs its `bg` too.
+
+- Steps say "ти" in the imperative („Нарежи“, „Загрей“, „Раздели в 2 чинии“), with no forms that show the reader's gender.
+- Ingredients by their shop names: кисело мляко, цедено кисело мляко (Greek yoghurt), извара (quark and cottage cheese), сирене (feta and sirene), пилешко филе, филе от пилешки бут, овесени ядки, гъби печурки, зелен фасул, риба тон в собствен сос, заквасена сметана (crème fraîche), прясно мляко 1,5%, „неварен“ for dried pasta and rice.
+- Amounts in г, мл, л, с. л., ч. л., бр., глава, скилидки, филии; „на вкус“, „за сервиране“; decimal commas (1,5 л).
+- Times as the page bolds them: „5 минути“, „1 минута“, „10–12 минути“ (an en dash, no spaces), „6 часа“, „30 секунди“; ovens „220°C (200°C с вентилатор)“. Keep every number the English step has.
+- Dish names translated where Bulgarians would (Пилешко къри с ориз, Пълнени яйца), well-known foreign ones in Cyrillic (Менемен, Бьоф Строганов, Чили кон карне). Cuisines as „Гръцка кухня“.
+- Names must differ from every other recipe's name in either language: a logged meal is matched to its recipe by name.
+
 ## To translate
 
-Everything the app shows in `lib/` is in the ARBs. Owner-only Debug tools (`lib/screens/debug/`, `lib/providers/debug_provider.dart`), the AI's facts (`lib/helpers/week_facts.dart`), the country names sent to the AI (`lib/models/user_profile.dart`), log lines and exceptions nobody sees stay English. Still English, for the owner to decide:
-
-- `assets/recipes/recipes.json`: 40 recipes' names, ingredients and steps, which are content, not ARB strings.
+Everything the app shows in `lib/` is in the ARBs, and the recipes carry their own Bulgarian (`bg` in `assets/recipes/recipes.json`, see Recipes above). Owner-only Debug tools (`lib/screens/debug/`, `lib/providers/debug_provider.dart`), the AI's facts (`lib/helpers/week_facts.dart`), the country names sent to the AI (`lib/models/user_profile.dart`), log lines and exceptions nobody sees stay English. Nothing else is left to translate.
 
 The legal pages have Bulgarian copies, `tools/hosting/privacy-bg.html` and `terms-bg.html` (`/privacy-bg`, `/terms-bg`), which the app opens in Bulgarian. The English is the one that counts: change the Bulgarian with it, keeping the same meaning, data and periods.

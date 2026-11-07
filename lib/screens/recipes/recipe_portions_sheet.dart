@@ -79,7 +79,7 @@ class _PortionsSheetState extends State<_PortionsSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      recipe.name,
+                      recipe.nameIn(l10n.localeName),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,

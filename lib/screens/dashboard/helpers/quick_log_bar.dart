@@ -654,6 +654,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
             recipes: recipes,
             query: _name.text,
             now: DateTime.now(),
+            language: context.l10n.localeName,
           )
         : const <MealSuggestion>[];
     // A name without calories can be searched for, while the chip is

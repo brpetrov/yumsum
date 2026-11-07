@@ -86,6 +86,7 @@ class _RecipeBody extends ConsumerWidget {
     final showProtein = ref.watch(trackProteinProvider);
     final showMacros = ref.watch(showMacrosProvider);
     final muted = TextStyle(fontSize: 14.5, color: AppColors.textSecondary);
+    final text = recipe.textIn(l10n.localeName);
 
     final photo = ClipRRect(
       borderRadius: BorderRadius.circular(AppTheme.cardRadius),
@@ -109,14 +110,14 @@ class _RecipeBody extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          recipe.name,
+          text.name,
           style: AppTheme.display.copyWith(
             fontSize: 26,
             color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 4),
-        Text([recipe.cuisine, ?recipe.description].join(' · '), style: muted),
+        Text([text.cuisine, ?text.description].join(' · '), style: muted),
         const SizedBox(height: 12),
         Text(
           showProtein
@@ -139,8 +140,8 @@ class _RecipeBody extends ConsumerWidget {
         _Facts(recipe: recipe),
       ],
     );
-    final ingredients = _Ingredients(recipe: recipe);
-    final steps = _Steps(recipe: recipe);
+    final ingredients = _Ingredients(recipe: recipe, text: text);
+    final steps = _Steps(text.steps);
 
     return SingleChildScrollView(
       child: ResponsivePage(
@@ -246,12 +247,17 @@ class _Facts extends StatelessWidget {
   }
 }
 
-final _numberSpace = RegExp(r'(\d) ');
+/// A number, or the first half of a Bulgarian spoon („2 с. л.“), and the
+/// space after it.
+final _numberSpace = RegExp(r'([\d½]|[чс]\.) ');
 
 class _Ingredients extends StatelessWidget {
-  const _Ingredients({required this.recipe});
+  const _Ingredients({required this.recipe, required this.text});
 
   final Recipe recipe;
+
+  /// [recipe]'s words in the app's language.
+  final RecipeText text;
 
   @override
   Widget build(BuildContext context) {
@@ -265,7 +271,7 @@ class _Ingredients extends StatelessWidget {
             style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 8),
-          for (final (i, ingredient) in recipe.ingredients.indexed) ...[
+          for (final (i, ingredient) in text.ingredients.indexed) ...[
             if (i > 0) Divider(height: 1, color: AppColors.divider),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
@@ -276,7 +282,7 @@ class _Ingredients extends StatelessWidget {
                     width: 88,
                     child: Text(
                       // A number stays with its unit: "2 tins" / "(800 g)",
-                      // never "(800" / "g)".
+                      // never "(800" / "g)"; and „с. л.“ stays whole.
                       ingredient.amount.replaceAllMapped(
                         _numberSpace,
                         (m) => '${m[1]} ',
@@ -309,15 +315,18 @@ class _Ingredients extends StatelessWidget {
 }
 
 /// Times and oven temperatures in a step: "5 minutes", "10 to 12 minutes",
-/// "220°C (200°C fan)".
+/// "220°C (200°C fan)", and in Bulgarian „1 час“, „10–12 минути“,
+/// „220°C (200°C с вентилатор)“.
 final _timeOrHeat = RegExp(
-  r'\d+(?: to \d+)? (?:minutes?|seconds?|hours?)|\d+°C(?: \(\d+°C fan\))?',
+  r'\d+(?: to \d+|–\d+)? (?:minutes?|seconds?|hours?|минут[аи]|секунд[аи]|'
+  r'час(?:а|ове)?(?![а-я]))|\d+°C(?: \(\d+°C (?:fan|с вентилатор)\))?',
 );
 
 class _Steps extends StatelessWidget {
-  const _Steps({required this.recipe});
+  const _Steps(this.steps);
 
-  final Recipe recipe;
+  /// In the app's language.
+  final List<String> steps;
 
   /// [step] with its times and temperatures in bold, so they stand out.
   static TextSpan _spans(String step) {
@@ -345,11 +354,9 @@ class _Steps extends StatelessWidget {
         children: [
           Text(context.l10n.recipesHowToMake, style: _heading),
           const SizedBox(height: 14),
-          for (final (i, step) in recipe.steps.indexed)
+          for (final (i, step) in steps.indexed)
             Padding(
-              padding: EdgeInsets.only(
-                bottom: i == recipe.steps.length - 1 ? 0 : 16,
-              ),
+              padding: EdgeInsets.only(bottom: i == steps.length - 1 ? 0 : 16),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

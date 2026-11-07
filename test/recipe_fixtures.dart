@@ -12,8 +12,10 @@ final testPixel = base64Decode(
 /// Stands in for the website: every photo is the test pixel.
 ImageProvider pixelImage(String url) => MemoryImage(testPixel);
 
+/// A recipe with [name], and [bgName] as its Bulgarian name when given.
 Recipe testRecipe(
   String name, {
+  String? bgName,
   RecipeCategory category = RecipeCategory.dinner,
   int kcal = 500,
   int protein = 40,
@@ -57,4 +59,16 @@ Recipe testRecipe(
     ),
   ],
   steps: const ['Brown the mince for 5 minutes.', 'Simmer and serve.'],
+  bg: bgName == null
+      ? null
+      : (
+          name: bgName,
+          description: null,
+          cuisine: 'Италианска кухня',
+          ingredients: const [
+            (item: 'Телешка кайма', amount: '500 г'),
+            (item: 'Спагети', amount: '320 г'),
+          ],
+          steps: const ['Запържи каймата 5 минути.', 'Остави да къкри.'],
+        ),
 );

@@ -28,7 +28,24 @@
       "Spoon the yoghurt into a bowl and smooth the top.",
       "Scatter over the berries, oats and walnuts. Frozen berries can go straight on; they soften in about 5 minutes.",
       "Drizzle over the honey and eat straight away."
-    ]
+    ],
+    "bg": {
+      "name": "Цедено кисело мляко с горски плодове",
+      "description": "Гъсто кисело мляко с горски плодове, овесени ядки и мед.",
+      "cuisine": "Гръцка кухня",
+      "ingredients": [
+        {"item": "Цедено кисело мляко, 0% масленост", "amount": "250 г"},
+        {"item": "Горски плодове, пресни или замразени", "amount": "100 г"},
+        {"item": "Овесени ядки", "amount": "25 г"},
+        {"item": "Мед", "amount": "1 ч. л."},
+        {"item": "Орехи, натрошени", "amount": "5 г"}
+      ],
+      "steps": [
+        "Сложи киселото мляко в купичка и заглади отгоре.",
+        "Поръси с горските плодове, овесените ядки и орехите. Замразените плодове може да сложиш направо: омекват за около 5 минути.",
+        "Полей с меда и хапни веднага."
+      ]
+    }
   },
   {
     "id": "tofu-scramble",
@@ -63,7 +80,28 @@
       "Crumble the tofu into the pan with your fingers, then stir in the turmeric, smoked paprika and a pinch of salt and pepper. Fry for 5 minutes, stirring, until hot and lightly golden. Meanwhile, toast the bread.",
       "Add the tomatoes and spinach and stir for 2 minutes, until the spinach has wilted.",
       "Split the scramble between 2 plates and serve with the toast."
-    ]
+    ],
+    "bg": {
+      "name": "Бъркано тофу с препечен хляб",
+      "description": "Натрошено тофу със спанак и домати: веган вариант на бърканите яйца.",
+      "cuisine": "Британска кухня",
+      "ingredients": [
+        {"item": "Тофу, твърдо", "amount": "300 г"},
+        {"item": "Спанак", "amount": "100 г"},
+        {"item": "Чери домати, разрязани наполовина", "amount": "150 г"},
+        {"item": "Лук, нарязан", "amount": "½ глава"},
+        {"item": "Куркума и пушен червен пипер", "amount": "по ½ ч. л."},
+        {"item": "Зехтин", "amount": "2 ч. л."},
+        {"item": "Пълнозърнест хляб", "amount": "2 филии (80 г)"}
+      ],
+      "steps": [
+        "Нарежи лука и разрежи доматите наполовина. Подсуши тофуто с кухненска хартия.",
+        "Загрей зехтина в голям тиган на среден огън. Добави лука и го задушавай 3 минути, като разбъркваш от време на време, докато омекне.",
+        "Натроши тофуто с пръсти в тигана, после добави куркумата, пушения червен пипер и по щипка сол и черен пипер. Пържи 5 минути, като разбъркваш, докато се затопли и леко позлатее. Междувременно препечи хляба.",
+        "Добави доматите и спанака и разбърквай 2 минути, докато спанакът омекне.",
+        "Раздели бърканото тофу в 2 чинии и сервирай с препечения хляб."
+      ]
+    }
   },
   {
     "id": "quark-pancakes",
@@ -97,7 +135,27 @@
       "Drop in heaped tablespoons of batter, spaced apart, and flatten them slightly. Cook for 2 to 3 minutes a side, until golden and set in the middle.",
       "Keep the cooked pancakes warm on a plate while you fry the rest, adding a little butter each time. You should get about 10.",
       "Split the pancakes between 2 plates and top with the berries and honey."
-    ]
+    ],
+    "bg": {
+      "name": "Изварени палачинки",
+      "description": "Полските placki z twarogu: меки палачинки, почти изцяло от извара.",
+      "cuisine": "Полска кухня",
+      "ingredients": [
+        {"item": "Извара", "amount": "250 г"},
+        {"item": "Яйца", "amount": "2 бр."},
+        {"item": "Бяло брашно", "amount": "60 г"},
+        {"item": "Краве масло, за пържене", "amount": "10 г"},
+        {"item": "Горски плодове, пресни или замразени", "amount": "150 г"},
+        {"item": "Мед", "amount": "2 ч. л."}
+      ],
+      "steps": [
+        "Разбъркай добре изварата с яйцата в купа, после добави брашното и забъркай гъсто тесто.",
+        "Загрей малко от маслото в голям незалепващ тиган на среден огън.",
+        "Сипвай тестото с препълнена супена лъжица, на купчинки с разстояние помежду им, и леко ги сплескай. Пържи по 2–3 минути от всяка страна, докато се зачервят и се стегнат в средата.",
+        "Дръж готовите палачинки топли в чиния, докато изпържиш останалите, като всеки път добавяш малко масло. Трябва да станат около 10.",
+        "Раздели палачинките в 2 чинии и сложи отгоре горските плодове и меда."
+      ]
+    }
   },
   {
     "id": "lighter-full-english",
@@ -132,7 +190,28 @@
       "Meanwhile, warm the beans in a small pan over a low heat for 4 to 5 minutes, stirring now and then.",
       "Poach the eggs: bring a deep pan of water to a gentle simmer, crack in the eggs one at a time and cook for 3 to 4 minutes, until the whites are set. Lift them out with a slotted spoon.",
       "Toast the bread, then split everything between 2 plates."
-    ]
+    ],
+    "bg": {
+      "name": "Олекотена английска закуска",
+      "description": "Яйца, бекон, боб, гъби и домати, на грил вместо пържени.",
+      "cuisine": "Британска кухня",
+      "ingredients": [
+        {"item": "Яйца", "amount": "4 бр."},
+        {"item": "Постен бекон", "amount": "4 филийки (120 г)"},
+        {"item": "Боб в доматен сос, с по-малко захар", "amount": "200 г"},
+        {"item": "Гъби печурки", "amount": "150 г"},
+        {"item": "Домати, разрязани наполовина", "amount": "2 бр. (200 г)"},
+        {"item": "Пълнозърнест хляб", "amount": "2 филии (80 г)"},
+        {"item": "Зехтин", "amount": "1 ч. л."}
+      ],
+      "steps": [
+        "Загрей грила на фурната на най-силно. Разрежи доматите наполовина и почисти гъбите с влажна кърпа.",
+        "Подреди бекона, гъбите и доматите (с разрязаната страна нагоре) в тавата на грила и намажи зеленчуците със зехтина. Печи 8–10 минути, като обърнеш бекона и гъбите по средата, докато беконът се изпече.",
+        "Междувременно затопли боба в малка тенджера на слаб огън за 4–5 минути, като разбъркваш от време на време.",
+        "Направи яйцата поширани: доведи вода в дълбока тенджера до леко къкрене, счупи яйцата едно по едно в нея и ги вари 3–4 минути, докато белтъците се стегнат. Извади ги с решетъчна лъжица.",
+        "Препечи хляба и раздели всичко в 2 чинии."
+      ]
+    }
   },
   {
     "id": "skyr-overnight-oats",
@@ -164,7 +243,25 @@
       "Stir the oats, skyr, milk and chia seeds together in a bowl until there are no dry bits.",
       "Split between 2 jars or boxes, cover and put in the fridge for at least 6 hours, or overnight.",
       "In the morning, give each jar a stir and top with the berries and honey. Eat cold. They keep in the fridge for up to 2 days."
-    ]
+    ],
+    "bg": {
+      "name": "Овесена каша със скир за през нощта",
+      "description": "Овесени ядки, накиснати за през нощта в скир и мляко, готови, когато пожелаеш.",
+      "cuisine": "Скандинавска кухня",
+      "ingredients": [
+        {"item": "Овесени ядки", "amount": "100 г"},
+        {"item": "Скир или цедено кисело мляко, без добавки", "amount": "300 г"},
+        {"item": "Прясно мляко, 1,5% масленост", "amount": "200 мл"},
+        {"item": "Семена от чиа", "amount": "1 с. л. (15 г)"},
+        {"item": "Горски плодове, пресни или замразени", "amount": "150 г"},
+        {"item": "Мед", "amount": "2 ч. л."}
+      ],
+      "steps": [
+        "Разбъркай в купа овесените ядки, скира, млякото и семената от чиа, докато не останат сухи бучки.",
+        "Раздели в 2 буркана или кутии, покрий ги и ги остави в хладилника поне 6 часа или за през нощта.",
+        "Сутринта разбъркай всеки буркан и сложи отгоре горските плодове и меда. Яж студено. Издържат в хладилника до 2 дни."
+      ]
+    }
   },
   {
     "id": "smoked-salmon-eggs-on-rye",
@@ -197,7 +294,26 @@
       "Toast the rye bread.",
       "Melt the butter in a non-stick pan over a low heat. Pour in the eggs and stir gently for 3 to 4 minutes, until softly set. Take the pan off the heat while they still look a little wet; they keep cooking.",
       "Split the toast between 2 plates. Top with the cucumber, then the eggs and smoked salmon, and scatter over the dill."
-    ]
+    ],
+    "bg": {
+      "name": "Пушена сьомга и яйца на ръжен хляб",
+      "description": "Меки бъркани яйца и пушена сьомга върху тъмен ръжен хляб.",
+      "cuisine": "Скандинавска кухня",
+      "ingredients": [
+        {"item": "Ръжен хляб", "amount": "4 филии (160 г)"},
+        {"item": "Яйца", "amount": "4 бр."},
+        {"item": "Пушена сьомга", "amount": "100 г"},
+        {"item": "Краставица, на кръгчета", "amount": "100 г"},
+        {"item": "Краве масло", "amount": "10 г"},
+        {"item": "Пресен копър", "amount": "няколко стръка"}
+      ],
+      "steps": [
+        "Нарежи краставицата на кръгчета и накълцай копъра. Разбий яйцата в купа с щипка сол и черен пипер.",
+        "Препечи ръжения хляб.",
+        "Разтопи маслото в незалепващ тиган на слаб огън. Изсипи яйцата и разбърквай внимателно 3–4 минути, докато леко се стегнат. Свали тигана от огъня, докато още изглеждат малко влажни: те продължават да се готвят.",
+        "Раздели хляба в 2 чинии. Сложи отгоре краставицата, после яйцата и пушената сьомга и поръси с копъра."
+      ]
+    }
   },
   {
     "id": "tomato-feta-omelette",
@@ -230,7 +346,26 @@
       "Heat the oil in a small non-stick frying pan over a medium heat. Add the tomatoes and spinach and stir for 1 minute, until the spinach wilts.",
       "Pour in the eggs and tilt the pan so they spread evenly. Cook for 2 to 3 minutes, pulling the edges into the middle now and then, until almost set on top. Meanwhile, toast the bread.",
       "Scatter the feta over half the omelette, fold it over and slide it onto a plate. Serve with the toast."
-    ]
+    ],
+    "bg": {
+      "name": "Омлет с домати и сирене",
+      "description": "Омлет от три яйца със спанак, домати и сирене.",
+      "cuisine": "Гръцка кухня",
+      "ingredients": [
+        {"item": "Яйца", "amount": "3 бр."},
+        {"item": "Сирене, натрошено", "amount": "30 г"},
+        {"item": "Чери домати, разрязани наполовина", "amount": "80 г"},
+        {"item": "Спанак", "amount": "40 г"},
+        {"item": "Зехтин", "amount": "1 ч. л."},
+        {"item": "Пълнозърнест хляб", "amount": "1 филия (40 г)"}
+      ],
+      "steps": [
+        "Разрежи доматите наполовина и натроши сиренето. Разбий яйцата в купа с щипка черен пипер (сиренето е достатъчно солено).",
+        "Загрей зехтина в малък незалепващ тиган на среден огън. Добави доматите и спанака и разбърквай 1 минута, докато спанакът омекне.",
+        "Изсипи яйцата и наклони тигана, за да се разлеят равномерно. Готви 2–3 минути, като от време на време придърпваш краищата към средата, докато отгоре почти се стегнат. Междувременно препечи хляба.",
+        "Поръси сиренето върху едната половина на омлета, прегъни другата върху нея и го плъзни в чиния. Сервирай с препечения хляб."
+      ]
+    }
   },
   {
     "id": "menemen",
@@ -266,7 +401,29 @@
       "Add the tomatoes and cook for 5 minutes, stirring, until they break down into a thick sauce. Meanwhile, toast the bread.",
       "Turn the heat to low and pour in the eggs. Stir gently for 3 to 4 minutes, until just set but still soft.",
       "Split between 2 plates, scatter over the feta and chilli flakes, and serve with the toast."
-    ]
+    ],
+    "bg": {
+      "name": "Менемен",
+      "description": "Турски яйца, сготвени с домати и чушки, със сирене.",
+      "cuisine": "Турска кухня",
+      "ingredients": [
+        {"item": "Яйца", "amount": "6 бр."},
+        {"item": "Зелени чушки, нарязани", "amount": "2 бр. (300 г)"},
+        {"item": "Домати, нарязани", "amount": "3 бр. (300 г)"},
+        {"item": "Лук, нарязан", "amount": "1 глава"},
+        {"item": "Зехтин", "amount": "2 ч. л."},
+        {"item": "Сирене, натрошено", "amount": "40 г"},
+        {"item": "Пълнозърнест хляб", "amount": "2 филии (80 г)"},
+        {"item": "Чили на люспи", "amount": "щипка"}
+      ],
+      "steps": [
+        "Нарежи лука, чушките и доматите. Разбий яйцата в купа с щипка сол и черен пипер.",
+        "Загрей зехтина в голям тиган на среден огън. Добави лука и чушките и ги задушавай 5 минути, като разбъркваш от време на време, докато омекнат.",
+        "Добави доматите и готви 5 минути, като разбъркваш, докато се разпаднат в гъст сос. Междувременно препечи хляба.",
+        "Намали котлона на слаб огън и изсипи яйцата. Разбърквай внимателно 3–4 минути, докато едва се стегнат, но останат меки.",
+        "Раздели в 2 чинии, поръси със сиренето и чилито и сервирай с препечения хляб."
+      ]
+    }
   },
   {
     "id": "chicken-noodle-soup",
@@ -302,7 +459,29 @@
       "Lift out the chicken and shred it with 2 forks. Lift out the onion and bay leaf too and throw them away.",
       "Add the noodles to the pan and simmer for 4 minutes, until soft. Stir the chicken back in and season with black pepper and a little salt.",
       "Split between 4 bowls and scatter with chopped parsley. Leftovers keep in the fridge for up to 2 days; reheat until piping hot."
-    ]
+    ],
+    "bg": {
+      "name": "Пилешка супа с фиде",
+      "description": "Бърз вариант на полския бульон rosół, с моркови и фиде.",
+      "cuisine": "Полска кухня",
+      "ingredients": [
+        {"item": "Пилешко филе", "amount": "500 г"},
+        {"item": "Моркови, на кръгчета", "amount": "2 бр."},
+        {"item": "Стръкова целина, нарязана", "amount": "2 стръка"},
+        {"item": "Лук, разрязан наполовина", "amount": "1 глава"},
+        {"item": "Пилешки бульон", "amount": "1,5 л"},
+        {"item": "Яйчено фиде, неварено", "amount": "120 г"},
+        {"item": "Дафинов лист, черен пипер и магданоз", "amount": "на вкус"}
+      ],
+      "steps": [
+        "Нарежи морковите и целината, обели лука и го разрежи наполовина.",
+        "Сложи пилешкото, морковите, целината, лука и дафиновия лист в голяма тенджера, налей бульона и доведи до кипене на силен огън.",
+        "Намали котлона и остави да къкри леко 20 минути, докато пилешкото се свари напълно, без розово в средата.",
+        "Извади пилешкото и го разкъсай на нишки с 2 вилици. Извади и изхвърли лука и дафиновия лист.",
+        "Добави фидето в тенджерата и вари 4 минути, докато омекне. Върни пилешкото и подправи с черен пипер и малко сол.",
+        "Раздели в 4 купи и поръси с нарязан магданоз. Остатъкът издържа в хладилника до 2 дни; затопли го, докато заври."
+      ]
+    }
   },
   {
     "id": "pea-and-ham-soup",
@@ -338,7 +517,29 @@
       "Add the peas, bring back to a simmer and cook for 3 minutes.",
       "Take the pan off the heat and blend until smooth with a stick blender. Stir in most of the ham and heat gently for 2 minutes.",
       "Split between 4 bowls and top each with a spoonful of yoghurt and the rest of the ham. Keeps in the fridge for up to 2 days, or in the freezer for up to 3 months."
-    ]
+    ],
+    "bg": {
+      "name": "Грахова крем супа с шунка",
+      "description": "Гъста, яркозелена британска класика.",
+      "cuisine": "Британска кухня",
+      "ingredients": [
+        {"item": "Замразен грах", "amount": "800 г"},
+        {"item": "Постна варена шунка, на парченца", "amount": "250 г"},
+        {"item": "Лук, нарязан", "amount": "1 глава"},
+        {"item": "Картоф, на кубчета", "amount": "1 бр. (200 г)"},
+        {"item": "Зехтин", "amount": "1 с. л."},
+        {"item": "Пилешки бульон", "amount": "1 л"},
+        {"item": "Цедено кисело мляко, 0% масленост, за сервиране", "amount": "100 г"}
+      ],
+      "steps": [
+        "Нарежи лука, обели картофа и го нарежи на малки кубчета.",
+        "Загрей зехтина в голяма тенджера на среден огън. Добави лука и го задушавай 5 минути, като разбъркваш от време на време, докато омекне.",
+        "Добави картофа и бульона, доведи до кипене и вари на тих огън 12 минути, докато картофът омекне.",
+        "Добави граха, изчакай отново да закъкри и вари 3 минути.",
+        "Свали тенджерата от котлона и пасирай с пасатор до гладкост. Добави по-голямата част от шунката и затопляй на слаб огън 2 минути.",
+        "Раздели в 4 купи и сложи във всяка по лъжица кисело мляко и от останалата шунка. Издържа в хладилника до 2 дни или във фризера до 3 месеца."
+      ]
+    }
   },
   {
     "id": "tuna-white-bean-salad",
@@ -373,7 +574,28 @@
       "In a large bowl, toss the beans, onion and tomatoes with the oil, a good squeeze of lemon juice and a pinch of salt and pepper.",
       "Gently fold in the tuna in large flakes, and the capers.",
       "Split the rocket between 2 plates and spoon the salad on top."
-    ]
+    ],
+    "bg": {
+      "name": "Салата с риба тон и бял боб",
+      "description": "Италианска салата от продукти в килера, готова за десет минути.",
+      "cuisine": "Италианска кухня",
+      "ingredients": [
+        {"item": "Риба тон в собствен сос, отцедена", "amount": "2 консерви (220 г)"},
+        {"item": "Бял боб (канелини), отцеден", "amount": "1 консерва (240 г)"},
+        {"item": "Червен лук, на тънки резени", "amount": "½ глава"},
+        {"item": "Чери домати, разрязани наполовина", "amount": "200 г"},
+        {"item": "Рукола", "amount": "50 г"},
+        {"item": "Зехтин", "amount": "1 с. л."},
+        {"item": "Лимонов сок и каперси", "amount": "на вкус"}
+      ],
+      "steps": [
+        "Отцеди рибата тон. Отцеди боба, изплакни го под студена вода и го изтръскай.",
+        "Нарежи червения лук на тънки резени и разрежи доматите наполовина.",
+        "В голяма купа разбъркай боба, лука и доматите със зехтина, щедра струя лимонов сок и по щипка сол и черен пипер.",
+        "Внимателно добави рибата тон на едри парчета и каперсите, без да разбъркваш много.",
+        "Раздели руколата в 2 чинии и разпредели салатата отгоре."
+      ]
+    }
   },
   {
     "id": "prawn-egg-open-sandwich",
@@ -407,7 +629,27 @@
       "Move the eggs into a bowl of cold water for 2 minutes, then peel and slice them.",
       "Spread half the yoghurt over the 4 slices of rye bread. Top with the cucumber, egg and prawns, then spoon over the rest of the yoghurt.",
       "Serve 2 slices each."
-    ]
+    ],
+    "bg": {
+      "name": "Отворен сандвич със скариди и яйце",
+      "description": "Ръжен хляб по датски, с яйце, скариди и сос от кисело мляко с копър.",
+      "cuisine": "Датска кухня",
+      "ingredients": [
+        {"item": "Ръжен хляб", "amount": "4 филии (160 г)"},
+        {"item": "Варени скариди", "amount": "200 г"},
+        {"item": "Яйца", "amount": "2 бр."},
+        {"item": "Цедено кисело мляко, 0% масленост", "amount": "60 г"},
+        {"item": "Краставица, на кръгчета", "amount": "100 г"},
+        {"item": "Пресен копър и лимон", "amount": "на вкус"}
+      ],
+      "steps": [
+        "Доведи до кипене вода в малка тенджера. Спусни яйцата с лъжица и ги вари 9 минути.",
+        "Междувременно нарежи краставицата и накълцай копъра. Смеси копъра с киселото мляко, малко лимонов сок и щипка сол.",
+        "Прехвърли яйцата в купа със студена вода за 2 минути, после ги обели и ги нарежи на кръгчета.",
+        "Намажи 4-те филии ръжен хляб с половината сос. Сложи отгоре краставицата, яйцата и скаридите и полей с останалия сос.",
+        "Сервирай по 2 филии на човек."
+      ]
+    }
   },
   {
     "id": "egg-mayo-sandwich",
@@ -441,7 +683,27 @@
       "Mash the eggs with a fork, then mix in the yoghurt, mayonnaise, mustard and a good pinch of black pepper.",
       "Spread the egg mayo over 2 slices of bread, add the cress and the other 2 slices, and cut in half.",
       "One sandwich each. Egg mayo keeps in the fridge for up to 2 days."
-    ]
+    ],
+    "bg": {
+      "name": "Сандвич с яйчена салата",
+      "description": "Класическият сандвич, олекотен с кисело мляко.",
+      "cuisine": "Британска кухня",
+      "ingredients": [
+        {"item": "Яйца", "amount": "5 бр."},
+        {"item": "Цедено кисело мляко, 0% масленост", "amount": "60 г"},
+        {"item": "Лека майонеза", "amount": "1 ч. л."},
+        {"item": "Пълнозърнест хляб", "amount": "4 филии (160 г)"},
+        {"item": "Кресон или рукола", "amount": "шепа"},
+        {"item": "Дижонска горчица и черен пипер", "amount": "½ ч. л."}
+      ],
+      "steps": [
+        "Доведи до кипене вода в тенджера. Спусни яйцата с лъжица и ги вари 10 минути.",
+        "Прехвърли яйцата в купа със студена вода за 3 минути, после ги обели.",
+        "Намачкай яйцата с вилица, после добави киселото мляко, майонезата, горчицата и щедра щипка черен пипер.",
+        "Намажи яйчената салата върху 2 филии хляб, сложи кресона и другите 2 филии и разрежи сандвичите наполовина.",
+        "По един сандвич на човек. Яйчената салата издържа в хладилника до 2 дни."
+      ]
+    }
   },
   {
     "id": "red-lentil-soup",
@@ -478,7 +740,30 @@
       "Add the lentils and stock and bring to the boil. Turn the heat down and simmer for 20 minutes, stirring now and then, until the lentils fall apart.",
       "Blend until smooth with a stick blender, then add a good squeeze of lemon juice and a pinch of salt.",
       "Split between 4 bowls. Keeps in the fridge for up to 2 days, or in the freezer for up to 3 months."
-    ]
+    ],
+    "bg": {
+      "name": "Супа от червена леща",
+      "description": "Турската мерджимек чорба: кадифена, сгряваща и чудесна за обядите през цялата седмица.",
+      "cuisine": "Турска кухня",
+      "ingredients": [
+        {"item": "Червена леща", "amount": "400 г"},
+        {"item": "Лук, нарязан", "amount": "1 глава"},
+        {"item": "Морков, нарязан", "amount": "1 бр."},
+        {"item": "Доматено пюре", "amount": "1 с. л."},
+        {"item": "Зехтин", "amount": "1 с. л."},
+        {"item": "Зеленчуков бульон", "amount": "1,5 л"},
+        {"item": "Смлян кимион и червен пипер", "amount": "по 1 ч. л."},
+        {"item": "Лимонов сок", "amount": "от 1 лимон"}
+      ],
+      "steps": [
+        "Нарежи лука и моркова. Изплакни лещата в цедка под студена вода.",
+        "Загрей зехтина в голяма тенджера на среден огън. Добави лука и моркова и ги задушавай 5 минути, като разбъркваш от време на време, докато омекнат.",
+        "Добави доматеното пюре, кимиона и червения пипер и готви 1 минута.",
+        "Добави лещата и бульона и доведи до кипене. Намали котлона и вари на тих огън 20 минути, като разбъркваш от време на време, докато лещата се разпадне.",
+        "Пасирай с пасатор до гладкост, после добави щедра струя лимонов сок и щипка сол.",
+        "Раздели в 4 купи. Издържа в хладилника до 2 дни или във фризера до 3 месеца."
+      ]
+    }
   },
   {
     "id": "chicken-caesar-salad",
@@ -513,7 +798,28 @@
       "Heat the rest of the oil in the same pan over a medium-high heat. Add the chicken with a pinch of salt and pepper and fry for 6 to 8 minutes, turning, until golden and cooked through with no pink in the middle.",
       "Meanwhile, make the dressing: whisk the yoghurt with a squeeze of lemon, half a crushed garlic clove, a little mustard and most of the Parmesan. Add a splash of water if it's too thick.",
       "Toss the lettuce with the dressing, split between 2 plates, and top with the chicken, croutons and the rest of the Parmesan."
-    ]
+    ],
+    "bg": {
+      "name": "Салата Цезар с пиле",
+      "description": "Хрупкава маруля, пиле и крутони в лек дресинг Цезар с кисело мляко.",
+      "cuisine": "Американска кухня",
+      "ingredients": [
+        {"item": "Пилешко филе", "amount": "300 г"},
+        {"item": "Маруля (ромейн)", "amount": "1 голяма (250 г)"},
+        {"item": "Пълнозърнест хляб, на кубчета", "amount": "2 филии (80 г)"},
+        {"item": "Пармезан, настърган", "amount": "25 г"},
+        {"item": "Цедено кисело мляко, 0% масленост", "amount": "100 г"},
+        {"item": "Зехтин", "amount": "2 ч. л."},
+        {"item": "Лимонов сок, чесън и дижонска горчица", "amount": "на вкус"}
+      ],
+      "steps": [
+        "Нарежи хляба на малки кубчета, а пилешкото – на тънки ивици. Измий марулята, изтръскай я и я накъсай.",
+        "Загрей 1 ч. л. от зехтина в голям тиган на среден огън. Запържи хляба 5 минути, като го обръщаш често, докато стане златист и хрупкав, после го прехвърли в чиния.",
+        "Загрей останалия зехтин в същия тиган на средно силен огън. Добави пилешкото с щипка сол и черен пипер и го пържи 6–8 минути, като го обръщаш, докато се зачерви и се изпече напълно, без розово в средата.",
+        "Междувременно направи дресинга: разбий киселото мляко с малко лимонов сок, половин стрита скилидка чесън, малко горчица и по-голямата част от пармезана. Ако е твърде гъст, добави малко вода.",
+        "Разбъркай марулята с дресинга, раздели в 2 чинии и сложи отгоре пилешкото, крутоните и останалия пармезан."
+      ]
+    }
   },
   {
     "id": "potatoes-herb-quark",
@@ -547,7 +853,27 @@
       "Meanwhile, grate the cucumber and squeeze out the water with your hands. Chop the radishes, chives and dill.",
       "Stir the cucumber, radishes and herbs into the quark with a pinch of salt.",
       "Drain the potatoes and split them between 2 plates with the herb quark. Drizzle the oil over the quark."
-    ]
+    ],
+    "bg": {
+      "name": "Картофи с извара и зелени подправки",
+      "description": "Немските Pellkartoffeln mit Quark: варени картофи с извара, краставица и лук резанка.",
+      "cuisine": "Немска кухня",
+      "ingredients": [
+        {"item": "Млади картофи", "amount": "600 г"},
+        {"item": "Извара", "amount": "400 г"},
+        {"item": "Краставица, настъргана", "amount": "100 г"},
+        {"item": "Репички, нарязани", "amount": "60 г"},
+        {"item": "Ленено олио или зехтин", "amount": "1 ч. л."},
+        {"item": "Лук резанка, копър и сол", "amount": "на вкус"}
+      ],
+      "steps": [
+        "Изтъркай добре картофите (не е нужно да ги белиш) и разрежи наполовина по-едрите. Сложи ги в тенджера със студена подсолена вода.",
+        "Доведи до кипене, после вари на тих огън 15–20 минути, докато ножът влиза лесно.",
+        "Междувременно настържи краставицата и изстискай водата с ръце. Нарежи репичките, лука резанка и копъра.",
+        "Смеси краставицата, репичките и зелените подправки с изварата и щипка сол.",
+        "Отцеди картофите и ги раздели в 2 чинии с изварата. Полей изварата с олиото."
+      ]
+    }
   },
   {
     "id": "tuna-nicoise-salad",
@@ -584,7 +910,30 @@
       "Drain, and put the eggs in cold water for 2 minutes. Peel and quarter the eggs, and halve the potatoes.",
       "Whisk the oil, mustard and vinegar with a pinch of salt and pepper to make the dressing.",
       "Split the lettuce between 2 plates. Top with the potatoes, beans, tomatoes, olives, eggs and the tuna in large flakes, then spoon over the dressing."
-    ]
+    ],
+    "bg": {
+      "name": "Салата Нисоаз с риба тон",
+      "description": "Картофи, зелен фасул, яйца и риба тон с дресинг с горчица.",
+      "cuisine": "Френска кухня",
+      "ingredients": [
+        {"item": "Млади картофи", "amount": "300 г"},
+        {"item": "Зелен фасул", "amount": "150 г"},
+        {"item": "Яйца", "amount": "2 бр."},
+        {"item": "Риба тон в собствен сос, отцедена", "amount": "2 консерви (220 г)"},
+        {"item": "Чери домати", "amount": "150 г"},
+        {"item": "Черни маслини", "amount": "30 г"},
+        {"item": "Зелена салата", "amount": "100 г"},
+        {"item": "Зехтин", "amount": "1 с. л."},
+        {"item": "Дижонска горчица и червен винен оцет", "amount": "по 1 ч. л."}
+      ],
+      "steps": [
+        "Разрежи по-едрите картофи наполовина и почисти краищата на фасула. Сложи картофите в тенджера със студена подсолена вода и доведи до кипене.",
+        "Вари картофите общо 15 минути: след 6 минути спусни яйцата, а за последните 4 минути добави фасула.",
+        "Отцеди и сложи яйцата в студена вода за 2 минути. Обели яйцата и ги нарежи на четвъртинки, а картофите разрежи наполовина.",
+        "За дресинга разбий зехтина, горчицата и оцета с щипка сол и черен пипер.",
+        "Раздели салатата в 2 чинии. Сложи отгоре картофите, фасула, доматите, маслините, яйцата и рибата тон на едри парчета и полей с дресинга."
+      ]
+    }
   },
   {
     "id": "chicken-souvlaki-wrap",
@@ -620,7 +969,29 @@
       "Meanwhile, make the tzatziki: grate the cucumber, squeeze out the water with your hands, and stir it into the yoghurt with a little crushed garlic and a pinch of salt.",
       "Slice the tomato and red onion. Warm the wraps in a dry pan for 30 seconds a side.",
       "Spread the tzatziki over the wraps, add the chicken, tomato and onion, and roll up. One wrap each."
-    ]
+    ],
+    "bg": {
+      "name": "Пилешко сувлаки в тортила",
+      "description": "Пиле с лимон и бързо дзадзики в топла тортила.",
+      "cuisine": "Гръцка кухня",
+      "ingredients": [
+        {"item": "Пилешко филе, на хапки", "amount": "300 г"},
+        {"item": "Пълнозърнести тортили", "amount": "2 бр."},
+        {"item": "Цедено кисело мляко, 0% масленост", "amount": "100 г"},
+        {"item": "Краставица, настъргана", "amount": "80 г"},
+        {"item": "Домат, на резени", "amount": "1 бр."},
+        {"item": "Червен лук, на резени", "amount": "½ глава"},
+        {"item": "Зехтин", "amount": "2 ч. л."},
+        {"item": "Лимонов сок, чесън и сушен риган", "amount": "на вкус"}
+      ],
+      "steps": [
+        "В купа разбъркай пилешкото със зехтина, малко лимонов сок, ригана и щипка сол.",
+        "Загрей голям тиган или грил тиган на средно силен огън. Пържи пилешкото 8–10 минути, като го обръщаш от време на време, докато се зачерви и се изпече напълно, без розово в средата.",
+        "Междувременно направи дзадзикито: настържи краставицата, изстискай водата с ръце и я смеси с киселото мляко, малко стрит чесън и щипка сол.",
+        "Нарежи домата и червения лук. Затопли тортилите в сух тиган по 30 секунди от всяка страна.",
+        "Намажи тортилите с дзадзикито, сложи пилешкото, домата и лука и ги завий на руло. По една тортила на човек."
+      ]
+    }
   },
   {
     "id": "tuna-pasta-salad",
@@ -656,7 +1027,29 @@
       "Drain the pasta, rinse it under cold water until cool, and drain well again.",
       "In a large bowl, mix the yoghurt, mayonnaise, a squeeze of lemon juice and a good pinch of black pepper.",
       "Stir in the pasta, tuna, sweetcorn, pepper and spring onions. Split between 2 bowls or lunch boxes. Keeps in the fridge for up to 2 days."
-    ]
+    ],
+    "bg": {
+      "name": "Салата с паста и риба тон",
+      "description": "Паста, риба тон, царевица и чушки в лек майонезен сос с кисело мляко.",
+      "cuisine": "Британска кухня",
+      "ingredients": [
+        {"item": "Къса паста, неварена", "amount": "140 г"},
+        {"item": "Риба тон в собствен сос, отцедена", "amount": "2 консерви (220 г)"},
+        {"item": "Царевица (консерва), отцедена", "amount": "100 г"},
+        {"item": "Червена чушка, на кубчета", "amount": "1 бр."},
+        {"item": "Зелен лук, нарязан", "amount": "2 стръка"},
+        {"item": "Цедено кисело мляко, 0% масленост", "amount": "60 г"},
+        {"item": "Лека майонеза", "amount": "1 с. л."},
+        {"item": "Лимонов сок и черен пипер", "amount": "на вкус"}
+      ],
+      "steps": [
+        "Доведи до кипене голяма тенджера подсолена вода. Свари пастата за 10–12 минути, или колкото пише на опаковката, докато стане ал денте.",
+        "Междувременно нарежи чушката на кубчета и зеления лук на колелца. Отцеди рибата тон и царевицата.",
+        "Отцеди пастата, изплакни я под студена вода, докато изстине, и я отцеди добре отново.",
+        "В голяма купа смеси киселото мляко, майонезата, малко лимонов сок и щедра щипка черен пипер.",
+        "Добави пастата, рибата тон, царевицата, чушката и зеления лук и разбъркай. Раздели в 2 купи или кутии за обяд. Издържа в хладилника до 2 дни."
+      ]
+    }
   },
   {
     "id": "shopska-salad-chicken",
@@ -693,7 +1086,30 @@
       "Toss the vegetables with the rest of the oil, a splash of vinegar and a pinch of salt.",
       "Warm the pitta in a toaster or a dry pan for 1 to 2 minutes.",
       "Split the salad between 2 plates, grate the cheese over the top and scatter with chopped parsley. Serve with the chicken and pitta."
-    ]
+    ],
+    "bg": {
+      "name": "Шопска салата с пиле",
+      "description": "Българската салата от домати, краставица, чушки и бяло сирене, с пиле.",
+      "cuisine": "Българска кухня",
+      "ingredients": [
+        {"item": "Пилешко филе", "amount": "300 г"},
+        {"item": "Домати, нарязани", "amount": "3 бр. (300 г)"},
+        {"item": "Краставица, нарязана", "amount": "1 бр. (300 г)"},
+        {"item": "Червена чушка, нарязана", "amount": "1 бр."},
+        {"item": "Червен лук, на резени", "amount": "½ глава"},
+        {"item": "Сирене, настъргано", "amount": "50 г"},
+        {"item": "Зехтин", "amount": "2 ч. л."},
+        {"item": "Пълнозърнеста питка", "amount": "2 бр."},
+        {"item": "Винен оцет и магданоз", "amount": "на вкус"}
+      ],
+      "steps": [
+        "Нарежи доматите, краставицата и чушката на хапки, а червения лук – на резени. Сложи ги в голяма купа.",
+        "Нарежи пилешкото на ивици и го подправи със сол и черен пипер. Загрей 1 ч. л. от зехтина в тиган на средно силен огън и пържи пилешкото 6–8 минути, като го обръщаш, докато се зачерви и се изпече напълно, без розово в средата.",
+        "Овкуси зеленчуците с останалия зехтин, малко оцет и щипка сол.",
+        "Затопли питките в тостер или сух тиган за 1–2 минути.",
+        "Раздели салатата в 2 чинии, настържи сиренето отгоре и поръси с нарязан магданоз. Сервирай с пилешкото и питките."
+      ]
+    }
   },
   {
     "id": "turkey-steaks-mustard-mash",
@@ -729,7 +1145,29 @@
       "Boil the green beans in a small pan for 4 minutes, then drain.",
       "Take the frying pan off the heat and stir in the crème fraîche, mustard and a splash of water. Put the steaks back and warm through over a low heat for 1 to 2 minutes, without letting it boil.",
       "Drain the potatoes and mash them with the milk and a pinch of salt. Split the mash, beans, steaks and sauce between 4 plates."
-    ]
+    ],
+    "bg": {
+      "name": "Пуешки пържоли с горчичен сос и пюре",
+      "description": "Бързо запържена пуйка в кремообразен сос с горчица, с картофено пюре и зелен фасул.",
+      "cuisine": "Френска кухня",
+      "ingredients": [
+        {"item": "Пуешко или пилешко филе на пържоли", "amount": "500 г"},
+        {"item": "Картофи", "amount": "800 г"},
+        {"item": "Прясно мляко, 1,5% масленост", "amount": "100 мл"},
+        {"item": "Заквасена сметана, нискомаслена", "amount": "100 г"},
+        {"item": "Дижонска горчица или горчица на зърна", "amount": "1 с. л."},
+        {"item": "Зелен фасул", "amount": "300 г"},
+        {"item": "Зехтин", "amount": "1 ч. л."}
+      ],
+      "steps": [
+        "Обели картофите и ги нарежи на еднакви парчета. Сложи ги в голяма тенджера със студена подсолена вода, доведи до кипене, после вари на тих огън 15–20 минути, докато омекнат.",
+        "Междувременно почисти краищата на фасула и подправи пържолите със сол и черен пипер.",
+        "Когато на картофите им остават около 10 минути, загрей зехтина в голям тиган на средно силен огън. Пържи пържолите по 3–4 минути от всяка страна, докато се изпекат напълно, без розово в средата, после ги прехвърли в чиния.",
+        "Свари фасула в малка тенджера за 4 минути и го отцеди.",
+        "Свали тигана от котлона и разбъркай в него сметаната, горчицата и малко вода. Върни пържолите и ги затопли на слаб огън 1–2 минути, без да оставяш соса да заври.",
+        "Отцеди картофите и ги намачкай на пюре с млякото и щипка сол. Раздели пюрето, фасула, пържолите и соса в 4 чинии."
+      ]
+    }
   },
   {
     "id": "cod-chorizo-white-beans",
@@ -765,7 +1203,29 @@
       "Add the tomatoes, beans, paprika and 3 tbsp water. Simmer for 5 minutes, until the tomatoes soften, then stir in the spinach until it wilts.",
       "Season the fish with salt and pepper and sit it on top of the beans. Cover with a lid (or a baking tray) and cook over a low heat for 8 to 10 minutes, until the fish is white all the way through and flakes easily.",
       "Split the beans and fish between 2 plates."
-    ]
+    ],
+    "bg": {
+      "name": "Треска с чоризо и бял боб",
+      "description": "Крехка бяла риба върху опушен боб с домати и спанак.",
+      "cuisine": "Испанска кухня",
+      "ingredients": [
+        {"item": "Филе от треска или друга бяла риба", "amount": "300 г"},
+        {"item": "Чоризо, на кубчета", "amount": "40 г"},
+        {"item": "Бял боб (канелини), отцеден", "amount": "1 консерва (240 г)"},
+        {"item": "Чери домати, разрязани наполовина", "amount": "200 г"},
+        {"item": "Спанак", "amount": "100 г"},
+        {"item": "Чесън, на филийки", "amount": "2 скилидки"},
+        {"item": "Зехтин", "amount": "1 ч. л."},
+        {"item": "Пушен червен пипер", "amount": "½ ч. л."}
+      ],
+      "steps": [
+        "Нарежи чоризото на кубчета, чесъна на филийки и доматите наполовина. Отцеди и изплакни боба.",
+        "Загрей зехтина в голям тиган на среден огън. Запържи чоризото и чесъна 2 минути, докато чоризото пусне червената си мазнина.",
+        "Добави доматите, боба, червения пипер и 3 с. л. вода. Остави да къкри 5 минути, докато доматите омекнат, после добави спанака и разбъркай, докато омекне.",
+        "Подправи рибата със сол и черен пипер и я сложи върху боба. Покрий с капак (или с тава) и готви на слаб огън 8–10 минути, докато рибата побелее изцяло и лесно се разделя на люспи.",
+        "Раздели боба и рибата в 2 чинии."
+      ]
+    }
   },
   {
     "id": "greek-lemon-chicken-potatoes",
@@ -801,7 +1261,29 @@
       "Pour the stock into the tin and roast for 30 minutes, turning everything halfway, until the potatoes are golden and the chicken is cooked through with no pink in the middle.",
       "For the last few minutes, boil the green beans in a pan of water for 4 minutes, then drain.",
       "Split between 4 plates and spoon over the lemony juices from the tin. Leftovers keep in the fridge for up to 2 days."
-    ]
+    ],
+    "bg": {
+      "name": "Гръцко пиле с лимон и картофи",
+      "description": "Пиле и картофи, печени в една тава с лимон, чесън и риган.",
+      "cuisine": "Гръцка кухня",
+      "ingredients": [
+        {"item": "Пилешко филе от бут, без кожа", "amount": "600 г"},
+        {"item": "Картофи, на резени", "amount": "700 г"},
+        {"item": "Лимон, сок и настъргана кора", "amount": "1 бр."},
+        {"item": "Чесън, смачкан", "amount": "3 скилидки"},
+        {"item": "Зехтин", "amount": "1 с. л."},
+        {"item": "Пилешки бульон", "amount": "150 мл"},
+        {"item": "Сушен риган", "amount": "2 ч. л."},
+        {"item": "Зелен фасул, за гарнитура", "amount": "300 г"}
+      ],
+      "steps": [
+        "Загрей фурната на 220°C (200°C с вентилатор). Нарежи картофите на тънки резени по дължина (не е нужно да ги белиш), настържи кората на лимона, изстискай сока му и смачкай чесъна.",
+        "В голяма тава разбъркай пилешкото и картофите със зехтина, лимоновата кора и сок, чесъна, ригана и щедра щипка сол и черен пипер. Разпредели всичко на един пласт.",
+        "Налей бульона в тавата и печи 30 минути, като обърнеш всичко по средата, докато картофите се зачервят и пилешкото се изпече напълно, без розово в средата.",
+        "Малко преди края свари фасула в тенджера с вода за 4 минути и го отцеди.",
+        "Раздели в 4 чинии и полей с лимоновия сос от тавата. Остатъкът издържа в хладилника до 2 дни."
+      ]
+    }
   },
   {
     "id": "chicken-goulash",
@@ -839,7 +1321,31 @@
       "Stir in the paprika for 1 minute, then add the tomatoes, potatoes, stock and a pinch of salt. Bring to the boil.",
       "Turn the heat down, cover and simmer for 20 minutes, stirring now and then, until the potatoes are tender and the chicken is cooked through.",
       "Split between 4 bowls and top each with a spoonful of yoghurt. Leftovers keep in the fridge for up to 2 days; reheat until piping hot."
-    ]
+    ],
+    "bg": {
+      "name": "Пилешки гулаш",
+      "description": "Унгарска яхния с червен пипер, пиле, чушки и картофи, в една тенджера.",
+      "cuisine": "Унгарска кухня",
+      "ingredients": [
+        {"item": "Пилешко филе от бут, без кожа", "amount": "600 г"},
+        {"item": "Лук, на полумесеци", "amount": "2 глави"},
+        {"item": "Червени чушки, на ивици", "amount": "2 бр."},
+        {"item": "Картофи, на кубчета", "amount": "600 г"},
+        {"item": "Домати на кубчета (консерва)", "amount": "1 консерва (400 г)"},
+        {"item": "Сладък червен пипер", "amount": "2 с. л."},
+        {"item": "Зехтин", "amount": "1 с. л."},
+        {"item": "Пилешки бульон", "amount": "500 мл"},
+        {"item": "Цедено кисело мляко, 0% масленост, за сервиране", "amount": "100 г"}
+      ],
+      "steps": [
+        "Нарежи пилешкото на големи хапки. Нарежи лука и чушките, а картофите – на кубчета от 2 см.",
+        "Загрей зехтина в голяма тенджера на средно силен огън. Добави пилешкото и го запържи 5 минути, като го обръщаш, докато се зачерви от всички страни.",
+        "Добави лука и чушките и ги задушавай 5 минути, като разбъркваш от време на време, докато започнат да омекват.",
+        "Добави червения пипер и разбърквай 1 минута, после добави доматите, картофите, бульона и щипка сол. Доведи до кипене.",
+        "Намали котлона, покрий и остави да къкри 20 минути, като разбъркваш от време на време, докато картофите омекнат и пилешкото се свари напълно.",
+        "Раздели в 4 купи и сложи във всяка по лъжица кисело мляко. Остатъкът издържа в хладилника до 2 дни; затопли го, докато заври."
+      ]
+    }
   },
   {
     "id": "garlic-prawn-spaghetti",
@@ -874,7 +1380,28 @@
       "Meanwhile, heat the oil in a large frying pan over a medium heat. Fry the garlic and a pinch of chilli flakes for 1 minute, then add the tomatoes and cook for 3 minutes, until soft.",
       "Add the prawns and cook for 3 to 4 minutes, stirring, until pink all over.",
       "Toss in the spaghetti, rocket, a squeeze of lemon and a splash of the cooking water. Split between 2 plates and scatter with chopped parsley."
-    ]
+    ],
+    "bg": {
+      "name": "Спагети със скариди и чесън",
+      "description": "Скариди, чери домати, чесън и чили, разбъркани със спагети.",
+      "cuisine": "Италианска кухня",
+      "ingredients": [
+        {"item": "Спагети, неварени", "amount": "160 г"},
+        {"item": "Сурови кралски скариди, пресни или замразени", "amount": "250 г"},
+        {"item": "Чери домати, разрязани наполовина", "amount": "200 г"},
+        {"item": "Чесън, на филийки", "amount": "3 скилидки"},
+        {"item": "Зехтин", "amount": "1 с. л."},
+        {"item": "Рукола или спанак", "amount": "50 г"},
+        {"item": "Чили на люспи, лимон и магданоз", "amount": "на вкус"}
+      ],
+      "steps": [
+        "Доведи до кипене голяма тенджера подсолена вода. Ако скаридите са замразени, сложи ги в купа студена вода за 10 минути да се размразят, после ги отцеди.",
+        "Нарежи чесъна на филийки и доматите наполовина. Свари спагетите за 10–12 минути, или колкото пише на опаковката. Загреби една чаша от водата, в която са варени, после ги отцеди.",
+        "Междувременно загрей зехтина в голям тиган на среден огън. Запържи чесъна и щипка чили за 1 минута, после добави доматите и ги готви 3 минути, докато омекнат.",
+        "Добави скаридите и ги готви 3–4 минути, като разбъркваш, докато порозовеят изцяло.",
+        "Добави спагетите, руколата, малко лимонов сок и малко от водата от варенето и разбъркай. Раздели в 2 чинии и поръси с нарязан магданоз."
+      ]
+    }
   },
   {
     "id": "beef-stroganoff",
@@ -911,7 +1438,30 @@
       "Turn the heat to medium, add the rest of the oil, the onion and the mushrooms, and cook for 6 minutes, stirring now and then, until soft and golden.",
       "Stir in the paprika, mustard and stock and bubble for 2 minutes. Turn the heat to low, stir in the crème fraîche, then add the beef and its juices and warm through for 1 minute, without letting it boil.",
       "Split the noodles or rice between 4 plates and spoon the stroganoff over them."
-    ]
+    ],
+    "bg": {
+      "name": "Бьоф Строганов",
+      "description": "Ивици постно телешко и гъби в лек сметанов сос с червен пипер, с нудли или ориз.",
+      "cuisine": "Източноевропейска кухня",
+      "ingredients": [
+        {"item": "Постно телешко, на тънки ивици", "amount": "500 г"},
+        {"item": "Гъби печурки, нарязани", "amount": "300 г"},
+        {"item": "Лук, нарязан", "amount": "1 глава"},
+        {"item": "Заквасена сметана, нискомаслена", "amount": "150 г"},
+        {"item": "Сладък червен пипер и дижонска горчица", "amount": "по 1 ч. л."},
+        {"item": "Зехтин", "amount": "2 ч. л."},
+        {"item": "Телешки бульон", "amount": "150 мл"},
+        {"item": "Яйчени нудли или бял ориз, неварени", "amount": "240 г"}
+      ],
+      "steps": [
+        "Нарежи лука и гъбите. Сложи тенджера с вода да заври за нудлите или ориза.",
+        "Свари нудлите за 4–5 минути или ориза за 10–12 минути (или колкото пише на опаковката), после ги отцеди.",
+        "Междувременно загрей половината зехтин в голям тиган на силен огън. Запържи телешкото 2 минути, като разбъркваш, докато покафенее, но остане леко розово отвътре, после го прехвърли в чиния.",
+        "Намали на среден огън, добави останалия зехтин, лука и гъбите и ги готви 6 минути, като разбъркваш от време на време, докато омекнат и се зачервят.",
+        "Добави червения пипер, горчицата и бульона и остави да покъкри 2 минути. Намали на слаб огън, разбъркай сметаната, после върни телешкото със соковете му и затопли 1 минута, без да оставяш соса да заври.",
+        "Раздели нудлите или ориза в 4 чинии и сложи отгоре строганова."
+      ]
+    }
   },
   {
     "id": "salmon-dill-potatoes",
@@ -946,7 +1496,28 @@
       "Chop the dill. Stir half of it into the yoghurt with a squeeze of lemon and a pinch of salt.",
       "Drain the potatoes and beans, and toss the potatoes with the butter and the rest of the dill.",
       "Split between 2 plates and serve the salmon with the potatoes, beans and dill sauce."
-    ]
+    ],
+    "bg": {
+      "name": "Сьомга с картофи и копър",
+      "description": "Печена сьомга по шведски, с млади картофи и сос от кисело мляко с копър.",
+      "cuisine": "Шведска кухня",
+      "ingredients": [
+        {"item": "Филе от сьомга", "amount": "2 бр. (260 г)"},
+        {"item": "Млади картофи", "amount": "400 г"},
+        {"item": "Зелен фасул", "amount": "200 г"},
+        {"item": "Цедено кисело мляко, 0% масленост", "amount": "100 г"},
+        {"item": "Пресен копър и лимон", "amount": "на вкус"},
+        {"item": "Краве масло", "amount": "10 г"}
+      ],
+      "steps": [
+        "Загрей фурната на 200°C (180°C с вентилатор). Разрежи по-едрите картофи наполовина, сложи ги в тенджера със студена подсолена вода, доведи до кипене и ги вари на тих огън 15–20 минути, докато омекнат.",
+        "Междувременно сложи сьомгата в тава с хартия за печене, подправи я със сол и черен пипер и я печи 12–15 минути, докато лесно се разделя на люспи.",
+        "Почисти краищата на фасула и го добави при картофите за последните 4 минути.",
+        "Накълцай копъра. Смеси половината с киселото мляко, малко лимонов сок и щипка сол.",
+        "Отцеди картофите и фасула и разбъркай картофите с маслото и останалия копър.",
+        "Раздели в 2 чинии и сервирай сьомгата с картофите, фасула и соса с копър."
+      ]
+    }
   },
   {
     "id": "chicken-stir-fry-noodles",
@@ -981,7 +1552,28 @@
       "Heat the oil in a wok or large frying pan over a high heat. Stir-fry the chicken for 5 minutes, until golden and cooked through with no pink in the middle.",
       "Add the vegetables, garlic and ginger and stir-fry for 3 minutes, until the vegetables are just tender but still crunchy.",
       "Add the noodles and the soy and honey mix and toss for 1 minute, until everything is hot. Split between 2 bowls."
-    ]
+    ],
+    "bg": {
+      "name": "Пиле с нудли в уок",
+      "description": "Пиле и хрупкави зеленчуци в сос от соев сос, чесън и джинджифил.",
+      "cuisine": "Китайска кухня",
+      "ingredients": [
+        {"item": "Пилешко филе, нарязано", "amount": "300 г"},
+        {"item": "Яйчени нудли, неварени", "amount": "120 г"},
+        {"item": "Зеленчукова смес за уок", "amount": "300 г"},
+        {"item": "Соев сос", "amount": "2 с. л."},
+        {"item": "Мед", "amount": "1 ч. л."},
+        {"item": "Чесън и пресен джинджифил, настъргани", "amount": "2 скилидки и парче колкото палец"},
+        {"item": "Олио", "amount": "2 ч. л."}
+      ],
+      "steps": [
+        "Нарежи пилешкото на тънки ивици и настържи чесъна и джинджифила. Смеси соевия сос и меда в чашка.",
+        "Свари нудлите в тенджера с вряща вода за 4 минути, или колкото пише на опаковката. Отцеди ги и ги изплакни със студена вода, за да не залепнат.",
+        "Загрей олиото в уок или голям тиган на силен огън. Запържи пилешкото 5 минути, като разбъркваш постоянно, докато се зачерви и се изпече напълно, без розово в средата.",
+        "Добави зеленчуците, чесъна и джинджифила и пържи 3 минути, като разбъркваш, докато зеленчуците леко омекнат, но останат хрупкави.",
+        "Добави нудлите и сместа от соев сос и мед и разбърквай 1 минута, докато всичко се затопли. Раздели в 2 купи."
+      ]
+    }
   },
   {
     "id": "spinach-feta-frittata",
@@ -1017,7 +1609,29 @@
       "Pour in the eggs and scatter over the tomatoes and feta. Cook gently for 5 minutes, without stirring, until the bottom is set.",
       "Put the pan under the grill for 3 to 4 minutes, until the top is set and golden. Use an oven glove: the handle gets hot.",
       "Cut into 4 wedges and serve 2 each with the salad leaves and bread."
-    ]
+    ],
+    "bg": {
+      "name": "Фритата със спанак и сирене",
+      "description": "Плътен омлет, довършен под грила, със спанак, домати и сирене.",
+      "cuisine": "Италианска кухня",
+      "ingredients": [
+        {"item": "Яйца", "amount": "7 бр."},
+        {"item": "Сирене, натрошено", "amount": "80 г"},
+        {"item": "Спанак", "amount": "150 г"},
+        {"item": "Чери домати, разрязани наполовина", "amount": "150 г"},
+        {"item": "Зелен лук, нарязан", "amount": "3 стръка"},
+        {"item": "Зехтин", "amount": "1 ч. л."},
+        {"item": "Микс от зелени салати, за гарнитура", "amount": "100 г"},
+        {"item": "Пълнозърнест хляб, за гарнитура", "amount": "2 филии (80 г)"}
+      ],
+      "steps": [
+        "Загрей грила на фурната на най-силно. Нарежи зеления лук, разрежи доматите наполовина и натроши сиренето. Разбий яйцата в купа с щипка сол и черен пипер.",
+        "Загрей зехтина на среден огън в незалепващ тиган с диаметър около 24 см, който може да влиза под грила. Добави зеления лук и спанака и разбърквай 2 минути, докато спанакът омекне.",
+        "Изсипи яйцата и поръси с доматите и сиренето. Готви на слаб огън 5 минути, без да разбъркваш, докато дъното се стегне.",
+        "Сложи тигана под грила за 3–4 минути, докато отгоре се стегне и зачерви. Хващай го с ръкавица: дръжката се нагорещява.",
+        "Нарежи на 4 парчета и сервирай по 2 на човек със салатата и хляба."
+      ]
+    }
   },
   {
     "id": "chicken-curry",
@@ -1054,7 +1668,30 @@
       "Meanwhile, rinse the rice and cook it in a pan of boiling water for 10 to 12 minutes, or as the packet says, then drain.",
       "Stir the spinach into the curry for 1 to 2 minutes, until it wilts.",
       "Split the rice and curry between 4 plates. Leftover curry keeps in the fridge for up to 2 days; leftover rice only until the next day."
-    ]
+    ],
+    "bg": {
+      "name": "Пилешко къри с ориз",
+      "description": "Немлюто къри с домати, кокосово мляко и спанак.",
+      "cuisine": "Индийска кухня",
+      "ingredients": [
+        {"item": "Пилешко филе, на кубчета", "amount": "600 г"},
+        {"item": "Лук, нарязан", "amount": "1 глава"},
+        {"item": "Паста за къри, немлюта", "amount": "2 с. л. (30 г)"},
+        {"item": "Домати на кубчета (консерва)", "amount": "1 консерва (400 г)"},
+        {"item": "Кокосово мляко, олекотено", "amount": "200 мл"},
+        {"item": "Спанак", "amount": "100 г"},
+        {"item": "Зехтин", "amount": "2 ч. л."},
+        {"item": "Ориз басмати, неварен", "amount": "240 г"}
+      ],
+      "steps": [
+        "Нарежи лука, а пилешкото – на хапки.",
+        "Загрей зехтина в голяма тенджера на среден огън. Добави лука и го задушавай 5 минути, като разбъркваш от време на време, докато омекне. Добави пастата за къри и готви 1 минута.",
+        "Добави пилешкото и разбъркай, за да се покрие с пастата, после налей доматите и кокосовото мляко. Доведи до кипене, после намали котлона и остави да къкри 20 минути, като разбъркваш от време на време, докато пилешкото се свари напълно.",
+        "Междувременно изплакни ориза и го свари в тенджера с вряща вода за 10–12 минути, или колкото пише на опаковката, после го отцеди.",
+        "Добави спанака в кърито и разбърквай 1–2 минути, докато омекне.",
+        "Раздели ориза и кърито в 4 чинии. Останалото къри издържа в хладилника до 2 дни, а оризът – само до следващия ден."
+      ]
+    }
   },
   {
     "id": "chilli-con-carne",
@@ -1091,7 +1728,30 @@
       "Stir in the garlic, chilli powder, cumin and smoked paprika for 1 minute. Add the tomatoes, beans, a splash of water and a pinch of salt. Bring to the boil, then simmer for 20 minutes, stirring now and then, until thick.",
       "Meanwhile, rinse the rice and cook it in a pan of boiling water for 10 to 12 minutes, or as the packet says, then drain.",
       "Split the rice and chilli between 4 plates and top each with a spoonful of yoghurt. Leftover chilli keeps in the fridge for up to 2 days, or in the freezer for up to 3 months; leftover rice only until the next day."
-    ]
+    ],
+    "bg": {
+      "name": "Чили кон карне",
+      "description": "Постно телешко и червен боб в опушен доматен сос, с ориз.",
+      "cuisine": "Тексаско-мексиканска кухня",
+      "ingredients": [
+        {"item": "Постна телешка кайма, 5% мазнини", "amount": "500 г"},
+        {"item": "Лук и червена чушка, нарязани", "amount": "по 1 бр."},
+        {"item": "Чесън, лют червен пипер, кимион и пушен червен пипер", "amount": "2 скилидки, по 1 ч. л."},
+        {"item": "Домати на кубчета (консерва)", "amount": "1 консерва (400 г)"},
+        {"item": "Червен боб (консерва), отцеден", "amount": "1 консерва (240 г)"},
+        {"item": "Зехтин", "amount": "1 ч. л."},
+        {"item": "Бял ориз, неварен", "amount": "240 г"},
+        {"item": "Цедено кисело мляко, 0% масленост, за сервиране", "amount": "100 г"}
+      ],
+      "steps": [
+        "Нарежи лука, чушката и чесъна. Отцеди и изплакни боба.",
+        "Загрей зехтина в голяма тенджера на среден огън. Добави лука и чушката и ги задушавай 5 минути, като разбъркваш от време на време, докато омекнат.",
+        "Усили котлона, добави каймата и я запържи 5 минути, като я разбиваш с дървена лъжица, докато покафенее и не остане розово.",
+        "Добави чесъна, лютия пипер, кимиона и пушения червен пипер и разбърквай 1 минута. Добави доматите, боба, малко вода и щипка сол. Доведи до кипене, после остави да къкри 20 минути, като разбъркваш от време на време, докато се сгъсти.",
+        "Междувременно изплакни ориза и го свари в тенджера с вряща вода за 10–12 минути, или колкото пише на опаковката, после го отцеди.",
+        "Раздели ориза и чилито в 4 чинии и сложи във всяка по лъжица кисело мляко. Останалото чили издържа в хладилника до 2 дни или във фризера до 3 месеца, а оризът – само до следващия ден."
+      ]
+    }
   },
   {
     "id": "pasta-bolognese",
@@ -1128,7 +1788,30 @@
       "Stir in the tomatoes with a pinch of salt and pepper and bring to a bubble. Turn the heat down and simmer for 20 minutes, stirring now and then, until thick. Add a splash of water if it gets too dry.",
       "When the sauce has about 15 minutes left, bring a large pan of salted water to the boil. Cook the pasta for 10 to 12 minutes, or as the packet says, then drain.",
       "Split the pasta between 4 plates, spoon the sauce over it and scatter with the Parmesan. Leftover sauce keeps in the fridge for up to 2 days, or in the freezer for up to 3 months."
-    ]
+    ],
+    "bg": {
+      "name": "Паста болонезе",
+      "description": "Рагу от постно телешко със спагети или талиатели.",
+      "cuisine": "Италианска кухня",
+      "ingredients": [
+        {"item": "Постна телешка кайма, 5% мазнини", "amount": "500 г"},
+        {"item": "Спагети или талиатели, неварени", "amount": "280 г"},
+        {"item": "Домати на кубчета (консерва)", "amount": "2 консерви (800 г)"},
+        {"item": "Лук, нарязан", "amount": "1 глава"},
+        {"item": "Морков, настърган", "amount": "1 бр."},
+        {"item": "Чесън, нарязан", "amount": "2 скилидки"},
+        {"item": "Зехтин", "amount": "1 ч. л."},
+        {"item": "Пармезан, настърган", "amount": "30 г"}
+      ],
+      "steps": [
+        "Обели и нарежи на ситно лука и чесъна и настържи моркова.",
+        "Загрей зехтина в голям тиган на среден огън. Добави лука и моркова и ги задушавай 5 минути, като разбъркваш от време на време, докато омекнат. Добави чесъна и готви още 1 минута.",
+        "Усили малко котлона, добави каймата и я запържи 5 минути, като я разбиваш с дървена лъжица, докато покафенее и не остане розово.",
+        "Добави доматите с щипка сол и черен пипер и изчакай да заврат. Намали котлона и остави да къкри 20 минути, като разбъркваш от време на време, докато се сгъсти. Ако стане твърде сухо, добави малко вода.",
+        "Когато на соса му остават около 15 минути, доведи до кипене голяма тенджера подсолена вода. Свари пастата за 10–12 минути, или колкото пише на опаковката, после я отцеди.",
+        "Раздели пастата в 4 чинии, полей със соса и поръси с пармезана. Останалият сос издържа в хладилника до 2 дни или във фризера до 3 месеца."
+      ]
+    }
   },
   {
     "id": "cottage-cheese-tomato-pasta",
@@ -1164,7 +1847,29 @@
       "Meanwhile, heat the oil in a saucepan over a low heat. Fry the garlic for 1 minute, then add the passata, basil and a pinch of chilli flakes and simmer for 5 minutes.",
       "Take the sauce off the heat and blend in the cottage cheese with a stick blender until smooth and creamy, or just stir it in for a chunkier sauce.",
       "Toss the pasta with the sauce and spinach until the spinach wilts. Split between 2 bowls and top with the grated cheese."
-    ]
+    ],
+    "bg": {
+      "name": "Паста с доматен сос и извара",
+      "description": "Кремообразен доматен сос с извара и спанак.",
+      "cuisine": "Италианска кухня",
+      "ingredients": [
+        {"item": "Къса паста, неварена", "amount": "160 г"},
+        {"item": "Извара, нискомаслена", "amount": "250 г"},
+        {"item": "Пасата (пасирани домати)", "amount": "300 г"},
+        {"item": "Чесън, нарязан", "amount": "2 скилидки"},
+        {"item": "Спанак", "amount": "100 г"},
+        {"item": "Пармезан или друго твърдо сирене, настъргани", "amount": "20 г"},
+        {"item": "Зехтин", "amount": "1 ч. л."},
+        {"item": "Сушен босилек и чили на люспи", "amount": "на вкус"}
+      ],
+      "steps": [
+        "Доведи до кипене голяма тенджера подсолена вода и нарежи чесъна.",
+        "Свари пастата за 10–12 минути, или колкото пише на опаковката, после я отцеди.",
+        "Междувременно загрей зехтина в малка тенджера на слаб огън. Запържи чесъна 1 минута, после добави пасатата, босилека и щипка чили и остави да къкри 5 минути.",
+        "Свали соса от котлона и пасирай изварата в него с пасатор, докато стане гладък и кремообразен, или само я разбъркай за по-едър сос.",
+        "Разбъркай пастата със соса и спанака, докато спанакът омекне. Раздели в 2 купи и поръси с настърганото сирене."
+      ]
+    }
   },
   {
     "id": "beef-burgers-wedges",
@@ -1200,7 +1905,29 @@
       "When the wedges have about 12 minutes left, heat a large frying pan over a medium-high heat (no oil needed). Cook the burgers for 4 to 5 minutes a side, until cooked through with no pink in the middle. Lay a cheese slice on each for the last minute.",
       "Halve the buns and toast them, cut side down, in the pan for 1 minute.",
       "Fill the buns with the lettuce, tomato, onion and burgers. One burger each, with the wedges on the side."
-    ]
+    ],
+    "bg": {
+      "name": "Телешки бургери с картофи по селски",
+      "description": "Домашни бургери от постно телешко с картофи от фурната.",
+      "cuisine": "Американска кухня",
+      "ingredients": [
+        {"item": "Постна телешка кайма, 5% мазнини", "amount": "500 г"},
+        {"item": "Пълнозърнести питки за бургер", "amount": "4 бр."},
+        {"item": "Лек чедър на филийки", "amount": "4 филийки (80 г)"},
+        {"item": "Зелена салата, домат и червен лук", "amount": "за сервиране"},
+        {"item": "Картофи, на резени", "amount": "600 г"},
+        {"item": "Зехтин", "amount": "1 с. л."},
+        {"item": "Пушен червен пипер, сол и черен пипер", "amount": "на вкус"}
+      ],
+      "steps": [
+        "Загрей фурната на 220°C (200°C с вентилатор). Нарежи картофите на резени по дължина (не е нужно да ги белиш).",
+        "В голяма тава разбъркай картофите със зехтина, пушения червен пипер и щипка сол и ги разстели. Печи 30–35 минути, като ги обърнеш по средата, докато се зачервят и станат хрупкави.",
+        "Междувременно подправи каймата със сол и черен пипер и оформи 4 плоски кюфтета, малко по-широки от питките. Нарежи домата и червения лук и измий салатата.",
+        "Когато на картофите им остават около 12 минути, загрей голям тиган на средно силен огън (без мазнина). Пържи кюфтетата по 4–5 минути от всяка страна, докато се изпекат напълно, без розово в средата. През последната минута сложи върху всяко по филийка сирене.",
+        "Разрежи питките наполовина и ги препечи в тигана с разрязаната страна надолу за 1 минута.",
+        "Напълни питките със салатата, домата, лука и кюфтетата. По един бургер на човек, с картофите отстрани."
+      ]
+    }
   },
   {
     "id": "devilled-eggs",
@@ -1232,7 +1959,25 @@
       "Scoop the yolks into a bowl and mash them with the yoghurt, mustard and a pinch of salt and pepper until smooth.",
       "Spoon the mix back into the whites. Dust with smoked paprika and scatter over chopped chives.",
       "4 halves each. They keep in the fridge, covered, for up to 2 days."
-    ]
+    ],
+    "bg": {
+      "name": "Пълнени яйца",
+      "description": "Половинки яйца, пълнени с жълтъци, кисело мляко и горчица.",
+      "cuisine": "Британска кухня",
+      "ingredients": [
+        {"item": "Яйца", "amount": "4 бр."},
+        {"item": "Цедено кисело мляко, 0% масленост", "amount": "40 г"},
+        {"item": "Дижонска горчица", "amount": "1 ч. л."},
+        {"item": "Пушен червен пипер и лук резанка", "amount": "на вкус"}
+      ],
+      "steps": [
+        "Доведи до кипене вода в тенджера. Спусни яйцата с лъжица и ги вари 10 минути.",
+        "Прехвърли яйцата в купа със студена вода за 3 минути, после ги обели и ги разрежи наполовина по дължина.",
+        "Извади жълтъците в купа и ги намачкай с киселото мляко, горчицата и по щипка сол и черен пипер до гладка смес.",
+        "Напълни белтъците със сместа. Поръси с пушен червен пипер и нарязан лук резанка.",
+        "По 4 половинки на човек. Покрити, издържат в хладилника до 2 дни."
+      ]
+    }
   },
   {
     "id": "chocolate-yoghurt-pot",
@@ -1262,7 +2007,23 @@
       "Spoon the yoghurt into a bowl and add the cocoa and honey.",
       "Stir for 1 minute, until smooth and evenly brown.",
       "Top with the raspberries. Frozen ones can go straight on; they soften in about 10 minutes."
-    ]
+    ],
+    "bg": {
+      "name": "Кисело мляко с какао и малини",
+      "description": "Цедено кисело мляко, разбито с какао и мед, с малини отгоре.",
+      "cuisine": "Интернационална кухня",
+      "ingredients": [
+        {"item": "Цедено кисело мляко, 0% масленост", "amount": "200 г"},
+        {"item": "Какао на прах", "amount": "1 с. л. (6 г)"},
+        {"item": "Мед", "amount": "1 ч. л."},
+        {"item": "Малини, пресни или замразени", "amount": "50 г"}
+      ],
+      "steps": [
+        "Сложи киселото мляко в купичка и добави какаото и меда.",
+        "Разбърквай 1 минута, докато сместа стане гладка и равномерно кафява.",
+        "Сложи малините отгоре. Замразените може да сложиш направо: омекват за около 10 минути."
+      ]
+    }
   },
   {
     "id": "chilli-edamame",
@@ -1292,7 +2053,23 @@
       "Add the edamame straight from the freezer and boil for 3 to 4 minutes, until tender. Drain well.",
       "Toss them in a bowl with the soy sauce, a pinch of chilli flakes, a squeeze of lemon and a pinch of sea salt.",
       "Split between 2 bowls and eat warm."
-    ]
+    ],
+    "bg": {
+      "name": "Едамаме с чили",
+      "description": "Топли соеви зърна със соев сос, чили и лимон.",
+      "cuisine": "Японска кухня",
+      "ingredients": [
+        {"item": "Едамаме, замразени, без шушулките", "amount": "300 г"},
+        {"item": "Соев сос", "amount": "1 ч. л."},
+        {"item": "Чили на люспи, лимонов сок и морска сол", "amount": "на вкус"}
+      ],
+      "steps": [
+        "Доведи до кипене вода в тенджера.",
+        "Добави едамамето направо от фризера и го вари 3–4 минути, докато омекне. Отцеди го добре.",
+        "Разбъркай го в купа със соевия сос, щипка чили, малко лимонов сок и щипка морска сол.",
+        "Раздели в 2 купички и яж топло."
+      ]
+    }
   },
   {
     "id": "tuna-rice-cakes",
@@ -1323,7 +2100,24 @@
       "Drain the tuna well and tip it into a bowl.",
       "Mix in the yoghurt, a squeeze of lemon and a pinch of black pepper.",
       "Pile it onto the rice cakes and top with the cucumber or tomato. Eat straight away, before the rice cakes go soft."
-    ]
+    ],
+    "bg": {
+      "name": "Оризовки с риба тон",
+      "description": "Оризовки с риба тон с лимон и краставица отгоре.",
+      "cuisine": "Интернационална кухня",
+      "ingredients": [
+        {"item": "Риба тон в собствен сос, отцедена", "amount": "1 консерва (110 г)"},
+        {"item": "Цедено кисело мляко, 0% масленост", "amount": "20 г"},
+        {"item": "Оризовки", "amount": "2 бр."},
+        {"item": "Краставица или домат, на кръгчета", "amount": "50 г"},
+        {"item": "Лимонов сок и черен пипер", "amount": "на вкус"}
+      ],
+      "steps": [
+        "Отцеди добре рибата тон и я сложи в купичка.",
+        "Добави киселото мляко, малко лимонов сок и щипка черен пипер и разбъркай.",
+        "Разпредели сместа върху оризовките и сложи отгоре краставицата или домата. Хапни веднага, преди оризовките да омекнат."
+      ]
+    }
   },
   {
     "id": "cottage-cheese-crispbreads",
@@ -1353,7 +2147,23 @@
       "Slice the cucumber and chop the chives.",
       "Spread the cottage cheese over the crispbreads.",
       "Top with the cucumber, chives and a good pinch of black pepper."
-    ]
+    ],
+    "bg": {
+      "name": "Хрупкави хлебчета с извара",
+      "description": "Ръжени хрупкави хлебчета с извара и краставица.",
+      "cuisine": "Скандинавска кухня",
+      "ingredients": [
+        {"item": "Ръжени хрупкави хлебчета", "amount": "3 бр. (30 г)"},
+        {"item": "Извара, нискомаслена", "amount": "150 г"},
+        {"item": "Краставица, на кръгчета", "amount": "50 г"},
+        {"item": "Черен пипер и лук резанка", "amount": "на вкус"}
+      ],
+      "steps": [
+        "Нарежи краставицата на кръгчета и лука резанка на ситно.",
+        "Намажи хлебчетата с изварата.",
+        "Сложи отгоре краставицата, лука резанка и щедра щипка черен пипер."
+      ]
+    }
   },
   {
     "id": "berry-protein-smoothie",
@@ -1383,6 +2193,22 @@
       "Peel the half banana and break it into chunks.",
       "Put the milk, yoghurt, frozen berries and banana in a blender.",
       "Blend for 1 minute, until smooth and thick. Pour into a glass and drink straight away."
-    ]
+    ],
+    "bg": {
+      "name": "Протеиново смути с горски плодове",
+      "description": "Мляко, кисело мляко, горски плодове и банан, пасирани на гъсто, без протеин на прах.",
+      "cuisine": "Интернационална кухня",
+      "ingredients": [
+        {"item": "Обезмаслено прясно мляко", "amount": "200 мл"},
+        {"item": "Цедено кисело мляко, 0% масленост", "amount": "150 г"},
+        {"item": "Замразени горски плодове", "amount": "100 г"},
+        {"item": "Банан", "amount": "½ бр."}
+      ],
+      "steps": [
+        "Обели половината банан и го начупи на парчета.",
+        "Сложи млякото, киселото мляко, замразените плодове и банана в блендер.",
+        "Пасирай 1 минута, докато стане гладко и гъсто. Изсипи в чаша и изпий веднага."
+      ]
+    }
   }
 ]

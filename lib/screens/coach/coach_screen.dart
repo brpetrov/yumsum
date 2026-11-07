@@ -576,7 +576,7 @@ class _NoteCard extends StatelessWidget {
     final found = [
       for (final name in point.recipes)
         for (final recipe in recipes)
-          if (recipe.name.toLowerCase() == name.toLowerCase()) recipe,
+          if (recipe.isNamed(name)) recipe,
     ];
     final rest = [
       if (point.why.isNotEmpty)
@@ -732,7 +732,7 @@ class _RecipeChip extends StatelessWidget {
               const SizedBox(width: 8),
               Flexible(
                 child: Text(
-                  recipe.name,
+                  recipe.nameIn(context.l10n.localeName),
                   overflow: TextOverflow.ellipsis,
                   style: AppTheme.display.copyWith(
                     fontSize: 13.5,
@@ -755,14 +755,16 @@ String _keepUnits(String note) => note.replaceAllMapped(
   (match) => '${match[1]} ${match[2]}',
 );
 
-/// Finds the library's recipe names in a note, with any quotes the AI puts
-/// round them. Longer names first, so one that contains another wins. Built
-/// once per library; null when it has no recipes.
+/// Finds the library's recipe names in a note, in English or Bulgarian,
+/// with any quotes the AI puts round them. Longer names first, so one that
+/// contains another wins. Built once per library; null when it has no
+/// recipes.
 final _recipeNamesProvider = Provider<RegExp?>((ref) {
   final recipes = ref.watch(recipesProvider).valueOrNull ?? const [];
   if (recipes.isEmpty) return null;
-  final names = recipes.map((recipe) => recipe.name).toList()
-    ..sort((a, b) => b.length.compareTo(a.length));
+  final names = [
+    for (final recipe in recipes) ...[recipe.name, ?recipe.bg?.name],
+  ]..sort((a, b) => b.length.compareTo(a.length));
   return RegExp(
     '["“”]?(${names.map(RegExp.escape).join('|')})["“”]?',
     caseSensitive: false,
@@ -770,8 +772,9 @@ final _recipeNamesProvider = Provider<RegExp?>((ref) {
 });
 
 /// A note's text, with every library recipe it names a link that opens it,
-/// shedding the quotes the AI puts round names. It's split once per text,
-/// and the links' recognizers are disposed with it.
+/// named in the app's language and shedding the quotes the AI puts round
+/// names. It's split once per text, and the links' recognizers are disposed
+/// with it.
 class _NoteText extends StatefulWidget {
   const _NoteText(this.text, {required this.recipes, required this.names});
 
@@ -786,8 +789,9 @@ class _NoteText extends StatefulWidget {
 }
 
 class _NoteTextState extends State<_NoteText> {
-  /// The note in pieces: its text, and a recognizer on each recipe name.
-  var _pieces = <(String, TapGestureRecognizer?)>[];
+  /// The note in pieces: its text, and the recipe and a recognizer on each
+  /// recipe name.
+  var _pieces = <(String, Recipe?, TapGestureRecognizer?)>[];
 
   @override
   void initState() {
@@ -812,29 +816,30 @@ class _NoteTextState extends State<_NoteText> {
 
   void _split() {
     final note = _keepUnits(widget.text);
-    final pieces = <(String, TapGestureRecognizer?)>[];
+    final pieces = <(String, Recipe?, TapGestureRecognizer?)>[];
     var at = 0;
     for (final match
         in widget.names?.allMatches(note) ?? const <RegExpMatch>[]) {
       final name = match[1]!;
       final recipe = widget.recipes.firstWhere(
-        (recipe) => recipe.name.toLowerCase() == name.toLowerCase(),
+        (recipe) => recipe.isNamed(name),
       );
-      pieces.add((note.substring(at, match.start), null));
+      pieces.add((note.substring(at, match.start), null, null));
       pieces.add((
         name,
+        recipe,
         TapGestureRecognizer()
           ..onTap = () =>
               context.push(AppRoutes.recipePath(recipe.id), extra: recipe),
       ));
       at = match.end;
     }
-    pieces.add((note.substring(at), null));
+    pieces.add((note.substring(at), null, null));
     _pieces = pieces;
   }
 
   void _disposeRecognizers() {
-    for (final (_, recognizer) in _pieces) {
+    for (final (_, _, recognizer) in _pieces) {
       recognizer?.dispose();
     }
   }
@@ -847,6 +852,14 @@ class _NoteTextState extends State<_NoteText> {
       decoration: TextDecoration.underline,
       decorationColor: AppColors.primary,
     );
+    // A recipe the note names in another language takes the app's name.
+    String shown(String text, Recipe? recipe) {
+      final name = recipe?.nameIn(context.l10n.localeName);
+      return name == null || name.toLowerCase() == text.toLowerCase()
+          ? text
+          : name;
+    }
+
     return Text.rich(
       TextSpan(
         style: TextStyle(
@@ -855,9 +868,9 @@ class _NoteTextState extends State<_NoteText> {
           color: AppColors.textPrimary,
         ),
         children: [
-          for (final (text, recognizer) in _pieces)
+          for (final (text, recipe, recognizer) in _pieces)
             TextSpan(
-              text: text,
+              text: shown(text, recipe),
               style: recognizer == null ? null : link,
               recognizer: recognizer,
             ),

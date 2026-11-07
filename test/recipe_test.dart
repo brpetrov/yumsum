@@ -1,4 +1,6 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/providers/recipe_provider.dart';
@@ -39,6 +41,21 @@ Map<String, dynamic> _json({Map<String, dynamic> change = const {}}) => {
   'steps': ['Brown the mince.', 'Simmer.'],
   ...change,
 };
+
+/// [_json]'s recipe in Bulgarian.
+const _bg = {
+  'name': 'Паста болонезе',
+  'description': 'Рагу от постно телешко.',
+  'cuisine': 'Италианска кухня',
+  'ingredients': [
+    {'item': 'Телешка кайма', 'amount': '500 г'},
+    {'item': 'Сол', 'amount': 'на вкус'},
+  ],
+  'steps': ['Запържи каймата.', 'Остави да къкри.'],
+};
+
+final _english = lookupAppLocalizations(const Locale('en'));
+final _bulgarian = lookupAppLocalizations(const Locale('bg'));
 
 Recipe _recipe(String name, {int kcal = 500}) => Recipe.fromJson(
   _json(
@@ -170,9 +187,66 @@ void main() {
       expect(recipe.proteinFor(0.5), 21);
       expect(recipe.macrosFor(1.5).fat, 21.75);
       expect(recipe.macrosFor(1.5).salt, closeTo(2.1, 1e-9));
-      expect(recipe.mealName(1), 'Pasta bolognese');
-      expect(recipe.mealName(2), 'Pasta bolognese × 2');
-      expect(recipe.mealName(1.5), 'Pasta bolognese × 1.5');
+      expect(recipe.mealName(1, _english), 'Pasta bolognese');
+      expect(recipe.mealName(2, _english), 'Pasta bolognese × 2');
+      expect(recipe.mealName(1.5, _english), 'Pasta bolognese × 1.5');
+    });
+
+    test('reads the Bulgarian, shown only in Bulgarian', () {
+      final recipe = Recipe.fromJson(_json(change: {'bg': _bg}));
+      final bg = recipe.textIn('bg');
+      expect(bg.name, 'Паста болонезе');
+      expect(bg.description, 'Рагу от постно телешко.');
+      expect(bg.cuisine, 'Италианска кухня');
+      expect(bg.ingredients.first, (item: 'Телешка кайма', amount: '500 г'));
+      expect(bg.steps, ['Запържи каймата.', 'Остави да къкри.']);
+      final en = recipe.textIn('en');
+      expect(en.name, 'Pasta bolognese');
+      expect(en.ingredients.first, (item: 'Beef mince', amount: '500 g'));
+      expect(en.steps, ['Brown the mince.', 'Simmer.']);
+      expect(recipe.nameIn('bg'), 'Паста болонезе');
+      // English where a recipe has no Bulgarian.
+      expect(Recipe.fromJson(_json()).nameIn('bg'), 'Pasta bolognese');
+    });
+
+    test('the Bulgarian is complete, an item and amount for each '
+        'ingredient', () {
+      for (final bad in <Object>[
+        'Паста болонезе',
+        {..._bg, 'name': ' '},
+        {..._bg}..remove('cuisine'),
+        {..._bg, 'steps': <String>[]},
+        {
+          ..._bg,
+          'ingredients': [
+            {'item': 'Телешка кайма', 'amount': '500 г'},
+          ],
+        },
+        {
+          ..._bg,
+          'ingredients': [
+            {'item': 'Телешка кайма'},
+            {'item': 'Сол', 'amount': 'на вкус'},
+          ],
+        },
+      ]) {
+        expect(
+          () => Recipe.fromJson(_json(change: {'bg': bad})),
+          throwsFormatException,
+          reason: '$bad',
+        );
+      }
+    });
+
+    test("names the meal in the app's language, and knows both names", () {
+      final recipe = Recipe.fromJson(_json(change: {'bg': _bg}));
+      expect(recipe.mealName(1, _bulgarian), 'Паста болонезе');
+      expect(recipe.mealName(2, _bulgarian), 'Паста болонезе × 2');
+      expect(recipe.mealName(1.5, _bulgarian), 'Паста болонезе × 1,5');
+      expect(recipe.mealName(1.5, _english), 'Pasta bolognese × 1.5');
+      expect(recipe.isNamed(' pasta BOLOGNESE'), isTrue);
+      expect(recipe.isNamed('ПАСТА болонезе'), isTrue);
+      expect(recipe.isNamed('Паста'), isFalse);
     });
   });
 
@@ -182,6 +256,9 @@ void main() {
       'Pasta bolognese',
     ]);
     expect(matchingRecipes(recipes, '  '), isEmpty);
+    final bolognese = Recipe.fromJson(_json(change: {'bg': _bg}));
+    expect(matchingRecipes([bolognese], 'БОЛОН'), [bolognese]);
+    expect(matchingRecipes([bolognese], 'bolog'), [bolognese]);
   });
 
   test('search wants every word in the name, meal, cuisine, labels or '
@@ -250,6 +327,88 @@ void main() {
     expect(search('omelette lunch'), isEmpty);
   });
 
+  test('search takes Bulgarian words too, forgiving their endings', () {
+    Recipe dish(
+      String name,
+      String bgName,
+      List<(String, String)> items, {
+      String category = 'dinner',
+      List<String> tags = const [],
+    }) => Recipe.fromJson(
+      _json(
+        change: {
+          'id': name.toLowerCase().replaceAll(RegExp('[^a-z]+'), '-'),
+          'name': name,
+          'category': category,
+          'tags': tags,
+          'ingredients': [
+            for (final (item, _) in items) {'item': item, 'amount': '1'},
+          ],
+          'bg': {
+            ..._bg,
+            'name': bgName,
+            'ingredients': [
+              for (final (_, item) in items) {'item': item, 'amount': '1'},
+            ],
+          },
+        },
+      ),
+    );
+    final recipes = [
+      dish(
+        'Tomato and feta omelette',
+        'Омлет с домати и сирене',
+        [
+          ('Eggs', 'Яйца'),
+          ('Cherry tomatoes', 'Чери домати'),
+          ('Feta', 'Сирене, натрошено'),
+        ],
+        category: 'breakfast',
+        tags: ['quick', 'vegetarian'],
+      ),
+      dish('Chicken noodle soup', 'Пилешка супа с фиде', [
+        ('Chicken breast', 'Пилешко филе'),
+        ('Chicken stock', 'Пилешки бульон'),
+      ], category: 'lunch'),
+      dish('Pea and ham soup', 'Грахова крем супа с шунка', [
+        ('Frozen peas', 'Замразен грах'),
+        ('Chicken stock', 'Пилешки бульон'),
+        ('Greek yoghurt', 'Цедено кисело мляко'),
+      ], category: 'lunch'),
+      dish('Berry protein smoothie', 'Протеиново смути с горски плодове', [
+        ('Skimmed milk', 'Обезмаслено прясно мляко'),
+        ('Frozen mixed berries', 'Замразени горски плодове'),
+      ], category: 'snack'),
+      dish('Garlic prawn spaghetti', 'Спагети със скариди и чесън', [
+        ('Spaghetti, dried', 'Спагети, неварени'),
+        ('Raw king prawns', 'Сурови кралски скариди'),
+      ]),
+    ];
+    List<String> search(String query) => [
+      for (final recipe in searchRecipes(recipes, query)) recipe.name,
+    ];
+
+    expect(search('ЯЙЦЕ'), ['Tomato and feta omelette']);
+    expect(search('домат'), ['Tomato and feta omelette']);
+    expect(search('супи'), ['Chicken noodle soup', 'Pea and ham soup']);
+    // Chicken stock makes no dish chicken, unless the search says stock.
+    expect(search('пиле'), ['Chicken noodle soup']);
+    expect(search('пилешки бульон'), [
+      'Chicken noodle soup',
+      'Pea and ham soup',
+    ]);
+    // Кисело мляко is yoghurt, not milk.
+    expect(search('мляко'), ['Berry protein smoothie']);
+    expect(search('кисело мляко'), ['Pea and ham soup']);
+    expect(search('йогурт'), ['Pea and ham soup']);
+    expect(search('бърза вегетарианска закуска'), ['Tomato and feta omelette']);
+    expect(search('паста със скариди'), ['Garlic prawn spaghetti']);
+    expect(search('фета'), ['Tomato and feta omelette']);
+    expect(search('италианска'), hasLength(5));
+    expect(search('protein smoothie'), ['Berry protein smoothie']);
+    expect(search('омлет lunch'), isEmpty);
+  });
+
   test('recently cooked recipes come from the last two weeks of meals, '
       'portions and all', () {
     final now = DateTime(2026, 10, 31, 12);
@@ -269,5 +428,21 @@ void main() {
       'Pasta bolognese',
       'Chicken soup',
     ]);
+  });
+
+  test('a recipe logged in either language counts as cooked in both', () {
+    final now = DateTime(2026, 10, 31, 12);
+    final bolognese = Recipe.fromJson(_json(change: {'bg': _bg}));
+    final recipes = [bolognese, _recipe('Chicken soup')];
+    for (final logged in [
+      'Паста болонезе × 1,5',
+      'паста болонезе',
+      'Pasta bolognese × 2',
+      'Pasta bolognese × 0.5',
+    ]) {
+      expect(recentlyCookedRecipes(recipes, [_meal(logged, now)], now), [
+        bolognese,
+      ], reason: logged);
+    }
   });
 }

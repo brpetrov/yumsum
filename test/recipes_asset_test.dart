@@ -6,8 +6,8 @@ import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/models/recipe.dart';
 
 /// The gate for the recipe library: run after adding recipes or photos.
-/// Every recipe must parse, add up, and have its photo ready for the
-/// website, in `tools/hosting/recipes/`.
+/// Every recipe must parse, add up, be in Bulgarian too, and have its photo
+/// ready for the website, in `tools/hosting/recipes/`.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -124,6 +124,61 @@ void main() {
       expect(String.fromCharCodes(bytes.sublist(0, 4)), 'RIFF');
       expect(String.fromCharCodes(bytes.sublist(8, 12)), 'WEBP');
     }
+  });
+
+  test('every recipe is in Bulgarian too, step for step', () {
+    final latin = RegExp('[A-Za-z]');
+    final numbers = RegExp(r'\d+');
+    List<String> numbersIn(String text) =>
+        [for (final match in numbers.allMatches(text)) match[0]!]..sort();
+
+    for (final recipe in recipes) {
+      final bg = recipe.bg;
+      expect(bg, isNotNull, reason: '${recipe.id}: no Bulgarian');
+      final reason = recipe.id;
+      expect(bg!.description == null, recipe.description == null);
+      expect(bg.steps, hasLength(recipe.steps.length), reason: reason);
+      final words = [
+        bg.name,
+        bg.cuisine,
+        for (final ingredient in bg.ingredients) ...[
+          ingredient.item,
+          ingredient.amount,
+        ],
+        // Oven temperatures keep their °C.
+        for (final step in bg.steps) step.replaceAll('°C', ''),
+      ];
+      for (final text in [...words, ?bg.description]) {
+        // Decimal commas, and „…“ for quotes.
+        expect(text, isNot(contains(RegExp(r'\d\.\d'))), reason: reason);
+        expect(text, isNot(contains('"')), reason: reason);
+      }
+      for (final text in words) {
+        expect(text, isNot(contains(latin)), reason: '$reason: $text');
+      }
+      // Every count, time and temperature carries over.
+      for (final (i, ingredient) in recipe.ingredients.indexed) {
+        expect(
+          numbersIn(bg.ingredients[i].amount),
+          numbersIn(ingredient.amount),
+          reason: '$reason: ${ingredient.item}',
+        );
+      }
+      for (final (i, step) in recipe.steps.indexed) {
+        expect(
+          numbersIn(bg.steps[i]),
+          numbersIn(step),
+          reason: '$reason, step ${i + 1}',
+        );
+      }
+    }
+  });
+
+  test('Bulgarian names are unique and differ from the English ones', () {
+    final names = [
+      for (final recipe in recipes) ...[recipe.name, recipe.bg!.name],
+    ].map((name) => name.toLowerCase()).toList();
+    expect(names.toSet(), hasLength(names.length));
   });
 
   test('the library is complete', () {

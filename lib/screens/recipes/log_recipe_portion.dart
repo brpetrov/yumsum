@@ -25,7 +25,7 @@ Future<void> logRecipePortion(
   await ref
       .read(logMealControllerProvider.notifier)
       .submit(
-        name: recipe.mealName(portions),
+        name: recipe.mealName(portions, context.l10n),
         calories: recipe.kcalFor(portions).toDouble(),
         proteinGrams: recipe.proteinFor(portions).toDouble(),
         macros: recipe.macrosFor(portions),
@@ -37,7 +37,9 @@ Future<void> logRecipePortion(
       content: Text(
         failed
             ? context.l10n.recipesErrorLog
-            : context.l10n.recipesLogged(recipe.mealName(portions)),
+            : context.l10n.recipesLogged(
+                recipe.mealName(portions, context.l10n),
+              ),
       ),
     ),
   );
