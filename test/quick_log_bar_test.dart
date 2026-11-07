@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -1043,6 +1044,31 @@ void main() {
     ]);
     expect(controller.savedMacros.single?.fat, 15);
     expect(controller.savedMacros.single?.salt, 1.8);
+  });
+
+  testWidgets('a chip can be tapped as a browser taps, where pressing '
+      'outside a box lets go of it', (tester) async {
+    await pumpCard(
+      tester,
+      recents: [
+        _recent('Ham sandwich', 500, 20),
+        _recent('Ham sandwich', 480, 20, daysAgo: 2),
+      ],
+    );
+    await tester.pump();
+    await tester.tap(nameBox);
+    await tester.pump();
+
+    // A browser (and a mouse anywhere) lets go of a box when the pointer
+    // goes down outside it; an empty bar would fold before the tap ends.
+    final press = await tester.startGesture(
+      tester.getCenter(find.text('Ham sandwich · 500 kcal')),
+      kind: PointerDeviceKind.mouse,
+    );
+    await tester.pump(const Duration(milliseconds: 100));
+    await press.up();
+    await tester.pumpAndSettle();
+    expect(boxes(tester), ['Ham sandwich', '500', '20']);
   });
 
   testWidgets('a typed recipe name offers a portion of it', (tester) async {
