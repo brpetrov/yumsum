@@ -9,6 +9,7 @@ import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/account_controller.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/core/constants/legal_links.dart';
@@ -299,7 +300,11 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                           Icons.open_in_new_rounded,
                           size: 18,
                         ),
-                        onTap: () => openLegalPage(LegalLinks.privacyPolicy),
+                        onTap: () => openLegalPage(
+                          LegalLinks.privacyPolicy(
+                            ref.read(languageCodeProvider),
+                          ),
+                        ),
                       ),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
@@ -308,7 +313,9 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                           Icons.open_in_new_rounded,
                           size: 18,
                         ),
-                        onTap: () => openLegalPage(LegalLinks.terms),
+                        onTap: () => openLegalPage(
+                          LegalLinks.terms(ref.read(languageCodeProvider)),
+                        ),
                       ),
                       ListTile(
                         contentPadding: EdgeInsets.zero,

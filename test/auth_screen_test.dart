@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/screens/auth/auth_screen.dart';
 
 class _FakeAuthController extends AuthController {
@@ -29,7 +30,10 @@ void main() {
     final controller = _FakeAuthController();
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [authControllerProvider.overrideWith(() => controller)],
+        overrides: [
+          authControllerProvider.overrideWith(() => controller),
+          languageCodeProvider.overrideWithValue('en'),
+        ],
         child: MaterialApp(theme: AppTheme.light, home: const AuthScreen()),
       ),
     );
@@ -56,6 +60,7 @@ void main() {
       ProviderScope(
         overrides: [
           authControllerProvider.overrideWith(_FakeAuthController.new),
+          languageCodeProvider.overrideWithValue('en'),
         ],
         child: MaterialApp(theme: AppTheme.light, home: const AuthScreen()),
       ),
@@ -76,7 +81,10 @@ void main() {
     final controller = _FakeAuthController();
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [authControllerProvider.overrideWith(() => controller)],
+        overrides: [
+          authControllerProvider.overrideWith(() => controller),
+          languageCodeProvider.overrideWithValue('en'),
+        ],
         child: MaterialApp(theme: AppTheme.light, home: const AuthScreen()),
       ),
     );
@@ -94,6 +102,7 @@ void main() {
       ProviderScope(
         overrides: [
           authControllerProvider.overrideWith(_FakeAuthController.new),
+          languageCodeProvider.overrideWithValue('en'),
         ],
         child: MaterialApp(theme: AppTheme.light, home: const AuthScreen()),
       ),

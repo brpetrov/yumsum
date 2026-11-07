@@ -44,7 +44,8 @@ Reset-Directory $hostingBuild
 
 Copy-Item -Path $fastBuild -Destination (Join-Path $hostingBuild 'app') -Recurse
 Copy-Item -Path $webkitBuild -Destination (Join-Path $hostingBuild 'webkit') -Recurse
-# Legal pages, served at /privacy and /terms (firebase.json has cleanUrls on).
+# Legal pages, served at /privacy and /terms, and in Bulgarian at /privacy-bg and
+# /terms-bg (firebase.json has cleanUrls on).
 Copy-Item -Path (Join-Path $PSScriptRoot 'hosting\*.html') -Destination $hostingBuild
 # Recipe photos, served at /recipes/<id>.webp; the app downloads them as needed.
 Copy-Item -Path (Join-Path $PSScriptRoot 'hosting\recipes') -Destination (Join-Path $hostingBuild 'recipes') -Recurse

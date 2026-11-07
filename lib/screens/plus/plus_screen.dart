@@ -10,6 +10,7 @@ import 'package:lean_streak/core/constants/legal_links.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/entitlement.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/plus_purchase_controller.dart';
 import 'package:lean_streak/services/billing_service.dart';
@@ -402,14 +403,20 @@ class _PlusScreenState extends ConsumerState<PlusScreen> {
                                   ),
                                 TextButton(
                                   style: link,
-                                  onPressed: () =>
-                                      openLegalPage(LegalLinks.terms),
+                                  onPressed: () => openLegalPage(
+                                    LegalLinks.terms(
+                                      ref.read(languageCodeProvider),
+                                    ),
+                                  ),
                                   child: Text(l10n.starTerms, style: linkSize),
                                 ),
                                 TextButton(
                                   style: link,
-                                  onPressed: () =>
-                                      openLegalPage(LegalLinks.privacyPolicy),
+                                  onPressed: () => openLegalPage(
+                                    LegalLinks.privacyPolicy(
+                                      ref.read(languageCodeProvider),
+                                    ),
+                                  ),
                                   child: Text(
                                     l10n.starPrivacy,
                                     style: linkSize,

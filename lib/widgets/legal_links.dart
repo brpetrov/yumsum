@@ -1,11 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/constants/legal_links.dart';
 import 'package:lean_streak/l10n/l10n.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 
 Future<void> openLegalPage(Uri page) =>
     launchUrl(page, mode: LaunchMode.externalApplication);
@@ -39,12 +41,13 @@ List<InlineSpan> _linked(
 }
 
 /// "By continuing you agree to..." with tappable Terms and Privacy links.
-class LegalFooter extends StatelessWidget {
+class LegalFooter extends ConsumerWidget {
   const LegalFooter({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    final language = ref.watch(languageCodeProvider);
     final muted = TextStyle(fontSize: 13, color: AppColors.textSecondary);
     final link = TextStyle(
       fontSize: 13,
@@ -57,8 +60,8 @@ class LegalFooter extends StatelessWidget {
         children: _linked(
           l10n.legalAgreement(l10n.legalTermsOfUse, l10n.legalPrivacyPolicy),
           [
-            (l10n.legalTermsOfUse, LegalLinks.terms),
-            (l10n.legalPrivacyPolicy, LegalLinks.privacyPolicy),
+            (l10n.legalTermsOfUse, LegalLinks.terms(language)),
+            (l10n.legalPrivacyPolicy, LegalLinks.privacyPolicy(language)),
           ],
           link,
         ),

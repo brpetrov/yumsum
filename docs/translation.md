@@ -150,4 +150,5 @@ Address the user as "ти" and keep lines free of the user's gender: „Колк
 Everything the app shows in `lib/` is in the ARBs. Owner-only Debug tools (`lib/screens/debug/`, `lib/providers/debug_provider.dart`), the AI's facts (`lib/helpers/week_facts.dart`), the country names sent to the AI (`lib/models/user_profile.dart`), log lines and exceptions nobody sees stay English. Still English, for the owner to decide:
 
 - `assets/recipes/recipes.json`: 40 recipes' names, ingredients and steps, which are content, not ARB strings.
-- The website (`tools/hosting/`): the legal pages.
+
+The legal pages have Bulgarian copies, `tools/hosting/privacy-bg.html` and `terms-bg.html` (`/privacy-bg`, `/terms-bg`), which the app opens in Bulgarian. The English is the one that counts: change the Bulgarian with it, keeping the same meaning, data and periods.
