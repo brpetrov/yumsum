@@ -95,7 +95,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get commonGotIt => 'Разбрах';
 
   @override
-  String get commonBecomeStar => 'Стани Star';
+  String get commonBecomeStar => 'Вземи YumSum Star';
 
   @override
   String commonKcal(int kcal) {
@@ -134,7 +134,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get homeDeleteMealTitle => 'Да изтрием ли храненето?';
 
   @override
-  String get homeDeleteMealBody => 'Ще изчезне от днешния ден.';
+  String get homeDeleteMealBody => 'Да го премахнем ли от днешния ден?';
 
   @override
   String get homeErrorDelete =>
@@ -151,7 +151,7 @@ class AppLocalizationsBg extends AppLocalizations {
       'Не успяхме да сменим почивния ден. Опитай отново.';
 
   @override
-  String get homeOnTrack => 'В норма';
+  String get homeOnTrack => 'В целта';
 
   @override
   String get homeOverTarget => 'Над целта';
@@ -171,7 +171,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get homeTargetsTooltip => 'За целите ти';
 
   @override
-  String get homeMealsTitle => 'Храненията днес';
+  String get homeMealsTitle => 'Днешни хранения';
 
   @override
   String homeMealsLogged(int count) {
@@ -242,7 +242,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String homeCreatineBody(String time) {
-    return 'Получавай напомняне всеки ден в $time. Часа можеш да смениш по-късно.';
+    return 'Всеки ден в $time ще ти напомняме. Можеш да смениш часа по-късно.';
   }
 
   @override
@@ -253,16 +253,16 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String homeCreatineOn(String time) {
-    return 'Напомнянето за креатин е за $time. Можеш да го смениш от „Известия“ в менюто.';
+    return 'Ще ти напомняме за креатин в $time. Можеш да го смениш от „Известия“ в менюто.';
   }
 
   @override
   String get homeCreatineBlocked =>
-      'Разреши известията в настройките на телефона, после го включи от „Известия“ в менюто.';
+      'Разреши известията в настройките на телефона, после включи напомнянето от „Известия“ в менюто.';
 
   @override
   String get homeCreatineLater =>
-      'Можеш да го включиш по всяко време от „Известия“ в менюто.';
+      'Можеш да включиш напомнянето по всяко време от „Известия“ в менюто.';
 
   @override
   String get homeDayOffBackTitle => 'Обратно към плана?';
@@ -275,7 +275,7 @@ class AppLocalizationsBg extends AppLocalizations {
       'Днешният ден отново ще се сравнява с целта ти.';
 
   @override
-  String get homeDayOffIntro => 'За празници и вечери навън.';
+  String get homeDayOffIntro => 'За празници и излизания.';
 
   @override
   String get homeDayOffLog => 'Записвай храненията си както обикновено.';
@@ -293,14 +293,14 @@ class AppLocalizationsBg extends AppLocalizations {
   String get homeDayOffBackButton => 'Обратно към плана';
 
   @override
-  String get homeDayOffTakeButton => 'Почивен ден';
+  String get homeDayOffTakeButton => 'Вземи почивен ден';
 
   @override
   String get adaptiveIntroTitle => 'Калории по твоя мярка';
 
   @override
   String get adaptiveIntroSubtitle =>
-      'Яж с повече увереност – с умна формула, която всяка седмица се настройва към теб.';
+      'Яж по-уверено с умна формула, която всяка седмица се настройва към теб.';
 
   @override
   String get adaptiveIntroBurnTitle => 'Разбери колко гориш';
@@ -317,7 +317,7 @@ class AppLocalizationsBg extends AppLocalizations {
       'Целта ти се оформя според това как реално реагира тялото ти, за да откриеш какво работи при теб.';
 
   @override
-  String get adaptiveIntroChangeTitle => 'Напредвай, докато се променяш';
+  String get adaptiveIntroChangeTitle => 'Остани в целта, докато се променяш';
 
   @override
   String get adaptiveIntroChangeBody =>
@@ -331,10 +331,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'Всяко претегляне допълва картината. Редовните записи прецизират целта ти с времето.';
 
   @override
-  String get adaptiveIntroLogWeight => 'Запиши теглото';
+  String get adaptiveIntroLogWeight => 'Запиши теглото си';
 
   @override
-  String get adaptiveLapseTitle => 'Твоят YumSum Star приключи';
+  String get adaptiveLapseTitle => 'Твоят YumSum Star изтече';
 
   @override
   String adaptiveLapseBody(String date) {
@@ -359,7 +359,7 @@ class AppLocalizationsBg extends AppLocalizations {
       'Не успяхме да започнем записа. Опитай отново.';
 
   @override
-  String get quickLogMisTap => 'Не те чух. Натисни микрофона и опитай пак.';
+  String get quickLogMisTap => 'Не те чух. Натисни микрофона и опитай отново.';
 
   @override
   String get quickLogNoCalories =>
@@ -426,14 +426,15 @@ class AppLocalizationsBg extends AppLocalizations {
   String get mealAiOff => 'AI оценките още не са включени.';
 
   @override
-  String get mealAiBusy => 'AI е зает в момента. Опитай пак след минута.';
+  String get mealAiBusy => 'AI е зает в момента. Опитай отново след минута.';
 
   @override
   String get mealAiPaused =>
-      'AI оценките са спрени засега. Пак можеш да въведеш калориите ръчно.';
+      'AI оценките са спрени засега. Все още можеш да въведеш калориите ръчно.';
 
   @override
-  String get mealAiBusyShort => 'AI е зает. Опитай пак след няколко секунди.';
+  String get mealAiBusyShort =>
+      'AI е зает. Опитай отново след няколко секунди.';
 
   @override
   String get mealAiNoStar =>
@@ -445,7 +446,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get mealAiNoMeal =>
-      'Не чухме хранене в записа. Натисни микрофона и опитай пак.';
+      'Не чухме хранене в записа. Натисни микрофона и опитай отново.';
 
   @override
   String get mealAiErrorVoice =>
@@ -453,7 +454,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get mealAiNoFood =>
-      'Не открихме храна на снимката. Опитай пак с чинията в кадър.';
+      'Не открихме храна на снимката. Опитай отново с цялата чиния в кадър.';
 
   @override
   String get mealAiErrorPhoto =>
@@ -475,7 +476,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get mealErrorEditLimit =>
-      'Промените по минали дни за този месец свършиха.';
+      'Този месец нямаш повече промени по минали дни.';
 
   @override
   String get mealErrorSave => 'Не успяхме да запазим храненето. Опитай отново.';
@@ -557,11 +558,11 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get cameraAllowApp =>
-      'Разреши достъп до камерата, за да сканираш баркодове и да снимаш. Ако по-рано е отказан, включи го от настройките на телефона.';
+      'Разреши достъп до камерата, за да сканираш баркодове и да снимаш. Ако достъпът е бил отказан, включи го от настройките на телефона.';
 
   @override
   String get cameraErrorReader =>
-      'Не успяхме да пуснем четеца на баркодове. Опитай отново.';
+      'Не успяхме да включим четеца на баркодове. Опитай отново.';
 
   @override
   String get cameraErrorPhoto =>
@@ -579,7 +580,7 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
-  String get cameraBarcodeTitle => 'Насочи към баркода';
+  String get cameraBarcodeTitle => 'Насочи камерата към баркода';
 
   @override
   String get cameraBarcodeTip => 'Дръж го в рамката и ще се прочете сам.';
@@ -594,15 +595,14 @@ class AppLocalizationsBg extends AppLocalizations {
   String get cameraFrontTitle => 'Снимай опаковката отпред';
 
   @override
-  String get cameraFrontTip =>
-      'Да се вижда цялата предна страна, заедно с името.';
+  String get cameraFrontTip => 'Цялата предна страна в кадър, заедно с името.';
 
   @override
   String get cameraTableTitle => 'Снимай таблицата с хранителните стойности';
 
   @override
   String get cameraTableTip =>
-      'Таблицата да изпълва кадъра, изправена и на фокус, за да се чете всяко число.';
+      'Таблицата да изпълва кадъра, изпъната и на фокус, за да се чете всяко число.';
 
   @override
   String get cameraSmartSnap => 'Smart Snap';
@@ -653,7 +653,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get foodErrorOffline =>
-      'Няма връзка с базата с храни. Провери интернета си.';
+      'Не успяхме да се свържем с базата с храни. Провери връзката си.';
 
   @override
   String get contributeAddNutritionTitle => 'Добави хранителните стойности';
@@ -809,7 +809,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get contributeErrorOffline =>
-      'Няма връзка с Open Food Facts. Провери интернета си и опитай отново.';
+      'Не успяхме да се свържем с Open Food Facts. Провери връзката си и опитай отново.';
 
   @override
   String get macroProtein => 'Протеин';
@@ -966,7 +966,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get macroGuideSaltWhy =>
-      'Вдига кръвното. Повечето е скрита в хляба, сиренето и готовите храни.';
+      'Вдига кръвното. Най-много се крие в хляба, сиренето и готовите храни.';
 
   @override
   String get macroGuideSaltTarget =>
@@ -1112,22 +1112,23 @@ class AppLocalizationsBg extends AppLocalizations {
   String get historyDayOff => 'Почивен ден';
 
   @override
-  String get historyDayNoMacros => 'Няма данни за макросите от този ден';
+  String get historyDayNoMacros =>
+      'Няма данни за макроси в храненията от този ден';
 
   @override
   String historyChangesLeft(int left, int limit) {
     String _temp0 = intl.Intl.pluralLogic(
       left,
       locale: localeName,
-      other: 'Остават $left от $limit промени в минали дни за този месец',
-      one: 'Остава 1 от $limit промени в минали дни за този месец',
+      other: 'Остават $left от $limit промени по минали дни този месец',
+      one: 'Остава 1 от $limit промени по минали дни този месец',
     );
     return '$_temp0';
   }
 
   @override
   String get historyNoChangesLeft =>
-      'Няма повече промени в минали дни за този месец.';
+      'Този месец нямаш повече промени по минали дни.';
 
   @override
   String get historyDayNoMeals => 'Няма записани хранения за този ден.';
@@ -1140,12 +1141,12 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String historyDeleteMealNamed(String name) {
-    return 'Да махнем ли „$name“ от този ден?';
+    return 'Да премахнем ли „$name“ от този ден?';
   }
 
   @override
   String get historyDeleteMealUnnamed =>
-      'Да махнем ли това хранене от този ден?';
+      'Да премахнем ли това хранене от този ден?';
 
   @override
   String get historyCancel => 'Отказ';
@@ -1165,7 +1166,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get coachSubtitle =>
-      'Свежи съвети, направени специално за теб, всеки понеделник – за да се храниш по-добре и да постигнеш целите си.';
+      'Всеки понеделник – свежи съвети само за теб, за да се храниш по-добре и да постигнеш целите си.';
 
   @override
   String get coachPromiseHoldingBackTitle => 'Виж какво те спъва';
@@ -1226,7 +1227,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String coachFirstNotesBody(String date) {
-    return 'AI треньорът чете цялата седмица наведнъж, затова следи тази, докато записваш. В понеделник, $date, ще ти каже какво е вървяло добре, какво те е спъвало и какво да пробваш следващата седмица.';
+    return 'AI треньорът преглежда цялата седмица наведнъж, затова следи тази, докато записваш храненията си. В понеделник, $date, ще ти каже какво е вървяло добре, какво те е спъвало и какво да пробваш следващата седмица.';
   }
 
   @override
@@ -1258,7 +1259,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get coachKeepGoing => 'Продължавай така';
 
   @override
-  String get coachTryThis => 'Пробвай';
+  String get coachTryThis => 'Пробвай това';
 
   @override
   String get coachNotesComing =>
@@ -1313,7 +1314,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get recipesEmpty => 'Още няма рецепти тук.';
 
   @override
-  String get recipesNoMatch => 'Няма такива рецепти. Пробвай с други думи.';
+  String get recipesNoMatch => 'Няма такива рецепти. Опитай с други думи.';
 
   @override
   String get recipesLogPortion => 'Запиши порция';
@@ -1443,7 +1444,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get notificationsCreatine => 'Напомняне за креатин';
 
   @override
-  String get starBecome => 'Стани звезда';
+  String get starBecome => 'Вземи YumSum Star';
 
   @override
   String get starHeaderPitch => 'Блесни с тези умни екстри.';
@@ -1525,12 +1526,12 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String starTermsYearly(String price) {
-    return '$price на година. Абонаментът се подновява всяка година, докато не го прекратиш. Прекрати го по всяко време в Google Play.';
+    return '$price на година. Подновява се автоматично всяка година. Можеш да го прекратиш по всяко време в Google Play.';
   }
 
   @override
   String starTermsMonthly(String price) {
-    return '$price на месец. Абонаментът се подновява всеки месец, докато не го прекратиш. Прекрати го по всяко време в Google Play.';
+    return '$price на месец. Подновява се автоматично всеки месец. Можеш да го прекратиш по всяко време в Google Play.';
   }
 
   @override
@@ -1539,9 +1540,9 @@ class AppLocalizationsBg extends AppLocalizations {
       days,
       locale: localeName,
       other:
-          '$days дни безплатно, след това $price на година. Абонаментът се подновява всяка година, докато не го прекратиш. Прекрати го по всяко време в Google Play.',
+          '$days дни безплатно, след това $price на година. Подновява се автоматично всяка година. Можеш да го прекратиш по всяко време в Google Play.',
       one:
-          '1 ден безплатно, след това $price на година. Абонаментът се подновява всяка година, докато не го прекратиш. Прекрати го по всяко време в Google Play.',
+          '1 ден безплатно, след това $price на година. Подновява се автоматично всяка година. Можеш да го прекратиш по всяко време в Google Play.',
     );
     return '$_temp0';
   }
@@ -1552,9 +1553,9 @@ class AppLocalizationsBg extends AppLocalizations {
       days,
       locale: localeName,
       other:
-          '$days дни безплатно, след това $price на месец. Абонаментът се подновява всеки месец, докато не го прекратиш. Прекрати го по всяко време в Google Play.',
+          '$days дни безплатно, след това $price на месец. Подновява се автоматично всеки месец. Можеш да го прекратиш по всяко време в Google Play.',
       one:
-          '1 ден безплатно, след това $price на месец. Абонаментът се подновява всеки месец, докато не го прекратиш. Прекрати го по всяко време в Google Play.',
+          '1 ден безплатно, след това $price на месец. Подновява се автоматично всеки месец. Можеш да го прекратиш по всяко време в Google Play.',
     );
     return '$_temp0';
   }
@@ -1567,7 +1568,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String starOnTrial(String date) {
-    return 'Вече имаш YumSum Star. Безплатната ти седмица свършва на $date.';
+    return 'Вече имаш YumSum Star. Безплатната ти седмица изтича на $date.';
   }
 
   @override
@@ -1578,7 +1579,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get starWeb =>
-      'Абонирай се от приложението YumSum за Android. После YumSum Star работи и тук, щом влезеш със същия профил.';
+      'Абонирай се от приложението YumSum за Android и YumSum Star ще работи и тук, щом влезеш със същия профил.';
 
   @override
   String get starNoIphone => 'YumSum Star още не може да се купи на iPhone.';
@@ -1645,7 +1646,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get starErrorOtherAccount =>
-      'Този абонамент в Google Play е свързан с друг профил в YumSum. Влез с онзи профил, за да ползваш абонамента.';
+      'Този абонамент в Google Play е свързан с друг профил в YumSum. Влез с другия профил, за да го ползваш.';
 
   @override
   String get starNothingToRestore =>
@@ -1675,7 +1676,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get commonErrorTooManyAttempts =>
-      'Твърде много опити. Опитай пак по-късно.';
+      'Твърде много опити. Опитай отново по-късно.';
 
   @override
   String get authSignInTab => 'Вход';
@@ -1700,7 +1701,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get authForgotPasswordNeedsEmail =>
-      'Въведи имейла си горе и тогава натисни „Забравена парола?“';
+      'Първо въведи имейла си горе, после натисни „Забравена парола?“';
 
   @override
   String get authOr => 'или';
@@ -1799,7 +1800,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get planActivityHighHint =>
-      'Физически труд, много крачки или много активни дни.';
+      'Физически труд, много крачки или особено активни дни.';
 
   @override
   String get planTrainingNone => 'Без редовни тренировки';
@@ -2048,7 +2049,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get accountErrorNoConnection =>
-      'Няма връзка. Провери интернета си и опитай отново.';
+      'Не успяхме да се свържем. Провери връзката си и опитай отново.';
 
   @override
   String get accountErrorEmailInUse => 'Вече има профил с този имейл адрес.';
@@ -2141,7 +2142,8 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
-  String get feedbackErrorSend => 'Не успяхме да го изпратим. Опитай отново.';
+  String get feedbackErrorSend =>
+      'Не успяхме да изпратим съобщението. Опитай отново.';
 
   @override
   String get feedbackSending => 'Изпращане…';

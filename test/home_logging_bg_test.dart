@@ -212,7 +212,7 @@ void main() {
     expect(find.text(capitalised(bg.weekdayDayMonth(now))), findsOneWidget);
     expect(find.textContaining('ккал остават', findRichText: true), findsOne);
     expect(find.textContaining('Изядени 1090 от'), findsOneWidget);
-    expect(find.text('Храненията днес'), findsOneWidget);
+    expect(find.text('Днешни хранения'), findsOneWidget);
     expect(find.text('2 записани'), findsOneWidget);
     expect(find.text('Отключи макроси'), findsOneWidget);
     expect(
@@ -454,6 +454,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Калории по твоя мярка'), findsOneWidget);
     expect(find.text('По-късно'), findsOneWidget);
-    expect(find.text('Стани Star'), findsOneWidget);
+    expect(find.text('Вземи YumSum Star'), findsOneWidget);
   });
 }

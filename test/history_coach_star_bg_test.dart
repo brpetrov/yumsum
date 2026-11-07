@@ -152,7 +152,7 @@ void main() {
     expect(find.text('1850 от 1900 ккал'), findsOneWidget);
     expect(find.text('В целта'), findsOneWidget);
     expect(
-      find.text('Остава 1 от 10 промени в минали дни за този месец'),
+      find.text('Остава 1 от 10 промени по минали дни този месец'),
       findsOneWidget,
     );
     expect(find.text('Няма записани хранения за този ден.'), findsOneWidget);
@@ -209,7 +209,7 @@ void main() {
 
       expect(find.text('AI треньор'), findsOneWidget);
       expect(find.text('Миналата седмица'), findsOneWidget);
-      expect(find.text('Пробвай'), findsOneWidget);
+      expect(find.text('Пробвай това'), findsOneWidget);
       expect(find.text('Продължавай така'), findsOneWidget);
       expect(find.byTooltip('Предишна седмица'), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -220,7 +220,7 @@ void main() {
 
       expect(find.text('Твоят AI треньор'), findsOneWidget);
       expect(find.text('Виж какво те спъва'), findsOneWidget);
-      expect(find.text('Стани звезда'), findsOneWidget);
+      expect(find.text('Вземи YumSum Star'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });
