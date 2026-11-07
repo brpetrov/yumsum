@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -6,9 +8,12 @@ import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
+import 'package:lean_streak/screens/dashboard/helpers/web_barcode_stub.dart'
+    if (dart.library.js_interop) 'package:lean_streak/screens/dashboard/helpers/web_barcode_web.dart';
 
-/// The bar's camera on phones, in the app or a browser, in one of two
-/// modes. Resolves to what it got, or null when closed.
+/// The bar's camera on phones, in the app or a browser, and in a desktop's
+/// browser, in one of two modes. Resolves to what it got, or null when
+/// closed.
 class MealCameraPage extends StatefulWidget {
   /// A live picture that picks up a packet's barcode by itself; nothing
   /// to press.
@@ -33,8 +38,10 @@ class _MealCameraPageState extends State<MealCameraPage>
     DeviceOrientation.landscapeRight: 270,
   };
 
-  /// The on-device barcode reader; the browser has none.
-  final BarcodeScanner? _scanner = hasBarcodeScanner
+  /// The app's barcode reader, ML Kit on the phone. The web's is in the
+  /// browser ([readWebBarcode]), which looks at the preview a few times a
+  /// second ([_webReading]).
+  final BarcodeScanner? _scanner = !kIsWeb && hasLiveCamera
       ? BarcodeScanner(
           formats: const [
             BarcodeFormat.ean13,
@@ -45,6 +52,7 @@ class _MealCameraPageState extends State<MealCameraPage>
         )
       : null;
   CameraController? _camera;
+  Timer? _webReading;
   bool _reading = false;
   bool _done = false;
   String? _problem;
@@ -78,9 +86,15 @@ class _MealCameraPageState extends State<MealCameraPage>
   /// reopened in the meantime.
   void _release() {
     _done = true;
+    _stopWebReading();
     final camera = _camera;
     _camera = null;
     _letGo(camera);
+  }
+
+  void _stopWebReading() {
+    _webReading?.cancel();
+    _webReading = null;
   }
 
   /// A controller whose start failed throws from dispose too; that is
@@ -100,8 +114,7 @@ class _MealCameraPageState extends State<MealCameraPage>
     _start();
   }
 
-  /// In a browser whose camera won't start: a photo from the device's
-  /// files instead.
+  /// In a browser: a photo from the device's files instead.
   Future<void> _pickInstead() async {
     final capture = await pickMealPhoto();
     if (capture != null) _leave(capture);
@@ -115,6 +128,7 @@ class _MealCameraPageState extends State<MealCameraPage>
     if (state == AppLifecycleState.inactive) {
       // Not yet initialised means the permission prompt is up; leave it be.
       if (camera == null || !camera.value.isInitialized) return;
+      _stopWebReading();
       _camera = null;
       _letGo(camera);
       setState(() {});
@@ -154,6 +168,12 @@ class _MealCameraPageState extends State<MealCameraPage>
       }
       if (_scanning && _scanner != null) {
         await camera.startImageStream(_onFrame);
+      } else if (_scanning && kIsWeb) {
+        _stopWebReading();
+        _webReading = Timer.periodic(
+          const Duration(milliseconds: 250),
+          (_) => _readWebFrame(),
+        );
       }
       setState(() {});
     } on CameraException catch (error) {
@@ -165,7 +185,8 @@ class _MealCameraPageState extends State<MealCameraPage>
         () => _problem = !error.code.startsWith('CameraAccess')
             ? 'The camera could not start.'
             : kIsWeb
-            ? 'Allow camera access in your browser to take photos.'
+            ? 'Allow camera access in your browser to scan barcodes and take '
+                  'photos.'
             : 'Allow camera access to scan barcodes and take photos. If '
                   'you said no before, turn it on in your phone\'s Settings.',
       );
@@ -189,6 +210,33 @@ class _MealCameraPageState extends State<MealCameraPage>
       }
     } catch (_) {
       // An unreadable frame; the next one will do.
+    } finally {
+      _reading = false;
+    }
+  }
+
+  /// The browser looks for a barcode in the preview; a look still going
+  /// skips the tick. When no reader could be loaded the camera is let go
+  /// and the page says so, with Try again.
+  Future<void> _readWebFrame() async {
+    if (_reading || _done || !mounted) return;
+    _reading = true;
+    try {
+      final code = await readWebBarcode();
+      if (code != null && !_done) {
+        _done = true;
+        _leave((barcode: code, photos: const []));
+      }
+    } catch (_) {
+      if (!_done && mounted) {
+        _stopWebReading();
+        final camera = _camera;
+        _camera = null;
+        _letGo(camera);
+        setState(
+          () => _problem = 'Could not start the barcode reader. Try again.',
+        );
+      }
     } finally {
       _reading = false;
     }
@@ -411,6 +459,14 @@ class _MealCameraPageState extends State<MealCameraPage>
                               ),
                             ),
                           ),
+                          if (kIsWeb)
+                            TextButton(
+                              onPressed: _pickInstead,
+                              style: TextButton.styleFrom(
+                                foregroundColor: white,
+                              ),
+                              child: const Text('Choose a photo instead'),
+                            ),
                         ],
                       ],
                     ),

@@ -960,7 +960,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                   _working ? null : _takePhoto,
                   dim: !plus,
                 ),
-                if (hasBarcodeScanner) ...[
+                if (hasLiveCamera) ...[
                   const SizedBox(width: 6),
                   _circle(
                     const Icon(Icons.qr_code_scanner_rounded),

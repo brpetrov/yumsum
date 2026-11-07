@@ -34,17 +34,15 @@ final mealCameraProvider =
       Future<MealCapture?> Function(BuildContext context, CameraMode mode)
     >((ref) => openMealCamera);
 
-/// Phones get the live camera page, in the app or a browser; a desktop,
-/// where nobody holds a plate up to the webcam, picks a photo file.
+/// The live camera page, which also reads barcodes: phones, in the app or a
+/// browser, and every browser, a desktop's webcam included (its page offers
+/// a photo file as well). The desktop app picks a photo file.
 bool get hasLiveCamera =>
+    kIsWeb ||
     defaultTargetPlatform == TargetPlatform.android ||
     defaultTargetPlatform == TargetPlatform.iOS;
 
-/// Only the app reads barcodes: the scanner runs on the phone, and a
-/// browser can't run it.
-bool get hasBarcodeScanner => !kIsWeb && hasLiveCamera;
-
-/// Phones get the live camera; elsewhere [pickMealPhoto].
+/// The live camera; elsewhere [pickMealPhoto].
 Future<MealCapture?> openMealCamera(
   BuildContext context,
   CameraMode mode,
