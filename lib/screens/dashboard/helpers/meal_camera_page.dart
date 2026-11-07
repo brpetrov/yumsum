@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 import 'package:lean_streak/screens/dashboard/helpers/web_camera_stub.dart'
     if (dart.library.js_interop) 'package:lean_streak/screens/dashboard/helpers/web_camera_web.dart';
@@ -159,7 +160,7 @@ class _MealCameraPageState extends State<MealCameraPage>
         final cameras = await availableCameras();
         if (!mounted || _done) return;
         if (cameras.isEmpty) {
-          if (mounted) setState(() => _problem = 'No camera found.');
+          if (mounted) setState(() => _problem = context.l10n.cameraNotFound);
           return;
         }
         description = cameras.firstWhere(
@@ -191,16 +192,15 @@ class _MealCameraPageState extends State<MealCameraPage>
       _camera = null;
       _letGo(failed);
       if (!mounted) return;
+      final l10n = context.l10n;
       setState(
         () => _problem = error.code == 'cameraNotFound'
-            ? 'No camera found.'
+            ? l10n.cameraNotFound
             : !error.code.startsWith('CameraAccess')
-            ? 'The camera could not start.'
+            ? l10n.cameraCouldNotStart
             : kIsWeb
-            ? 'Allow camera access in your browser to scan barcodes and take '
-                  'photos.'
-            : 'Allow camera access to scan barcodes and take photos. If '
-                  'you said no before, turn it on in your phone\'s Settings.',
+            ? l10n.cameraAllowWeb
+            : l10n.cameraAllowApp,
       );
     }
   }
@@ -282,9 +282,7 @@ class _MealCameraPageState extends State<MealCameraPage>
         final camera = _camera;
         _camera = null;
         _letGo(camera);
-        setState(
-          () => _problem = 'Could not start the barcode reader. Try again.',
-        );
+        setState(() => _problem = context.l10n.cameraErrorReader);
       }
     } finally {
       _reading = false;
@@ -341,9 +339,9 @@ class _MealCameraPageState extends State<MealCameraPage>
       // Closed meanwhile: nothing to go back to.
       if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) return;
       _done = false;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not take the photo. Try again.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.cameraErrorPhoto)));
       if (_camera == null &&
           WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
         // The app went to the background mid-photo and is back already.
@@ -355,6 +353,7 @@ class _MealCameraPageState extends State<MealCameraPage>
   @override
   Widget build(BuildContext context) {
     const white = Colors.white;
+    final l10n = context.l10n;
     final camera = _camera;
     final ready = camera != null && camera.value.isInitialized;
     final steps = widget.photoSteps;
@@ -413,7 +412,7 @@ class _MealCameraPageState extends State<MealCameraPage>
                                 foregroundColor: white,
                                 side: const BorderSide(color: white),
                               ),
-                              child: const Text('Try again'),
+                              child: Text(l10n.commonTryAgain),
                             ),
                             if (kIsWeb && !_scanning) ...[
                               const SizedBox(height: 8),
@@ -422,7 +421,7 @@ class _MealCameraPageState extends State<MealCameraPage>
                                 style: TextButton.styleFrom(
                                   foregroundColor: white,
                                 ),
-                                child: const Text('Choose a photo instead'),
+                                child: Text(l10n.cameraChoosePhoto),
                               ),
                             ],
                           ],
@@ -446,7 +445,7 @@ class _MealCameraPageState extends State<MealCameraPage>
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: IconButton(
-                    tooltip: 'Close',
+                    tooltip: l10n.commonClose,
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(
                       Icons.close_rounded,
@@ -472,14 +471,7 @@ class _MealCameraPageState extends State<MealCameraPage>
                           duration: const Duration(milliseconds: 250),
                           child: PhotoStepCard(
                             key: ValueKey(index),
-                            step: _scanning
-                                ? const (
-                                    title: 'Point at the barcode',
-                                    tip:
-                                        'Hold it inside the box and it\'s '
-                                        'read by itself.',
-                                  )
-                                : steps[index],
+                            step: _scanning ? PhotoStep.barcode : steps[index],
                             number: steps.length > 1 ? index + 1 : null,
                             total: steps.length,
                           ),
@@ -488,7 +480,7 @@ class _MealCameraPageState extends State<MealCameraPage>
                           const SizedBox(height: 20),
                           Semantics(
                             button: true,
-                            label: 'Take photo',
+                            label: l10n.cameraTakePhoto,
                             child: GestureDetector(
                               onTap: _takePhoto,
                               child: Container(
@@ -514,7 +506,7 @@ class _MealCameraPageState extends State<MealCameraPage>
                               style: TextButton.styleFrom(
                                 foregroundColor: white,
                               ),
-                              child: const Text('Choose a photo instead'),
+                              child: Text(l10n.cameraChoosePhoto),
                             ),
                         ],
                       ],
@@ -546,6 +538,7 @@ class PhotoStepCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const white = Colors.white;
+    final l10n = context.l10n;
     return Container(
       constraints: const BoxConstraints(maxWidth: 420),
       margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -565,7 +558,7 @@ class PhotoStepCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Text(
-                'Step $number of $total',
+                l10n.cameraStep(number!, total),
                 style: TextStyle(
                   color: AppColors.onPrimary,
                   fontSize: 13,
@@ -576,7 +569,7 @@ class PhotoStepCard extends StatelessWidget {
             const SizedBox(height: 10),
           ],
           Text(
-            step.title,
+            step.title(l10n),
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: white,
@@ -585,18 +578,16 @@ class PhotoStepCard extends StatelessWidget {
               height: 1.25,
             ),
           ),
-          if (step.tip case final tip?) ...[
-            const SizedBox(height: 6),
-            Text(
-              tip,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: white.withValues(alpha: 0.8),
-                fontSize: 14,
-                height: 1.35,
-              ),
+          const SizedBox(height: 6),
+          Text(
+            step.tip(l10n),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: white.withValues(alpha: 0.8),
+              fontSize: 14,
+              height: 1.35,
             ),
-          ],
+          ),
         ],
       ),
     );

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 
 /// A small round badge with a wheat sprig, on the photo of a recipe high in
 /// fibre (`Recipe.highFibre`). Material has no such icon, so it is drawn.
@@ -10,13 +11,12 @@ import 'package:lean_streak/core/constants/app_colors.dart';
 class FibreBadge extends StatelessWidget {
   const FibreBadge({super.key, this.size = 28, this.showLabel = false});
 
-  static const text = 'Rich in fibre';
-
   final double size;
   final bool showLabel;
 
   @override
   Widget build(BuildContext context) {
+    final text = context.l10n.macroFibreBadge;
     final sprig = SizedBox.square(
       dimension: size * 0.6,
       child: CustomPaint(painter: _SprigPainter(AppColors.veryGood)),

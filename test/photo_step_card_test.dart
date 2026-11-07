@@ -17,7 +17,7 @@ void main() {
   ) async {
     await pumpCard(
       tester,
-      const PhotoStepCard(step: nutritionTableStep, number: 2, total: 2),
+      const PhotoStepCard(step: PhotoStep.nutritionTable, number: 2, total: 2),
     );
     expect(find.text('Step 2 of 2'), findsOneWidget);
     expect(find.text('Take a photo of the nutrition table'), findsOneWidget);
@@ -25,10 +25,7 @@ void main() {
   });
 
   testWidgets('a single photo has no step count', (tester) async {
-    await pumpCard(
-      tester,
-      const PhotoStepCard(step: (title: 'Point at the barcode', tip: null)),
-    );
+    await pumpCard(tester, const PhotoStepCard(step: PhotoStep.barcode));
     expect(find.textContaining('Step'), findsNothing);
     expect(find.text('Point at the barcode'), findsOneWidget);
   });

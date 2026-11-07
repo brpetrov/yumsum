@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
@@ -124,11 +125,11 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
       _macros = result.macros;
       _macrosKcal = result.kcal;
     } on DailyLimitExceededException {
-      _error = 'Daily AI limit reached. Enter the calories yourself.';
+      if (mounted) _error = context.l10n.mealAiLimit;
     } on CalorieEstimateException catch (error) {
       _error = error.message;
     } catch (_) {
-      _error = 'Could not reach the AI. Try again.';
+      if (mounted) _error = context.l10n.mealErrorAi;
     }
 
     if (!mounted) return;
@@ -149,9 +150,9 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
   }
 
   Future<void> _submit() async {
-    final calories = double.tryParse(_caloriesController.text.trim());
+    final calories = parseDecimal(_caloriesController.text);
     if (calories == null || calories <= 0) {
-      setState(() => _error = 'Enter the calories, or estimate them.');
+      setState(() => _error = context.l10n.mealErrorNoCalories);
       return;
     }
     setState(() => _error = null);
@@ -163,7 +164,7 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
           date: _date,
           name: _nameController.text,
           calories: calories,
-          proteinGrams: double.tryParse(_proteinController.text.trim()),
+          proteinGrams: parseDecimal(_proteinController.text),
           macros: switch ((_macros, _macrosKcal)) {
             (final macros?, final from?) when from > 0 => macros.scaled(
               calories / from,
@@ -177,8 +178,8 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
     if (result.hasError) {
       setState(
         () => _error = result.error is EditLimitExceededException
-            ? 'No past-day changes left this month.'
-            : 'Could not save the meal. Try again.',
+            ? context.l10n.mealErrorEditLimit
+            : context.l10n.mealErrorSave,
       );
       return;
     }
@@ -189,10 +190,11 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
   Widget build(BuildContext context) {
     final saving = ref.watch(logMealControllerProvider).isLoading;
     final showProtein = ref.watch(trackProteinProvider);
+    final l10n = context.l10n;
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final dateLabel = _date == today
         ? null
-        : DateFormat('EEEE, d MMMM').format(DateTime.parse(_date));
+        : capitalised(l10n.weekdayDayMonth(DateTime.parse(_date)));
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -211,7 +213,7 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              _isEditing ? 'Edit meal' : 'Add meal',
+              _isEditing ? l10n.mealEditTitle : l10n.mealAddTitle,
               style: AppTheme.display.copyWith(
                 fontSize: 22,
                 color: AppColors.textPrimary,
@@ -231,9 +233,9 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
               textInputAction: TextInputAction.next,
               // An estimate's macros belong to the food it was for.
               onChanged: (_) => setState(() => _macros = null),
-              decoration: const InputDecoration(
-                labelText: 'Meal',
-                hintText: 'e.g. Musaka, chicken wrap',
+              decoration: InputDecoration(
+                labelText: l10n.mealName,
+                hintText: l10n.mealNameHint,
               ),
             ),
             const SizedBox(height: 12),
@@ -248,9 +250,9 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
                         ? TextInputAction.next
                         : TextInputAction.done,
                     onSubmitted: showProtein ? null : (_) => _submit(),
-                    decoration: const InputDecoration(
-                      labelText: 'Calories',
-                      suffixText: 'kcal',
+                    decoration: InputDecoration(
+                      labelText: l10n.mealCalories,
+                      suffixText: l10n.commonKcalUnit,
                     ),
                   ),
                 ),
@@ -263,9 +265,9 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       textInputAction: TextInputAction.done,
                       onSubmitted: (_) => _submit(),
-                      decoration: const InputDecoration(
-                        labelText: 'Protein',
-                        suffixText: 'g',
+                      decoration: InputDecoration(
+                        labelText: l10n.mealProtein,
+                        suffixText: l10n.commonGramsUnit,
                       ),
                     ),
                   ),
@@ -275,7 +277,7 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
             if (showProtein) ...[
               const SizedBox(height: 6),
               Text(
-                'Leave protein blank to estimate it from the name.',
+                l10n.mealProteinNote,
                 style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             ],
@@ -293,7 +295,7 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.auto_awesome_rounded, size: 18),
-                label: const Text('Estimate from name'),
+                label: Text(l10n.mealEstimateFromName),
               ),
             ),
             if (_estimateItems.isNotEmpty)
@@ -321,7 +323,7 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
                         color: AppColors.onPrimary,
                       ),
                     )
-                  : Text(_isEditing ? 'Save changes' : 'Save meal'),
+                  : Text(_isEditing ? l10n.mealSaveChanges : l10n.mealSave),
             ),
           ],
         ),

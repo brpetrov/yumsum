@@ -14,7 +14,6 @@ import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
 import 'package:lean_streak/providers/weight_log_controller.dart';
-import 'package:lean_streak/screens/dashboard/helpers/adaptive_dialogs.dart';
 import 'package:lean_streak/screens/progress/progress_screen.dart';
 import 'package:lean_streak/services/weight_log_service.dart';
 import 'package:lean_streak/widgets/app_card.dart';
@@ -180,7 +179,10 @@ void main() {
     await tester.ensureVisible(find.text('Adaptive formula'));
     await tester.tap(find.text('Adaptive formula'));
     await tester.pumpAndSettle();
-    expect(find.text(adaptiveSubtitle), findsOneWidget);
+    expect(
+      find.textContaining('Feel more confident about how much to eat'),
+      findsOneWidget,
+    );
     expect(find.text('Become a Star'), findsOneWidget);
     expect(find.text('Maybe later'), findsOneWidget);
     expect(find.text('Log my weight'), findsNothing);

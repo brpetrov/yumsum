@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/country_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
@@ -54,7 +55,7 @@ class _FoodSearchSheetState extends ConsumerState<_FoodSearchSheet> {
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
             child: Text(
-              'Packaged foods · Open Food Facts',
+              context.l10n.foodSearchSource,
               style: muted.copyWith(fontSize: 13),
             ),
           ),
@@ -74,9 +75,8 @@ class _FoodSearchSheetState extends ConsumerState<_FoodSearchSheet> {
                       error is FoodLookupException
                           ? error.message
                           : snapshot.hasError
-                          ? 'Could not search right now.'
-                          : 'Nothing found. Try other words, or let the AI '
-                                'estimate it.',
+                          ? context.l10n.foodSearchError
+                          : context.l10n.foodSearchEmpty,
                       style: muted,
                     ),
                   );
@@ -94,7 +94,7 @@ class _FoodSearchSheetState extends ConsumerState<_FoodSearchSheet> {
                       subtitle: Text(
                         [
                           if (food.brand != null) food.brand!,
-                          '${food.kcalPer100g} kcal per 100 g',
+                          context.l10n.foodPer100g(food.kcalPer100g),
                         ].join(' · '),
                       ),
                       onTap: () => Navigator.of(context).pop(food),

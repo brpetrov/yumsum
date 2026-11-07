@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
 import 'package:lean_streak/widgets/macro_totals.dart';
@@ -73,8 +74,8 @@ class _PortionSheetState extends State<_PortionSheet> {
 
   String _amounts(int kcal, int? protein) =>
       protein == null || !widget.showProtein
-      ? '$kcal kcal'
-      : '$kcal kcal · $protein g protein';
+      ? context.l10n.commonKcal(kcal)
+      : context.l10n.commonKcalProtein(kcal, protein);
 
   @override
   Widget build(BuildContext context) {
@@ -119,8 +120,9 @@ class _PortionSheetState extends State<_PortionSheet> {
                       if (food.brand != null) Text(food.brand!, style: muted),
                       const SizedBox(height: 4),
                       Text(
-                        '${_amounts(food.kcalPer100g, food.proteinPer100g)}'
-                        ' per 100 g · Open Food Facts',
+                        context.l10n.foodPortionSource(
+                          _amounts(food.kcalPer100g, food.proteinPer100g),
+                        ),
                         style: muted.copyWith(fontSize: 13),
                       ),
                     ],
@@ -138,9 +140,9 @@ class _PortionSheetState extends State<_PortionSheet> {
                     autofocus: true,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    decoration: const InputDecoration(
-                      labelText: 'Amount',
-                      suffixText: 'g',
+                    decoration: InputDecoration(
+                      labelText: context.l10n.foodPortionAmount,
+                      suffixText: context.l10n.commonGramsUnit,
                     ),
                     onChanged: (_) => setState(() {}),
                     onSubmitted: (_) => _use(),
@@ -162,7 +164,10 @@ class _PortionSheetState extends State<_PortionSheet> {
             if (widget.showMacros && _amount > 0)
               if (portion.macros case final macros?) ...[
                 const SizedBox(height: 10),
-                Text(macrosLine(macros), style: muted.copyWith(fontSize: 13)),
+                Text(
+                  macrosLine(macros, l10n: context.l10n),
+                  style: muted.copyWith(fontSize: 13),
+                ),
               ],
             const SizedBox(height: 20),
             FilledButton(
@@ -170,7 +175,7 @@ class _PortionSheetState extends State<_PortionSheet> {
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(52),
               ),
-              child: const Text('Done'),
+              child: Text(context.l10n.commonDone),
             ),
           ],
         ),

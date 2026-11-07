@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:lean_streak/core/constants/app_info.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/nutrients.dart';
 
 /// A packaged food as Open Food Facts describes it, per 100 g.
@@ -55,11 +57,15 @@ class FoodLookupException implements Exception {
 
 /// Looks packaged foods up in Open Food Facts, the open database behind
 /// most barcode scanners: by barcode, or by name. Only the barcode or the
-/// words searched for are sent.
+/// words searched for are sent. Its errors are in [l10n]'s language,
+/// English without it.
 class FoodLookupService {
-  FoodLookupService([http.Client? client]) : _client = client ?? http.Client();
+  FoodLookupService([http.Client? client, AppLocalizations? l10n])
+    : _client = client ?? http.Client(),
+      _l10n = l10n ?? lookupAppLocalizations(const Locale('en'));
 
   final http.Client _client;
+  final AppLocalizations _l10n;
 
   /// The product behind [barcode].
   Future<BarcodeLookup> byBarcode(String barcode) async {
@@ -77,9 +83,7 @@ class FoodLookupService {
       return (listed: false, food: null, needsNutrition: null);
     }
     if (response.statusCode != 200) {
-      throw const FoodLookupException(
-        'The food database is not answering right now.',
-      );
+      throw FoodLookupException(_l10n.foodErrorNotAnswering);
     }
     final json = jsonDecode(response.body) as Map<String, dynamic>;
     return (
@@ -102,9 +106,7 @@ class FoodLookupService {
     });
     final response = await _get(uri);
     if (response.statusCode != 200) {
-      throw const FoodLookupException(
-        'The food database is not answering right now.',
-      );
+      throw FoodLookupException(_l10n.foodErrorNotAnswering);
     }
     return parseSearchHits(
       jsonDecode(response.body) as Map<String, dynamic>,
@@ -123,9 +125,7 @@ class FoodLookupService {
           )
           .timeout(const Duration(seconds: 12));
     } on Exception {
-      throw const FoodLookupException(
-        'Could not reach the food database. Check your connection.',
-      );
+      throw FoodLookupException(_l10n.foodErrorOffline);
     }
   }
 }

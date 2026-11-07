@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/widgets/macro_guide.dart';
 
-const _names = ['fat', 'saturates', 'carbs', 'sugars', 'fibre', 'salt'];
+/// The names of [_six]'s figures, in its order.
+List<String> _names(AppLocalizations l10n) => [
+  l10n.macroFat,
+  l10n.macroSaturates,
+  l10n.macroCarbs,
+  l10n.macroSugars,
+  l10n.macroFibre,
+  l10n.macroSalt,
+];
+
+/// Salt's place in [_six].
+const _salt = 5;
 
 List<double?> _six(Nutrients n) => [
   n.fat,
@@ -20,41 +32,41 @@ List<double?> _six(Nutrients n) => [
 const _nb = ' ';
 
 /// Whole grams, except salt, which gets one decimal.
-String _grams(String name, double value) =>
-    '${name == 'salt' ? value.toStringAsFixed(1) : value.round()}${_nb}g';
-
-String _capitalised(String text) =>
-    text.isEmpty ? text : text[0].toUpperCase() + text.substring(1);
+String _grams(AppLocalizations l10n, double value, {bool salt = false}) =>
+    '${salt ? l10n.decimal(value) : value.round()}$_nb${l10n.commonGramsUnit}';
 
 /// The known figures in one line, for a meal's row, the recipe page and the
 /// amount sheet: "Fat 18 g · saturates 6 g · carbs 52 g · sugars 5 g ·
 /// fibre 4 g · salt 2.1 g", each figure held together. With [protein], it
-/// goes where a food label has it, between fibre and salt.
-String macrosLine(Nutrients macros, {double? protein}) => _capitalised(
-  [
-    for (final (i, value) in _six(macros).indexed) ...[
-      if (_names[i] == 'salt' && protein != null)
-        'protein$_nb${_grams('protein', protein)}',
-      if (value != null) '${_names[i]}$_nb${_grams(_names[i], value)}',
-    ],
-  ].join(' · '),
-);
+/// goes where a food label has it, between fibre and salt. In [l10n]'s
+/// language, English without it.
+String macrosLine(Nutrients macros, {double? protein, AppLocalizations? l10n}) {
+  final texts = l10n ?? lookupAppLocalizations(const Locale('en'));
+  final names = _names(texts);
+  return capitalised(
+    [
+      for (final (i, value) in _six(macros).indexed) ...[
+        if (i == _salt && protein != null)
+          '${texts.macroProtein.toLowerCase()}$_nb${_grams(texts, protein)}',
+        if (value != null)
+          '${names[i].toLowerCase()}$_nb'
+              '${_grams(texts, value, salt: i == _salt)}',
+      ],
+    ].join(' · '),
+  );
+}
 
 /// A day's macros, for YumSum Star: one muted line with fat, carbs and salt
 /// (four figures don't fit a 360dp phone, and salt is the one with a
 /// limit), which opens on a tap to all six. Its info button explains each
 /// one and the UK's guides ([showMacroGuide]). Plain totals: no bars, no
 /// colours, no targets. Hidden with nothing logged; [noneNote] when no meal
-/// has macros.
+/// has macros (by default, that today's meals have none).
 class MacroTotals extends StatefulWidget {
-  const MacroTotals({
-    super.key,
-    required this.meals,
-    this.noneNote = 'No macro info for today\'s meals',
-  });
+  const MacroTotals({super.key, required this.meals, this.noneNote});
 
   final List<Meal> meals;
-  final String noneNote;
+  final String? noneNote;
 
   @override
   State<MacroTotals> createState() => _MacroTotalsState();
@@ -67,16 +79,19 @@ class _MacroTotalsState extends State<MacroTotals> {
   Widget build(BuildContext context) {
     final meals = widget.meals;
     if (meals.isEmpty) return const SizedBox.shrink();
+    final l10n = context.l10n;
     final muted = TextStyle(fontSize: 13, color: AppColors.textSecondary);
     final counted = [for (final meal in meals) ?meal.macros];
-    if (counted.isEmpty) return Text(widget.noneNote, style: muted);
+    if (counted.isEmpty) {
+      return Text(widget.noneNote ?? l10n.macroNoneToday, style: muted);
+    }
 
     final total = Nutrients.total(counted)!;
     final uncounted = meals.length - counted.length;
     // The info button, then the chevron, at the end of the last line.
     final ends = [
       IconButton(
-        tooltip: 'About macros',
+        tooltip: l10n.macroAbout,
         onPressed: () => showMacroGuide(context, withProtein: false),
         icon: const Icon(Icons.info_outline_rounded),
         iconSize: 18,
@@ -96,12 +111,13 @@ class _MacroTotalsState extends State<MacroTotals> {
     if (!_open) {
       final short = macrosLine(
         Nutrients(fat: total.fat, carbs: total.carbs, salt: total.salt),
+        l10n: l10n,
       );
       child = Row(
         children: [
           Expanded(
             child: Text(
-              short.isEmpty ? macrosLine(total) : short,
+              short.isEmpty ? macrosLine(total, l10n: l10n) : short,
               style: muted,
             ),
           ),
@@ -110,16 +126,17 @@ class _MacroTotalsState extends State<MacroTotals> {
       );
     } else {
       final totals = _six(total);
+      final names = _names(l10n);
       // "At least" where some of the counted meals don't give the figure.
       String value(int i) => switch (totals[i]) {
         null => '–',
         final grams when counted.any((n) => _six(n)[i] == null) =>
-          'at least ${_grams(_names[i], grams)}',
-        final grams => _grams(_names[i], grams),
+          l10n.macroAtLeast(_grams(l10n, grams, salt: i == _salt)),
+        final grams => _grams(l10n, grams, salt: i == _salt),
       };
       Widget cell(int i) => Row(
         children: [
-          Text(_capitalised(_names[i]), style: muted),
+          Text(names[i], style: muted),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -136,7 +153,7 @@ class _MacroTotalsState extends State<MacroTotals> {
       child = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (var i = 0; i < _names.length; i += 2)
+          for (var i = 0; i < names.length; i += 2)
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
               child: Row(
@@ -151,11 +168,7 @@ class _MacroTotalsState extends State<MacroTotals> {
             children: [
               Expanded(
                 child: uncounted > 0
-                    ? Text(
-                        '$uncounted ${uncounted == 1 ? 'meal' : 'meals'} not '
-                        'counted (no macro info)',
-                        style: muted,
-                      )
+                    ? Text(l10n.macroNotCountedMacros(uncounted), style: muted)
                     : const SizedBox.shrink(),
               ),
               ...ends,

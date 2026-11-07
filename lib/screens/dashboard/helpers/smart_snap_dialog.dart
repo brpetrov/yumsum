@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/widgets/feature_intro.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
-
-/// Smart Snap (photo logging) in one line, under its name in the dialog.
-const smartSnapSubtitle = 'Make food logging as easy as taking a photo.';
 
 /// Sells Smart Snap to someone without YumSum Star, from the bar's photo
 /// button. It is simple, so the dialog is small: the bowl with its camera
@@ -14,6 +12,7 @@ const smartSnapSubtitle = 'Make food logging as easy as taking a photo.';
 /// the line, two promises, and Become a Star, which opens the YumSum Star
 /// page.
 Future<void> showSmartSnapIntro(BuildContext context) async {
+  final l10n = context.l10n;
   final go = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
@@ -25,10 +24,10 @@ Future<void> showSmartSnapIntro(BuildContext context) async {
             filterQuality: FilterQuality.medium,
           ),
           const SizedBox(height: 10),
-          const Text('Smart Snap'),
+          Text(l10n.cameraSmartSnap),
           const SizedBox(height: 4),
           Text(
-            smartSnapSubtitle,
+            l10n.cameraSmartSnapSubtitle,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium!.copyWith(
               fontSize: 14.5,
@@ -38,28 +37,27 @@ Future<void> showSmartSnapIntro(BuildContext context) async {
           ),
         ],
       ),
-      content: const FeaturePromises([
+      content: FeaturePromises([
         (
           Icons.auto_awesome_rounded,
-          'Skip the manual entry',
-          'Snap your meal and let AI identify the food, with estimated '
-              'calories and macros for each item.',
+          l10n.cameraSmartSnapSkipTitle,
+          l10n.cameraSmartSnapSkipBody,
         ),
         (
           Icons.fact_check_rounded,
-          'You\'re always in control',
-          'Review your meal, make any changes and save when you\'re happy.',
+          l10n.cameraSmartSnapControlTitle,
+          l10n.cameraSmartSnapControlBody,
         ),
       ]),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('Maybe later'),
+          child: Text(l10n.commonMaybeLater),
         ),
         FilledButton.icon(
           onPressed: () => Navigator.of(context).pop(true),
           icon: const PlusStar(size: 24),
-          label: const Text('Become a Star'),
+          label: Text(l10n.commonBecomeStar),
         ),
       ],
     ),

@@ -11,6 +11,7 @@ import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/helpers/meal_suggestions.dart';
 import 'package:lean_streak/helpers/wav.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/models/recipe.dart';
@@ -78,9 +79,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   static const _speechDbfs = -30.0;
   static const _silenceDbfs = -45.0;
   static const _switchDuration = Duration(milliseconds: 220);
-  static const _limitMessage =
-      'Today\'s ${AiUsageRepository.dailyLimit} AI estimates are used up. '
-      'Type the calories yourself.';
+
+  String get _limitMessage =>
+      context.l10n.quickLogLimit(AiUsageRepository.dailyLimit);
 
   final _name = TextEditingController();
   final _kcal = TextEditingController();
@@ -305,7 +306,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
 
     setState(() => _working = false);
     if (ref.read(logMealControllerProvider).hasError) {
-      setState(() => _error = 'Could not save meal. Try again.');
+      setState(() => _error = context.l10n.quickLogErrorSave);
       return;
     }
     _reset();
@@ -345,11 +346,11 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     try {
       await action();
     } on DailyLimitExceededException {
-      _error = _limitMessage;
+      if (mounted) _error = _limitMessage;
     } on CalorieEstimateException catch (error) {
       _error = error.message;
     } catch (_) {
-      _error = 'Could not reach the AI. Try again.';
+      if (mounted) _error = context.l10n.mealErrorAi;
     }
 
     if (mounted) setState(() => _working = false);
@@ -369,7 +370,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     final recorder = ref.read(audioRecorderProvider);
     if (!await recorder.hasPermission()) {
       if (mounted) {
-        setState(() => _error = 'Allow microphone access to log by voice.');
+        setState(() => _error = context.l10n.quickLogAllowMic);
       }
       return;
     }
@@ -398,7 +399,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       if (!mounted) return;
       setState(() {
         _listening = false;
-        _error = 'Could not start recording. Try again.';
+        _error = context.l10n.quickLogErrorRecord;
       });
       return;
     }
@@ -444,7 +445,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
 
     // Under half a second (16-bit mono) is a mis-tap, not a meal.
     if (pcm.length < _sampleRate) {
-      setState(() => _error = 'Didn\'t catch that. Tap the mic and try again.');
+      setState(() => _error = context.l10n.quickLogMisTap);
       return;
     }
 
@@ -530,10 +531,8 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       _error =
           problem ??
           (found!.listed
-              ? 'Open Food Facts has no calories for this product yet. '
-                    'Take a photo of the packet instead.'
-              : 'This product isn\'t on Open Food Facts. Take a photo of '
-                    'the packet instead.');
+              ? context.l10n.quickLogNoCalories
+              : context.l10n.quickLogNotListed);
     });
   }
 
@@ -554,8 +553,8 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       return _Offer.declined;
     }
     final steps = listed == null
-        ? const [frontOfPackStep, nutritionTableStep]
-        : const [nutritionTableStep];
+        ? const [PhotoStep.frontOfPack, PhotoStep.nutritionTable]
+        : const [PhotoStep.nutritionTable];
     final photos = await ref.read(productPhotosProvider)(context, steps);
     if (photos == null || photos.length < steps.length || !mounted) {
       return _Offer.abandoned;
@@ -650,11 +649,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
             entry.kcal == null &&
             left != null &&
             left <= limit ~/ 2
-        ? switch (left) {
-            0 => 'No AI estimates left today',
-            1 => '1 AI estimate left today',
-            _ => '$left AI estimates left today',
-          }
+        ? context.l10n.quickLogAiLeft(left)
         : null;
 
     // A soft panel with a rounded top, floating on a warm shadow. Swiping
@@ -762,14 +757,14 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                                   color: AppColors.textPrimary,
                                 ),
                                 decoration: _boxDecoration(
-                                  hint: 'Type a meal',
+                                  hint: context.l10n.quickLogHint,
                                   // A clear button once there is text, so a
                                   // wrong voice or AI result is one tap from
                                   // gone.
                                   suffixIcon:
                                       hasText && !_working && !_listening
                                       ? IconButton(
-                                          tooltip: 'Clear',
+                                          tooltip: context.l10n.quickLogClear,
                                           onPressed: _reset,
                                           color: AppColors.textSecondary,
                                           icon: const Icon(Icons.close_rounded),
@@ -793,8 +788,8 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                                   'quick-log-kcal',
                                   _kcal,
                                   _kcalFocus,
-                                  hint: 'kcal',
-                                  unit: 'kcal',
+                                  hint: context.l10n.commonKcalUnit,
+                                  unit: context.l10n.commonKcalUnit,
                                 ),
                               ),
                               if (trackProtein) ...[
@@ -804,8 +799,8 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                                     'quick-log-protein',
                                     _protein,
                                     _proteinFocus,
-                                    hint: 'protein (g)',
-                                    unit: 'g protein',
+                                    hint: context.l10n.quickLogProteinHint,
+                                    unit: context.l10n.quickLogProteinUnit,
                                   ),
                                 ),
                               ],
@@ -905,7 +900,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     final chips = [
       if (search != null)
         chip(
-          'Search foods',
+          context.l10n.quickLogSearchFoods,
           () => _search(search),
           avatar: Icon(
             Icons.search_rounded,
@@ -915,7 +910,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
         ),
       for (final meal in suggestions)
         chip(
-          '${meal.name} · ${meal.kcal} kcal',
+          context.l10n.quickLogChip(meal.name, meal.kcal),
           () {
             _fill(meal.name, meal.kcal, meal.protein, macros: meal.macros);
             _focusNode.requestFocus();
@@ -951,12 +946,13 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   /// with calories. A change scales at the box's edge, which follows it.
   Widget _buildActions(_Entry entry, bool typing) {
     final plus = ref.watch(plusProvider);
+    final l10n = context.l10n;
     final (String kind, Widget buttons) = _listening
         ? (
             'stop',
             _circle(
               const Icon(Icons.stop_rounded),
-              'Stop',
+              l10n.quickLogStop,
               _toggleListening,
               stop: true,
             ),
@@ -971,7 +967,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                   plus
                       ? const Icon(Icons.photo_camera_rounded)
                       : const _Starred(Icons.photo_camera_rounded),
-                  'Take a photo',
+                  l10n.quickLogPhoto,
                   _working ? null : _takePhoto,
                   dim: !plus,
                 ),
@@ -979,14 +975,14 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                   const SizedBox(width: 6),
                   _circle(
                     const Icon(Icons.qr_code_scanner_rounded),
-                    'Scan a barcode',
+                    l10n.quickLogBarcode,
                     _working ? null : _scanBarcode,
                   ),
                 ],
                 const SizedBox(width: 6),
                 _circle(
                   const Icon(Icons.mic_rounded),
-                  'Speak',
+                  l10n.quickLogSpeak,
                   _working ? null : _toggleListening,
                 ),
               ],
@@ -997,7 +993,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
             'save',
             _circle(
               const Icon(Icons.check_rounded),
-              'Save',
+              l10n.commonSave,
               _working ? null : _submit,
             ),
           )
@@ -1005,7 +1001,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
             'estimate',
             _circle(
               const Icon(Icons.auto_awesome_rounded),
-              'Estimate',
+              l10n.quickLogEstimate,
               _working || entry.name == null ? null : _submit,
             ),
           );
@@ -1124,9 +1120,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   /// Listening, working or what went wrong, and an AI result's breakdown.
   Widget _buildStatus(bool showProtein) {
     final (String? message, Color color) = _listening
-        ? ('Listening... tap stop when you\'re done.', AppColors.textSecondary)
+        ? (context.l10n.quickLogListening, AppColors.textSecondary)
         : _working
-        ? ('Working...', AppColors.textSecondary)
+        ? (context.l10n.quickLogWorking, AppColors.textSecondary)
         : (_error, AppColors.error);
 
     return Padding(

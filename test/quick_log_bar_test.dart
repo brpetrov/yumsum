@@ -717,7 +717,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final sent = contributor.sent.single;
-    expect(photoSteps, [frontOfPackStep, nutritionTableStep]);
+    expect(photoSteps, [PhotoStep.frontOfPack, PhotoStep.nutritionTable]);
     expect(estimateService.readFront, isTrue);
     expect(sent.lang, 'bg');
     expect(sent.barcode, '3800000000017');
@@ -767,7 +767,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // One photo, of the table; what the product has isn't asked for again.
-    expect(photoSteps, [nutritionTableStep]);
+    expect(photoSteps, [PhotoStep.nutritionTable]);
     expect(estimateService.readFront, isFalse);
     expect(find.text('Check the nutrition'), findsOneWidget);
     expect(find.byKey(const ValueKey('contribute-name')), findsNothing);

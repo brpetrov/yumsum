@@ -3,8 +3,10 @@ import 'dart:math';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 import 'package:lean_streak/core/constants/app_info.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 
 /// A new product as the user checked it, ready to send. [per100g] is keyed
 /// by Open Food Facts nutrient ids (`energy-kcal`, `proteins`, ...).
@@ -66,11 +68,16 @@ class FoodContributionService {
     required this.appUuid,
     required FirebaseFunctions functions,
     this.dryRun = _dryRun,
-  }) : _functions = functions;
+    AppLocalizations? l10n,
+  }) : _functions = functions,
+       _l10n = l10n ?? lookupAppLocalizations(const Locale('en'));
 
   final String appUuid;
   final bool dryRun;
   final FirebaseFunctions _functions;
+
+  /// The language of the errors it throws: the app's (`l10nProvider`).
+  final AppLocalizations _l10n;
 
   /// The account is on the server, so contributing can always be offered
   /// (Today still leaves it out on the web).
@@ -125,13 +132,11 @@ class FoodContributionService {
       debugPrint('Could not contribute: $error');
       throw FoodContributionException(switch (error) {
         FirebaseFunctionsException(code: 'resource-exhausted') =>
-          "You've sent all you can today. You can send more tomorrow.",
+          _l10n.contributeErrorLimit,
         // Open Food Facts answered, but not with a yes.
         FirebaseFunctionsException(code: 'aborted') =>
-          "Open Food Facts didn't accept it. Try again in a moment.",
-        _ =>
-          'Could not reach Open Food Facts. Check your connection and try '
-              'again.',
+          _l10n.contributeErrorRejected,
+        _ => _l10n.contributeErrorOffline,
       });
     }
   }

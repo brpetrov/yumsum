@@ -9,6 +9,7 @@ import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/units.dart';
@@ -177,11 +178,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     final dateKey = DateFormat('yyyy-MM-dd').format(today);
     // The first name only, so the Star badge still fits beside it on a phone.
     final firstName = profileAsync.valueOrNull?.name.split(' ').first;
+    final l10n = context.l10n;
 
     return AppFrame(
-      title: firstName ?? 'Home',
+      title: firstName ?? l10n.homeTitle,
       titleBadge: StarBadge(onTap: () => showPlusPaywall(context)),
-      subtitle: DateFormat('EEEE, d MMMM').format(today),
+      subtitle: capitalised(l10n.weekdayDayMonth(today)),
       actions: [_DayOffButton(date: dateKey)],
       bottom: const QuickLogBar(),
       body: profileAsync.when(
@@ -189,7 +191,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           if (profile == null) {
             return Center(
               child: Text(
-                'Could not load your profile.',
+                l10n.homeErrorProfile,
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             );
@@ -230,19 +232,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     context: context,
                     builder: (context) {
                       return AlertDialog(
-                        title: Text('Delete meal?'),
-                        content: Text('Remove this meal from today?'),
+                        title: Text(l10n.homeDeleteMealTitle),
+                        content: Text(l10n.homeDeleteMealBody),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(false),
-                            child: Text('Cancel'),
+                            child: Text(l10n.commonCancel),
                           ),
                           FilledButton(
                             onPressed: () => Navigator.of(context).pop(true),
                             style: FilledButton.styleFrom(
                               backgroundColor: AppColors.error,
                             ),
-                            child: Text('Delete'),
+                            child: Text(l10n.commonDelete),
                           ),
                         ],
                       );
@@ -258,9 +260,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   } catch (_) {
                     if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Could not delete the meal. Try again.'),
-                      ),
+                      SnackBar(content: Text(l10n.homeErrorDelete)),
                     );
                   }
                 },
@@ -271,7 +271,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             ),
             error: (_, _) => Center(
               child: Text(
-                'Could not load your meals.',
+                l10n.homeErrorMeals,
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             ),
@@ -281,7 +281,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (_, _) => Center(
           child: Text(
-            'Could not load your profile.',
+            l10n.homeErrorProfile,
             style: TextStyle(color: AppColors.textSecondary),
           ),
         ),
@@ -368,7 +368,7 @@ class _DayOffButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isOff = ref.watch(dayOffProvider(date)).valueOrNull ?? false;
     return IconButton(
-      tooltip: isOff ? 'Day off' : 'Take the day off',
+      tooltip: isOff ? context.l10n.homeDayOff : context.l10n.homeDayOffTake,
       icon: IconBubble(
         isOff ? Icons.beach_access_rounded : Icons.beach_access_outlined,
         raised: true,
@@ -385,11 +385,9 @@ class _DayOffButton extends ConsumerWidget {
               .setDayOff(uid, date, !isOff);
         } catch (_) {
           if (!context.mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Could not change your day off. Try again.'),
-            ),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(context.l10n.homeErrorDayOff)));
         }
       },
     );
@@ -421,6 +419,7 @@ class _TodayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final remaining = summary.targetCalories - summary.totalCalories;
     final calorieProgress = summary.targetCalories <= 0
         ? 0.0
@@ -428,14 +427,14 @@ class _TodayCard extends StatelessWidget {
     // The day isn't over, so being under target isn't flagged; only "on
     // track" and "over" are worth saying while it is still today.
     final (String? pillLabel, Color barColor) = switch (summary) {
-      _ when summary.dayOff => ('Day off', AppColors.veryGood),
+      _ when summary.dayOff => (l10n.homeDayOff, AppColors.veryGood),
       _ when summary.mealCount == 0 => (null, AppColors.veryGood),
       _ when summary.status == DailyStatus.green => (
-        'On track',
+        l10n.homeOnTrack,
         AppColors.veryGood,
       ),
       _ when summary.calorieDelta > 0 => (
-        'Over target',
+        l10n.homeOverTarget,
         dayStatusColor(summary.status),
       ),
       _ => (null, AppColors.veryGood),
@@ -472,7 +471,8 @@ class _TodayCard extends StatelessWidget {
                         children: [
                           TextSpan(text: '${remaining.abs()}'),
                           TextSpan(
-                            text: remaining >= 0 ? ' kcal left' : ' kcal over',
+                            text:
+                                ' ${remaining >= 0 ? l10n.homeKcalLeft : l10n.homeKcalOver}',
                             style: number.copyWith(
                               fontSize: 22,
                               letterSpacing: 0,
@@ -496,7 +496,7 @@ class _TodayCard extends StatelessWidget {
                 top: -10,
                 right: -15,
                 child: IconButton(
-                  tooltip: 'About your targets',
+                  tooltip: l10n.homeTargetsTooltip,
                   onPressed: () => showMacroGuide(
                     context,
                     withProtein: trackProtein,
@@ -512,7 +512,7 @@ class _TodayCard extends StatelessWidget {
           const SizedBox(height: 4),
           // Below the pill and the button, so it has the card's width.
           Text(
-            '${summary.totalCalories} of ${summary.targetCalories} kcal eaten',
+            l10n.homeKcalEaten(summary.totalCalories, summary.targetCalories),
             style: TextStyle(
               fontSize: 14.5,
               fontWeight: FontWeight.w600,
@@ -612,7 +612,7 @@ class _MealsCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'Today\'s meals',
+                    context.l10n.homeMealsTitle,
                     style: AppTheme.display.copyWith(
                       fontSize: 19,
                       color: AppColors.textPrimary,
@@ -621,16 +621,16 @@ class _MealsCard extends StatelessWidget {
                 ),
                 if (meals.isNotEmpty)
                   StatusPill(
-                    label: '${meals.length} logged',
+                    label: context.l10n.homeMealsLogged(meals.length),
                     color: AppColors.primary,
                   ),
               ],
             ),
           ),
           if (meals.isEmpty)
-            const Padding(
-              padding: EdgeInsets.only(top: 12, bottom: 12, right: 14),
-              child: BowlNote('Nothing logged yet. Type or tap the mic below.'),
+            Padding(
+              padding: const EdgeInsets.only(top: 12, bottom: 12, right: 14),
+              child: BowlNote(context.l10n.homeNothingLogged),
             )
           else
             for (var index = 0; index < meals.length; index++) ...[
@@ -661,6 +661,7 @@ class _MonthPreviewCard extends ConsumerWidget {
     final today = DateTime(date.year, date.month, date.day);
     final range = ReviewRange(startDate: startOfMonth, endDate: today);
     final summariesAsync = ref.watch(reviewSummariesProvider(range));
+    final l10n = context.l10n;
 
     return AppCard(
       onTap: onOpenReview,
@@ -671,7 +672,7 @@ class _MonthPreviewCard extends ConsumerWidget {
             children: [
               Expanded(
                 child: Text(
-                  DateFormat('MMMM').format(date),
+                  capitalised(l10n.month(date)),
                   style: AppTheme.display.copyWith(
                     fontSize: 19,
                     color: AppColors.textPrimary,
@@ -688,7 +689,7 @@ class _MonthPreviewCard extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'History',
+                      l10n.homeHistory,
                       style: AppTheme.display.copyWith(
                         fontSize: 14,
                         color: AppColors.onPrimaryContainer,
@@ -742,8 +743,8 @@ class _MonthPreviewCard extends ConsumerWidget {
                       Expanded(
                         child: Text(
                           summaries.isEmpty
-                              ? 'No logged days yet this month.'
-                              : '${summaries.length} days logged',
+                              ? l10n.homeNoDaysThisMonth
+                              : l10n.homeDaysLogged(summaries.length),
                           style: TextStyle(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w600,
@@ -780,7 +781,7 @@ class _MonthPreviewCard extends ConsumerWidget {
               height: 112,
               child: Center(
                 child: Text(
-                  'Could not load this month.',
+                  l10n.homeErrorMonth,
                   style: TextStyle(color: AppColors.textSecondary),
                 ),
               ),
@@ -802,6 +803,7 @@ class _WeightCard extends ConsumerWidget {
     final daysAgo = latest == null
         ? 0
         : DateTime.now().difference(latest.date).inDays;
+    final l10n = context.l10n;
 
     return AppCard(
       onTap: () => context.push(AppRoutes.progress),
@@ -815,7 +817,7 @@ class _WeightCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Weight',
+                  l10n.homeWeight,
                   style: AppTheme.display.copyWith(
                     fontSize: 19,
                     color: AppColors.textPrimary,
@@ -824,11 +826,15 @@ class _WeightCard extends ConsumerWidget {
                 const SizedBox(height: 2),
                 Text(
                   latest == null
-                      ? 'Log your weight to track progress'
+                      ? l10n.homeWeightEmpty
                       : daysAgo > 7
-                      ? 'Latest: ${formatWeight(latest.weightKg, unit)}'
-                            ' · $daysAgo days ago'
-                      : 'Latest: ${formatWeight(latest.weightKg, unit)}',
+                      ? l10n.homeWeightLatestAgo(
+                          formatWeight(latest.weightKg, unit),
+                          daysAgo,
+                        )
+                      : l10n.homeWeightLatest(
+                          formatWeight(latest.weightKg, unit),
+                        ),
                   style: TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
@@ -844,7 +850,7 @@ class _WeightCard extends ConsumerWidget {
               foregroundColor: AppColors.onPrimaryContainer,
               padding: const EdgeInsets.symmetric(horizontal: 22),
             ),
-            child: const Text('Log'),
+            child: Text(l10n.homeWeightLog),
           ),
         ],
       ),

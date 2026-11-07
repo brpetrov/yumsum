@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
@@ -62,8 +63,7 @@ class _PlusPromptCardState extends ConsumerState<PlusPromptCard> {
                   const PlusMark(size: 19),
                   const SizedBox(height: 4),
                   Text(
-                    'Smart Snap, the Adaptive Formula, an AI Assisted Coach and '
-                    'Detailed Macros.',
+                    context.l10n.homeStarPitch,
                     style: TextStyle(
                       fontSize: 14,
                       height: 1.35,
@@ -74,7 +74,7 @@ class _PlusPromptCardState extends ConsumerState<PlusPromptCard> {
               ),
             ),
             IconButton(
-              tooltip: 'Hide for now',
+              tooltip: context.l10n.homeStarHide,
               icon: Icon(
                 Icons.close_rounded,
                 size: 20,

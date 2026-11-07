@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
@@ -29,6 +30,7 @@ Future<bool> inviteToContribute(
     height: 1.4,
     color: AppColors.textSecondary,
   );
+  final l10n = context.l10n;
   final yes = await showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
@@ -47,7 +49,9 @@ Future<bool> inviteToContribute(
             ),
             const SizedBox(height: 12),
             Text(
-              nutritionOnly ? 'Add its nutrition' : 'Be the first to add this',
+              nutritionOnly
+                  ? l10n.contributeAddNutritionTitle
+                  : l10n.contributeAddProductTitle,
               textAlign: TextAlign.center,
               style: AppTheme.display.copyWith(
                 fontSize: 20,
@@ -57,19 +61,14 @@ Future<bool> inviteToContribute(
             const SizedBox(height: 8),
             Text(
               nutritionOnly
-                  ? 'This product is in the database, but its nutrition '
-                        'isn\'t yet. Add it with one photo of the nutrition '
-                        'table and it\'ll be there for you and everyone who '
-                        'scans it next.'
-                  : 'This product isn\'t in the database yet. Add it with '
-                        'two photos and it\'ll be there for you and everyone '
-                        'who scans it next.',
+                  ? l10n.contributeAddNutritionBody
+                  : l10n.contributeAddProductBody,
               textAlign: TextAlign.center,
               style: muted,
             ),
             const SizedBox(height: 6),
             Text(
-              'It takes 30 seconds and helps everyone, forever ♥',
+              l10n.contributeTakesSeconds,
               textAlign: TextAlign.center,
               style: muted.copyWith(fontSize: 13),
             ),
@@ -77,14 +76,14 @@ Future<bool> inviteToContribute(
             FilledButton.icon(
               onPressed: () => Navigator.of(context).pop(true),
               icon: const Icon(Icons.favorite_rounded),
-              label: const Text('Contribute'),
+              label: Text(l10n.contributeButton),
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(52),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Not now'),
+              child: Text(l10n.contributeNotNow),
             ),
           ],
         ),
@@ -127,15 +126,16 @@ Future<ContributionResult> showContributeSheet(
   return (contributed: contributed, food: food);
 }
 
-const _nutrientLabels = {
-  'energy-kcal': 'Energy (kcal)',
-  'proteins': 'Protein (g)',
-  'fat': 'Fat (g)',
-  'saturated-fat': 'of which saturates (g)',
-  'carbohydrates': 'Carbohydrate (g)',
-  'sugars': 'of which sugars (g)',
-  'fiber': 'Fibre (g)',
-  'salt': 'Salt (g)',
+/// The box label for each of [labelNutrientIds].
+String _nutrientLabel(AppLocalizations l10n, String id) => switch (id) {
+  'energy-kcal' => l10n.contributeEnergy,
+  'proteins' => l10n.contributeProtein,
+  'fat' => l10n.contributeFat,
+  'saturated-fat' => l10n.contributeSaturates,
+  'carbohydrates' => l10n.contributeCarbs,
+  'sugars' => l10n.contributeSugars,
+  'fiber' => l10n.contributeFibre,
+  _ => l10n.contributeSalt,
 };
 
 class _ContributeSheet extends ConsumerStatefulWidget {
@@ -203,8 +203,11 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
     if (!mounted) return;
     setState(() => _images = images);
     final uid = ref.read(currentUidProvider);
+    final l10n = context.l10n;
     try {
-      if (uid == null) throw const CalorieEstimateException('Not signed in.');
+      if (uid == null) {
+        throw CalorieEstimateException(l10n.contributeNotSignedIn);
+      }
       final reading = await ref
           .read(calorieEstimateServiceProvider)
           .readLabel(uid, images.length > 1 ? images.first : null, images.last);
@@ -217,18 +220,13 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
       for (final MapEntry(:key, :value) in reading.per100g.entries) {
         _figures[key]?.text = _number(value);
       }
-      _note =
-          'The AI read these from your '
-          '${images.length > 1 ? 'photos' : 'photo'}. Check them against '
-          'the packet: they will be public.';
+      _note = l10n.contributeAiRead(images.length);
     } on DailyLimitExceededException {
-      _note =
-          'Daily AI limit reached. Copy the details from the packet '
-          'yourself.';
+      _note = l10n.contributeAiLimit;
     } on CalorieEstimateException catch (error) {
       _note = error.message;
     } catch (_) {
-      _note = 'Could not read the label. Fill in the details yourself.';
+      _note = l10n.contributeErrorRead;
     }
     if (mounted) setState(() => _reading = false);
   }
@@ -236,8 +234,7 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
   static String _number(double value) =>
       value == value.roundToDouble() ? '${value.round()}' : '$value';
 
-  double? _figure(String id) =>
-      double.tryParse(_figures[id]!.text.trim().replaceAll(',', '.'));
+  double? _figure(String id) => parseDecimal(_figures[id]!.text);
 
   String? _text(TextEditingController box) {
     final text = box.text.trim();
@@ -255,7 +252,7 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
     final name = _productName;
     final kcal = _figure('energy-kcal');
     if (name == null || kcal == null) {
-      setState(() => _error = 'Add the product name and energy (kcal).');
+      setState(() => _error = context.l10n.contributeErrorMissing);
       return;
     }
     final prefs = ref.read(sharedPreferencesProvider);
@@ -346,6 +343,8 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
 
   Widget _buildThanks() {
     final count = _thanksCount!;
+    final l10n = context.l10n;
+    final product = _productName!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
       child: Column(
@@ -355,7 +354,7 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
           Icon(Icons.favorite_rounded, size: 40, color: AppColors.primary),
           const SizedBox(height: 12),
           Text(
-            'Thank you!',
+            l10n.contributeThanks,
             textAlign: TextAlign.center,
             style: AppTheme.display.copyWith(
               fontSize: 22,
@@ -364,9 +363,12 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
           ),
           const SizedBox(height: 8),
           Text(
-            '$_productName ${_listed == null ? 'is now on' : 'now has its nutrition on'} '
-            'Open Food Facts for everyone who scans it next.'
-            '${count > 1 ? ' That\'s $count products you\'ve added.' : ''}',
+            [
+              _listed == null
+                  ? l10n.contributeThanksProduct(product)
+                  : l10n.contributeThanksNutrition(product),
+              if (count > 1) l10n.contributeThanksCount(count),
+            ].join(' '),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,
@@ -380,7 +382,7 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(52),
             ),
-            child: const Text('Log it'),
+            child: Text(l10n.contributeLogIt),
           ),
         ],
       ),
@@ -392,6 +394,7 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
     final images = _images;
     final ids = labelNutrientIds;
     final listed = _listed;
+    final l10n = context.l10n;
 
     Widget box(
       TextEditingController controller,
@@ -418,7 +421,9 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            listed == null ? 'Check the details' : 'Check the nutrition',
+            listed == null
+                ? l10n.contributeCheckDetails
+                : l10n.contributeCheckNutrition,
             style: AppTheme.display.copyWith(
               fontSize: 20,
               color: AppColors.textPrimary,
@@ -426,7 +431,7 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
           ),
           const SizedBox(height: 4),
           Text(
-            [?listed?.name, 'Barcode ${widget.barcode}'].join(' · '),
+            [?listed?.name, l10n.contributeBarcode(widget.barcode)].join(' · '),
             style: muted,
           ),
           const SizedBox(height: 12),
@@ -457,39 +462,39 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
                 const SizedBox(width: 10),
-                Text('Reading the label...', style: muted),
+                Text(l10n.contributeReading, style: muted),
               ],
             )
           else if (_note != null)
             Text(_note!, style: muted),
           const SizedBox(height: 16),
           if (listed == null) ...[
-            box(_name, 'Product name', key: 'contribute-name'),
+            box(_name, l10n.contributeProductName, key: 'contribute-name'),
             const SizedBox(height: 12),
-            box(_brand, 'Brand'),
+            box(_brand, l10n.contributeBrand),
             const SizedBox(height: 12),
             Row(
               children: [
-                Expanded(child: box(_quantity, 'Pack size, e.g. 400 g')),
+                Expanded(child: box(_quantity, l10n.contributePackSize)),
                 const SizedBox(width: 12),
-                Expanded(child: box(_serving, 'Serving, e.g. 30 g')),
+                Expanded(child: box(_serving, l10n.contributeServing)),
               ],
             ),
             const SizedBox(height: 20),
           ] else ...[
             // Only what the product is missing besides its nutrition.
             if (listed.name == null) ...[
-              box(_name, 'Product name', key: 'contribute-name'),
+              box(_name, l10n.contributeProductName, key: 'contribute-name'),
               const SizedBox(height: 12),
             ],
             if (listed.servingSize == null) ...[
-              box(_serving, 'Serving, e.g. 30 g'),
+              box(_serving, l10n.contributeServing),
               const SizedBox(height: 12),
             ],
             const SizedBox(height: 8),
           ],
           Text(
-            'PER 100 G (OR 100 ML)',
+            l10n.contributePer100,
             style: muted.copyWith(
               fontSize: 11,
               fontWeight: FontWeight.w700,
@@ -504,7 +509,7 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
                   Expanded(
                     child: box(
                       _figures[id]!,
-                      _nutrientLabels[id]!,
+                      _nutrientLabel(l10n, id),
                       number: true,
                       key: 'contribute-$id',
                     ),
@@ -517,13 +522,11 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
           ],
           const SizedBox(height: 4),
           Text(
-            '${listed == null
-                ? 'Your photos and these details'
+            listed == null
+                ? l10n.contributePublishNew
                 : listed.hasNutritionPhoto
-                ? 'These figures'
-                : 'Your photo and these figures'} will be published on Open '
-            'Food Facts under open licences (CC BY-SA and ODbL), so anyone '
-            'can use them. Your name and email are never shared.',
+                ? l10n.contributePublishFigures
+                : l10n.contributePublishPhoto,
             style: muted,
           ),
           if (_error != null) ...[
@@ -546,7 +549,7 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
                     ),
                   )
                 : const Icon(Icons.favorite_rounded),
-            label: const Text('Contribute'),
+            label: Text(l10n.contributeButton),
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(52),
             ),

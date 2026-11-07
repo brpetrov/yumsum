@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 
 /// Asks about every item of [items] the AI couldn't settle
@@ -37,7 +38,7 @@ Future<EstimateItem?> showEstimateChoice(
   return showDialog<EstimateItem>(
     context: context,
     builder: (context) => AlertDialog(
-      title: const Text('Which did you have?'),
+      title: Text(context.l10n.mealChoiceTitle),
       contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -46,7 +47,7 @@ Future<EstimateItem?> showEstimateChoice(
           Padding(
             padding: const EdgeInsets.only(left: 8, bottom: 6),
             child: Text(
-              'We went with the first.',
+              context.l10n.mealChoiceNote,
               style: TextStyle(fontSize: 13.5, color: AppColors.textSecondary),
             ),
           ),
@@ -104,7 +105,7 @@ class _Choice extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  '${item.kcal} kcal',
+                  context.l10n.commonKcal(item.kcal),
                   style: TextStyle(
                     fontSize: 13.5,
                     color: AppColors.textSecondary,

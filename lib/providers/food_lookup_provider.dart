@@ -1,12 +1,13 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/services/food_contribution_service.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
 
 final foodLookupServiceProvider = Provider<FoodLookupService>(
-  (ref) => FoodLookupService(),
+  (ref) => FoodLookupService(null, ref.watch(l10nProvider)),
 );
 
 /// Contributions go out under a random id kept for this install.
@@ -20,5 +21,6 @@ final foodContributionServiceProvider = Provider<FoodContributionService>((
   return FoodContributionService(
     appUuid: uuid,
     functions: FirebaseFunctions.instanceFor(region: 'europe-west10'),
+    l10n: ref.watch(l10nProvider),
   );
 });

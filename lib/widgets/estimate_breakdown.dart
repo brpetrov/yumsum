@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 
 /// How the AI arrived at its number: one muted line of components, which
@@ -43,6 +44,7 @@ class _EstimateBreakdownState extends State<EstimateBreakdown> {
   @override
   Widget build(BuildContext context) {
     if (widget.items.isEmpty) return const SizedBox.shrink();
+    final l10n = context.l10n;
     final muted = TextStyle(fontSize: 13, color: AppColors.textSecondary);
     final editable =
         widget.onChanged != null &&
@@ -75,7 +77,7 @@ class _EstimateBreakdownState extends State<EstimateBreakdown> {
                                         vertical: 4,
                                       ),
                                       child: Text(
-                                        '${item.grams} g',
+                                        l10n.commonGrams('${item.grams}'),
                                         style: muted.copyWith(
                                           color: AppColors.primary,
                                           fontWeight: FontWeight.w600,
@@ -90,14 +92,14 @@ class _EstimateBreakdownState extends State<EstimateBreakdown> {
                                       horizontal: 8,
                                     ),
                                     child: Text(
-                                      '${item.grams} g',
+                                      l10n.commonGrams('${item.grams}'),
                                       style: muted,
                                     ),
                                   ),
                           Text(
                             item.protein == null || !widget.showProtein
-                                ? '${item.kcal} kcal'
-                                : '${item.kcal} kcal · ${item.protein} g',
+                                ? l10n.commonKcal(item.kcal)
+                                : l10n.mealKcalGrams(item.kcal, item.protein!),
                             style: muted,
                           ),
                         ],
@@ -105,7 +107,7 @@ class _EstimateBreakdownState extends State<EstimateBreakdown> {
                     ),
                   if (editable)
                     Text(
-                      'Tap a weight to change it.',
+                      l10n.mealTapWeight,
                       style: muted.copyWith(fontSize: 12),
                     ),
                 ],
@@ -170,15 +172,18 @@ class _GramsDialogState extends State<_GramsDialog> {
           FilteringTextInputFormatter.digitsOnly,
           LengthLimitingTextInputFormatter(4),
         ],
-        decoration: const InputDecoration(labelText: 'Weight', suffixText: 'g'),
+        decoration: InputDecoration(
+          labelText: context.l10n.mealWeight,
+          suffixText: context.l10n.commonGramsUnit,
+        ),
         onSubmitted: (_) => _use(),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.commonCancel),
         ),
-        FilledButton(onPressed: _use, child: const Text('Use')),
+        FilledButton(onPressed: _use, child: Text(context.l10n.mealUseWeight)),
       ],
     );
   }

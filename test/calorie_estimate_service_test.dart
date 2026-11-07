@@ -162,10 +162,17 @@ void main() {
       );
       expect(
         await failure('failed-precondition', 'off'),
-        aiNotSwitchedOnMessage,
+        'AI estimates aren\'t switched on yet.',
       );
-      expect(await failure('failed-precondition', 'paused'), aiPausedMessage);
-      expect(await failure('unavailable', 'busy'), aiBusyMessage);
+      expect(
+        await failure('failed-precondition', 'paused'),
+        'AI estimates are paused for now. You can still type the calories '
+        'yourself.',
+      );
+      expect(
+        await failure('unavailable', 'busy'),
+        'The AI is busy right now. Try again in a minute.',
+      );
       expect(await failure('unavailable', 'transient'), contains('busy'));
       expect(await failure('permission-denied'), contains('YumSum Star'));
       expect(

@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/repositories/ai_usage_repository.dart';
 
@@ -246,12 +248,6 @@ EstimateItem resized(EstimateItem item, int grams) {
   );
 }
 
-const aiNotSwitchedOnMessage = 'AI estimates aren\'t switched on yet.';
-const aiBusyMessage = 'The AI is busy right now. Try again in a minute.';
-const aiPausedMessage =
-    'AI estimates are paused for now. You can still type the calories '
-    'yourself.';
-
 class DailyLimitExceededException implements Exception {
   const DailyLimitExceededException();
 }
@@ -281,10 +277,11 @@ Future<Map<String, dynamic>> callAi(
   return Map<String, dynamic>.from(result.data as Map);
 }
 
-/// What to tell the user when an AI call fails: the server's code, and its
-/// `reason` where it gives one, else [fallback]. `resource-exhausted` is the
-/// day's allowance used up; the server answers it before asking Gemini.
-Exception aiCallError(Object error, String fallback) {
+/// What to tell the user when an AI call fails, in [l10n]'s language: the
+/// server's code, and its `reason` where it gives one, else [fallback].
+/// `resource-exhausted` is the day's allowance used up; the server answers
+/// it before asking Gemini.
+Exception aiCallError(Object error, String fallback, AppLocalizations l10n) {
   if (error is! FirebaseFunctionsException) {
     return CalorieEstimateException(fallback);
   }
@@ -294,20 +291,14 @@ Exception aiCallError(Object error, String fallback) {
   };
   return switch ((error.code, reason)) {
     ('resource-exhausted', _) => const DailyLimitExceededException(),
-    ('failed-precondition', 'off') => const CalorieEstimateException(
-      aiNotSwitchedOnMessage,
-    ),
-    ('failed-precondition', _) => const CalorieEstimateException(
-      aiPausedMessage,
-    ),
-    ('unavailable', 'busy') => const CalorieEstimateException(aiBusyMessage),
-    ('unavailable', 'transient') => const CalorieEstimateException(
-      'The AI is busy. Try again in a few seconds.',
+    ('failed-precondition', 'off') => CalorieEstimateException(l10n.mealAiOff),
+    ('failed-precondition', _) => CalorieEstimateException(l10n.mealAiPaused),
+    ('unavailable', 'busy') => CalorieEstimateException(l10n.mealAiBusy),
+    ('unavailable', 'transient') => CalorieEstimateException(
+      l10n.mealAiBusyShort,
     ),
     // The app thought the account had YumSum Star; the server didn't.
-    ('permission-denied', _) => const CalorieEstimateException(
-      'YumSum Star isn\'t on for this account. Try again.',
-    ),
+    ('permission-denied', _) => CalorieEstimateException(l10n.mealAiNoStar),
     _ => CalorieEstimateException(fallback),
   };
 }
@@ -319,9 +310,11 @@ class CalorieEstimateService {
     required String country,
     int? dailyLimit = AiUsageRepository.dailyLimit,
     bool plus = false,
+    AppLocalizations? l10n,
   }) : _country = country,
        _dailyLimit = dailyLimit,
-       _plus = plus;
+       _plus = plus,
+       _l10n = l10n ?? lookupAppLocalizations(const Locale('en'));
 
   final AiUsageRepository _usageRepo;
   final FirebaseFunctions _functions;
@@ -335,6 +328,9 @@ class CalorieEstimateService {
   /// YumSum Star, whose estimates always come with macros. The server
   /// refuses macros to an account without it.
   final bool _plus;
+
+  /// The language of the errors it throws: the app's (`l10nProvider`).
+  final AppLocalizations _l10n;
 
   /// Asks `aiEstimate` for [kind] with the country, which the server's
   /// prompts open with.
@@ -372,7 +368,7 @@ class CalorieEstimateService {
       );
     } catch (error, st) {
       debugPrint('CalorieEstimateService error: $error\n$st');
-      throw aiCallError(error, 'Could not estimate calories. Try again.');
+      throw aiCallError(error, _l10n.mealAiErrorEstimate, _l10n);
     }
   }
 
@@ -385,19 +381,14 @@ class CalorieEstimateService {
     try {
       final map = await _ask('voice', {'audio': base64Encode(wav)});
       if (map['error'] != null || map['kcal'] is! num) {
-        throw const CalorieEstimateException(
-          'Couldn\'t hear a meal in that. Tap the mic and try again.',
-        );
+        throw CalorieEstimateException(_l10n.mealAiNoMeal);
       }
       return _mealFrom(map);
     } on CalorieEstimateException {
       rethrow;
     } catch (error, st) {
       debugPrint('CalorieEstimateService voice error: $error\n$st');
-      throw aiCallError(
-        error,
-        'Could not understand the recording. Try again.',
-      );
+      throw aiCallError(error, _l10n.mealAiErrorVoice, _l10n);
     }
   }
 
@@ -409,16 +400,14 @@ class CalorieEstimateService {
     try {
       final map = await _ask('photo', {'photo': base64Encode(jpeg)});
       if (map['error'] != null || map['kcal'] is! num) {
-        throw const CalorieEstimateException(
-          'No food found in that photo. Try again with the plate in view.',
-        );
+        throw CalorieEstimateException(_l10n.mealAiNoFood);
       }
       return _mealFrom(map);
     } on CalorieEstimateException {
       rethrow;
     } catch (error, st) {
       debugPrint('CalorieEstimateService photo error: $error\n$st');
-      throw aiCallError(error, 'Could not read that photo. Try again.');
+      throw aiCallError(error, _l10n.mealAiErrorPhoto, _l10n);
     }
   }
 
@@ -437,19 +426,14 @@ class CalorieEstimateService {
         'label': base64Encode(label),
       });
       if (map['error'] != null) {
-        throw const CalorieEstimateException(
-          'Those photos don\'t show a label. Fill in the details yourself.',
-        );
+        throw CalorieEstimateException(_l10n.mealAiNoLabel);
       }
       return parseLabelReading(map);
     } on CalorieEstimateException {
       rethrow;
     } catch (error, st) {
       debugPrint('CalorieEstimateService label error: $error\n$st');
-      throw aiCallError(
-        error,
-        'Could not read the label. Fill in the details yourself.',
-      );
+      throw aiCallError(error, _l10n.contributeErrorRead, _l10n);
     }
   }
 

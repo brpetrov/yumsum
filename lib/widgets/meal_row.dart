@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/widgets/macro_totals.dart';
 
@@ -36,12 +36,13 @@ class _MealRowState extends State<MealRow> {
   @override
   Widget build(BuildContext context) {
     final meal = widget.meal;
+    final l10n = context.l10n;
     final name = (meal.name?.trim().isNotEmpty ?? false)
         ? meal.name!.trim()
-        : 'Unnamed meal';
+        : l10n.mealUnnamed;
     final macros = widget.showMacros ? meal.macros : null;
     final time = Text(
-      DateFormat('HH:mm').format(meal.timestamp),
+      l10n.time(meal.timestamp),
       style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
     );
 
@@ -69,7 +70,7 @@ class _MealRowState extends State<MealRow> {
                     time,
                     const SizedBox(width: 10),
                     Text(
-                      'Nutrition',
+                      l10n.mealNutrition,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -94,7 +95,7 @@ class _MealRowState extends State<MealRow> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              '${meal.calories.round()} kcal',
+              l10n.commonKcal(meal.calories.round()),
               style: AppTheme.display.copyWith(
                 fontSize: 16.5,
                 color: AppColors.textPrimary,
@@ -103,21 +104,27 @@ class _MealRowState extends State<MealRow> {
             if (widget.showProtein && meal.proteinGrams != null) ...[
               const SizedBox(height: 3),
               Text(
-                '${meal.proteinGrams!.round()} g protein',
+                l10n.mealProteinGrams(meal.proteinGrams!.round()),
                 style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             ],
           ],
         ),
         PopupMenuButton<_MealAction>(
-          tooltip: 'Meal options',
+          tooltip: l10n.mealOptions,
           onSelected: (action) => switch (action) {
             _MealAction.edit => widget.onEdit(),
             _MealAction.delete => widget.onDelete(),
           },
-          itemBuilder: (context) => const [
-            PopupMenuItem(value: _MealAction.edit, child: Text('Edit')),
-            PopupMenuItem(value: _MealAction.delete, child: Text('Delete')),
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: _MealAction.edit,
+              child: Text(l10n.commonEdit),
+            ),
+            PopupMenuItem(
+              value: _MealAction.delete,
+              child: Text(l10n.commonDelete),
+            ),
           ],
         ),
       ],
@@ -146,6 +153,7 @@ class _MealRowState extends State<MealRow> {
                   macrosLine(
                     macros,
                     protein: widget.showProtein ? meal.proteinGrams : null,
+                    l10n: l10n,
                   ),
                   style: TextStyle(
                     fontSize: 12.5,

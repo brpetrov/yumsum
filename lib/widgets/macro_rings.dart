@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/widgets/macro_guide.dart';
@@ -15,7 +16,14 @@ import 'package:lean_streak/widgets/plus_mark.dart';
 /// bar; or a most (sugars, saturates, salt).
 enum _Kind { aim, guide, limit }
 
-typedef _Ring = ({String name, double? grams, int target, _Kind kind});
+/// [decimal] for salt, whose grams get one decimal.
+typedef _Ring = ({
+  String name,
+  double? grams,
+  int target,
+  _Kind kind,
+  bool decimal,
+});
 
 /// Today's protein and macros as rings in the bars' green, protein first,
 /// then carbs, fat and fibre, then the limits: sugars, saturates and salt,
@@ -43,6 +51,7 @@ class MacroRings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final counted = [for (final meal in meals) ?meal.macros];
     final total = full ? Nutrients.total(counted) : null;
     final protein = meals.fold<double>(
@@ -58,47 +67,54 @@ class MacroRings extends StatelessWidget {
         meals.isEmpty ? 0 : (total == null ? null : of(total) ?? 0);
 
     final _Ring proteinRing = (
-      name: 'Protein',
+      name: l10n.macroProtein,
       grams: protein,
       target: proteinTarget,
       kind: _Kind.aim,
+      decimal: false,
     );
     final List<_Ring> macros = [
       (
-        name: 'Carbs',
+        name: l10n.macroRingCarbs,
         grams: eaten((n) => n.carbs),
         target: targets.carbs,
         kind: _Kind.guide,
+        decimal: false,
       ),
       (
-        name: 'Fat',
+        name: l10n.macroFat,
         grams: eaten((n) => n.fat),
         target: targets.fat,
         kind: _Kind.guide,
+        decimal: false,
       ),
       (
-        name: 'Fibre',
+        name: l10n.macroFibre,
         grams: eaten((n) => n.fibre),
         target: targets.fibre,
         kind: _Kind.aim,
+        decimal: false,
       ),
       (
-        name: 'Sugars',
+        name: l10n.macroSugars,
         grams: eaten((n) => n.sugars),
         target: targets.sugars,
         kind: _Kind.limit,
+        decimal: false,
       ),
       (
-        name: 'Saturates',
+        name: l10n.macroRingSaturates,
         grams: eaten((n) => n.saturates),
         target: targets.saturates,
         kind: _Kind.limit,
+        decimal: false,
       ),
       (
-        name: 'Salt',
+        name: l10n.macroSalt,
         grams: eaten((n) => n.salt),
         target: targets.salt,
         kind: _Kind.limit,
+        decimal: true,
       ),
     ];
 
@@ -117,14 +133,15 @@ class MacroRings extends StatelessWidget {
       ],
     );
 
+    final withoutProtein = meals
+        .where((meal) => meal.proteinGrams == null)
+        .length;
+    final withoutMacros = meals.length - counted.length;
     final notes = [
-      if (trackProtein)
-        _count(
-          meals.where((meal) => meal.proteinGrams == null).length,
-          'protein',
-        ),
-      if (full) _count(meals.length - counted.length, 'macro'),
-    ].nonNulls;
+      if (trackProtein && withoutProtein > 0)
+        l10n.macroNotCountedProtein(withoutProtein),
+      if (full && withoutMacros > 0) l10n.macroNotCountedMacros(withoutMacros),
+    ];
 
     final Widget rings = full
         // A row, not a list, so it is as tall as its text, whatever its
@@ -166,10 +183,6 @@ class MacroRings extends StatelessWidget {
   }
 
   static const _previewFills = [0.7, 0.5, 0.35, 0.6, 0.45, 0.55];
-
-  static String? _count(int meals, String what) => meals == 0
-      ? null
-      : '$meals ${meals == 1 ? 'meal' : 'meals'} not counted (no $what info)';
 }
 
 /// The macros a free account doesn't have yet: dimmed, part-filled rings
@@ -184,7 +197,7 @@ class _Locked extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: 'Unlock full macros with YumSum Star',
+      label: context.l10n.macroUnlockLabel,
       excludeSemantics: true,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -219,7 +232,7 @@ class _Locked extends StatelessWidget {
                         const PlusStar(size: 20),
                         const SizedBox(width: 6),
                         Text(
-                          'Unlock full macros',
+                          context.l10n.macroUnlock,
                           style: AppTheme.display.copyWith(
                             fontSize: 14,
                             color: AppColors.onPrimaryContainer,
@@ -262,12 +275,13 @@ class _RingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final grams = ring.grams;
     final figure = switch (grams) {
       _ when preview != null => '',
       null => '–',
-      final g when ring.name == 'Salt' => '${g.toStringAsFixed(1)} g',
-      final g => '${g.round()} g',
+      final g when ring.decimal => l10n.commonGrams(l10n.decimal(g)),
+      final g => l10n.commonGrams('${g.round()}'),
     };
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -312,7 +326,9 @@ class _RingTile extends StatelessWidget {
             ),
             if (preview == null && ring.target > 0)
               Text(
-                '${ring.kind == _Kind.limit ? 'max' : 'of'} ${ring.target} g',
+                ring.kind == _Kind.limit
+                    ? l10n.macroRingMax(ring.target)
+                    : l10n.macroRingOf(ring.target),
                 style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
               ),
           ],

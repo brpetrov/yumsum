@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 
 /// What each macro does for you and how its target is set, in three groups
 /// that match how the rings are judged: aim for, keep in balance and keep
@@ -13,73 +14,57 @@ Future<void> showMacroGuide(
   bool withProtein = true,
   bool withCalories = false,
 }) {
-  const calories = (
-    'Calories',
-    'The energy in food. Eat less than you burn and you lose weight.',
-    'What you burn in a day, from your age, height, weight and activity, '
-        'with a little taken off if you\'re losing weight.',
+  final l10n = context.l10n;
+  final calories = (
+    l10n.macroGuideCalories,
+    l10n.macroGuideCaloriesWhy,
+    l10n.macroGuideCaloriesTarget,
   );
+  // Each group with its heading, its colour, a note under the heading (why,
+  // once for all of Keep under) and its macros.
   final groups = [
     (
-      'Aim for',
+      l10n.macroGuideAimFor,
       AppColors.veryGood,
+      null,
       [
         if (withProtein)
           (
-            'Protein',
-            'Keeps you full and protects your muscle while you lose fat.',
-            '1.2 to 2 g per kg of your goal weight, more the more you train.',
+            l10n.macroProtein,
+            l10n.macroGuideProteinWhy,
+            l10n.macroGuideProteinTarget,
           ),
-        (
-          'Fibre',
-          'Keeps you full and your gut healthy.',
-          'At least 30 g a day.',
-        ),
+        (l10n.macroFibre, l10n.macroGuideFibreWhy, l10n.macroGuideFibreTarget),
       ],
     ),
     (
-      'Keep in balance',
+      l10n.macroGuideBalance,
       AppColors.primary,
+      null,
       [
-        (
-          'Carbs',
-          'Your main fuel: bread, rice, pasta, potatoes and fruit.',
-          'What\'s left after protein and fat.',
-        ),
-        (
-          'Fat',
-          'Energy, and it helps you absorb vitamins.',
-          'About 30% of your calories.',
-        ),
+        (l10n.macroCarbs, l10n.macroGuideCarbsWhy, l10n.macroGuideCarbsTarget),
+        (l10n.macroFat, l10n.macroGuideFatWhy, l10n.macroGuideFatTarget),
       ],
     ),
     (
-      'Keep under',
+      l10n.macroGuideKeepUnder,
       AppColors.bad,
+      l10n.macroGuideKeepUnderNote,
       [
         (
-          'Sugars',
-          'Calories that don\'t fill you up, and bad for your teeth.',
-          'Under 18% of your calories.',
+          l10n.macroSugars,
+          l10n.macroGuideSugarsWhy,
+          l10n.macroGuideSugarsTarget,
         ),
         (
-          'Saturates',
-          'Raises your cholesterol: butter, cheese, fatty meat and cakes.',
-          'Under 10% of your calories.',
+          l10n.macroSaturates,
+          l10n.macroGuideSaturatesWhy,
+          l10n.macroGuideSaturatesTarget,
         ),
-        (
-          'Salt',
-          'Raises your blood pressure. Most is hidden in bread, cheese and '
-              'ready meals.',
-          'Under 6 g a day, about a teaspoon.',
-        ),
+        (l10n.macroSalt, l10n.macroGuideSaltWhy, l10n.macroGuideSaltTarget),
       ],
     ),
   ];
-  // Under the Keep under heading: why, once for all three.
-  const keepUnder =
-      'Keep these under the amounts shown. Going over day after day is what '
-      'harms your teeth, heart and blood pressure.';
   final body = TextStyle(
     fontSize: 13.5,
     height: 1.35,
@@ -102,7 +87,7 @@ Future<void> showMacroGuide(
         TextSpan(
           children: [
             TextSpan(
-              text: 'Target: ',
+              text: l10n.macroGuideTarget,
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
@@ -121,18 +106,17 @@ Future<void> showMacroGuide(
     builder: (context) => AlertDialog(
       // 150 shorter than the usual full height on a phone; the rest scrolls.
       insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 99),
-      title: Text(withCalories ? 'Your targets' : 'Your macros'),
+      title: Text(
+        withCalories ? l10n.macroGuideTargets : l10n.macroGuideMacros,
+      ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Your targets come from your plan, so they change with it.',
-              style: body,
-            ),
+            Text(l10n.macroGuideIntro, style: body),
             if (withCalories) ...item(calories),
-            for (final (group, color, items) in groups) ...[
+            for (final (group, color, note, items) in groups) ...[
               const SizedBox(height: 18),
               Row(
                 children: [
@@ -156,15 +140,15 @@ Future<void> showMacroGuide(
                   ),
                 ],
               ),
-              if (group == 'Keep under') ...[
+              if (note != null) ...[
                 const SizedBox(height: 6),
-                Text(keepUnder, style: body),
+                Text(note, style: body),
               ],
               for (final entry in items) ...item(entry),
             ],
             const SizedBox(height: 18),
             Text(
-              'General guidance for adults, not medical advice.',
+              l10n.macroGuideDisclaimer,
               style: body.copyWith(fontSize: 12.5),
             ),
           ],
@@ -173,7 +157,7 @@ Future<void> showMacroGuide(
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('OK'),
+          child: Text(l10n.commonOk),
         ),
       ],
     ),

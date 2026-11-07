@@ -44,6 +44,11 @@ class _FakeDaysOff extends Fake implements DayOffRepository {}
 
 const _plus = Entitlement(active: true, source: EntitlementSource.manual);
 
+/// The Adaptive formula dialog's line under its title.
+const adaptiveSubtitle =
+    'Feel more confident about how much to eat, with a smart formula that '
+    'adapts to you every week.';
+
 /// The app's fonts, so a line's length on a 360dp phone is the real one.
 Future<void> _loadFonts() async {
   for (final (family, file) in [

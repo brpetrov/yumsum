@@ -69,5 +69,1035 @@
   "reminderCreatineChannelDescription": "Reminds you once a day to take creatine.",
   "@reminderCreatineChannelDescription": {
     "description": "Android's notification settings: what the creatine reminder is for."
+  },
+
+  "commonCancel": "Cancel",
+  "@commonCancel": {
+    "description": "Button that closes a dialog without doing anything."
+  },
+  "commonDelete": "Delete",
+  "@commonDelete": {
+    "description": "Button or menu item that deletes something, such as a meal."
+  },
+  "commonEdit": "Edit",
+  "@commonEdit": {
+    "description": "Menu item that opens something, such as a meal, for editing."
+  },
+  "commonSave": "Save",
+  "@commonSave": {
+    "description": "Save button, e.g. the tick beside the quick-log bar's box."
+  },
+  "commonDone": "Done",
+  "@commonDone": {
+    "description": "Button that confirms and closes a sheet, e.g. the portion sheet."
+  },
+  "commonOk": "OK",
+  "@commonOk": {
+    "description": "Button that closes an information dialog."
+  },
+  "commonClose": "Close",
+  "@commonClose": {
+    "description": "Tooltip of a close (X) button, e.g. on the camera page."
+  },
+  "commonTryAgain": "Try again",
+  "@commonTryAgain": {
+    "description": "Button that retries something that failed, e.g. starting the camera."
+  },
+  "commonMaybeLater": "Maybe later",
+  "@commonMaybeLater": {
+    "description": "Button that turns down an offer for now, in the YumSum Star feature dialogs."
+  },
+  "commonGotIt": "Got it",
+  "@commonGotIt": {
+    "description": "Button that closes a notice once read."
+  },
+  "commonBecomeStar": "Become a Star",
+  "@commonBecomeStar": {
+    "description": "Button with a star icon that opens the YumSum Star page; Star is the paid tier's name."
+  },
+  "commonKcal": "{kcal} kcal",
+  "@commonKcal": {
+    "description": "An amount of calories, e.g. on a meal row or an option in the which-did-you-have dialog.",
+    "placeholders": { "kcal": { "type": "int" } }
+  },
+  "commonKcalUnit": "kcal",
+  "@commonKcalUnit": {
+    "description": "The calorie unit on its own: the hint and suffix of calorie boxes."
+  },
+  "commonGramsUnit": "g",
+  "@commonGramsUnit": {
+    "description": "The gram unit on its own: the suffix of weight boxes."
+  },
+  "commonGrams": "{grams} g",
+  "@commonGrams": {
+    "description": "An amount in grams, e.g. a food's weight or a macro ring's figure. grams is already formatted, maybe with a decimal.",
+    "placeholders": { "grams": { "type": "String" } }
+  },
+  "commonKcalProtein": "{kcal} kcal · {protein} g protein",
+  "@commonKcalProtein": {
+    "description": "Calories and protein of a portion of a packaged food.",
+    "placeholders": { "kcal": { "type": "int" }, "protein": { "type": "int" } }
+  },
+
+  "homeTitle": "Home",
+  "@homeTitle": {
+    "description": "Home: the page title while the user's first name hasn't loaded."
+  },
+  "homeErrorProfile": "Could not load your profile.",
+  "@homeErrorProfile": {
+    "description": "Home: shown instead of the page when the profile doesn't load."
+  },
+  "homeErrorMeals": "Could not load your meals.",
+  "@homeErrorMeals": {
+    "description": "Home: shown instead of the page when today's meals don't load."
+  },
+  "homeErrorMonth": "Could not load this month.",
+  "@homeErrorMonth": {
+    "description": "Home: in the month card when its days don't load."
+  },
+  "homeDeleteMealTitle": "Delete meal?",
+  "@homeDeleteMealTitle": {
+    "description": "Home: title of the dialog confirming a meal's deletion."
+  },
+  "homeDeleteMealBody": "Remove this meal from today?",
+  "@homeDeleteMealBody": {
+    "description": "Home: text of the dialog confirming a meal's deletion."
+  },
+  "homeErrorDelete": "Could not delete the meal. Try again.",
+  "@homeErrorDelete": {
+    "description": "Home: snack bar when deleting a meal failed."
+  },
+  "homeDayOff": "Day off",
+  "@homeDayOff": {
+    "description": "Home: the pill on today's card, and the umbrella button's tooltip, when today is a day off."
+  },
+  "homeDayOffTake": "Take the day off",
+  "@homeDayOffTake": {
+    "description": "Home: tooltip of the umbrella button at the top right, which takes today off."
+  },
+  "homeErrorDayOff": "Could not change your day off. Try again.",
+  "@homeErrorDayOff": {
+    "description": "Home: snack bar when taking the day off, or undoing it, failed."
+  },
+  "homeOnTrack": "On track",
+  "@homeOnTrack": {
+    "description": "Home: green pill on today's card when the calories so far are on target."
+  },
+  "homeOverTarget": "Over target",
+  "@homeOverTarget": {
+    "description": "Home: amber or red pill on today's card when today's calories are over the target."
+  },
+  "homeKcalLeft": "kcal left",
+  "@homeKcalLeft": {
+    "description": "Home: after the big number of calories still to eat today (\"1250 kcal left\"), in smaller type."
+  },
+  "homeKcalOver": "kcal over",
+  "@homeKcalOver": {
+    "description": "Home: after the big number of calories eaten over today's target (\"200 kcal over\"), in smaller type."
+  },
+  "homeKcalEaten": "{eaten} of {target} kcal eaten",
+  "@homeKcalEaten": {
+    "description": "Home: under the big number, today's calories so far against the target.",
+    "placeholders": { "eaten": { "type": "int" }, "target": { "type": "int" } }
+  },
+  "homeTargetsTooltip": "About your targets",
+  "@homeTargetsTooltip": {
+    "description": "Home: tooltip of the info button on today's card, which explains the targets."
+  },
+  "homeMealsTitle": "Today's meals",
+  "@homeMealsTitle": {
+    "description": "Home: heading of the card listing today's meals."
+  },
+  "homeMealsLogged": "{count, plural, other{{count} logged}}",
+  "@homeMealsLogged": {
+    "description": "Home: pill beside Today's meals with how many meals are logged today.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "homeNothingLogged": "Nothing logged yet. Type or tap the mic below.",
+  "@homeNothingLogged": {
+    "description": "Home: in the meals card while nothing is logged today; the quick-log bar with its mic is below."
+  },
+  "homeHistory": "History",
+  "@homeHistory": {
+    "description": "Home: the month card's button that opens History."
+  },
+  "homeNoDaysThisMonth": "No logged days yet this month.",
+  "@homeNoDaysThisMonth": {
+    "description": "Home: in the month card when no day this month has meals."
+  },
+  "homeDaysLogged": "{count, plural, other{{count} days logged}}",
+  "@homeDaysLogged": {
+    "description": "Home: in the month card, how many days this month have meals.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "homeWeight": "Weight",
+  "@homeWeight": {
+    "description": "Home: heading of the weight card, which opens Weight & Progress."
+  },
+  "homeWeightEmpty": "Log your weight to track progress",
+  "@homeWeightEmpty": {
+    "description": "Home: in the weight card before any weight is logged."
+  },
+  "homeWeightLatest": "Latest: {weight}",
+  "@homeWeightLatest": {
+    "description": "Home: in the weight card, the latest weight, formatted in the user's unit (\"82.4 kg\", \"12 st 4 lb\").",
+    "placeholders": { "weight": { "type": "String" } }
+  },
+  "homeWeightLatestAgo": "{days, plural, other{Latest: {weight} · {days} days ago}}",
+  "@homeWeightLatestAgo": {
+    "description": "Home: in the weight card, the latest weight when it is over a week old, formatted in the user's unit.",
+    "placeholders": { "weight": { "type": "String" }, "days": { "type": "int" } }
+  },
+  "homeWeightLog": "Log",
+  "@homeWeightLog": {
+    "description": "Home: the weight card's button that opens the weigh-in dialog."
+  },
+  "homeStarPitch": "Smart Snap, the Adaptive Formula, an AI Assisted Coach and Detailed Macros.",
+  "@homeStarPitch": {
+    "description": "Home: the YumSum Star card for free accounts, under the YumSum Star logo: what it adds. Smart Snap is a name; AI Coach is AI треньор in Bulgarian."
+  },
+  "homeStarHide": "Hide for now",
+  "@homeStarHide": {
+    "description": "Home: tooltip of the YumSum Star card's close button, which hides it for two weeks."
+  },
+  "homeCreatineTitle": "Take creatine?",
+  "@homeCreatineTitle": {
+    "description": "Home: title of the dialog offering the daily creatine reminder, once in the first week."
+  },
+  "homeCreatineBody": "Get a daily reminder at {time}. You can change the time later.",
+  "@homeCreatineBody": {
+    "description": "Home: text of the creatine reminder offer. time is e.g. 09:00.",
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "homeCreatineNo": "No thanks",
+  "@homeCreatineNo": {
+    "description": "Home: button turning down the creatine reminder."
+  },
+  "homeCreatineYes": "Remind me",
+  "@homeCreatineYes": {
+    "description": "Home: button turning on the creatine reminder."
+  },
+  "homeCreatineOn": "Creatine reminder on for {time}. Change it under Notifications in the menu.",
+  "@homeCreatineOn": {
+    "description": "Home: snack bar once the creatine reminder is on. time is e.g. 09:00; Notifications is the menu page.",
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "homeCreatineBlocked": "Allow notifications in your phone's Settings, then turn it on under Notifications in the menu.",
+  "@homeCreatineBlocked": {
+    "description": "Home: snack bar when the creatine reminder was wanted but notifications are blocked."
+  },
+  "homeCreatineLater": "You can turn it on any time under Notifications in the menu.",
+  "@homeCreatineLater": {
+    "description": "Home: snack bar when the creatine reminder was turned down."
+  },
+  "homeDayOffBackTitle": "Back on plan?",
+  "@homeDayOffBackTitle": {
+    "description": "Day off dialog: title when today is already a day off."
+  },
+  "homeDayOffTakeTitle": "Take today off?",
+  "@homeDayOffTakeTitle": {
+    "description": "Day off dialog: title when taking today off."
+  },
+  "homeDayOffBackBody": "Today will be measured against your target again.",
+  "@homeDayOffBackBody": {
+    "description": "Day off dialog: text when going back on plan."
+  },
+  "homeDayOffIntro": "For holidays and nights out.",
+  "@homeDayOffIntro": {
+    "description": "Day off dialog: first line, what a day off is for."
+  },
+  "homeDayOffLog": "Log your meals as usual.",
+  "@homeDayOffLog": {
+    "description": "Day off dialog: a line beside a plate icon."
+  },
+  "homeDayOffNoColours": "No green, yellow or red today.",
+  "@homeDayOffNoColours": {
+    "description": "Day off dialog: a line saying the day gets no on-track colour."
+  },
+  "homeDayOffHistory": "Left out of History scores.",
+  "@homeDayOffHistory": {
+    "description": "Day off dialog: a line saying History's counts leave the day out. History is the page."
+  },
+  "homeDayOffUndo": "Tap the umbrella to undo.",
+  "@homeDayOffUndo": {
+    "description": "Day off dialog: a line saying the umbrella button undoes it."
+  },
+  "homeDayOffBackButton": "Back on plan",
+  "@homeDayOffBackButton": {
+    "description": "Day off dialog: button ending the day off."
+  },
+  "homeDayOffTakeButton": "Take day off",
+  "@homeDayOffTakeButton": {
+    "description": "Day off dialog: button taking today off."
+  },
+
+  "adaptiveIntroTitle": "Your calories, personalised",
+  "@adaptiveIntroTitle": {
+    "description": "Adaptive formula dialog: title."
+  },
+  "adaptiveIntroSubtitle": "Feel more confident about how much to eat, with a smart formula that adapts to you every week.",
+  "@adaptiveIntroSubtitle": {
+    "description": "Adaptive formula dialog: the line under the title."
+  },
+  "adaptiveIntroBurnTitle": "Understand what you burn",
+  "@adaptiveIntroBurnTitle": {
+    "description": "Adaptive formula dialog: first promise, bold."
+  },
+  "adaptiveIntroBurnBody": "Your food logs and weight trends help estimate your daily calorie burn, taking the guesswork out of your target.",
+  "@adaptiveIntroBurnBody": {
+    "description": "Adaptive formula dialog: first promise, its line."
+  },
+  "adaptiveIntroBodyTitle": "Built around your body",
+  "@adaptiveIntroBodyTitle": {
+    "description": "Adaptive formula dialog: second promise, bold."
+  },
+  "adaptiveIntroBodyBody": "Get a target shaped by how your body actually responds, helping you find what works for you.",
+  "@adaptiveIntroBodyBody": {
+    "description": "Adaptive formula dialog: second promise, its line."
+  },
+  "adaptiveIntroChangeTitle": "Stay on track as you change",
+  "@adaptiveIntroChangeTitle": {
+    "description": "Adaptive formula dialog: third promise, bold."
+  },
+  "adaptiveIntroChangeBody": "Your calorie needs can change as you lose weight. Your target adjusts to help you keep making progress.",
+  "@adaptiveIntroChangeBody": {
+    "description": "Adaptive formula dialog: third promise, its line."
+  },
+  "adaptiveIntroWeighTitle": "Make every weigh-in count",
+  "@adaptiveIntroWeighTitle": {
+    "description": "Adaptive formula dialog: fourth promise, bold."
+  },
+  "adaptiveIntroWeighBody": "Each weigh-in adds to the picture. Consistent logging helps fine-tune your target over time.",
+  "@adaptiveIntroWeighBody": {
+    "description": "Adaptive formula dialog: fourth promise, its line."
+  },
+  "adaptiveIntroLogWeight": "Log my weight",
+  "@adaptiveIntroLogWeight": {
+    "description": "Adaptive formula dialog: button for YumSum Star members, opening the weigh-in dialog."
+  },
+  "adaptiveLapseTitle": "Your YumSum Star has ended",
+  "@adaptiveLapseTitle": {
+    "description": "Notice once YumSum Star ends while the Adaptive formula had changed the target: title."
+  },
+  "adaptiveLapseBody": "Your target goes back to your standard plan on {date}.",
+  "@adaptiveLapseBody": {
+    "description": "Notice once YumSum Star ends: when the target returns to the plan's. date is e.g. 7 November.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+
+  "quickLogLimit": "Today's {limit} AI estimates are used up. Type the calories yourself.",
+  "@quickLogLimit": {
+    "description": "Quick-log bar: error when the day's AI estimates are used up.",
+    "placeholders": { "limit": { "type": "int" } }
+  },
+  "quickLogErrorSave": "Could not save meal. Try again.",
+  "@quickLogErrorSave": {
+    "description": "Quick-log bar: error when saving a meal failed."
+  },
+  "quickLogAllowMic": "Allow microphone access to log by voice.",
+  "@quickLogAllowMic": {
+    "description": "Quick-log bar: error when the microphone isn't allowed."
+  },
+  "quickLogErrorRecord": "Could not start recording. Try again.",
+  "@quickLogErrorRecord": {
+    "description": "Quick-log bar: error when the recording didn't start."
+  },
+  "quickLogMisTap": "Didn't catch that. Tap the mic and try again.",
+  "@quickLogMisTap": {
+    "description": "Quick-log bar: error after a recording too short to be a meal."
+  },
+  "quickLogNoCalories": "Open Food Facts has no calories for this product yet. Take a photo of the packet instead.",
+  "@quickLogNoCalories": {
+    "description": "Quick-log bar: a scanned product is listed without calories, and contributing wasn't taken up."
+  },
+  "quickLogNotListed": "This product isn't on Open Food Facts. Take a photo of the packet instead.",
+  "@quickLogNotListed": {
+    "description": "Quick-log bar: a scanned product isn't listed, and contributing wasn't taken up."
+  },
+  "quickLogAiLeft": "{count, plural, =0{No AI estimates left today} =1{1 AI estimate left today} other{{count} AI estimates left today}}",
+  "@quickLogAiLeft": {
+    "description": "Quick-log bar: quiet line above the box once half of the day's AI estimates are used.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "quickLogHint": "Type a meal",
+  "@quickLogHint": {
+    "description": "Quick-log bar: hint in the box where a meal is typed."
+  },
+  "quickLogClear": "Clear",
+  "@quickLogClear": {
+    "description": "Quick-log bar: tooltip of the button that empties the boxes."
+  },
+  "quickLogProteinHint": "protein (g)",
+  "@quickLogProteinHint": {
+    "description": "Quick-log bar: hint in the protein box, half the bar's width."
+  },
+  "quickLogProteinUnit": "g protein",
+  "@quickLogProteinUnit": {
+    "description": "Quick-log bar: after the number in the protein box."
+  },
+  "quickLogSearchFoods": "Search foods",
+  "@quickLogSearchFoods": {
+    "description": "Quick-log bar: chip that searches packaged foods for what's typed."
+  },
+  "quickLogChip": "{name} · {kcal} kcal",
+  "@quickLogChip": {
+    "description": "Quick-log bar: a chip offering a recent meal or a recipe portion.",
+    "placeholders": { "name": { "type": "String" }, "kcal": { "type": "int" } }
+  },
+  "quickLogStop": "Stop",
+  "@quickLogStop": {
+    "description": "Quick-log bar: tooltip of the button that stops the recording."
+  },
+  "quickLogPhoto": "Take a photo",
+  "@quickLogPhoto": {
+    "description": "Quick-log bar: tooltip of the camera button (Smart Snap)."
+  },
+  "quickLogBarcode": "Scan a barcode",
+  "@quickLogBarcode": {
+    "description": "Quick-log bar: tooltip of the barcode button."
+  },
+  "quickLogSpeak": "Speak",
+  "@quickLogSpeak": {
+    "description": "Quick-log bar: tooltip of the mic button."
+  },
+  "quickLogEstimate": "Estimate",
+  "@quickLogEstimate": {
+    "description": "Quick-log bar: tooltip of the sparkle button, which has the AI estimate the typed meal."
+  },
+  "quickLogListening": "Listening... tap stop when you're done.",
+  "@quickLogListening": {
+    "description": "Quick-log bar: status line while recording."
+  },
+  "quickLogWorking": "Working...",
+  "@quickLogWorking": {
+    "description": "Quick-log bar: status line while the AI or the food database is busy."
+  },
+
+  "mealAiOff": "AI estimates aren't switched on yet.",
+  "@mealAiOff": {
+    "description": "AI error: the AI isn't switched on on the server."
+  },
+  "mealAiBusy": "The AI is busy right now. Try again in a minute.",
+  "@mealAiBusy": {
+    "description": "AI error: the AI is overloaded."
+  },
+  "mealAiPaused": "AI estimates are paused for now. You can still type the calories yourself.",
+  "@mealAiPaused": {
+    "description": "AI error: the AI is paused on the server."
+  },
+  "mealAiBusyShort": "The AI is busy. Try again in a few seconds.",
+  "@mealAiBusyShort": {
+    "description": "AI error: a brief hiccup."
+  },
+  "mealAiNoStar": "YumSum Star isn't on for this account. Try again.",
+  "@mealAiNoStar": {
+    "description": "AI error: the server doesn't see YumSum Star on the account."
+  },
+  "mealAiErrorEstimate": "Could not estimate calories. Try again.",
+  "@mealAiErrorEstimate": {
+    "description": "AI error: estimating a typed meal failed."
+  },
+  "mealAiNoMeal": "Couldn't hear a meal in that. Tap the mic and try again.",
+  "@mealAiNoMeal": {
+    "description": "AI error: the recording had no meal in it."
+  },
+  "mealAiErrorVoice": "Could not understand the recording. Try again.",
+  "@mealAiErrorVoice": {
+    "description": "AI error: reading the recording failed."
+  },
+  "mealAiNoFood": "No food found in that photo. Try again with the plate in view.",
+  "@mealAiNoFood": {
+    "description": "AI error: the Smart Snap photo had no food in it."
+  },
+  "mealAiErrorPhoto": "Could not read that photo. Try again.",
+  "@mealAiErrorPhoto": {
+    "description": "AI error: reading the Smart Snap photo failed."
+  },
+  "mealAiNoLabel": "Those photos don't show a label. Fill in the details yourself.",
+  "@mealAiNoLabel": {
+    "description": "AI error, on the contribute form: the packet photos show no label."
+  },
+  "mealAiLimit": "Daily AI limit reached. Enter the calories yourself.",
+  "@mealAiLimit": {
+    "description": "Meal form: error when the day's AI estimates are used up."
+  },
+  "mealErrorAi": "Could not reach the AI. Try again.",
+  "@mealErrorAi": {
+    "description": "Meal form and quick-log bar: error when the AI couldn't be reached."
+  },
+  "mealErrorNoCalories": "Enter the calories, or estimate them.",
+  "@mealErrorNoCalories": {
+    "description": "Meal form: error on saving without calories."
+  },
+  "mealErrorEditLimit": "No past-day changes left this month.",
+  "@mealErrorEditLimit": {
+    "description": "Meal form: error when this month's changes to past days are used up."
+  },
+  "mealErrorSave": "Could not save the meal. Try again.",
+  "@mealErrorSave": {
+    "description": "Meal form: error when saving failed."
+  },
+  "mealEditTitle": "Edit meal",
+  "@mealEditTitle": {
+    "description": "Meal form: title when editing a meal."
+  },
+  "mealAddTitle": "Add meal",
+  "@mealAddTitle": {
+    "description": "Meal form: title when adding a meal."
+  },
+  "mealName": "Meal",
+  "@mealName": {
+    "description": "Meal form: label of the name box."
+  },
+  "mealNameHint": "e.g. Musaka, chicken wrap",
+  "@mealNameHint": {
+    "description": "Meal form: example in the name box; local dishes in Bulgarian."
+  },
+  "mealCalories": "Calories",
+  "@mealCalories": {
+    "description": "Meal form: label of the calories box, half width."
+  },
+  "mealProtein": "Protein",
+  "@mealProtein": {
+    "description": "Meal form: label of the protein box, half width."
+  },
+  "mealProteinNote": "Leave protein blank to estimate it from the name.",
+  "@mealProteinNote": {
+    "description": "Meal form: note under the protein box."
+  },
+  "mealEstimateFromName": "Estimate from name",
+  "@mealEstimateFromName": {
+    "description": "Meal form: button that has the AI estimate the calories from the name."
+  },
+  "mealSaveChanges": "Save changes",
+  "@mealSaveChanges": {
+    "description": "Meal form: save button when editing."
+  },
+  "mealSave": "Save meal",
+  "@mealSave": {
+    "description": "Meal form: save button when adding."
+  },
+  "mealUnnamed": "Unnamed meal",
+  "@mealUnnamed": {
+    "description": "Meal row: a meal logged with calories only."
+  },
+  "mealNutrition": "Nutrition",
+  "@mealNutrition": {
+    "description": "Meal row: small link beside the time that opens the meal's macros."
+  },
+  "mealProteinGrams": "{grams} g protein",
+  "@mealProteinGrams": {
+    "description": "Meal row: the meal's protein, under its calories.",
+    "placeholders": { "grams": { "type": "int" } }
+  },
+  "mealOptions": "Meal options",
+  "@mealOptions": {
+    "description": "Meal row: tooltip of the menu with Edit and Delete."
+  },
+  "mealTapWeight": "Tap a weight to change it.",
+  "@mealTapWeight": {
+    "description": "AI breakdown: note under the items, whose weights can be tapped."
+  },
+  "mealWeight": "Weight",
+  "@mealWeight": {
+    "description": "AI breakdown: label of the box for an item's weight in grams."
+  },
+  "mealUseWeight": "Use",
+  "@mealUseWeight": {
+    "description": "AI breakdown: button that applies the weight typed."
+  },
+  "mealKcalGrams": "{kcal} kcal · {grams} g",
+  "@mealKcalGrams": {
+    "description": "AI breakdown: an item's calories and protein grams.",
+    "placeholders": { "kcal": { "type": "int" }, "grams": { "type": "int" } }
+  },
+  "mealChoiceTitle": "Which did you have?",
+  "@mealChoiceTitle": {
+    "description": "Dialog asking which version of an item the user had (size, milk, homemade or takeaway)."
+  },
+  "mealChoiceNote": "We went with the first.",
+  "@mealChoiceNote": {
+    "description": "Which-did-you-have dialog: the first option, ticked, is the AI's guess."
+  },
+
+  "cameraNotFound": "No camera found.",
+  "@cameraNotFound": {
+    "description": "Camera page: the device has no camera."
+  },
+  "cameraCouldNotStart": "The camera could not start.",
+  "@cameraCouldNotStart": {
+    "description": "Camera page: the camera failed to open."
+  },
+  "cameraAllowWeb": "Allow camera access in your browser to scan barcodes and take photos.",
+  "@cameraAllowWeb": {
+    "description": "Camera page in a browser: camera access was refused."
+  },
+  "cameraAllowApp": "Allow camera access to scan barcodes and take photos. If you said no before, turn it on in your phone's Settings.",
+  "@cameraAllowApp": {
+    "description": "Camera page in the app: camera access was refused."
+  },
+  "cameraErrorReader": "Could not start the barcode reader. Try again.",
+  "@cameraErrorReader": {
+    "description": "Camera page in a browser: the barcode reader didn't load."
+  },
+  "cameraErrorPhoto": "Could not take the photo. Try again.",
+  "@cameraErrorPhoto": {
+    "description": "Camera page: snack bar when taking the photo failed."
+  },
+  "cameraChoosePhoto": "Choose a photo instead",
+  "@cameraChoosePhoto": {
+    "description": "Camera page in a browser: button picking a photo file instead."
+  },
+  "cameraTakePhoto": "Take photo",
+  "@cameraTakePhoto": {
+    "description": "Camera page: what screen readers say for the shutter button."
+  },
+  "cameraStep": "Step {number} of {total}",
+  "@cameraStep": {
+    "description": "Camera page: which photo of several this is.",
+    "placeholders": { "number": { "type": "int" }, "total": { "type": "int" } }
+  },
+  "cameraBarcodeTitle": "Point at the barcode",
+  "@cameraBarcodeTitle": {
+    "description": "Camera page, scanning: what to do."
+  },
+  "cameraBarcodeTip": "Hold it inside the box and it's read by itself.",
+  "@cameraBarcodeTip": {
+    "description": "Camera page, scanning: the tip under it; the box is drawn on the camera picture."
+  },
+  "cameraMealTitle": "Take a photo of your meal",
+  "@cameraMealTitle": {
+    "description": "Camera page, Smart Snap: what to photograph."
+  },
+  "cameraMealTip": "From above, with the whole plate in.",
+  "@cameraMealTip": {
+    "description": "Camera page, Smart Snap: how to take it."
+  },
+  "cameraFrontTitle": "Take a photo of the front of the pack",
+  "@cameraFrontTitle": {
+    "description": "Camera page, contributing a product: the first photo."
+  },
+  "cameraFrontTip": "Get the whole front in, name and all.",
+  "@cameraFrontTip": {
+    "description": "Camera page, contributing a product: how to take the first photo."
+  },
+  "cameraTableTitle": "Take a photo of the nutrition table",
+  "@cameraTableTitle": {
+    "description": "Camera page, contributing a product: the nutrition table photo."
+  },
+  "cameraTableTip": "Fill the frame with the table, flat and sharp, so every number can be read.",
+  "@cameraTableTip": {
+    "description": "Camera page, contributing a product: how to take the nutrition table photo."
+  },
+  "cameraSmartSnap": "Smart Snap",
+  "@cameraSmartSnap": {
+    "description": "Smart Snap's name, the YumSum Star photo logging; a name, kept in Latin letters."
+  },
+  "cameraSmartSnapSubtitle": "Make food logging as easy as taking a photo.",
+  "@cameraSmartSnapSubtitle": {
+    "description": "Smart Snap dialog for free accounts: the line under its name."
+  },
+  "cameraSmartSnapSkipTitle": "Skip the manual entry",
+  "@cameraSmartSnapSkipTitle": {
+    "description": "Smart Snap dialog: first promise, bold."
+  },
+  "cameraSmartSnapSkipBody": "Snap your meal and let AI identify the food, with estimated calories and macros for each item.",
+  "@cameraSmartSnapSkipBody": {
+    "description": "Smart Snap dialog: first promise, its line."
+  },
+  "cameraSmartSnapControlTitle": "You're always in control",
+  "@cameraSmartSnapControlTitle": {
+    "description": "Smart Snap dialog: second promise, bold."
+  },
+  "cameraSmartSnapControlBody": "Review your meal, make any changes and save when you're happy.",
+  "@cameraSmartSnapControlBody": {
+    "description": "Smart Snap dialog: second promise, its line."
+  },
+
+  "foodSearchSource": "Packaged foods · Open Food Facts",
+  "@foodSearchSource": {
+    "description": "Food search sheet: under the words searched for."
+  },
+  "foodSearchError": "Could not search right now.",
+  "@foodSearchError": {
+    "description": "Food search sheet: the search failed."
+  },
+  "foodSearchEmpty": "Nothing found. Try other words, or let the AI estimate it.",
+  "@foodSearchEmpty": {
+    "description": "Food search sheet: no results."
+  },
+  "foodPer100g": "{kcal} kcal per 100 g",
+  "@foodPer100g": {
+    "description": "Food search sheet: a product's calories, after its brand.",
+    "placeholders": { "kcal": { "type": "int" } }
+  },
+  "foodPortionSource": "{amounts} per 100 g · Open Food Facts",
+  "@foodPortionSource": {
+    "description": "Portion sheet: the product's figures per 100 g. amounts is e.g. 215 kcal · 9 g protein.",
+    "placeholders": { "amounts": { "type": "String" } }
+  },
+  "foodPortionAmount": "Amount",
+  "@foodPortionAmount": {
+    "description": "Portion sheet: label of the grams box."
+  },
+  "foodErrorNotAnswering": "The food database is not answering right now.",
+  "@foodErrorNotAnswering": {
+    "description": "Barcode lookup or food search: Open Food Facts answered with an error."
+  },
+  "foodErrorOffline": "Could not reach the food database. Check your connection.",
+  "@foodErrorOffline": {
+    "description": "Barcode lookup or food search: no connection."
+  },
+
+  "contributeAddNutritionTitle": "Add its nutrition",
+  "@contributeAddNutritionTitle": {
+    "description": "Contribute invitation: title when the product is listed without its nutrition."
+  },
+  "contributeAddProductTitle": "Be the first to add this",
+  "@contributeAddProductTitle": {
+    "description": "Contribute invitation: title when the product isn't listed."
+  },
+  "contributeAddNutritionBody": "This product is in the database, but its nutrition isn't yet. Add it with one photo of the nutrition table and it'll be there for you and everyone who scans it next.",
+  "@contributeAddNutritionBody": {
+    "description": "Contribute invitation: text when the product is listed without its nutrition."
+  },
+  "contributeAddProductBody": "This product isn't in the database yet. Add it with two photos and it'll be there for you and everyone who scans it next.",
+  "@contributeAddProductBody": {
+    "description": "Contribute invitation: text when the product isn't listed."
+  },
+  "contributeTakesSeconds": "It takes 30 seconds and helps everyone, forever ♥",
+  "@contributeTakesSeconds": {
+    "description": "Contribute invitation: small line under the text."
+  },
+  "contributeButton": "Contribute",
+  "@contributeButton": {
+    "description": "Contribute invitation and form: the button that adds the product to Open Food Facts."
+  },
+  "contributeNotNow": "Not now",
+  "@contributeNotNow": {
+    "description": "Contribute invitation: button turning it down."
+  },
+  "contributeAiRead": "{count, plural, =1{The AI read these from your photo. Check them against the packet: they will be public.} other{The AI read these from your photos. Check them against the packet: they will be public.}}",
+  "@contributeAiRead": {
+    "description": "Contribute form: note once the AI has filled the form from the packet photos.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "contributeAiLimit": "Daily AI limit reached. Copy the details from the packet yourself.",
+  "@contributeAiLimit": {
+    "description": "Contribute form: the AI couldn't read the photos, the day's AI use being up."
+  },
+  "contributeErrorRead": "Could not read the label. Fill in the details yourself.",
+  "@contributeErrorRead": {
+    "description": "Contribute form: reading the packet photos failed."
+  },
+  "contributeNotSignedIn": "Not signed in.",
+  "@contributeNotSignedIn": {
+    "description": "Contribute form: the account was signed out."
+  },
+  "contributeErrorMissing": "Add the product name and energy (kcal).",
+  "@contributeErrorMissing": {
+    "description": "Contribute form: error when the name or calories are missing."
+  },
+  "contributeEnergy": "Energy (kcal)",
+  "@contributeEnergy": {
+    "description": "Contribute form: label of a half-width box, as on a nutrition label."
+  },
+  "contributeProtein": "Protein (g)",
+  "@contributeProtein": {
+    "description": "Contribute form: label of a half-width box, as on a nutrition label."
+  },
+  "contributeFat": "Fat (g)",
+  "@contributeFat": {
+    "description": "Contribute form: label of a half-width box, as on a nutrition label."
+  },
+  "contributeSaturates": "of which saturates (g)",
+  "@contributeSaturates": {
+    "description": "Contribute form: label of a half-width box, as on a nutrition label."
+  },
+  "contributeCarbs": "Carbohydrate (g)",
+  "@contributeCarbs": {
+    "description": "Contribute form: label of a half-width box, as on a nutrition label."
+  },
+  "contributeSugars": "of which sugars (g)",
+  "@contributeSugars": {
+    "description": "Contribute form: label of a half-width box, as on a nutrition label."
+  },
+  "contributeFibre": "Fibre (g)",
+  "@contributeFibre": {
+    "description": "Contribute form: label of a half-width box, as on a nutrition label."
+  },
+  "contributeSalt": "Salt (g)",
+  "@contributeSalt": {
+    "description": "Contribute form: label of a half-width box, as on a nutrition label."
+  },
+  "contributeThanks": "Thank you!",
+  "@contributeThanks": {
+    "description": "Contribute: heading once the product is sent; one of the two places with an exclamation mark."
+  },
+  "contributeThanksProduct": "{product} is now on Open Food Facts for everyone who scans it next.",
+  "@contributeThanksProduct": {
+    "description": "Contribute: thank-you text after adding a new product.",
+    "placeholders": { "product": { "type": "String" } }
+  },
+  "contributeThanksNutrition": "{product} now has its nutrition on Open Food Facts for everyone who scans it next.",
+  "@contributeThanksNutrition": {
+    "description": "Contribute: thank-you text after adding a listed product's nutrition.",
+    "placeholders": { "product": { "type": "String" } }
+  },
+  "contributeThanksCount": "{count, plural, other{That's {count} products you've added.}}",
+  "@contributeThanksCount": {
+    "description": "Contribute: after the thank-you text, from the second product on.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "contributeLogIt": "Log it",
+  "@contributeLogIt": {
+    "description": "Contribute: button that goes on to log the product just added."
+  },
+  "contributeCheckDetails": "Check the details",
+  "@contributeCheckDetails": {
+    "description": "Contribute form: title for a new product."
+  },
+  "contributeCheckNutrition": "Check the nutrition",
+  "@contributeCheckNutrition": {
+    "description": "Contribute form: title for a listed product's nutrition."
+  },
+  "contributeBarcode": "Barcode {barcode}",
+  "@contributeBarcode": {
+    "description": "Contribute form: under the title.",
+    "placeholders": { "barcode": { "type": "String" } }
+  },
+  "contributeReading": "Reading the label...",
+  "@contributeReading": {
+    "description": "Contribute form: while the AI reads the packet photos."
+  },
+  "contributeProductName": "Product name",
+  "@contributeProductName": {
+    "description": "Contribute form: label of the name box."
+  },
+  "contributeBrand": "Brand",
+  "@contributeBrand": {
+    "description": "Contribute form: label of the brand box."
+  },
+  "contributePackSize": "Pack size, e.g. 400 g",
+  "@contributePackSize": {
+    "description": "Contribute form: label of a half-width box; what is typed goes to Open Food Facts, so keep the example's unit as g."
+  },
+  "contributeServing": "Serving, e.g. 30 g",
+  "@contributeServing": {
+    "description": "Contribute form: label of a half-width box; what is typed goes to Open Food Facts, so keep the example's unit as g."
+  },
+  "contributePer100": "PER 100 G (OR 100 ML)",
+  "@contributePer100": {
+    "description": "Contribute form: small capitals over the nutrition boxes."
+  },
+  "contributePublishNew": "Your photos and these details will be published on Open Food Facts under open licences (CC BY-SA and ODbL), so anyone can use them. Your name and email are never shared.",
+  "@contributePublishNew": {
+    "description": "Contribute form: what gets published, for a new product."
+  },
+  "contributePublishFigures": "These figures will be published on Open Food Facts under open licences (CC BY-SA and ODbL), so anyone can use them. Your name and email are never shared.",
+  "@contributePublishFigures": {
+    "description": "Contribute form: what gets published, for nutrition alone."
+  },
+  "contributePublishPhoto": "Your photo and these figures will be published on Open Food Facts under open licences (CC BY-SA and ODbL), so anyone can use them. Your name and email are never shared.",
+  "@contributePublishPhoto": {
+    "description": "Contribute form: what gets published, for nutrition with its photo."
+  },
+  "contributeErrorLimit": "You've sent all you can today. You can send more tomorrow.",
+  "@contributeErrorLimit": {
+    "description": "Contribute form: the day's contributions are used up."
+  },
+  "contributeErrorRejected": "Open Food Facts didn't accept it. Try again in a moment.",
+  "@contributeErrorRejected": {
+    "description": "Contribute form: Open Food Facts refused it."
+  },
+  "contributeErrorOffline": "Could not reach Open Food Facts. Check your connection and try again.",
+  "@contributeErrorOffline": {
+    "description": "Contribute form: sending failed."
+  },
+
+  "macroProtein": "Protein",
+  "@macroProtein": {
+    "description": "Protein: a macro ring's label, a macro guide heading, and in a meal's macro line."
+  },
+  "macroCarbs": "Carbs",
+  "@macroCarbs": {
+    "description": "Carbohydrates: a macro guide heading, a cell of the day's totals, and in a meal's macro line."
+  },
+  "macroFat": "Fat",
+  "@macroFat": {
+    "description": "Fat: a macro ring's label, a macro guide heading, a totals cell, and in a meal's macro line."
+  },
+  "macroFibre": "Fibre",
+  "@macroFibre": {
+    "description": "Fibre: a macro ring's label, a macro guide heading, a totals cell, and in a meal's macro line."
+  },
+  "macroSugars": "Sugars",
+  "@macroSugars": {
+    "description": "Sugars: a macro ring's label, a macro guide heading, a totals cell, and in a meal's macro line."
+  },
+  "macroSaturates": "Saturates",
+  "@macroSaturates": {
+    "description": "Saturated fat: a macro guide heading, a totals cell, and in a meal's macro line."
+  },
+  "macroSalt": "Salt",
+  "@macroSalt": {
+    "description": "Salt: a macro ring's label, a macro guide heading, a totals cell, and in a meal's macro line."
+  },
+  "macroRingCarbs": "Carbs",
+  "@macroRingCarbs": {
+    "description": "Carbohydrates under a macro ring, 72 px wide: abbreviate if needed."
+  },
+  "macroRingSaturates": "Saturates",
+  "@macroRingSaturates": {
+    "description": "Saturated fat under a macro ring, 72 px wide: abbreviate if needed."
+  },
+  "macroRingMax": "max {grams} g",
+  "@macroRingMax": {
+    "description": "Under a macro ring with a limit (sugars, saturates, salt): the most for the day.",
+    "placeholders": { "grams": { "type": "int" } }
+  },
+  "macroRingOf": "of {grams} g",
+  "@macroRingOf": {
+    "description": "Under a macro ring with a target: the day's target.",
+    "placeholders": { "grams": { "type": "int" } }
+  },
+  "macroNotCountedProtein": "{count, plural, =1{1 meal not counted (no protein info)} other{{count} meals not counted (no protein info)}}",
+  "@macroNotCountedProtein": {
+    "description": "Under the macro rings: meals whose protein isn't known.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "macroNotCountedMacros": "{count, plural, =1{1 meal not counted (no macro info)} other{{count} meals not counted (no macro info)}}",
+  "@macroNotCountedMacros": {
+    "description": "Under the macro rings or the day's totals: meals whose macros aren't known.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "macroUnlockLabel": "Unlock full macros with YumSum Star",
+  "@macroUnlockLabel": {
+    "description": "What screen readers say for the dimmed macro rings of a free account."
+  },
+  "macroUnlock": "Unlock full macros",
+  "@macroUnlock": {
+    "description": "Chip over the dimmed macro rings of a free account, beside a star; about 140 px wide at most."
+  },
+  "macroNoneToday": "No macro info for today's meals",
+  "@macroNoneToday": {
+    "description": "The day's macro totals when no meal has macros."
+  },
+  "macroAbout": "About macros",
+  "@macroAbout": {
+    "description": "Tooltip of the info button by the day's macro totals."
+  },
+  "macroAtLeast": "at least {grams}",
+  "@macroAtLeast": {
+    "description": "The day's macro totals: where some meals don't give the figure. grams is e.g. 12 g.",
+    "placeholders": { "grams": { "type": "String" } }
+  },
+  "macroGuideTargets": "Your targets",
+  "@macroGuideTargets": {
+    "description": "Macro guide dialog: title when opened from Home's calorie card."
+  },
+  "macroGuideMacros": "Your macros",
+  "@macroGuideMacros": {
+    "description": "Macro guide dialog: title when opened from the rings or totals."
+  },
+  "macroGuideIntro": "Your targets come from your plan, so they change with it.",
+  "@macroGuideIntro": {
+    "description": "Macro guide dialog: first line."
+  },
+  "macroGuideCalories": "Calories",
+  "@macroGuideCalories": {
+    "description": "Macro guide dialog: the calories heading."
+  },
+  "macroGuideCaloriesWhy": "The energy in food. Eat less than you burn and you lose weight.",
+  "@macroGuideCaloriesWhy": {
+    "description": "Macro guide dialog: what calories are."
+  },
+  "macroGuideCaloriesTarget": "What you burn in a day, from your age, height, weight and activity, with a little taken off if you're losing weight.",
+  "@macroGuideCaloriesTarget": {
+    "description": "Macro guide dialog: how the calorie target is set, after Target:."
+  },
+  "macroGuideAimFor": "Aim for",
+  "@macroGuideAimFor": {
+    "description": "Macro guide dialog: group heading over protein and fibre, shown in capitals."
+  },
+  "macroGuideBalance": "Keep in balance",
+  "@macroGuideBalance": {
+    "description": "Macro guide dialog: group heading over carbs and fat, shown in capitals."
+  },
+  "macroGuideKeepUnder": "Keep under",
+  "@macroGuideKeepUnder": {
+    "description": "Macro guide dialog: group heading over sugars, saturates and salt, shown in capitals."
+  },
+  "macroGuideKeepUnderNote": "Keep these under the amounts shown. Going over day after day is what harms your teeth, heart and blood pressure.",
+  "@macroGuideKeepUnderNote": {
+    "description": "Macro guide dialog: under the Keep under heading."
+  },
+  "macroGuideProteinWhy": "Keeps you full and protects your muscle while you lose fat.",
+  "@macroGuideProteinWhy": {
+    "description": "Macro guide dialog: what protein does."
+  },
+  "macroGuideProteinTarget": "1.2 to 2 g per kg of your goal weight, more the more you train.",
+  "@macroGuideProteinTarget": {
+    "description": "Macro guide dialog: protein's target, after Target:."
+  },
+  "macroGuideFibreWhy": "Keeps you full and your gut healthy.",
+  "@macroGuideFibreWhy": {
+    "description": "Macro guide dialog: what fibre does."
+  },
+  "macroGuideFibreTarget": "At least 30 g a day.",
+  "@macroGuideFibreTarget": {
+    "description": "Macro guide dialog: fibre's target, after Target:."
+  },
+  "macroGuideCarbsWhy": "Your main fuel: bread, rice, pasta, potatoes and fruit.",
+  "@macroGuideCarbsWhy": {
+    "description": "Macro guide dialog: what carbs do."
+  },
+  "macroGuideCarbsTarget": "What's left after protein and fat.",
+  "@macroGuideCarbsTarget": {
+    "description": "Macro guide dialog: carbs' target, after Target:."
+  },
+  "macroGuideFatWhy": "Energy, and it helps you absorb vitamins.",
+  "@macroGuideFatWhy": {
+    "description": "Macro guide dialog: what fat does."
+  },
+  "macroGuideFatTarget": "About 30% of your calories.",
+  "@macroGuideFatTarget": {
+    "description": "Macro guide dialog: fat's target, after Target:."
+  },
+  "macroGuideSugarsWhy": "Calories that don't fill you up, and bad for your teeth.",
+  "@macroGuideSugarsWhy": {
+    "description": "Macro guide dialog: why to limit sugars."
+  },
+  "macroGuideSugarsTarget": "Under 18% of your calories.",
+  "@macroGuideSugarsTarget": {
+    "description": "Macro guide dialog: sugars' limit, after Target:."
+  },
+  "macroGuideSaturatesWhy": "Raises your cholesterol: butter, cheese, fatty meat and cakes.",
+  "@macroGuideSaturatesWhy": {
+    "description": "Macro guide dialog: why to limit saturated fat."
+  },
+  "macroGuideSaturatesTarget": "Under 10% of your calories.",
+  "@macroGuideSaturatesTarget": {
+    "description": "Macro guide dialog: saturated fat's limit, after Target:."
+  },
+  "macroGuideSaltWhy": "Raises your blood pressure. Most is hidden in bread, cheese and ready meals.",
+  "@macroGuideSaltWhy": {
+    "description": "Macro guide dialog: why to limit salt."
+  },
+  "macroGuideSaltTarget": "Under 6 g a day, about a teaspoon.",
+  "@macroGuideSaltTarget": {
+    "description": "Macro guide dialog: salt's limit, after Target:."
+  },
+  "macroGuideTarget": "Target: ",
+  "@macroGuideTarget": {
+    "description": "Macro guide dialog: bold, before each target; keep the space at the end."
+  },
+  "macroGuideDisclaimer": "General guidance for adults, not medical advice.",
+  "@macroGuideDisclaimer": {
+    "description": "Macro guide dialog: small last line."
+  },
+  "macroFibreBadge": "Rich in fibre",
+  "@macroFibreBadge": {
+    "description": "Badge on a recipe high in fibre: its tooltip on the photo, and a pill on the recipe page."
   }
 }

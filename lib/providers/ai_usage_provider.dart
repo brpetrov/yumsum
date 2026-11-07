@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/country_provider.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/repositories/ai_usage_repository.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
@@ -20,6 +21,7 @@ final calorieEstimateServiceProvider = Provider<CalorieEstimateService>((ref) {
     country: ref.watch(countryProvider),
     dailyLimit: ref.watch(aiDailyLimitProvider),
     plus: ref.watch(aiMacrosProvider),
+    l10n: ref.watch(l10nProvider),
   );
 });
 
