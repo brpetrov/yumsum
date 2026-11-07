@@ -348,6 +348,8 @@ class _WeightChartCard extends StatelessWidget {
 
     final maxX = spots.last.x == 0 ? 1.0 : spots.last.x;
     final labelInterval = math.max(1.0, (maxX / 4).floorToDouble());
+    // Room at the sides too, so the first and last dots aren't cut in half.
+    final xPad = maxX * 0.05;
 
     return AppCard(
       padding: const EdgeInsets.fromLTRB(10, 24, 20, 16),
@@ -357,8 +359,8 @@ class _WeightChartCard extends StatelessWidget {
             height: 240,
             child: LineChart(
               LineChartData(
-                minX: 0,
-                maxX: maxX,
+                minX: -xPad,
+                maxX: maxX + xPad,
                 minY: minY,
                 maxY: maxY,
                 gridData: FlGridData(
@@ -399,9 +401,10 @@ class _WeightChartCard extends StatelessWidget {
                       reservedSize: 28,
                       interval: labelInterval,
                       getTitlesWidget: (value, meta) {
-                        // fl_chart always adds a label at the end of the axis,
-                        // which collides with the last regular one.
-                        if (value == meta.max && value % labelInterval != 0) {
+                        // fl_chart always adds labels at the ends of the axis,
+                        // which fall between days and collide with the
+                        // regular ones.
+                        if (value % labelInterval != 0) {
                           return const SizedBox.shrink();
                         }
                         final date = firstDate.add(
@@ -445,6 +448,9 @@ class _WeightChartCard extends StatelessWidget {
                       ),
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
+                    // Kept inside the chart, clear of the card's edges.
+                    fitInsideHorizontally: true,
+                    fitInsideVertically: true,
                     getTooltipItems: (touched) => [
                       for (final spot in touched)
                         LineTooltipItem(

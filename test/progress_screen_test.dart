@@ -97,6 +97,42 @@ void main() {
     expect(weighIns.barWidth, 0);
   });
 
+  testWidgets('the dots and the target sit clear of the chart\'s edges', (
+    tester,
+  ) async {
+    // On a phone, the highest and lowest weigh-ins at the ends, the target
+    // (73 kg) below them all.
+    tester.view.physicalSize = const Size(411 * 3, 915 * 3);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpScreen(
+      tester,
+      profile: planProfile(),
+      entries: [
+        _entry('2026-10-20', 80.6),
+        _entry('2026-11-04', 79.3),
+        _entry('2026-11-07', 79.5),
+      ],
+    );
+    final chart = find.byType(LineChart);
+    final data = tester.widget<LineChart>(chart).data;
+    final size = tester.getSize(chart);
+    final titles = data.titlesData;
+    final width = size.width - titles.leftTitles.sideTitles.reservedSize;
+    final height = size.height - titles.bottomTitles.sideTitles.reservedSize;
+    double xGap(double days) => days / (data.maxX - data.minX) * width;
+    double yGap(double kg) => kg / (data.maxY - data.minY) * height;
+    // A dot reaches 7 from its centre with its rim, a touched one 10, so
+    // more than that is kept clear.
+    expect(yGap(data.maxY - 80.6), greaterThan(10));
+    expect(yGap(73 - data.minY), greaterThan(10));
+    expect(xGap(0 - data.minX), greaterThan(10));
+    expect(xGap(data.maxX - 18), greaterThan(10));
+    // The tooltip stays inside too, not cut off by the card's corner.
+    expect(data.lineTouchData.touchTooltipData.fitInsideHorizontally, isTrue);
+    expect(data.lineTouchData.touchTooltipData.fitInsideVertically, isTrue);
+  });
+
   testWidgets('without YumSum Star it is a shining button that offers it', (
     tester,
   ) async {
