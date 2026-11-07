@@ -31,6 +31,17 @@ class MealCameraPage extends StatefulWidget {
 
 class _MealCameraPageState extends State<MealCameraPage>
     with WidgetsBindingObserver {
+  /// A browser's cameras, listed once a visit: camera_web lists them by
+  /// opening each one in turn, which is slow.
+  static Future<List<CameraDescription>>? _webCameras;
+
+  /// A browser's errors for a camera that's still busy. Firefox on Android
+  /// lets a stopped camera go about 3 seconds later, and the phone opens one
+  /// at a time, so the camera opened just after the listing, or just after
+  /// the page last closed, is refused at first (seen on a Galaxy S24+ on
+  /// 7 November 2026).
+  static const _busy = {'cameraNotReadable', 'cameraAbort'};
+
   static const _orientationDegrees = {
     DeviceOrientation.portraitUp: 0,
     DeviceOrientation.landscapeLeft: 90,
@@ -142,26 +153,22 @@ class _MealCameraPageState extends State<MealCameraPage>
 
   Future<void> _start() async {
     try {
-      final cameras = await availableCameras();
+      final cameras = await (kIsWeb
+          ? _webCameras ??= availableCameras()
+          : availableCameras());
       if (!mounted || _done) return;
       if (cameras.isEmpty) {
+        _webCameras = null;
         if (mounted) setState(() => _problem = 'No camera found.');
         return;
       }
-      final camera = CameraController(
+      final camera = await _open(
         cameras.firstWhere(
           (camera) => camera.lensDirection == CameraLensDirection.back,
           orElse: () => cameras.first,
         ),
-        // 720p: sharp enough for barcodes and for the AI, small to upload.
-        ResolutionPreset.high,
-        enableAudio: false,
-        imageFormatGroup: defaultTargetPlatform == TargetPlatform.android
-            ? ImageFormatGroup.nv21
-            : ImageFormatGroup.bgra8888,
       );
-      _camera = camera;
-      await camera.initialize();
+      if (camera == null) return;
       if (!mounted || _camera != camera) {
         _letGo(camera);
         return;
@@ -177,6 +184,8 @@ class _MealCameraPageState extends State<MealCameraPage>
       }
       setState(() {});
     } on CameraException catch (error) {
+      // Listed again next time, in case the camera changed.
+      _webCameras = null;
       final failed = _camera;
       _camera = null;
       _letGo(failed);
@@ -190,6 +199,34 @@ class _MealCameraPageState extends State<MealCameraPage>
             : 'Allow camera access to scan barcodes and take photos. If '
                   'you said no before, turn it on in your phone\'s Settings.',
       );
+    }
+  }
+
+  /// Opens [description], trying a browser camera that's still busy
+  /// ([_busy]) again every second for a few seconds. Null when the page
+  /// closed meanwhile.
+  Future<CameraController?> _open(CameraDescription description) async {
+    for (var attempt = 1; ; attempt++) {
+      final camera = CameraController(
+        description,
+        // 720p: sharp enough for barcodes and for the AI, small to upload.
+        ResolutionPreset.high,
+        enableAudio: false,
+        imageFormatGroup: defaultTargetPlatform == TargetPlatform.android
+            ? ImageFormatGroup.nv21
+            : ImageFormatGroup.bgra8888,
+      );
+      _camera = camera;
+      try {
+        await camera.initialize();
+        return camera;
+      } on CameraException catch (error) {
+        if (!kIsWeb || !_busy.contains(error.code) || attempt == 6) rethrow;
+        if (_camera == camera) _camera = null;
+        _letGo(camera);
+        await Future<void>.delayed(const Duration(seconds: 1));
+        if (!mounted || _done) return null;
+      }
     }
   }
 
