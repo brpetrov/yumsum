@@ -209,7 +209,7 @@ void main() {
 
       expect(find.text('AI треньор'), findsOneWidget);
       expect(find.text('Миналата седмица'), findsOneWidget);
-      expect(find.text('Пробвай това'), findsOneWidget);
+      expect(find.text('Опитай това'), findsOneWidget);
       expect(find.text('Продължавай така'), findsOneWidget);
       expect(find.byTooltip('Предишна седмица'), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -220,7 +220,7 @@ void main() {
 
       expect(find.text('Твоят AI треньор'), findsOneWidget);
       expect(find.text('Виж какво те спъва'), findsOneWidget);
-      expect(find.text('Вземи YumSum Star'), findsOneWidget);
+      expect(find.text('Отключи Star'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });
@@ -325,10 +325,10 @@ void main() {
     testWidgets('the offer', (tester) async {
       await pump(tester, null);
 
-      expect(find.text('Блесни с тези умни екстри.'), findsOneWidget);
+      expect(find.text('Отключи още умни функции.'), findsOneWidget);
       expect(find.text('Годишен'), findsOneWidget);
       expect(find.text('Спести 50%'), findsOneWidget);
-      expect(find.text('Пробвай 7 дни безплатно'), findsOneWidget);
+      expect(find.text('Опитай 7 дни безплатно'), findsOneWidget);
       expect(find.textContaining('7 дни безплатно, след това'), findsOneWidget);
       expect(find.text('Възстанови покупка'), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -337,7 +337,7 @@ void main() {
     testWidgets('for a member', (tester) async {
       await pump(tester, _plus);
 
-      expect(find.text('Вече грееш като YumSum Star'), findsOneWidget);
+      expect(find.text('Вече имаш YumSum Star'), findsOneWidget);
       expect(find.text('Всичко това е твое.'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });

@@ -317,7 +317,7 @@ void main() {
     addTearDown(tester.view.resetViewInsets);
     await tester.tap(find.byKey(const ValueKey('quick-log-name')));
     await tester.pumpAndSettle();
-    expect(find.text('Какво хапна?'), findsOneWidget);
+    expect(find.text('Добави хранене'), findsOneWidget);
     expect(find.text('ккал'), findsOneWidget);
     expect(find.text('протеин (г)'), findsOneWidget);
     expect(find.text('За днес остават 5 AI оценки'), findsOneWidget);
@@ -454,6 +454,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Калории по твоя мярка'), findsOneWidget);
     expect(find.text('По-късно'), findsOneWidget);
-    expect(find.text('Вземи YumSum Star'), findsOneWidget);
+    expect(find.text('Отключи YumSum Star'), findsOneWidget);
   });
 }

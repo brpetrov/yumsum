@@ -275,7 +275,7 @@ void main() {
     expect(find.text('Идея'), findsOneWidget);
     expect(find.text('Какво се случи и какво очакваше?'), findsOneWidget);
     expect(
-      find.text('Днес вече изпрати 3 съобщения. Утре можеш да пратиш още.'),
+      find.text('Днес вече изпрати 3 съобщения. Утре можеш да изпратиш още.'),
       findsOneWidget,
     );
     expect(find.text('Изпрати'), findsOneWidget);

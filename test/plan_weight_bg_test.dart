@@ -261,7 +261,7 @@ void main() {
       expect(find.text('Цел до'), findsOneWidget);
       expect(find.text('0,5 кг/седм.'), findsOneWidget);
       expect(find.text('Устойчиво темпо'), findsOneWidget);
-      expect(find.text('Да започваме'), findsOneWidget);
+      expect(find.text('Започни'), findsOneWidget);
       await tester.ensureVisible(find.textContaining('„Настройки на плана“'));
       await tester.pumpAndSettle();
       fits(tester);
@@ -461,7 +461,7 @@ void main() {
       expect(find.text('73,0 кг'), findsOneWidget);
       expect(find.text('Включена'), findsOneWidget);
       expect(
-        find.text('Гориш 2410 ккал на ден', findRichText: true),
+        find.text('Изгаряш 2410 ккал на ден', findRichText: true),
         findsOneWidget,
       );
       expect(
@@ -593,7 +593,7 @@ void main() {
 
     expect(
       line(AdaptiveNote.lowered.value),
-      'Настроено за теб: −80 ккал. Гориш малко по-малко, отколкото '
+      'Настроено за теб: −80 ккал. Изгаряш малко по-малко, отколкото '
       'предвиждаше планът.',
     );
     expect(
