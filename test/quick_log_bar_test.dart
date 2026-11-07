@@ -1084,6 +1084,34 @@ void main() {
     expect(boxes(tester), ['Ham sandwich', '500', '20']);
   });
 
+  testWidgets('a chip can be tapped as iOS Safari taps, where touching '
+      'outside a box drops it and the keyboard', (tester) async {
+    tester.view.viewInsets = const FakeViewPadding(bottom: 800);
+    addTearDown(tester.view.resetViewInsets);
+    await pumpCard(
+      tester,
+      recents: [
+        _recent('Ham sandwich', 500, 20),
+        _recent('Ham sandwich', 480, 20, daysAgo: 2),
+      ],
+    );
+    await tester.pump();
+    await tester.tap(nameBox);
+    await tester.pump();
+
+    // The browser lets go of the box, and the keyboard goes, as soon as the
+    // finger touches the chip, before the tap ends.
+    final press = await tester.startGesture(
+      tester.getCenter(find.text('Ham sandwich · 500 kcal')),
+    );
+    FocusManager.instance.primaryFocus?.unfocus();
+    tester.view.viewInsets = FakeViewPadding.zero;
+    await tester.pump(const Duration(milliseconds: 100));
+    await press.up();
+    await tester.pumpAndSettle();
+    expect(boxes(tester), ['Ham sandwich', '500', '20']);
+  });
+
   testWidgets('a typed recipe name offers a portion of it', (tester) async {
     await pumpCard(
       tester,

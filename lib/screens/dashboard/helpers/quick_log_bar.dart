@@ -87,6 +87,13 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   final _kcal = TextEditingController();
   final _protein = TextEditingController();
   final _focusNode = FocusNode();
+
+  /// Whether the keyboard was up when a finger went down on the panel while
+  /// a box had focus, until it lifts; null otherwise. iOS Safari lets go of
+  /// the box, and hides the keyboard, as soon as a finger touches outside
+  /// it, which folded the chips before their tap could end; the panel stays
+  /// as it was until the finger lifts.
+  bool? _heldKeyboardUp;
   final _kcalFocus = FocusNode();
   final _proteinFocus = FocusNode();
 
@@ -231,6 +238,13 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     if (_focusNode.hasFocus || _kcalFocus.hasFocus || _proteinFocus.hasFocus) {
       setState(() {});
     }
+  }
+
+  /// The finger that held the panel open lifted: it follows the boxes'
+  /// focus and the keyboard again. The chip's tap lands first, as the
+  /// rebuild waits for the next frame.
+  void _letGo() {
+    if (_heldKeyboardUp != null) setState(() => _heldKeyboardUp = null);
   }
 
   /// A weight corrected in the breakdown: the boxes follow the items, and
@@ -601,13 +615,17 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       _protein,
     ].any((box) => box.text.trim().isNotEmpty);
     final focused =
-        _focusNode.hasFocus || _kcalFocus.hasFocus || _proteinFocus.hasFocus;
+        _heldKeyboardUp != null ||
+        _focusNode.hasFocus ||
+        _kcalFocus.hasFocus ||
+        _proteinFocus.hasFocus;
     // The number boxes join the name box once the bar is in use, so while
     // idle it is one box, the camera and the mic. On phones focus outlives
     // the keyboard (Back only hides it), so an empty bar folds away with
     // it. The view's insets are read because Scaffold hides them from its
     // body, where the bar lives.
-    final keyboardUp = View.of(context).viewInsets.bottom > 0;
+    final keyboardUp =
+        _heldKeyboardUp ?? View.of(context).viewInsets.bottom > 0;
     final open = hasText || (focused && (keyboardUp || _isDesktop));
     // The other ways in make room once the bar is in use: text, or the
     // keyboard up to type it. Not for desktop's standing focus, which
@@ -664,150 +682,161 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
           FocusManager.instance.primaryFocus?.unfocus();
         }
       },
-      child: TextFieldTapRegion(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadow,
-                blurRadius: 28,
-                offset: const Offset(0, -8),
+      child: Listener(
+        onPointerDown: (_) {
+          if (focused) setState(() => _heldKeyboardUp = keyboardUp);
+        },
+        onPointerUp: (_) => _letGo(),
+        onPointerCancel: (_) => _letGo(),
+        child: TextFieldTapRegion(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(30),
               ),
-            ],
-          ),
-          child: Material(
-            type: MaterialType.transparency,
-            child: SafeArea(
-              top: false,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 720),
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(18, open ? 8 : 18, 18, 16),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // The drag handle a sheet has, while there is
-                        // something to swipe down.
-                        if (open) ...[
-                          Center(
-                            child: Container(
-                              key: const ValueKey('quick-log-handle'),
-                              width: 32,
-                              height: 4,
-                              decoration: BoxDecoration(
-                                color: AppColors.outline,
-                                borderRadius: BorderRadius.circular(2),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                        ],
-                        if (recents.isNotEmpty || search != null) ...[
-                          _buildChips(recents, search),
-                          const SizedBox(height: 12),
-                        ],
-                        if (showStatus) ...[
-                          _buildStatus(trackProtein),
-                          const SizedBox(height: 12),
-                        ] else if (aiHint != null) ...[
-                          Padding(
-                            padding: const EdgeInsets.only(left: 6),
-                            child: Text(
-                              aiHint,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                        ],
-                        // Keyed so the status line and chips appearing above
-                        // it never make Flutter rebuild this row as one of
-                        // them, which would recreate the field and drop the
-                        // keyboard on the first keystroke. The number boxes
-                        // come after it, so they never shift it either.
-                        Row(
-                          key: const ValueKey('quick-log-field'),
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                key: const ValueKey('quick-log-name'),
-                                controller: _name,
-                                focusNode: _focusNode,
-                                autofocus: _isDesktop,
-                                readOnly: _working || _listening,
-                                textCapitalization:
-                                    TextCapitalization.sentences,
-                                textInputAction: TextInputAction.done,
-                                // Macros belong to the food named, so a new
-                                // name drops them.
-                                onChanged: (_) {
-                                  _macros = null;
-                                  _edited();
-                                },
-                                onSubmitted: (_) => _submit(),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: AppColors.textPrimary,
-                                ),
-                                decoration: _boxDecoration(
-                                  hint: context.l10n.quickLogHint,
-                                  // A clear button once there is text, so a
-                                  // wrong voice or AI result is one tap from
-                                  // gone.
-                                  suffixIcon:
-                                      hasText && !_working && !_listening
-                                      ? IconButton(
-                                          tooltip: context.l10n.quickLogClear,
-                                          onPressed: _reset,
-                                          color: AppColors.textSecondary,
-                                          icon: const Icon(Icons.close_rounded),
-                                        )
-                                      : null,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.shadow,
+                  blurRadius: 28,
+                  offset: const Offset(0, -8),
+                ),
+              ],
+            ),
+            child: Material(
+              type: MaterialType.transparency,
+              child: SafeArea(
+                top: false,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 720),
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(18, open ? 8 : 18, 18, 16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // The drag handle a sheet has, while there is
+                          // something to swipe down.
+                          if (open) ...[
+                            Center(
+                              child: Container(
+                                key: const ValueKey('quick-log-handle'),
+                                width: 32,
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  color: AppColors.outline,
+                                  borderRadius: BorderRadius.circular(2),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 10),
-                            _buildActions(entry, typing),
+                            const SizedBox(height: 10),
                           ],
-                        ),
-                        // The number boxes span the whole bar, under the name
-                        // and the button.
-                        if (open) ...[
-                          const SizedBox(height: 12),
+                          if (recents.isNotEmpty || search != null) ...[
+                            _buildChips(recents, search),
+                            const SizedBox(height: 12),
+                          ],
+                          if (showStatus) ...[
+                            _buildStatus(trackProtein),
+                            const SizedBox(height: 12),
+                          ] else if (aiHint != null) ...[
+                            Padding(
+                              padding: const EdgeInsets.only(left: 6),
+                              child: Text(
+                                aiHint,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                          // Keyed so the status line and chips appearing above
+                          // it never make Flutter rebuild this row as one of
+                          // them, which would recreate the field and drop the
+                          // keyboard on the first keystroke. The number boxes
+                          // come after it, so they never shift it either.
                           Row(
+                            key: const ValueKey('quick-log-field'),
                             children: [
                               Expanded(
-                                child: _numberBox(
-                                  'quick-log-kcal',
-                                  _kcal,
-                                  _kcalFocus,
-                                  hint: context.l10n.commonKcalUnit,
-                                  unit: context.l10n.commonKcalUnit,
-                                ),
-                              ),
-                              if (trackProtein) ...[
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: _numberBox(
-                                    'quick-log-protein',
-                                    _protein,
-                                    _proteinFocus,
-                                    hint: context.l10n.quickLogProteinHint,
-                                    unit: context.l10n.quickLogProteinUnit,
+                                child: TextField(
+                                  key: const ValueKey('quick-log-name'),
+                                  controller: _name,
+                                  focusNode: _focusNode,
+                                  autofocus: _isDesktop,
+                                  readOnly: _working || _listening,
+                                  textCapitalization:
+                                      TextCapitalization.sentences,
+                                  textInputAction: TextInputAction.done,
+                                  // Macros belong to the food named, so a new
+                                  // name drops them.
+                                  onChanged: (_) {
+                                    _macros = null;
+                                    _edited();
+                                  },
+                                  onSubmitted: (_) => _submit(),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                  decoration: _boxDecoration(
+                                    hint: context.l10n.quickLogHint,
+                                    // A clear button once there is text, so a
+                                    // wrong voice or AI result is one tap from
+                                    // gone.
+                                    suffixIcon:
+                                        hasText && !_working && !_listening
+                                        ? IconButton(
+                                            tooltip: context.l10n.quickLogClear,
+                                            onPressed: _reset,
+                                            color: AppColors.textSecondary,
+                                            icon: const Icon(
+                                              Icons.close_rounded,
+                                            ),
+                                          )
+                                        : null,
                                   ),
                                 ),
-                              ],
+                              ),
+                              const SizedBox(width: 10),
+                              _buildActions(entry, typing),
                             ],
                           ),
+                          // The number boxes span the whole bar, under the name
+                          // and the button.
+                          if (open) ...[
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _numberBox(
+                                    'quick-log-kcal',
+                                    _kcal,
+                                    _kcalFocus,
+                                    hint: context.l10n.commonKcalUnit,
+                                    unit: context.l10n.commonKcalUnit,
+                                  ),
+                                ),
+                                if (trackProtein) ...[
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: _numberBox(
+                                      'quick-log-protein',
+                                      _protein,
+                                      _proteinFocus,
+                                      hint: context.l10n.quickLogProteinHint,
+                                      unit: context.l10n.quickLogProteinUnit,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ),
                 ),
