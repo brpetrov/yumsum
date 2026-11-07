@@ -9,6 +9,7 @@ import 'package:lean_streak/models/weekly_review.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/country_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/recipe_provider.dart';
@@ -18,7 +19,7 @@ import 'package:lean_streak/repositories/weekly_review_repository.dart';
 import 'package:lean_streak/services/weekly_review_service.dart';
 
 final weeklyReviewServiceProvider = Provider<WeeklyReviewService>((ref) {
-  return WeeklyReviewService();
+  return WeeklyReviewService(null, ref.watch(languageCodeProvider));
 });
 
 final weeklyReviewRepositoryProvider = Provider<WeeklyReviewRepository>((ref) {
@@ -79,7 +80,9 @@ final _writingProvider = Provider<Map<String, Future<List<ReviewPoint>>>>(
 /// The AI Coach's notes on the week starting [monday] (plan 09): the saved
 /// ones, or null when there are none. The AI writes them only where
 /// [reviewWritable], and only when the saved notes don't match the facts,
-/// which are worked out afresh each time. Empty for a week still going or
+/// which are worked out afresh each time, or the app's language: notes
+/// saved in English are written again in Bulgarian after a switch, and
+/// back. Empty for a week still going or
 /// with fewer than 4 judged days.
 final weeklyReviewProvider = FutureProvider.autoDispose
     .family<List<ReviewPoint>?, DateTime>((ref, monday) async {
@@ -135,7 +138,11 @@ final weeklyReviewProvider = FutureProvider.autoDispose
       );
       if (facts.judgedDays < 4) return const [];
 
-      final basis = 'Prompt version $weeklyReviewPromptVersion\n${facts.text}';
+      // English keeps the basis it always had, so its saved notes stay.
+      final language = ref.watch(languageCodeProvider);
+      final basis =
+          'Prompt version $weeklyReviewPromptVersion\n'
+          '${language == 'en' ? '' : 'Language $language\n'}${facts.text}';
       if (saved != null && saved.basis == basis) return saved.points;
 
       final key = '$uid $week $basis';

@@ -9,6 +9,7 @@ import 'package:lean_streak/models/weekly_review.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/country_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/recipe_provider.dart';
@@ -128,12 +129,14 @@ void main() {
   late _FakeCoach coach;
 
   /// Listening to the notes on [week] (last week unless given), with
-  /// [saved] already written, for an account with [entitlement].
+  /// [saved] already written, for an account with [entitlement], in
+  /// [language].
   ProviderContainer container({
     Entitlement? entitlement = _plus,
     DateTime? week,
     Map<String, WeeklyReview> saved = const {},
     String region = 'GB',
+    String language = 'en',
   }) {
     meals = _FakeMeals();
     weighIns = _FakeWeighIns();
@@ -143,6 +146,7 @@ void main() {
       overrides: [
         currentUidProvider.overrideWithValue('user-1'),
         deviceRegionProvider.overrideWithValue(region),
+        languageCodeProvider.overrideWithValue(language),
         entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
         userProfileProvider.overrideWith((ref) => Stream.value(planProfile())),
         recipesProvider.overrideWith((ref) async => const []),
@@ -199,6 +203,38 @@ void main() {
     expect(await notesOn(again), _points);
     expect(coach.calls, isEmpty);
     expect(basis, startsWith('Prompt version $weeklyReviewPromptVersion\n'));
+  });
+
+  test('notes saved in one language are written again in the other', () async {
+    container();
+    await pumpEventQueue();
+    coach.calls.single.complete(_points);
+    await pumpEventQueue();
+    final english = reviews.saved[week]!;
+    // English keeps the basis it always had.
+    expect(
+      english.basis,
+      'Prompt version $weeklyReviewPromptVersion\n${coach.facts}',
+    );
+
+    container(language: 'bg', saved: {week: english});
+    await pumpEventQueue();
+    expect(coach.calls, hasLength(1));
+    coach.calls.single.complete(_points);
+    await pumpEventQueue();
+    final bulgarian = reviews.saved[week]!;
+    expect(
+      bulgarian.basis,
+      'Prompt version $weeklyReviewPromptVersion\nLanguage bg\n${coach.facts}',
+    );
+
+    final again = container(language: 'bg', saved: {week: bulgarian});
+    expect(await notesOn(again), _points);
+    expect(coach.calls, isEmpty);
+
+    container(saved: {week: bulgarian});
+    await pumpEventQueue();
+    expect(coach.calls, hasLength(1));
   });
 
   test(

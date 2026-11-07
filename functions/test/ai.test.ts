@@ -14,6 +14,8 @@ import {
   weeklyReviewAsk,
 } from "../src/ai";
 import {
+  coachInstruction,
+  languageOf,
   mealConfig,
   mealPrompt,
   nutrientsPrompt,
@@ -418,6 +420,98 @@ describe("the prompts", () => {
     assert.ok(!weeklyReviewInstruction.includes("!"));
     assert.ok(!weeklyReviewInstruction.includes("own first meals"));
     assert.ok(!weeklyReviewInstruction.includes("one small"));
+  });
+});
+
+describe("the app's language", () => {
+  const prompt = (ask: Ask) => {
+    const contents = ask.contents;
+    return typeof contents === "string"
+      ? contents
+      : (contents as { parts: { text?: string }[] }[])[0].parts[0].text!;
+  };
+  const audio = Buffer.from("RIFF....WAVE").toString("base64");
+  const jpeg = Buffer.from("jpeg").toString("base64");
+
+  test("is English for anything but 'bg', and for older apps that send none", () => {
+    assert.equal(languageOf("bg"), "bg");
+    for (const value of ["en", undefined, null, "BG", "de", 1, {}]) {
+      assert.equal(languageOf(value), "en", String(value));
+    }
+    const english = estimateAsk({ kind: "meal", text: "Musaka", country: "Bulgaria" });
+    for (const language of ["en", "fr", 5]) {
+      const ask = estimateAsk({ kind: "meal", text: "Musaka", country: "Bulgaria", language });
+      assert.equal(ask.contents, english.contents);
+    }
+    assert.equal(
+      weeklyReviewAsk({ facts: "Week.", language: "xx" }).config.systemInstruction,
+      weeklyReviewInstruction,
+    );
+  });
+
+  test("in Bulgarian, typed, spoken and photographed meals are named in Bulgarian", () => {
+    for (const data of [
+      { kind: "meal", text: "cappuccino and chips" },
+      { kind: "voice", audio },
+      { kind: "photo", photo: jpeg },
+    ]) {
+      const bg = prompt(estimateAsk({ ...data, country: "Bulgaria", language: "bg" }));
+      const en = prompt(estimateAsk({ ...data, country: "Bulgaria" }));
+      assert.ok(bg.includes("natural Bulgarian"), data.kind);
+      assert.ok(bg.includes(`"Пържени картофи"`), data.kind);
+      assert.ok(bg.includes("Where the user wrote in Bulgarian, keep their words"));
+      assert.ok(bg.includes("Keep brand, chain and product names as the user wrote them"));
+      assert.ok(!en.includes("Bulgarian, keep their words"), data.kind);
+      assert.ok(en.includes("write the meal name and item names in the language they used"));
+    }
+    // A label is copied as printed, in whatever language.
+    const label = prompt(estimateAsk({ kind: "label", label: jpeg, language: "bg" }));
+    assert.ok(!label.includes("natural Bulgarian"));
+  });
+
+  test("nutritionContext still names only the country in Bulgarian", () => {
+    const context = nutritionContext({ country: "Bulgaria", language: "bg" });
+    assert.ok(context.startsWith(
+      "You are a nutrition assistant. The user lives in Bulgaria. Read",
+    ));
+    assert.ok(!context.includes("often eats"));
+  });
+
+  test("AI Coach writes in Bulgarian with its English rules kept", () => {
+    const bg = coachInstruction("bg");
+    assert.equal(coachInstruction("en"), weeklyReviewInstruction);
+    assert.equal(
+      weeklyReviewAsk({ facts: "Week.", language: "bg" }).config.systemInstruction,
+      bg,
+    );
+    assert.deepEqual(
+      { ...weeklyReviewAsk({ facts: "Week.", language: "bg" }).config, systemInstruction: "" },
+      { ...weeklyReviewConfig, systemInstruction: "" },
+    );
+    for (const rule of [
+      "less than the minimum",
+      "medical advice",
+      "on a day off",
+      "use only numbers",
+      "5 to 7 notes",
+      "never a brand",
+      `"good" is true only`,
+      // Bulgarian's own rules.
+      `with "ти"`,
+      `never "Вие"`,
+      "never use one about the user",
+      "a decimal comma",
+      "no separator in thousands",
+      "„…“",
+      "recipe names stay exactly as the facts write them",
+    ]) {
+      assert.ok(bg.includes(rule), rule);
+    }
+    assert.ok(!bg.includes("British English"));
+    assert.ok(!bg.includes("!"));
+    assert.ok(bg.includes("at most 50 characters"));
+    assert.ok(weeklyReviewInstruction.includes("at most 40 characters"));
+    assert.ok(!weeklyReviewInstruction.includes("Bulgarian"));
   });
 });
 

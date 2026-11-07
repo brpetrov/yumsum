@@ -173,6 +173,27 @@ void main() {
     expect(() => _parse('One.'), throwsA(isA<WeeklyReviewException>()));
   });
 
+  test(
+    'reads numbers written the Bulgarian way, and drops Bulgarian blame',
+    () {
+      expect(
+        _parse([
+          'Солта беше средно 7,4 г.',
+          'Делничните дни бяха средно 1890 ккал, а уикендът 2 580 ккал.',
+          'Съботата беше най-големият ден в 3 от последните 4 седмици.',
+          'Средно 7,5 г сол.',
+          'Уикендът беше провал.',
+          'Не си мързелив.',
+        ]),
+        [
+          'Солта беше средно 7,4 г.',
+          'Делничните дни бяха средно 1890 ккал, а уикендът 2 580 ккал.',
+          'Съботата беше най-големият ден в 3 от последните 4 седмици.',
+        ],
+      );
+    },
+  );
+
   // The instruction's own rules are tested with it, in functions/test.
   test('the server writes the notes from the facts alone', () async {
     final functions = FakeAiFunctions()
@@ -196,8 +217,22 @@ void main() {
       ),
     ]);
     expect(functions.calls.single.$1, 'aiWeeklyReview');
-    expect(functions.calls.single.$2.keys, ['facts', 'dateKey']);
+    expect(functions.calls.single.$2.keys, ['facts', 'language', 'dateKey']);
     expect(functions.calls.single.$2['facts'], _facts);
+    expect(functions.calls.single.$2['language'], 'en');
+  });
+
+  test('asks for the notes in the app\'s language', () async {
+    final functions = FakeAiFunctions()
+      ..reply = {
+        'points': [
+          {'title': 'Сол над нормата', 'text': 'Средно 7,4 г сол.'},
+        ],
+      };
+
+    await WeeklyReviewService(functions, 'bg').write(_facts);
+
+    expect(functions.calls.single.$2['language'], 'bg');
   });
 
   test('a refusal from the server is a failure', () async {

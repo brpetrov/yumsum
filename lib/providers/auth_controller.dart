@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import 'package:lean_streak/providers/language_provider.dart';
+
 enum AuthStatus { idle, verificationSent, resetSent }
 
 /// Thrown when a user tries to sign in before verifying their email.
@@ -136,11 +138,12 @@ class AuthController extends AsyncNotifier<AuthStatus> {
 /// Sends the signed-in user our confirmation email (sendVerificationEmail,
 /// functions/src/email.ts): styled as YumSum and from help.yumsum, where
 /// Firebase's own is plain text from lean-streak-project.firebaseapp.com.
+/// It's written in the app's language.
 final verificationEmailProvider = Provider<Future<void> Function()>(
   (ref) =>
-      () => FirebaseFunctions.instanceFor(
-        region: 'europe-west10',
-      ).httpsCallable('sendVerificationEmail').call<Object?>(),
+      () => FirebaseFunctions.instanceFor(region: 'europe-west10')
+          .httpsCallable('sendVerificationEmail')
+          .call<Object?>({'language': ref.read(languageCodeProvider)}),
 );
 
 final authControllerProvider =

@@ -19,16 +19,24 @@ class WeeklyReviewException implements Exception {
 }
 
 // "Bad" isn't here, as "not bad" would trip it; the instruction covers it.
+// The Bulgarian words have no \b, which only knows Latin letters.
 final _shaming = RegExp(
-  r'\b(cheat|guilt|naughty|junk|sinful|failed|failure|lazy)',
+  r'\b(cheat|guilt|naughty|junk|sinful|failed|failure|lazy)'
+  r'|провал|виновн|мързел|боклук|боклучав',
   caseSensitive: false,
 );
 final _thousands = RegExp(r'(\d),(?=\d{3}(?!\d))');
+// Bulgarian notes write 1850 or 10 000, and 7,4 for the facts' 7.4.
+final _spacedThousands = RegExp(r'(\d)[ \u00A0](?=\d{3}(?!\d))');
+final _decimalComma = RegExp(r'(\d),(?=\d)');
 final _number = RegExp(r'\d+(\.\d+)?');
 
 Set<double> _numbersIn(String text) => {
   for (final match in _number.allMatches(
-    text.replaceAllMapped(_thousands, (m) => m[1]!),
+    text
+        .replaceAllMapped(_thousands, (m) => m[1]!)
+        .replaceAllMapped(_spacedThousands, (m) => m[1]!)
+        .replaceAllMapped(_decimalComma, (m) => '${m[1]}.'),
   ))
     double.parse(match[0]!),
 };
@@ -80,17 +88,19 @@ List<ReviewPoint> parseReviewPoints(Object? raw, {required String facts}) {
 /// `aiWeeklyReview` Cloud Function, which checks YumSum Star. It never
 /// touches the daily AI allowance: it's one automatic call a week, not
 /// something the user asks for each time. The server caps it at 10 a day.
+/// The notes are written in [_language], the app's ('en' or 'bg').
 class WeeklyReviewService {
-  WeeklyReviewService([this._functions]);
+  WeeklyReviewService([this._functions, this._language = 'en']);
 
   final FirebaseFunctions? _functions;
+  final String _language;
 
   Future<List<ReviewPoint>> write(String facts) async {
     try {
       final map = await callAi(
         _functions ?? FirebaseFunctions.instanceFor(region: 'europe-west10'),
         'aiWeeklyReview',
-        {'facts': facts},
+        {'facts': facts, 'language': _language},
       );
       return parseReviewPoints(map['points'], facts: facts);
     } catch (error, st) {

@@ -58,6 +58,7 @@ void main() {
         expect(data, {
           'kind': 'meal',
           'country': 'Bulgaria',
+          'language': 'en',
           'macros': true,
           'text': 'Musaka',
           'dateKey': today,

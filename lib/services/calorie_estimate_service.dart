@@ -308,10 +308,12 @@ class CalorieEstimateService {
     this._usageRepo,
     this._functions, {
     required String country,
+    String language = 'en',
     int? dailyLimit = AiUsageRepository.dailyLimit,
     bool plus = false,
     AppLocalizations? l10n,
   }) : _country = country,
+       _language = language,
        _dailyLimit = dailyLimit,
        _plus = plus,
        _l10n = l10n ?? lookupAppLocalizations(const Locale('en'));
@@ -324,6 +326,9 @@ class CalorieEstimateService {
 
   /// Where the user lives (`countryProvider`).
   final String _country;
+
+  /// The app's language ('en' or 'bg'), which the names come back in.
+  final String _language;
 
   /// YumSum Star, whose estimates always come with macros. The server
   /// refuses macros to an account without it.
@@ -338,6 +343,7 @@ class CalorieEstimateService {
       callAi(_functions, 'aiEstimate', {
         'kind': kind,
         'country': _country,
+        'language': _language,
         'macros': _plus,
         ...data,
       });

@@ -18,13 +18,14 @@ import {
   coachModelId,
   jsonReply,
   labelPrompt,
+  languageOf,
   mealConfig,
   mealPrompt,
   nutrientsPrompt,
   photoPrompt,
   type Profile,
   voicePrompt,
-  weeklyReviewConfig,
+  weeklyReviewConfigFor,
 } from "./prompts";
 
 // Every Gemini call goes through these two functions: the app sends what the
@@ -85,7 +86,9 @@ export type Generate = (ask: Ask) => Promise<string | undefined>;
  * - `nutrients`: `name` and `kcal`, the fill-in when a named meal is saved.
  * All take `dateKey` (the phone's date, yyyy-MM-dd), and all but `label`
  * take `country` and `macros` (true for YumSum Star); older apps' `usualFood`
- * is ignored. Returns the model's JSON reply as it is, which the app reads.
+ * is ignored. `language` ('en' or 'bg', English for anything else or none)
+ * is what the names come back in. Returns the model's JSON reply as it is,
+ * which the app reads.
  */
 export const aiEstimate = onCall(options, (request) => {
   const uid = signedIn(request);
@@ -95,7 +98,9 @@ export const aiEstimate = onCall(options, (request) => {
 
 /**
  * AI Coach's notes on a week, for YumSum Star: `facts`, the week as the app
- * worked it out, and `dateKey`. Returns `{points: [{text, good}]}`.
+ * worked it out, `dateKey`, and `language` ('en' or 'bg', English for
+ * anything else or none), which the notes are written in. Returns
+ * `{points: [{text, good}]}`.
  */
 export const aiWeeklyReview = onCall(options, (request) => {
   const uid = signedIn(request);
@@ -112,6 +117,7 @@ export function estimateAsk(raw: unknown): Ask {
   const data = dataOf(raw);
   const profile: Profile = {
     country: text(data.country, 100) || "United Kingdom",
+    language: languageOf(data.language),
   };
   const macros = data.macros === true;
   const estimate = (contents: ContentListUnion): Ask => ({
@@ -175,11 +181,12 @@ export function estimateAsk(raw: unknown): Ask {
 
 /** AI Coach's call, from the week's facts. */
 export function weeklyReviewAsk(raw: unknown): Ask {
+  const data = dataOf(raw);
   return {
     use: "coach",
     star: true,
-    contents: filled(text(dataOf(raw).facts, 16000)),
-    config: weeklyReviewConfig,
+    contents: filled(text(data.facts, 16000)),
+    config: weeklyReviewConfigFor(languageOf(data.language)),
   };
 }
 

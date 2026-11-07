@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { verificationEmail } from "../src/email";
+import { inLanguage, verificationEmail } from "../src/email";
 
 describe("verificationEmail", () => {
   const link =
@@ -22,12 +22,44 @@ describe("verificationEmail", () => {
     assert.ok(email.html.includes("&quot;&gt;&lt;script&gt;"));
   });
 
-  test("keeps to the app's copy rules", () => {
-    const { html, text, subject } = verificationEmail(link);
-    // The doctype's "!" isn't wording.
-    for (const words of [html.replace("<!DOCTYPE html>", ""), text, subject]) {
-      assert.ok(!words.includes("!"), "no exclamation marks");
-      assert.ok(!/please/i.test(words), "no please");
+  test("keeps to the app's copy rules, in English and in Bulgarian", () => {
+    for (const language of ["en", "bg"] as const) {
+      const { html, text, subject } = verificationEmail(link, language);
+      // The doctype's "!" isn't wording.
+      for (const words of [html.replace("<!DOCTYPE html>", ""), text, subject]) {
+        assert.ok(!words.includes("!"), `no exclamation marks (${language})`);
+        assert.ok(!/please|моля/i.test(words), `no please (${language})`);
+        // No \b: it only knows Latin letters.
+        assert.ok(
+          !/(^|[^а-я])(вие|вас|ваш[а-я]*|ви)(?![а-я])/i.test(words),
+          `"ти", not "Вие" (${language})`,
+        );
+      }
     }
+  });
+
+  test("in Bulgarian: the same design, with the words and the page in Bulgarian", () => {
+    const english = verificationEmail(link);
+    const bulgarian = verificationEmail(inLanguage(link, "bg"), "bg");
+    assert.equal(bulgarian.subject, "Потвърди имейла си за YumSum");
+    assert.ok(bulgarian.html.includes('<html lang="bg">'));
+    assert.ok(bulgarian.html.includes(">Потвърди имейла</a>"));
+    assert.ok(bulgarian.html.includes("Постоянство всеки ден. Винаги във форма."));
+    assert.ok(bulgarian.text.startsWith("Потвърди имейла си\n\n"));
+    for (const word of ["Confirm", "tap", "ignore", "Stay lean"]) {
+      assert.ok(!bulgarian.html.includes(word), word);
+      assert.ok(!bulgarian.text.includes(word), word);
+    }
+    // Only the words differ: the same tags, styles and logo.
+    const tags = (html: string) => html.match(/<[^>]*>/g)?.filter((tag) => !tag.startsWith("<a "));
+    assert.deepEqual(tags(bulgarian.html), tags(english.html)?.map((tag) =>
+      tag === '<html lang="en">' ? '<html lang="bg">' : tag));
+    assert.ok(bulgarian.text.includes("&lang=bg"));
+  });
+
+  test("Firebase's page opens in the email's language", () => {
+    assert.equal(inLanguage(link, "en"), link);
+    assert.equal(inLanguage(link, "bg"), link.replace("lang=en", "lang=bg"));
+    assert.ok(inLanguage("https://x.test/a?oobCode=1", "bg").endsWith("?oobCode=1&lang=bg"));
   });
 });
