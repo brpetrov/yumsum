@@ -1,4 +1,4 @@
-The web's barcode reader, used by ../barcode_reader.js where the browser
+The web's barcode reader, used by ../camera.js where the browser
 has no BarcodeDetector of its own for shop barcodes (iPhones, Firefox,
 desktops). Copied unchanged from npm on 7 November 2026:
 
