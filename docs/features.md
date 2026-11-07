@@ -252,7 +252,7 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
 
 ## Packaged foods and Open Food Facts
 
-- **Scanning (phones and browsers):** the bar's barcode button opens `MealCameraPage.barcode` (`camera` plugin, 720p).
+- **Scanning (phones and browsers):** the bar's barcode button opens `MealCameraPage.barcode` (`camera` plugin, 720p). The camera page is the router's `/camera` (`cameraRoute`, the photo steps as `extra`, none for a barcode), so a browser's Back closes it like any other page; a reload goes Home.
   - Every preview frame (NV21 on Android, BGRA on iOS) goes to ML Kit's on-device barcode reader (`google_mlkit_barcode_scanning`, retail formats only), and the first barcode closes the page.
   - The photo button opens `MealCameraPage.photos`, a shutter for the AI.
   - The page lets the camera go when the app is backgrounded and picks it up on return.

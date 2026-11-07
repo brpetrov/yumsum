@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'package:lean_streak/screens/dashboard/helpers/meal_camera_page.dart';
+import 'package:lean_streak/app/router.dart';
 
 /// What the camera brought back: a packet's barcode, or the photos taken
 /// (one for a meal, one per step for a product).
@@ -48,21 +49,17 @@ Future<MealCapture?> openMealCamera(
   CameraMode mode,
 ) async {
   if (hasLiveCamera) {
-    return Navigator.of(context).push<MealCapture>(
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => switch (mode) {
-          CameraMode.barcode => const MealCameraPage.barcode(),
-          CameraMode.photo => const MealCameraPage.photos(
-            photoSteps: [
-              (
-                title: 'Take a photo of your meal',
-                tip: 'From above, with the whole plate in.',
-              ),
-            ],
+    return context.push<MealCapture>(
+      AppRoutes.camera,
+      extra: switch (mode) {
+        CameraMode.barcode => const <PhotoStep>[],
+        CameraMode.photo => const <PhotoStep>[
+          (
+            title: 'Take a photo of your meal',
+            tip: 'From above, with the whole plate in.',
           ),
-        },
-      ),
+        ],
+      },
     );
   }
   return pickMealPhoto();
@@ -91,11 +88,9 @@ Future<List<XFile>?> takeProductPhotos(
   BuildContext context,
   List<PhotoStep> steps,
 ) async {
-  final capture = await Navigator.of(context).push<MealCapture>(
-    MaterialPageRoute(
-      fullscreenDialog: true,
-      builder: (_) => MealCameraPage.photos(photoSteps: steps),
-    ),
+  final capture = await context.push<MealCapture>(
+    AppRoutes.camera,
+    extra: steps,
   );
   return capture?.photos;
 }

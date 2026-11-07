@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,6 +11,8 @@ import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/account/account_settings_screen.dart';
 import 'package:lean_streak/screens/auth/auth_screen.dart';
 import 'package:lean_streak/screens/dashboard/dashboard_screen.dart';
+import 'package:lean_streak/screens/dashboard/helpers/meal_camera_page.dart';
+import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 import 'package:lean_streak/screens/debug/debug_screen.dart';
 import 'package:lean_streak/screens/notifications/notifications_screen.dart';
 import 'package:lean_streak/screens/onboarding/onboarding_screen.dart';
@@ -45,7 +47,29 @@ class AppRoutes {
   static String recipePath(String id) => '/recipes/$id';
   static const plus = '/plus';
   static const debug = '/debug';
+  static const camera = '/camera';
 }
+
+/// The bar's camera page, pushed by openMealCamera and takeProductPhotos
+/// with the photo steps as `extra`, none for a barcode. A route of its own,
+/// so a browser's Back closes it as it does the other pages (pushed with
+/// the Navigator, it added no history entry and Back left it open). A
+/// reload, which has no steps, goes Home.
+final cameraRoute = GoRoute(
+  path: AppRoutes.camera,
+  redirect: (context, state) =>
+      state.extra is List<PhotoStep> ? null : AppRoutes.dashboard,
+  pageBuilder: (context, state) {
+    final steps = state.extra! as List<PhotoStep>;
+    return MaterialPage(
+      key: state.pageKey,
+      fullscreenDialog: true,
+      child: steps.isEmpty
+          ? const MealCameraPage.barcode()
+          : MealCameraPage.photos(photoSteps: steps),
+    );
+  },
+);
 
 // ---------------------------------------------------------------------------
 // Notifier — re-triggers GoRouter whenever auth or onboarding state changes.
@@ -151,6 +175,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             ref.read(debugToolsProvider) ? null : AppRoutes.dashboard,
         builder: (context, state) => const DebugScreen(),
       ),
+      cameraRoute,
     ],
   );
 
