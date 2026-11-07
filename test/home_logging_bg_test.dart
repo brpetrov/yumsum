@@ -229,7 +229,7 @@ void main() {
     expect(find.text(capitalised(bg.month(now))), findsOneWidget);
     expect(find.text('Този месец още няма записани дни.'), findsOneWidget);
     expect(find.textContaining('адаптивна формула, AI треньор'), findsOne);
-    expect(find.textContaining(' · преди 10 дни'), findsOneWidget);
+    expect(find.text('Последно: 80,5 кг · преди 10 дни'), findsOneWidget);
     expect(find.text('Запиши'), findsOneWidget);
 
     expect(shownTexts(tester).where(_english.hasMatch), isEmpty);

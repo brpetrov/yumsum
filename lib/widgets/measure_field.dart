@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/widgets/pill_toggle.dart';
 
 /// What's typed for a weight or height in the user's unit: one box, or two
 /// for stones and pounds or feet and inches. [value] is in kg or cm, and a
 /// value put in with [show] comes back exactly until a box is edited, so a
-/// form saved untouched changes nothing.
+/// form saved untouched changes nothing. Decimals are shown in the
+/// language's way ("79,8" in Bulgarian), and typed with either mark.
 abstract class MeasureInput {
   final whole = TextEditingController();
   final part = TextEditingController();
@@ -17,13 +19,13 @@ abstract class MeasureInput {
   String _shownPart = '';
 
   bool get twoBoxes;
-  String get wholeSuffix;
-  String get partLabel;
-  String get partSuffix;
+  String wholeSuffix(AppLocalizations l10n);
+  String partLabel(AppLocalizations l10n);
+  String partSuffix(AppLocalizations l10n);
   int get wholeDigits;
 
   /// The boxes' text for [value].
-  (String, String) texts(double value);
+  (String, String) texts(double value, AppLocalizations l10n);
 
   /// The value in the boxes, or null when it isn't a number.
   double? parse(double? whole, double? part);
@@ -36,8 +38,7 @@ abstract class MeasureInput {
         part.text == _shownPart) {
       return _shown;
     }
-    double? read(TextEditingController box) =>
-        double.tryParse(box.text.trim().replaceAll(',', '.'));
+    double? read(TextEditingController box) => parseDecimal(box.text);
     if (!twoBoxes) return parse(read(whole), null);
     if (isEmpty) return null;
     // An empty box of the two counts as nought: "12" st, "" lb.
@@ -47,9 +48,9 @@ abstract class MeasureInput {
     return parse(w, p);
   }
 
-  void show(double? value) {
+  void show(double? value, AppLocalizations l10n) {
     _shown = value;
-    final (w, p) = value == null ? ('', '') : texts(value);
+    final (w, p) = value == null ? ('', '') : texts(value, l10n);
     whole.text = _shownWhole = w;
     part.text = _shownPart = p;
   }
@@ -61,19 +62,19 @@ abstract class MeasureInput {
 }
 
 /// One decimal at most, and none when it's a whole number.
-String _number(double value) {
+String _number(double value, AppLocalizations l10n) {
   final rounded = (value * 10).round() / 10;
   return rounded == rounded.roundToDouble()
       ? rounded.round().toString()
-      : rounded.toStringAsFixed(1);
+      : l10n.decimal(rounded);
 }
 
 /// A whole and a part (stones and pounds, feet and inches) for [small]
 /// units with [perWhole] to the whole, to one decimal.
-(String, String) _split(double small, int perWhole) {
+(String, String) _split(double small, int perWhole, AppLocalizations l10n) {
   final total = (small * 10).round() / 10;
   final whole = total ~/ perWhole;
-  return (whole.toString(), _number(total - whole * perWhole));
+  return (whole.toString(), _number(total - whole * perWhole, l10n));
 }
 
 class WeightInput extends MeasureInput {
@@ -82,29 +83,33 @@ class WeightInput extends MeasureInput {
   WeightUnit unit;
 
   /// Shows the same weight in [next].
-  void switchTo(WeightUnit next) {
+  void switchTo(WeightUnit next, AppLocalizations l10n) {
     if (next == unit) return;
     final kg = value;
     unit = next;
-    show(kg);
+    show(kg, l10n);
   }
 
   @override
   bool get twoBoxes => unit == WeightUnit.st;
   @override
-  String get wholeSuffix => unit.value;
+  String wholeSuffix(AppLocalizations l10n) => switch (unit) {
+    WeightUnit.kg => l10n.unitsKgLabel,
+    WeightUnit.lb => l10n.unitsLbLabel,
+    WeightUnit.st => l10n.unitsStLabel,
+  };
   @override
-  String get partLabel => 'Pounds';
+  String partLabel(AppLocalizations l10n) => l10n.unitsPounds;
   @override
-  String get partSuffix => 'lb';
+  String partSuffix(AppLocalizations l10n) => l10n.unitsLbLabel;
   @override
   int get wholeDigits => twoBoxes ? 2 : 3;
 
   @override
-  (String, String) texts(double value) => switch (unit) {
-    WeightUnit.kg => (_number(value), ''),
-    WeightUnit.lb => (_number(kgToLb(value)), ''),
-    WeightUnit.st => _split(kgToLb(value), 14),
+  (String, String) texts(double value, AppLocalizations l10n) => switch (unit) {
+    WeightUnit.kg => (_number(value, l10n), ''),
+    WeightUnit.lb => (_number(kgToLb(value), l10n), ''),
+    WeightUnit.st => _split(kgToLb(value), 14, l10n),
   };
 
   @override
@@ -124,28 +129,29 @@ class HeightInput extends MeasureInput {
   HeightUnit unit;
 
   /// Shows the same height in [next].
-  void switchTo(HeightUnit next) {
+  void switchTo(HeightUnit next, AppLocalizations l10n) {
     if (next == unit) return;
     final cm = value;
     unit = next;
-    show(cm);
+    show(cm, l10n);
   }
 
   @override
   bool get twoBoxes => unit == HeightUnit.ftin;
   @override
-  String get wholeSuffix => twoBoxes ? 'ft' : 'cm';
+  String wholeSuffix(AppLocalizations l10n) =>
+      twoBoxes ? l10n.unitsFtLabel : l10n.unitsCmLabel;
   @override
-  String get partLabel => 'Inches';
+  String partLabel(AppLocalizations l10n) => l10n.unitsInches;
   @override
-  String get partSuffix => 'in';
+  String partSuffix(AppLocalizations l10n) => l10n.unitsInLabel;
   @override
   int get wholeDigits => twoBoxes ? 1 : 3;
 
   @override
-  (String, String) texts(double value) => switch (unit) {
-    HeightUnit.cm => (_number(value), ''),
-    HeightUnit.ftin => _split(value / cmPerInch, 12),
+  (String, String) texts(double value, AppLocalizations l10n) => switch (unit) {
+    HeightUnit.cm => (_number(value, l10n), ''),
+    HeightUnit.ftin => _split(value / cmPerInch, 12, l10n),
   };
 
   @override
@@ -186,6 +192,7 @@ class MeasureField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return FormField<void>(
       validator: validator == null ? null : (_) => validator!(),
       builder: (field) {
@@ -214,7 +221,7 @@ class MeasureField extends StatelessWidget {
           ],
           decoration: InputDecoration(
             labelText: label,
-            suffixText: input.wholeSuffix,
+            suffixText: input.wholeSuffix(l10n),
             // No room for it beside a second box.
             prefixIcon: input.twoBoxes ? null : prefixIcon,
             errorText: input.twoBoxes ? null : message,
@@ -244,8 +251,8 @@ class MeasureField extends StatelessWidget {
                       ),
                     ],
                     decoration: InputDecoration(
-                      labelText: input.partLabel,
-                      suffixText: input.partSuffix,
+                      labelText: input.partLabel(l10n),
+                      suffixText: input.partSuffix(l10n),
                     ),
                     onChanged: changed,
                     onSubmitted: onSubmitted == null
@@ -283,10 +290,10 @@ class WeightUnitToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => PillToggle<WeightUnit>(
-    options: const [
-      (WeightUnit.kg, 'kg'),
-      (WeightUnit.lb, 'lb'),
-      (WeightUnit.st, 'st & lb'),
+    options: [
+      (WeightUnit.kg, context.l10n.unitsKgLabel),
+      (WeightUnit.lb, context.l10n.unitsLbLabel),
+      (WeightUnit.st, context.l10n.unitsStLbToggle),
     ],
     selected: unit,
     onChanged: onChanged,
@@ -306,7 +313,10 @@ class HeightUnitToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => PillToggle<HeightUnit>(
-    options: const [(HeightUnit.cm, 'cm'), (HeightUnit.ftin, 'ft & in')],
+    options: [
+      (HeightUnit.cm, context.l10n.unitsCmLabel),
+      (HeightUnit.ftin, context.l10n.unitsFtInToggle),
+    ],
     selected: unit,
     onChanged: onChanged,
   );

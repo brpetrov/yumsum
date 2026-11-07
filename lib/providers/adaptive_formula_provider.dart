@@ -3,15 +3,16 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import 'package:lean_streak/helpers/adaptive_formula.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/models/weight_entry.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weight_entry_provider.dart';
@@ -231,6 +232,7 @@ final adaptiveTodayLineProvider = Provider.autoDispose<String?>((ref) {
   if (profile == null || !ref.watch(plusProvider)) return null;
   return adaptiveTodayLine(
     profile,
+    ref.watch(l10nProvider),
     lastWeighIn: ref.watch(latestWeightEntryProvider).valueOrNull?.date,
     now: DateTime.now(),
   );
@@ -241,14 +243,15 @@ final adaptiveTodayLineProvider = Provider.autoDispose<String?>((ref) {
 /// learning. Amounts are the target minus the plan's, so they match Plan
 /// Settings.
 String? adaptiveTodayLine(
-  UserProfile profile, {
+  UserProfile profile,
+  AppLocalizations l10n, {
   required DateTime? lastWeighIn,
   required DateTime now,
 }) {
   if (lastWeighIn != null &&
       AdaptiveFormula.daysBetween(lastWeighIn, now) >=
           AdaptiveFormula.pausedDays) {
-    return 'Paused: no weigh-in for 10 days. Weigh in to keep it personal.';
+    return l10n.adaptivePaused;
   }
   if (profile.adaptiveWeek !=
       AdaptiveFormula.dateKey(AdaptiveFormula.mondayOf(now))) {
@@ -267,29 +270,17 @@ String? adaptiveTodayLine(
       (note == AdaptiveNote.lowered ||
           note == AdaptiveNote.raised ||
           note == AdaptiveNote.steady)) {
-    return 'Your target is at your minimum, so your goal date is now '
-        '${DateFormat('d MMMM').format(plan.targetDate)}.';
+    return l10n.adaptiveAtMinimum(l10n.dayMonth(plan.targetDate));
   }
   return switch (note) {
-    AdaptiveNote.lowered =>
-      'Adjusted for you: $signed kcal. You burn a little less than your plan '
-          'assumed.',
-    AdaptiveNote.raised =>
-      'Adjusted for you: $signed kcal. You burn a little more than your plan '
-          'assumed.',
-    AdaptiveNote.firstSign =>
-      'You may burn a little less than your plan assumed. Checking again '
-          'next Monday.',
-    AdaptiveNote.steady when amount != 0 =>
-      'Adjusted for you: $signed kcal. No change this week.',
-    AdaptiveNote.steady =>
-      'No change this week: your weight matches what you eat.',
-    AdaptiveNote.fewWeighIns =>
-      'Not enough weigh-ins this week, so your target stays the same.',
-    AdaptiveNote.fewDays =>
-      'Not enough days logged this week, so your target stays the same.',
-    AdaptiveNote.unusual =>
-      'Your numbers look unusual. Check your logging and weigh-ins.',
+    AdaptiveNote.lowered => l10n.adaptiveLowered(signed),
+    AdaptiveNote.raised => l10n.adaptiveRaised(signed),
+    AdaptiveNote.firstSign => l10n.adaptiveFirstSign,
+    AdaptiveNote.steady when amount != 0 => l10n.adaptiveSteadyAdjusted(signed),
+    AdaptiveNote.steady => l10n.adaptiveSteady,
+    AdaptiveNote.fewWeighIns => l10n.adaptiveFewWeighIns,
+    AdaptiveNote.fewDays => l10n.adaptiveFewDays,
+    AdaptiveNote.unusual => l10n.adaptiveUnusual,
     _ => null,
   };
 }
@@ -311,14 +302,14 @@ final adaptiveLapseProvider = Provider.autoDispose<DateTime?>((ref) {
 
 /// The sum the Adaptive formula makes: "1670 from your plan − 80 adaptive =
 /// 1590 kcal", for Plan Settings and Weight & Progress.
-String adaptiveSumLine(HealthPlanCalculation preview) {
+String adaptiveSumLine(HealthPlanCalculation preview, AppLocalizations l10n) {
   final plan = preview.planCalorieTarget.round();
   final target = preview.dailyCalorieTarget.round();
   final amount = target - plan;
   final sign = amount < 0 ? '−' : '+';
-  final minimum = preview.calorieTargetClamped ? ', your minimum' : '';
-  return '$plan from your plan $sign ${amount.abs()} adaptive = '
-      '$target kcal$minimum';
+  return preview.calorieTargetClamped
+      ? l10n.adaptiveSumMinimum(plan, sign, amount.abs(), target)
+      : l10n.adaptiveSum(plan, sign, amount.abs(), target);
 }
 
 /// What you burn a day, to the nearest 10: what it has measured once it
@@ -333,7 +324,5 @@ int adaptiveBurn(UserProfile profile, AdaptiveMeasure? measure) {
 
 /// The one stage worth a line, as it asks for something: paused, for want
 /// of a weigh-in. Null otherwise.
-String? adaptivePausedLine(AdaptiveMeasure measure) =>
-    measure.stage == AdaptiveStage.paused
-    ? 'Paused: no weigh-in for 10 days. Weigh in to keep it personal.'
-    : null;
+String? adaptivePausedLine(AdaptiveMeasure measure, AppLocalizations l10n) =>
+    measure.stage == AdaptiveStage.paused ? l10n.adaptivePaused : null;

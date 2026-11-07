@@ -415,7 +415,7 @@ class _PlusTile extends ConsumerWidget {
                 const PlusMark(size: 19),
                 const SizedBox(height: 3),
                 Text(
-                  plusStatusLine(entitlement, now),
+                  plusStatusLine(entitlement, now, l10n: context.l10n),
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.3,

@@ -133,7 +133,7 @@ class _RecipeBody extends ConsumerWidget {
         ),
         if (showMacros) ...[
           const SizedBox(height: 2),
-          Text(macrosLine(recipe.macrosPerPortion), style: muted),
+          Text(macrosLine(recipe.macrosPerPortion, l10n: l10n), style: muted),
         ],
         const SizedBox(height: 16),
         _Facts(recipe: recipe),

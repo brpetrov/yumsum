@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/providers/units_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
@@ -24,8 +25,8 @@ Future<void> logWeightWithFeedback(BuildContext context) async {
   final result = await showLogWeightDialog(context);
   if (!context.mounted || result == null) return;
   final message = result.targetChanged
-      ? 'Weight saved. New target: ${result.newCalorieTarget} kcal.'
-      : 'Weight saved.';
+      ? context.l10n.progressWeightSavedTarget(result.newCalorieTarget)
+      : context.l10n.progressWeightSaved;
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
 }
 
@@ -39,14 +40,24 @@ class _LogWeightDialog extends ConsumerStatefulWidget {
 class _LogWeightDialogState extends ConsumerState<_LogWeightDialog> {
   late final WeightUnit _unit;
   late final WeightInput _weight;
+  var _filled = false;
   String? _error;
 
   @override
   void initState() {
     super.initState();
-    final current = ref.read(userProfileProvider).valueOrNull?.currentWeightKg;
     _unit = ref.read(weightUnitProvider);
-    _weight = WeightInput(_unit)..show(current);
+    _weight = WeightInput(_unit);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Filled once, here, where the language's decimal mark is known.
+    if (_filled) return;
+    _filled = true;
+    final current = ref.read(userProfileProvider).valueOrNull?.currentWeightKg;
+    _weight.show(current, context.l10n);
   }
 
   @override
@@ -57,11 +68,18 @@ class _LogWeightDialogState extends ConsumerState<_LogWeightDialog> {
 
   Future<void> _save() async {
     final weight = _weight.value;
+    final l10n = context.l10n;
     if (weight == null || weight < 25 || weight > 400) {
       setState(
-        () => _error =
-            'Enter a weight between '
-            '${weightRange(25, 400, _unit, between: ' and ')}.',
+        () => _error = l10n.progressWeighInRange(
+          weightRange(
+            25,
+            400,
+            _unit,
+            l10n,
+            between: l10n.progressWeighInRangeAnd,
+          ),
+        ),
       );
       return;
     }
@@ -73,7 +91,7 @@ class _LogWeightDialogState extends ConsumerState<_LogWeightDialog> {
 
     if (!mounted) return;
     if (result == null) {
-      setState(() => _error = 'Could not save your weight. Try again.');
+      setState(() => _error = l10n.progressErrorSaveWeight);
       return;
     }
     Navigator.of(context).pop(result);
@@ -82,21 +100,22 @@ class _LogWeightDialogState extends ConsumerState<_LogWeightDialog> {
   @override
   Widget build(BuildContext context) {
     final isSaving = ref.watch(weightLogControllerProvider).isLoading;
+    final l10n = context.l10n;
 
     return AlertDialog(
-      title: const Text('Log your weight'),
+      title: Text(l10n.progressWeighInTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Your plan adjusts to match.',
+            l10n.progressWeighInNote,
             style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 16),
           MeasureField(
             input: _weight,
-            label: 'Current weight',
+            label: l10n.commonCurrentWeight,
             autofocus: true,
             error: _error,
             textInputAction: TextInputAction.done,
@@ -107,7 +126,7 @@ class _LogWeightDialogState extends ConsumerState<_LogWeightDialog> {
       actions: [
         TextButton(
           onPressed: isSaving ? null : () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(l10n.commonCancel),
         ),
         FilledButton(
           onPressed: isSaving ? null : _save,
@@ -117,7 +136,7 @@ class _LogWeightDialogState extends ConsumerState<_LogWeightDialog> {
                   height: 18,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Save'),
+              : Text(l10n.commonSave),
         ),
       ],
     );

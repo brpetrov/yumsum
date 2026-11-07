@@ -3607,6 +3607,1032 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Log by voice'**
   String get shortcutLogVoice;
+
+  /// A weight in kg: "80.5 kg", or a range "30–300 kg". {value} comes formatted.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} kg'**
+  String unitsKg(String value);
+
+  /// A weight in pounds: "176.4 lb", or a range "67–661 lb". {value} comes formatted.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} lb'**
+  String unitsLb(String value);
+
+  /// A weight in stones and pounds: "12 st 8 lb".
+  ///
+  /// In en, this message translates to:
+  /// **'{stones} st {pounds} lb'**
+  String unitsStLb(int stones, int pounds);
+
+  /// A height in cm: "180 cm", or a range "100–250 cm".
+  ///
+  /// In en, this message translates to:
+  /// **'{value} cm'**
+  String unitsCm(String value);
+
+  /// A height in feet and inches: "5 ft 11 in".
+  ///
+  /// In en, this message translates to:
+  /// **'{feet} ft {inches} in'**
+  String unitsFtIn(int feet, int inches);
+
+  /// Weight chart in stones: a label on the side on a whole stone, "12 st".
+  ///
+  /// In en, this message translates to:
+  /// **'{stones} st'**
+  String unitsStAxis(int stones);
+
+  /// Weight chart in stones: a label on the side between whole stones, "12 st 7" (pounds left out for room).
+  ///
+  /// In en, this message translates to:
+  /// **'{stones} st {pounds}'**
+  String unitsStLbAxis(int stones, int pounds);
+
+  /// The kilogram on its own: the unit toggle and the weight box's suffix.
+  ///
+  /// In en, this message translates to:
+  /// **'kg'**
+  String get unitsKgLabel;
+
+  /// The pound on its own: the unit toggle and the pounds box's suffix.
+  ///
+  /// In en, this message translates to:
+  /// **'lb'**
+  String get unitsLbLabel;
+
+  /// The stone on its own: the stones box's suffix.
+  ///
+  /// In en, this message translates to:
+  /// **'st'**
+  String get unitsStLabel;
+
+  /// The centimetre on its own: the unit toggle and the height box's suffix.
+  ///
+  /// In en, this message translates to:
+  /// **'cm'**
+  String get unitsCmLabel;
+
+  /// The foot on its own: the feet box's suffix.
+  ///
+  /// In en, this message translates to:
+  /// **'ft'**
+  String get unitsFtLabel;
+
+  /// The inch on its own: the inches box's suffix.
+  ///
+  /// In en, this message translates to:
+  /// **'in'**
+  String get unitsInLabel;
+
+  /// Weight unit toggle: stones and pounds.
+  ///
+  /// In en, this message translates to:
+  /// **'st & lb'**
+  String get unitsStLbToggle;
+
+  /// Height unit toggle: feet and inches.
+  ///
+  /// In en, this message translates to:
+  /// **'ft & in'**
+  String get unitsFtInToggle;
+
+  /// Label of the second weight box when typing stones and pounds.
+  ///
+  /// In en, this message translates to:
+  /// **'Pounds'**
+  String get unitsPounds;
+
+  /// Label of the second height box when typing feet and inches.
+  ///
+  /// In en, this message translates to:
+  /// **'Inches'**
+  String get unitsInches;
+
+  /// A yes option on a two-way toggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get commonYes;
+
+  /// A no option on a two-way toggle.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get commonNo;
+
+  /// Onboarding and Plan Settings: label of the age box.
+  ///
+  /// In en, this message translates to:
+  /// **'Age'**
+  String get commonAge;
+
+  /// Onboarding and Plan Settings: label of the height box, and the height unit toggle's heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Height'**
+  String get commonHeight;
+
+  /// Onboarding, Plan Settings and the weigh-in dialog: label of the weight box.
+  ///
+  /// In en, this message translates to:
+  /// **'Current weight'**
+  String get commonCurrentWeight;
+
+  /// Onboarding and Plan Settings: label of the target weight box.
+  ///
+  /// In en, this message translates to:
+  /// **'Target weight'**
+  String get commonTargetWeight;
+
+  /// Onboarding and Plan Settings: the age box is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your age.'**
+  String get commonEnterAge;
+
+  /// Onboarding and Plan Settings: the age typed is out of range.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid age: 18–120.'**
+  String get commonAgeRange;
+
+  /// Onboarding and Plan Settings: the target weight is not below the current one.
+  ///
+  /// In en, this message translates to:
+  /// **'Must be less than your current weight'**
+  String get commonTargetBelowCurrent;
+
+  /// Onboarding and Plan Settings: gender button.
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get commonMale;
+
+  /// Onboarding and Plan Settings: gender button.
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get commonFemale;
+
+  /// Onboarding and Plan Settings: gender button.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get commonOther;
+
+  /// Onboarding: the height box is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your height.'**
+  String get onboardingEnterHeight;
+
+  /// Onboarding: the weight box is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your weight.'**
+  String get onboardingEnterWeight;
+
+  /// Onboarding card heading.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s your name?'**
+  String get onboardingNameTitle;
+
+  /// Onboarding: label of the name box.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get onboardingName;
+
+  /// Onboarding card heading, over the Male, Female and Other buttons.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you…'**
+  String get onboardingGenderTitle;
+
+  /// Onboarding card heading.
+  ///
+  /// In en, this message translates to:
+  /// **'How old are you?'**
+  String get onboardingAgeTitle;
+
+  /// Onboarding card heading.
+  ///
+  /// In en, this message translates to:
+  /// **'How tall are you?'**
+  String get onboardingHeightTitle;
+
+  /// Onboarding card heading.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you weigh now?'**
+  String get onboardingWeightTitle;
+
+  /// Onboarding card heading.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s your goal?'**
+  String get onboardingGoalTitle;
+
+  /// Onboarding: the line under What's your goal?
+  ///
+  /// In en, this message translates to:
+  /// **'A calorie is the energy in food. Eat a little less than your body burns and you lose weight, steadily and safely.'**
+  String get onboardingGoalBody;
+
+  /// Onboarding: goal toggle option.
+  ///
+  /// In en, this message translates to:
+  /// **'Lose weight'**
+  String get onboardingLoseWeight;
+
+  /// Onboarding: goal toggle option.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep my weight'**
+  String get onboardingKeepWeight;
+
+  /// Onboarding card heading.
+  ///
+  /// In en, this message translates to:
+  /// **'What weight are you aiming for?'**
+  String get onboardingTargetTitle;
+
+  /// Onboarding card heading, over the daily movement cards.
+  ///
+  /// In en, this message translates to:
+  /// **'How active is your normal day?'**
+  String get onboardingActivityTitle;
+
+  /// Onboarding: the line under How active is your normal day?
+  ///
+  /// In en, this message translates to:
+  /// **'Outside workouts.'**
+  String get onboardingActivityBody;
+
+  /// Onboarding card heading, over the training cards.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you train on top of that?'**
+  String get onboardingTrainingTitle;
+
+  /// Onboarding: the line under Do you train on top of that?
+  ///
+  /// In en, this message translates to:
+  /// **'Structured workouts, if any.'**
+  String get onboardingTrainingBody;
+
+  /// Onboarding card heading, over a Yes/No toggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track protein too?'**
+  String get onboardingProteinTitle;
+
+  /// Onboarding: the line under Track protein too?
+  ///
+  /// In en, this message translates to:
+  /// **'Protein keeps you full and looks after your muscle. YumSum works it out for each meal you log.'**
+  String get onboardingProteinBody;
+
+  /// Onboarding: the last card's heading. One of the two places allowed an exclamation mark.
+  ///
+  /// In en, this message translates to:
+  /// **'Your plan is ready!'**
+  String get onboardingPlanTitle;
+
+  /// Onboarding: title of the plan card on the last card.
+  ///
+  /// In en, this message translates to:
+  /// **'Your plan'**
+  String get onboardingPlanCardTitle;
+
+  /// Onboarding: under the plan card.
+  ///
+  /// In en, this message translates to:
+  /// **'You can go over all of this again, and get into more detail, in Plan Settings.'**
+  String get onboardingPlanNote;
+
+  /// Onboarding: saving the profile failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Try again.'**
+  String get onboardingErrorSave;
+
+  /// Onboarding: goes to the card before.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get onboardingBack;
+
+  /// Onboarding: the big button to the next card.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboardingNext;
+
+  /// Onboarding: the big button on the last card, which saves and opens Home.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get onboardingStart;
+
+  /// Plan card: the pace line when keeping weight.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance plan'**
+  String get planPreviewMaintenance;
+
+  /// Plan card: the pace line when the target is held at the minimum.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum calorie floor'**
+  String get planPreviewFloor;
+
+  /// Plan card: the pace line, green.
+  ///
+  /// In en, this message translates to:
+  /// **'Sustainable pace'**
+  String get planPreviewSafe;
+
+  /// Plan card: the pace line, amber.
+  ///
+  /// In en, this message translates to:
+  /// **'Faster pace'**
+  String get planPreviewCaution;
+
+  /// Plan card: the pace line, red.
+  ///
+  /// In en, this message translates to:
+  /// **'Very aggressive'**
+  String get planPreviewWarning;
+
+  /// Plan card: under Maintenance plan.
+  ///
+  /// In en, this message translates to:
+  /// **'No calorie deficit is applied.'**
+  String get planPreviewMaintenanceNote;
+
+  /// Plan card: under Minimum calorie floor.
+  ///
+  /// In en, this message translates to:
+  /// **'This pace would go below the minimum, so the goal date moves later.'**
+  String get planPreviewFloorNote;
+
+  /// Plan card: under Sustainable pace.
+  ///
+  /// In en, this message translates to:
+  /// **'A moderate deficit from estimated maintenance.'**
+  String get planPreviewSafeNote;
+
+  /// Plan card: under Faster pace.
+  ///
+  /// In en, this message translates to:
+  /// **'This needs consistency and may feel restrictive.'**
+  String get planPreviewCautionNote;
+
+  /// Plan card: under Very aggressive.
+  ///
+  /// In en, this message translates to:
+  /// **'Consider a slower pace if this feels hard to maintain.'**
+  String get planPreviewWarningNote;
+
+  /// Plan card: the weekly loss and goal date when keeping weight.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintain'**
+  String get planPreviewMaintain;
+
+  /// Plan card: the weekly loss, "0.5 kg/wk". {amount} is formatted in the user's unit.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount}/wk'**
+  String planPreviewPerWeek(String amount);
+
+  /// Plan card: small label over the calories a day; a third of the card wide.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily target'**
+  String get planPreviewDailyTarget;
+
+  /// Plan card: small label over the weekly loss; a third of the card wide.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly loss'**
+  String get planPreviewWeeklyLoss;
+
+  /// Plan card: small label over the date the target weight is reached; a third of the card wide.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal by'**
+  String get planPreviewGoalBy;
+
+  /// Plan card: tooltip of the info button.
+  ///
+  /// In en, this message translates to:
+  /// **'How this is calculated'**
+  String get planPreviewInfoTooltip;
+
+  /// Plan card's info dialog: title.
+  ///
+  /// In en, this message translates to:
+  /// **'How calories are estimated'**
+  String get planInfoTitle;
+
+  /// Plan card's info dialog: the text over the sum.
+  ///
+  /// In en, this message translates to:
+  /// **'First we estimate your resting burn from weight, height, age, and sex. Then we add your daily movement and training to estimate maintenance.'**
+  String get planInfoBody;
+
+  /// Plan card's info dialog: a line's label, 118 wide.
+  ///
+  /// In en, this message translates to:
+  /// **'Resting burn'**
+  String get planInfoResting;
+
+  /// Plan card's info dialog: a line's label, 118 wide.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily movement'**
+  String get planInfoMovement;
+
+  /// Plan card's info dialog: a line's label, 118 wide.
+  ///
+  /// In en, this message translates to:
+  /// **'Training bonus'**
+  String get planInfoTraining;
+
+  /// Plan card's info dialog: a line's label, 118 wide.
+  ///
+  /// In en, this message translates to:
+  /// **'Combined activity'**
+  String get planInfoActivity;
+
+  /// Plan card's info dialog: a line's label, 118 wide.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance'**
+  String get planInfoMaintenance;
+
+  /// Plan card's info dialog: the Adaptive formula's line label, 118 wide.
+  ///
+  /// In en, this message translates to:
+  /// **'Adaptive'**
+  String get planInfoAdaptive;
+
+  /// Plan card's info dialog: the calorie target's line label, 118 wide.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get planInfoTarget;
+
+  /// Plan card's info dialog: calories a day, also at the end of a sum ("1800 - 500 = 1300 kcal/day").
+  ///
+  /// In en, this message translates to:
+  /// **'{kcal} kcal/day'**
+  String planInfoKcalPerDay(int kcal);
+
+  /// Plan card's info dialog: the target when held at the minimum.
+  ///
+  /// In en, this message translates to:
+  /// **'{kcal} kcal/day, your minimum'**
+  String planInfoAtMinimum(int kcal);
+
+  /// Plan card's info dialog: under the sum when the target is held at the minimum.
+  ///
+  /// In en, this message translates to:
+  /// **'This pace would go below the minimum, so your target stays at the minimum and the goal date moves later.'**
+  String get planInfoFloorNote;
+
+  /// Plan Settings: the page title.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan Settings'**
+  String get planTitle;
+
+  /// Plan Settings: the profile did not load.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your profile.'**
+  String get planErrorLoad;
+
+  /// Plan Settings: saving with no gender chosen.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your gender.'**
+  String get planSelectGender;
+
+  /// Plan Settings: after saving.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan saved.'**
+  String get planSaved;
+
+  /// Plan Settings: saving failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save your plan. Try again.'**
+  String get planErrorSave;
+
+  /// Plan Settings: under an empty height or weight box.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get planRequired;
+
+  /// Plan Settings: the heading at the top.
+  ///
+  /// In en, this message translates to:
+  /// **'Update your health plan'**
+  String get planHeading;
+
+  /// Plan Settings: under the heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Change anything below and your plan adjusts to match.'**
+  String get planSubtitle;
+
+  /// Plan Settings: section label, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'PERSONAL DETAILS'**
+  String get planSectionPersonal;
+
+  /// Plan Settings: over the gender buttons.
+  ///
+  /// In en, this message translates to:
+  /// **'Gender'**
+  String get planGender;
+
+  /// Plan Settings: section label, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'UNITS'**
+  String get planSectionUnits;
+
+  /// Plan Settings: over the weight unit toggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get planWeightUnit;
+
+  /// Plan Settings: section label, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'YOUR BODY'**
+  String get planSectionBody;
+
+  /// Plan Settings: section label, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'YOUR BMI'**
+  String get planSectionBmi;
+
+  /// Plan Settings: section label, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'YOUR GOAL'**
+  String get planSectionGoal;
+
+  /// Plan Settings: in place of the target box when keeping weight.
+  ///
+  /// In en, this message translates to:
+  /// **'Your target weight stays at your current weight.'**
+  String get planTargetStays;
+
+  /// Plan Settings: section label, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'YOUR DAILY MOVEMENT'**
+  String get planSectionMovement;
+
+  /// Plan Settings: under YOUR DAILY MOVEMENT.
+  ///
+  /// In en, this message translates to:
+  /// **'Your normal day outside workouts.'**
+  String get planMovementNote;
+
+  /// Plan Settings: section label, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'HOW OFTEN DO YOU TRAIN?'**
+  String get planSectionTraining;
+
+  /// Plan Settings: under HOW OFTEN DO YOU TRAIN?
+  ///
+  /// In en, this message translates to:
+  /// **'Structured workouts on top of your normal day.'**
+  String get planTrainingNote;
+
+  /// Plan Settings: section label, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'TRACK PROTEIN TOO?'**
+  String get planSectionProtein;
+
+  /// Plan Settings: under TRACK PROTEIN TOO?
+  ///
+  /// In en, this message translates to:
+  /// **'Protein helps keep muscle while you lose weight. Off hides it everywhere.'**
+  String get planProteinNote;
+
+  /// Plan Settings: section label, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'HOW FAST DO YOU WANT TO LOSE WEIGHT?'**
+  String get planSectionPace;
+
+  /// Plan Settings: under the pace section label.
+  ///
+  /// In en, this message translates to:
+  /// **'Pace sets the calorie target. Target weight sets how long the plan takes.'**
+  String get planPaceNote;
+
+  /// Plan Settings: section label over the Adaptive formula, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'PERSONAL ADJUSTMENT'**
+  String get planSectionAdjustment;
+
+  /// Plan Settings: title of the plan card.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated plan'**
+  String get planUpdatedPlan;
+
+  /// Plan Settings: the save button.
+  ///
+  /// In en, this message translates to:
+  /// **'Save plan'**
+  String get planSave;
+
+  /// Plan Settings: under Adaptive formula.
+  ///
+  /// In en, this message translates to:
+  /// **'Learns from your weigh-ins and adjusts your target each Monday.'**
+  String get planAdaptiveNote;
+
+  /// Plan Settings: under the Adaptive formula when a change will start it over.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving starts it again from your new plan.'**
+  String get planAdaptiveRestarts;
+
+  /// Plan Settings: BMI badge.
+  ///
+  /// In en, this message translates to:
+  /// **'Underweight'**
+  String get planBmiUnderweight;
+
+  /// Plan Settings: BMI badge.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy range'**
+  String get planBmiHealthy;
+
+  /// Plan Settings: BMI badge.
+  ///
+  /// In en, this message translates to:
+  /// **'Overweight'**
+  String get planBmiOverweight;
+
+  /// Plan Settings: BMI badge.
+  ///
+  /// In en, this message translates to:
+  /// **'Obese range'**
+  String get planBmiObese;
+
+  /// Plan Settings: over the BMI number.
+  ///
+  /// In en, this message translates to:
+  /// **'Your BMI'**
+  String get planBmiTitle;
+
+  /// The Adaptive formula's name as a heading: Plan Settings and Weight & Progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Adaptive formula'**
+  String get adaptiveTitle;
+
+  /// The Adaptive formula: opens its explanation.
+  ///
+  /// In en, this message translates to:
+  /// **'How it works'**
+  String get adaptiveHowItWorks;
+
+  /// Weight & Progress, without YumSum Star: under the Adaptive formula button.
+  ///
+  /// In en, this message translates to:
+  /// **'A customised formula tailored just for you. Adapting with time and your weigh-ins.'**
+  String get adaptiveTryNote;
+
+  /// Weight & Progress: the green chip beside Adaptive formula.
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get adaptiveOn;
+
+  /// Weight & Progress: the Adaptive formula's first fact. {kcal} is shown big, e.g. "2440 kcal".
+  ///
+  /// In en, this message translates to:
+  /// **'You burn {kcal} a day'**
+  String adaptiveBurnFact(String kcal);
+
+  /// Weight & Progress: the Adaptive formula's second fact. {kcal} is shown big, e.g. "1940 kcal".
+  ///
+  /// In en, this message translates to:
+  /// **'Your target is {kcal} a day'**
+  String adaptiveTargetFact(String kcal);
+
+  /// Weight & Progress: under You burn, once measured.
+  ///
+  /// In en, this message translates to:
+  /// **'Learnt from your weigh-ins and meals.'**
+  String get adaptiveBurnLearnt;
+
+  /// Weight & Progress: under You burn, before it is measured.
+  ///
+  /// In en, this message translates to:
+  /// **'A first estimate. It learns as you weigh in.'**
+  String get adaptiveBurnFirst;
+
+  /// Weight & Progress: under Your target, when keeping weight.
+  ///
+  /// In en, this message translates to:
+  /// **'To keep your weight steady.'**
+  String get adaptiveTargetKeep;
+
+  /// Weight & Progress: under Your target. {amount} is formatted in the user's unit, "0.5 kg".
+  ///
+  /// In en, this message translates to:
+  /// **'To lose {amount} a week.'**
+  String adaptiveTargetLose(String amount);
+
+  /// The Adaptive formula's line on Home, Weight & Progress and Plan Settings when the last weigh-in is 10 days old.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused: no weigh-in for 10 days. Weigh in to keep it personal.'**
+  String get adaptivePaused;
+
+  /// The Adaptive formula's line on Home: the target is held at the minimum. {date} is "7 November".
+  ///
+  /// In en, this message translates to:
+  /// **'Your target is at your minimum, so your goal date is now {date}.'**
+  String adaptiveAtMinimum(String date);
+
+  /// The Adaptive formula's line on Home after Monday lowered the target. {amount} is signed, "−80".
+  ///
+  /// In en, this message translates to:
+  /// **'Adjusted for you: {amount} kcal. You burn a little less than your plan assumed.'**
+  String adaptiveLowered(String amount);
+
+  /// The Adaptive formula's line on Home after Monday raised the target. {amount} is signed, "+80".
+  ///
+  /// In en, this message translates to:
+  /// **'Adjusted for you: {amount} kcal. You burn a little more than your plan assumed.'**
+  String adaptiveRaised(String amount);
+
+  /// The Adaptive formula's line on Home: a first sign, no change yet.
+  ///
+  /// In en, this message translates to:
+  /// **'You may burn a little less than your plan assumed. Checking again next Monday.'**
+  String get adaptiveFirstSign;
+
+  /// The Adaptive formula's line on Home: an earlier adjustment stands. {amount} is signed, "−80".
+  ///
+  /// In en, this message translates to:
+  /// **'Adjusted for you: {amount} kcal. No change this week.'**
+  String adaptiveSteadyAdjusted(String amount);
+
+  /// The Adaptive formula's line on Home: no change.
+  ///
+  /// In en, this message translates to:
+  /// **'No change this week: your weight matches what you eat.'**
+  String get adaptiveSteady;
+
+  /// The Adaptive formula's line on Home.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough weigh-ins this week, so your target stays the same.'**
+  String get adaptiveFewWeighIns;
+
+  /// The Adaptive formula's line on Home.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough days logged this week, so your target stays the same.'**
+  String get adaptiveFewDays;
+
+  /// The Adaptive formula's line on Home.
+  ///
+  /// In en, this message translates to:
+  /// **'Your numbers look unusual. Check your logging and weigh-ins.'**
+  String get adaptiveUnusual;
+
+  /// Plan Settings: the sum the Adaptive formula makes, "1670 from your plan − 80 adaptive = 1590 kcal". {sign} is + or −.
+  ///
+  /// In en, this message translates to:
+  /// **'{plan} from your plan {sign} {amount} adaptive = {target} kcal'**
+  String adaptiveSum(int plan, String sign, int amount, int target);
+
+  /// Plan Settings: the Adaptive formula's sum when the target is held at the minimum.
+  ///
+  /// In en, this message translates to:
+  /// **'{plan} from your plan {sign} {amount} adaptive = {target} kcal, your minimum'**
+  String adaptiveSumMinimum(int plan, String sign, int amount, int target);
+
+  /// Weight & Progress: the page title.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight & Progress'**
+  String get progressTitle;
+
+  /// Weight & Progress: the button that opens the weigh-in dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Log weight'**
+  String get progressLogWeight;
+
+  /// Weight & Progress: heading over the weigh-ins.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get progressHistory;
+
+  /// Weight & Progress: the button under the weigh-ins.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset progress'**
+  String get progressReset;
+
+  /// Weight & Progress: the weigh-ins did not load.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your weight history.'**
+  String get progressErrorLoad;
+
+  /// Weight & Progress: after a weigh-in that changed the target.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight saved. New target: {kcal} kcal (was {previous}).'**
+  String progressSavedNewTarget(int kcal, int previous);
+
+  /// Weight & Progress: after a weigh-in that kept the target.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight saved. Your target stays at {kcal} kcal.'**
+  String progressSavedSameTarget(int kcal);
+
+  /// Weight & Progress: title of the dialog before deleting a weigh-in.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete weigh-in?'**
+  String get progressDeleteTitle;
+
+  /// Weight & Progress: the delete dialog. {weight} is "80.5 kg", {date} "Sat, 7 Nov".
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {weight} from {date}?'**
+  String progressDeleteBody(String weight, String date);
+
+  /// Weight & Progress: the delete dialog for the newest weigh-in. {previous} is the weigh-in before it.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {weight} from {date}? Your plan adjusts back to {previous}.'**
+  String progressDeleteBodyBack(String weight, String date, String previous);
+
+  /// Weight & Progress: deleting failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete the weigh-in. Try again.'**
+  String get progressErrorDelete;
+
+  /// Weight & Progress: after deleting a weigh-in that changed the target.
+  ///
+  /// In en, this message translates to:
+  /// **'Weigh-in deleted. New target: {kcal} kcal (was {previous}).'**
+  String progressDeletedNewTarget(int kcal, int previous);
+
+  /// Weight & Progress: after deleting a weigh-in.
+  ///
+  /// In en, this message translates to:
+  /// **'Weigh-in deleted.'**
+  String get progressDeleted;
+
+  /// Weight & Progress: title of the dialog before Reset progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset progress?'**
+  String get progressResetTitle;
+
+  /// Weight & Progress: the Reset progress dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'This clears all your weight history and chart progress. Are you sure?'**
+  String get progressResetBody;
+
+  /// Weight & Progress: confirms Reset progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get progressResetButton;
+
+  /// Weight & Progress: after Reset progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight history cleared.'**
+  String get progressResetDone;
+
+  /// Weight & Progress: Reset progress failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reset progress. Try again.'**
+  String get progressErrorReset;
+
+  /// Weight & Progress: small label over the current weight; a third of the card wide.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get progressCurrent;
+
+  /// Weight & Progress: small label over the change since the first weigh-in; a third of the card wide.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get progressChange;
+
+  /// Weight & Progress: small label over the target weight, and the chart's target line.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get progressTarget;
+
+  /// Weight & Progress: the chart's touch label on the trend line, "Trend 80.2 kg".
+  ///
+  /// In en, this message translates to:
+  /// **'Trend {weight}'**
+  String progressTrend(String weight);
+
+  /// Weight & Progress: tooltip of a weigh-in's delete button.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete weigh-in'**
+  String get progressDeleteTooltip;
+
+  /// Weight & Progress: heading with no weigh-ins.
+  ///
+  /// In en, this message translates to:
+  /// **'No weight logged yet'**
+  String get progressEmptyTitle;
+
+  /// Weight & Progress: the text with no weigh-ins.
+  ///
+  /// In en, this message translates to:
+  /// **'Log your weight to see your progress. Your plan adjusts each time.'**
+  String get progressEmptyBody;
+
+  /// Weigh-in dialog: title.
+  ///
+  /// In en, this message translates to:
+  /// **'Log your weight'**
+  String get progressWeighInTitle;
+
+  /// Weigh-in dialog: under the title.
+  ///
+  /// In en, this message translates to:
+  /// **'Your plan adjusts to match.'**
+  String get progressWeighInNote;
+
+  /// Weigh-in dialog: the weight is out of range. {range} is "25 and 400 kg", joined with progressWeighInRangeAnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a weight between {range}.'**
+  String progressWeighInRange(String range);
+
+  /// Weigh-in dialog: joins the two ends of the weight range, spaces included.
+  ///
+  /// In en, this message translates to:
+  /// **' and '**
+  String get progressWeighInRangeAnd;
+
+  /// Weigh-in dialog: saving failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save your weight. Try again.'**
+  String get progressErrorSaveWeight;
+
+  /// Home and the Adaptive formula: after a weigh-in that changed the target.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight saved. New target: {kcal} kcal.'**
+  String progressWeightSavedTarget(int kcal);
+
+  /// Home and the Adaptive formula: after a weigh-in.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight saved.'**
+  String get progressWeightSaved;
 }
 
 class _AppLocalizationsDelegate

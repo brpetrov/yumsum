@@ -1,5 +1,7 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/country_provider.dart';
@@ -10,6 +12,9 @@ import 'package:lean_streak/widgets/measure_field.dart';
 import 'adaptive_fixtures.dart';
 
 void main() {
+  final en = lookupAppLocalizations(const Locale('en'));
+  final bg = lookupAppLocalizations(const Locale('bg'));
+
   test('pounds and inches convert both ways', () {
     expect(kgToLb(1), closeTo(2.20462, 1e-5));
     expect(lbToKg(kgToLb(79.8)), closeTo(79.8, 1e-9));
@@ -17,39 +22,52 @@ void main() {
   });
 
   test('weights show in each unit', () {
-    expect(formatWeight(79.8, WeightUnit.kg), '79.8 kg');
-    expect(formatWeight(79.8, WeightUnit.lb), '175.9 lb');
-    expect(formatWeight(79.8, WeightUnit.st), '12 st 8 lb');
-    expect(formatWeight(lbToKg(168), WeightUnit.st), '12 st 0 lb');
+    expect(formatWeight(79.8, WeightUnit.kg, en), '79.8 kg');
+    expect(formatWeight(79.8, WeightUnit.lb, en), '175.9 lb');
+    expect(formatWeight(79.8, WeightUnit.st, en), '12 st 8 lb');
+    expect(formatWeight(lbToKg(168), WeightUnit.st, en), '12 st 0 lb');
   });
 
   test('a change is signed, and in stones only past a stone', () {
-    expect(formatWeightChange(-0.8, WeightUnit.kg), '-0.8 kg');
-    expect(formatWeightChange(1.2, WeightUnit.kg), '+1.2 kg');
-    expect(formatWeightChange(-0.8, WeightUnit.lb), '-1.8 lb');
-    expect(formatWeightChange(-0.8, WeightUnit.st), '-1.8 lb');
-    expect(formatWeightChange(lbToKg(-16), WeightUnit.st), '-1 st 2 lb');
+    expect(formatWeightChange(-0.8, WeightUnit.kg, en), '-0.8 kg');
+    expect(formatWeightChange(1.2, WeightUnit.kg, en), '+1.2 kg');
+    expect(formatWeightChange(-0.8, WeightUnit.lb, en), '-1.8 lb');
+    expect(formatWeightChange(-0.8, WeightUnit.st, en), '-1.8 lb');
+    expect(formatWeightChange(lbToKg(-16), WeightUnit.st, en), '-1 st 2 lb');
   });
 
   test('paces and heights', () {
-    expect(formatPace(0.5, WeightUnit.kg), '0.5 kg');
-    expect(formatPace(0.25, WeightUnit.kg), '0.25 kg');
-    expect(formatPace(0.5, WeightUnit.lb), '1.1 lb');
-    expect(formatPace(0.75, WeightUnit.st), '1.65 lb');
-    expect(formatHeight(180, HeightUnit.cm), '180 cm');
-    expect(formatHeight(180, HeightUnit.ftin), '5 ft 11 in');
+    expect(formatPace(0.5, WeightUnit.kg, en), '0.5 kg');
+    expect(formatPace(0.25, WeightUnit.kg, en), '0.25 kg');
+    expect(formatPace(0.5, WeightUnit.lb, en), '1.1 lb');
+    expect(formatPace(0.75, WeightUnit.st, en), '1.65 lb');
+    expect(formatHeight(180, HeightUnit.cm, en), '180 cm');
+    expect(formatHeight(180, HeightUnit.ftin, en), '5 ft 11 in');
+  });
+
+  test('in Bulgarian: decimal commas, кг and см, imperial symbols kept', () {
+    expect(formatWeight(80.5, WeightUnit.kg, bg), '80,5 кг');
+    expect(formatWeight(79.8, WeightUnit.lb, bg), '175,9 lb');
+    expect(formatWeight(79.8, WeightUnit.st, bg), '12 st 8 lb');
+    expect(formatWeightChange(-0.8, WeightUnit.kg, bg), '-0,8 кг');
+    expect(formatPace(0.25, WeightUnit.kg, bg), '0,25 кг');
+    expect(formatPace(0.75, WeightUnit.st, bg), '1,65 lb');
+    expect(formatHeight(180, HeightUnit.cm, bg), '180 см');
+    expect(formatHeight(180, HeightUnit.ftin, bg), '5 ft 11 in');
+    expect(weightRange(30, 300, WeightUnit.kg, bg), '30–300 кг');
+    expect(heightRange(100, 250, HeightUnit.cm, bg), '100–250 см');
   });
 
   test('ranges round inwards, so both ends are allowed', () {
-    expect(weightRange(30, 300, WeightUnit.kg), '30–300 kg');
-    expect(weightRange(30, 300, WeightUnit.lb), '67–661 lb');
-    expect(weightRange(30, 300, WeightUnit.st), '4 st 11 lb–47 st 3 lb');
+    expect(weightRange(30, 300, WeightUnit.kg, en), '30–300 kg');
+    expect(weightRange(30, 300, WeightUnit.lb, en), '67–661 lb');
+    expect(weightRange(30, 300, WeightUnit.st, en), '4 st 11 lb–47 st 3 lb');
     expect(
-      weightRange(25, 400, WeightUnit.kg, between: ' and '),
+      weightRange(25, 400, WeightUnit.kg, en, between: ' and '),
       '25 and 400 kg',
     );
-    expect(heightRange(100, 250, HeightUnit.cm), '100–250 cm');
-    expect(heightRange(100, 250, HeightUnit.ftin), '3 ft 4 in–8 ft 2 in');
+    expect(heightRange(100, 250, HeightUnit.cm, en), '100–250 cm');
+    expect(heightRange(100, 250, HeightUnit.ftin, en), '3 ft 4 in–8 ft 2 in');
     expect(lbToKg(67), greaterThanOrEqualTo(30));
     expect(lbToKg(661), lessThanOrEqualTo(300));
     expect(40 * cmPerInch, greaterThanOrEqualTo(100));
@@ -68,7 +86,7 @@ void main() {
 
   group('the boxes', () {
     test('a stored weight comes back exactly until a box changes', () {
-      final input = WeightInput(WeightUnit.st)..show(79.8);
+      final input = WeightInput(WeightUnit.st)..show(79.8, en);
       expect((input.whole.text, input.part.text), ('12', '7.9'));
       expect(input.value, 79.8);
       input.part.text = '8';
@@ -77,13 +95,24 @@ void main() {
     });
 
     test('switching unit keeps the value', () {
-      final input = WeightInput(WeightUnit.kg)..show(79.8);
-      input.switchTo(WeightUnit.lb);
+      final input = WeightInput(WeightUnit.kg)..show(79.8, en);
+      input.switchTo(WeightUnit.lb, en);
       expect(input.whole.text, '175.9');
-      input.switchTo(WeightUnit.st);
-      input.switchTo(WeightUnit.kg);
+      input.switchTo(WeightUnit.st, en);
+      input.switchTo(WeightUnit.kg, en);
       expect(input.whole.text, '79.8');
       expect(input.value, 79.8);
+      input.dispose();
+    });
+
+    test('in Bulgarian the boxes show a decimal comma', () {
+      final input = WeightInput(WeightUnit.kg)..show(79.8, bg);
+      expect(input.whole.text, '79,8');
+      expect(input.value, 79.8);
+      input.whole.text = '80,5';
+      expect(input.value, 80.5);
+      input.switchTo(WeightUnit.st, bg);
+      expect((input.whole.text, input.part.text), ('12', '9,5'));
       input.dispose();
     });
 
@@ -96,7 +125,7 @@ void main() {
       height.whole.text = '5';
       height.part.text = '7';
       expect(height.value, closeTo(67 * cmPerInch, 1e-9));
-      height.show(170);
+      height.show(170, en);
       expect((height.whole.text, height.part.text), ('5', '6.9'));
       weight.dispose();
       height.dispose();

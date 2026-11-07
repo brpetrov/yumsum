@@ -829,11 +829,11 @@ class _WeightCard extends ConsumerWidget {
                       ? l10n.homeWeightEmpty
                       : daysAgo > 7
                       ? l10n.homeWeightLatestAgo(
-                          formatWeight(latest.weightKg, unit),
+                          formatWeight(latest.weightKg, unit, l10n),
                           daysAgo,
                         )
                       : l10n.homeWeightLatest(
-                          formatWeight(latest.weightKg, unit),
+                          formatWeight(latest.weightKg, unit, l10n),
                         ),
                   style: TextStyle(
                     fontSize: 13,

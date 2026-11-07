@@ -311,9 +311,9 @@ void main() {
     expect(find.text('Физическа работа или много движение'), findsOneWidget);
     expect(find.text('1–2 тренировки седмично'), findsOneWidget);
     await tester.scrollUntilVisible(find.byType(MedicalNote), 200);
-    expect(find.textContaining('Бавно – '), findsOneWidget);
-    expect(find.textContaining('Умерено – '), findsOneWidget);
-    expect(find.textContaining('Бързо – '), findsOneWidget);
+    expect(find.text('Бавно – 0,25 кг седмично'), findsOneWidget);
+    expect(find.text('Умерено – 0,5 кг седмично'), findsOneWidget);
+    expect(find.text('Бързо – 0,75 кг седмично'), findsOneWidget);
     expect(find.textContaining('не медицински съвет'), findsOneWidget);
     fits(tester);
   });

@@ -2137,4 +2137,599 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shortcutLogVoice => 'Log by voice';
+
+  @override
+  String unitsKg(String value) {
+    return '$value kg';
+  }
+
+  @override
+  String unitsLb(String value) {
+    return '$value lb';
+  }
+
+  @override
+  String unitsStLb(int stones, int pounds) {
+    return '$stones st $pounds lb';
+  }
+
+  @override
+  String unitsCm(String value) {
+    return '$value cm';
+  }
+
+  @override
+  String unitsFtIn(int feet, int inches) {
+    return '$feet ft $inches in';
+  }
+
+  @override
+  String unitsStAxis(int stones) {
+    return '$stones st';
+  }
+
+  @override
+  String unitsStLbAxis(int stones, int pounds) {
+    return '$stones st $pounds';
+  }
+
+  @override
+  String get unitsKgLabel => 'kg';
+
+  @override
+  String get unitsLbLabel => 'lb';
+
+  @override
+  String get unitsStLabel => 'st';
+
+  @override
+  String get unitsCmLabel => 'cm';
+
+  @override
+  String get unitsFtLabel => 'ft';
+
+  @override
+  String get unitsInLabel => 'in';
+
+  @override
+  String get unitsStLbToggle => 'st & lb';
+
+  @override
+  String get unitsFtInToggle => 'ft & in';
+
+  @override
+  String get unitsPounds => 'Pounds';
+
+  @override
+  String get unitsInches => 'Inches';
+
+  @override
+  String get commonYes => 'Yes';
+
+  @override
+  String get commonNo => 'No';
+
+  @override
+  String get commonAge => 'Age';
+
+  @override
+  String get commonHeight => 'Height';
+
+  @override
+  String get commonCurrentWeight => 'Current weight';
+
+  @override
+  String get commonTargetWeight => 'Target weight';
+
+  @override
+  String get commonEnterAge => 'Enter your age.';
+
+  @override
+  String get commonAgeRange => 'Valid age: 18–120.';
+
+  @override
+  String get commonTargetBelowCurrent =>
+      'Must be less than your current weight';
+
+  @override
+  String get commonMale => 'Male';
+
+  @override
+  String get commonFemale => 'Female';
+
+  @override
+  String get commonOther => 'Other';
+
+  @override
+  String get onboardingEnterHeight => 'Enter your height.';
+
+  @override
+  String get onboardingEnterWeight => 'Enter your weight.';
+
+  @override
+  String get onboardingNameTitle => 'What\'s your name?';
+
+  @override
+  String get onboardingName => 'Name';
+
+  @override
+  String get onboardingGenderTitle => 'Are you…';
+
+  @override
+  String get onboardingAgeTitle => 'How old are you?';
+
+  @override
+  String get onboardingHeightTitle => 'How tall are you?';
+
+  @override
+  String get onboardingWeightTitle => 'What do you weigh now?';
+
+  @override
+  String get onboardingGoalTitle => 'What\'s your goal?';
+
+  @override
+  String get onboardingGoalBody =>
+      'A calorie is the energy in food. Eat a little less than your body burns and you lose weight, steadily and safely.';
+
+  @override
+  String get onboardingLoseWeight => 'Lose weight';
+
+  @override
+  String get onboardingKeepWeight => 'Keep my weight';
+
+  @override
+  String get onboardingTargetTitle => 'What weight are you aiming for?';
+
+  @override
+  String get onboardingActivityTitle => 'How active is your normal day?';
+
+  @override
+  String get onboardingActivityBody => 'Outside workouts.';
+
+  @override
+  String get onboardingTrainingTitle => 'Do you train on top of that?';
+
+  @override
+  String get onboardingTrainingBody => 'Structured workouts, if any.';
+
+  @override
+  String get onboardingProteinTitle => 'Track protein too?';
+
+  @override
+  String get onboardingProteinBody =>
+      'Protein keeps you full and looks after your muscle. YumSum works it out for each meal you log.';
+
+  @override
+  String get onboardingPlanTitle => 'Your plan is ready!';
+
+  @override
+  String get onboardingPlanCardTitle => 'Your plan';
+
+  @override
+  String get onboardingPlanNote =>
+      'You can go over all of this again, and get into more detail, in Plan Settings.';
+
+  @override
+  String get onboardingErrorSave => 'Something went wrong. Try again.';
+
+  @override
+  String get onboardingBack => 'Back';
+
+  @override
+  String get onboardingNext => 'Next';
+
+  @override
+  String get onboardingStart => 'Start';
+
+  @override
+  String get planPreviewMaintenance => 'Maintenance plan';
+
+  @override
+  String get planPreviewFloor => 'Minimum calorie floor';
+
+  @override
+  String get planPreviewSafe => 'Sustainable pace';
+
+  @override
+  String get planPreviewCaution => 'Faster pace';
+
+  @override
+  String get planPreviewWarning => 'Very aggressive';
+
+  @override
+  String get planPreviewMaintenanceNote => 'No calorie deficit is applied.';
+
+  @override
+  String get planPreviewFloorNote =>
+      'This pace would go below the minimum, so the goal date moves later.';
+
+  @override
+  String get planPreviewSafeNote =>
+      'A moderate deficit from estimated maintenance.';
+
+  @override
+  String get planPreviewCautionNote =>
+      'This needs consistency and may feel restrictive.';
+
+  @override
+  String get planPreviewWarningNote =>
+      'Consider a slower pace if this feels hard to maintain.';
+
+  @override
+  String get planPreviewMaintain => 'Maintain';
+
+  @override
+  String planPreviewPerWeek(String amount) {
+    return '$amount/wk';
+  }
+
+  @override
+  String get planPreviewDailyTarget => 'Daily target';
+
+  @override
+  String get planPreviewWeeklyLoss => 'Weekly loss';
+
+  @override
+  String get planPreviewGoalBy => 'Goal by';
+
+  @override
+  String get planPreviewInfoTooltip => 'How this is calculated';
+
+  @override
+  String get planInfoTitle => 'How calories are estimated';
+
+  @override
+  String get planInfoBody =>
+      'First we estimate your resting burn from weight, height, age, and sex. Then we add your daily movement and training to estimate maintenance.';
+
+  @override
+  String get planInfoResting => 'Resting burn';
+
+  @override
+  String get planInfoMovement => 'Daily movement';
+
+  @override
+  String get planInfoTraining => 'Training bonus';
+
+  @override
+  String get planInfoActivity => 'Combined activity';
+
+  @override
+  String get planInfoMaintenance => 'Maintenance';
+
+  @override
+  String get planInfoAdaptive => 'Adaptive';
+
+  @override
+  String get planInfoTarget => 'Target';
+
+  @override
+  String planInfoKcalPerDay(int kcal) {
+    return '$kcal kcal/day';
+  }
+
+  @override
+  String planInfoAtMinimum(int kcal) {
+    return '$kcal kcal/day, your minimum';
+  }
+
+  @override
+  String get planInfoFloorNote =>
+      'This pace would go below the minimum, so your target stays at the minimum and the goal date moves later.';
+
+  @override
+  String get planTitle => 'Plan Settings';
+
+  @override
+  String get planErrorLoad => 'Could not load your profile.';
+
+  @override
+  String get planSelectGender => 'Select your gender.';
+
+  @override
+  String get planSaved => 'Plan saved.';
+
+  @override
+  String get planErrorSave => 'Could not save your plan. Try again.';
+
+  @override
+  String get planRequired => 'Required';
+
+  @override
+  String get planHeading => 'Update your health plan';
+
+  @override
+  String get planSubtitle =>
+      'Change anything below and your plan adjusts to match.';
+
+  @override
+  String get planSectionPersonal => 'PERSONAL DETAILS';
+
+  @override
+  String get planGender => 'Gender';
+
+  @override
+  String get planSectionUnits => 'UNITS';
+
+  @override
+  String get planWeightUnit => 'Weight';
+
+  @override
+  String get planSectionBody => 'YOUR BODY';
+
+  @override
+  String get planSectionBmi => 'YOUR BMI';
+
+  @override
+  String get planSectionGoal => 'YOUR GOAL';
+
+  @override
+  String get planTargetStays =>
+      'Your target weight stays at your current weight.';
+
+  @override
+  String get planSectionMovement => 'YOUR DAILY MOVEMENT';
+
+  @override
+  String get planMovementNote => 'Your normal day outside workouts.';
+
+  @override
+  String get planSectionTraining => 'HOW OFTEN DO YOU TRAIN?';
+
+  @override
+  String get planTrainingNote =>
+      'Structured workouts on top of your normal day.';
+
+  @override
+  String get planSectionProtein => 'TRACK PROTEIN TOO?';
+
+  @override
+  String get planProteinNote =>
+      'Protein helps keep muscle while you lose weight. Off hides it everywhere.';
+
+  @override
+  String get planSectionPace => 'HOW FAST DO YOU WANT TO LOSE WEIGHT?';
+
+  @override
+  String get planPaceNote =>
+      'Pace sets the calorie target. Target weight sets how long the plan takes.';
+
+  @override
+  String get planSectionAdjustment => 'PERSONAL ADJUSTMENT';
+
+  @override
+  String get planUpdatedPlan => 'Updated plan';
+
+  @override
+  String get planSave => 'Save plan';
+
+  @override
+  String get planAdaptiveNote =>
+      'Learns from your weigh-ins and adjusts your target each Monday.';
+
+  @override
+  String get planAdaptiveRestarts =>
+      'Saving starts it again from your new plan.';
+
+  @override
+  String get planBmiUnderweight => 'Underweight';
+
+  @override
+  String get planBmiHealthy => 'Healthy range';
+
+  @override
+  String get planBmiOverweight => 'Overweight';
+
+  @override
+  String get planBmiObese => 'Obese range';
+
+  @override
+  String get planBmiTitle => 'Your BMI';
+
+  @override
+  String get adaptiveTitle => 'Adaptive formula';
+
+  @override
+  String get adaptiveHowItWorks => 'How it works';
+
+  @override
+  String get adaptiveTryNote =>
+      'A customised formula tailored just for you. Adapting with time and your weigh-ins.';
+
+  @override
+  String get adaptiveOn => 'On';
+
+  @override
+  String adaptiveBurnFact(String kcal) {
+    return 'You burn $kcal a day';
+  }
+
+  @override
+  String adaptiveTargetFact(String kcal) {
+    return 'Your target is $kcal a day';
+  }
+
+  @override
+  String get adaptiveBurnLearnt => 'Learnt from your weigh-ins and meals.';
+
+  @override
+  String get adaptiveBurnFirst =>
+      'A first estimate. It learns as you weigh in.';
+
+  @override
+  String get adaptiveTargetKeep => 'To keep your weight steady.';
+
+  @override
+  String adaptiveTargetLose(String amount) {
+    return 'To lose $amount a week.';
+  }
+
+  @override
+  String get adaptivePaused =>
+      'Paused: no weigh-in for 10 days. Weigh in to keep it personal.';
+
+  @override
+  String adaptiveAtMinimum(String date) {
+    return 'Your target is at your minimum, so your goal date is now $date.';
+  }
+
+  @override
+  String adaptiveLowered(String amount) {
+    return 'Adjusted for you: $amount kcal. You burn a little less than your plan assumed.';
+  }
+
+  @override
+  String adaptiveRaised(String amount) {
+    return 'Adjusted for you: $amount kcal. You burn a little more than your plan assumed.';
+  }
+
+  @override
+  String get adaptiveFirstSign =>
+      'You may burn a little less than your plan assumed. Checking again next Monday.';
+
+  @override
+  String adaptiveSteadyAdjusted(String amount) {
+    return 'Adjusted for you: $amount kcal. No change this week.';
+  }
+
+  @override
+  String get adaptiveSteady =>
+      'No change this week: your weight matches what you eat.';
+
+  @override
+  String get adaptiveFewWeighIns =>
+      'Not enough weigh-ins this week, so your target stays the same.';
+
+  @override
+  String get adaptiveFewDays =>
+      'Not enough days logged this week, so your target stays the same.';
+
+  @override
+  String get adaptiveUnusual =>
+      'Your numbers look unusual. Check your logging and weigh-ins.';
+
+  @override
+  String adaptiveSum(int plan, String sign, int amount, int target) {
+    return '$plan from your plan $sign $amount adaptive = $target kcal';
+  }
+
+  @override
+  String adaptiveSumMinimum(int plan, String sign, int amount, int target) {
+    return '$plan from your plan $sign $amount adaptive = $target kcal, your minimum';
+  }
+
+  @override
+  String get progressTitle => 'Weight & Progress';
+
+  @override
+  String get progressLogWeight => 'Log weight';
+
+  @override
+  String get progressHistory => 'History';
+
+  @override
+  String get progressReset => 'Reset progress';
+
+  @override
+  String get progressErrorLoad => 'Could not load your weight history.';
+
+  @override
+  String progressSavedNewTarget(int kcal, int previous) {
+    return 'Weight saved. New target: $kcal kcal (was $previous).';
+  }
+
+  @override
+  String progressSavedSameTarget(int kcal) {
+    return 'Weight saved. Your target stays at $kcal kcal.';
+  }
+
+  @override
+  String get progressDeleteTitle => 'Delete weigh-in?';
+
+  @override
+  String progressDeleteBody(String weight, String date) {
+    return 'Remove $weight from $date?';
+  }
+
+  @override
+  String progressDeleteBodyBack(String weight, String date, String previous) {
+    return 'Remove $weight from $date? Your plan adjusts back to $previous.';
+  }
+
+  @override
+  String get progressErrorDelete => 'Could not delete the weigh-in. Try again.';
+
+  @override
+  String progressDeletedNewTarget(int kcal, int previous) {
+    return 'Weigh-in deleted. New target: $kcal kcal (was $previous).';
+  }
+
+  @override
+  String get progressDeleted => 'Weigh-in deleted.';
+
+  @override
+  String get progressResetTitle => 'Reset progress?';
+
+  @override
+  String get progressResetBody =>
+      'This clears all your weight history and chart progress. Are you sure?';
+
+  @override
+  String get progressResetButton => 'Reset';
+
+  @override
+  String get progressResetDone => 'Weight history cleared.';
+
+  @override
+  String get progressErrorReset => 'Could not reset progress. Try again.';
+
+  @override
+  String get progressCurrent => 'Current';
+
+  @override
+  String get progressChange => 'Change';
+
+  @override
+  String get progressTarget => 'Target';
+
+  @override
+  String progressTrend(String weight) {
+    return 'Trend $weight';
+  }
+
+  @override
+  String get progressDeleteTooltip => 'Delete weigh-in';
+
+  @override
+  String get progressEmptyTitle => 'No weight logged yet';
+
+  @override
+  String get progressEmptyBody =>
+      'Log your weight to see your progress. Your plan adjusts each time.';
+
+  @override
+  String get progressWeighInTitle => 'Log your weight';
+
+  @override
+  String get progressWeighInNote => 'Your plan adjusts to match.';
+
+  @override
+  String progressWeighInRange(String range) {
+    return 'Enter a weight between $range.';
+  }
+
+  @override
+  String get progressWeighInRangeAnd => ' and ';
+
+  @override
+  String get progressErrorSaveWeight =>
+      'Could not save your weight. Try again.';
+
+  @override
+  String progressWeightSavedTarget(int kcal) {
+    return 'Weight saved. New target: $kcal kcal.';
+  }
+
+  @override
+  String get progressWeightSaved => 'Weight saved.';
 }

@@ -6,6 +6,7 @@ import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/adaptive_formula_provider.dart';
@@ -108,7 +109,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
     );
   }
 
-  void _seedForm(UserProfile profile) {
+  void _seedForm(UserProfile profile, AppLocalizations l10n) {
     if (_loadedProfileUid == profile.uid) return;
 
     _loadedProfileUid = profile.uid;
@@ -117,13 +118,13 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
     _heightUnit = ref.read(heightUnitProvider);
     _height
       ..unit = _heightUnit
-      ..show(profile.heightCm);
+      ..show(profile.heightCm, l10n);
     _currentWeight
       ..unit = _weightUnit
-      ..show(profile.currentWeightKg);
+      ..show(profile.currentWeightKg, l10n);
     _targetWeight
       ..unit = _weightUnit
-      ..show(profile.targetWeightKg);
+      ..show(profile.targetWeightKg, l10n);
     _gender = profile.gender;
     _activityLevel = profile.activityLevel;
     _trainingFrequency = profile.trainingFrequency;
@@ -134,7 +135,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
   Future<void> _submit(UserProfile profile) async {
     if (!_formKey.currentState!.validate()) return;
     if (_gender == null) {
-      _showSnack('Select your gender.');
+      _showSnack(context.l10n.planSelectGender);
       return;
     }
 
@@ -161,20 +162,23 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
     if (!mounted) return;
 
     if (success) {
+      final saved = context.l10n.planSaved;
       Navigator.of(context).pop();
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Plan saved.')));
+      ).showSnackBar(SnackBar(content: Text(saved)));
       return;
     }
 
-    _showSnack('Could not save your plan. Try again.');
+    _showSnack(context.l10n.planErrorSave);
   }
 
   String? _weightError(WeightInput input) {
     final kg = input.value;
-    if (kg == null) return 'Required';
-    if (kg < 30 || kg > 300) return weightRange(30, 300, _weightUnit);
+    if (kg == null) return context.l10n.planRequired;
+    if (kg < 30 || kg > 300) {
+      return weightRange(30, 300, _weightUnit, context.l10n);
+    }
     return null;
   }
 
@@ -188,40 +192,41 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(userProfileProvider);
     final isSaving = ref.watch(profileControllerProvider).isLoading;
+    final l10n = context.l10n;
 
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(),
-      appBar: AppBar(title: Text('Plan Settings')),
+      appBar: AppBar(title: Text(l10n.planTitle)),
       body: profileAsync.when(
         data: (profile) {
           if (profile == null) {
             return Center(
               child: Text(
-                'Could not load your profile.',
+                l10n.planErrorLoad,
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             );
           }
 
-          _seedForm(profile);
+          _seedForm(profile, l10n);
           final preview = _preview(profile);
           final currentBmi = _currentBmi;
           final heightField = MeasureField(
             input: _height,
-            label: 'Height',
+            label: l10n.commonHeight,
             validator: () {
               final cm = _height.value;
-              if (cm == null) return 'Required';
+              if (cm == null) return l10n.planRequired;
               if (cm < 100 || cm > 250) {
-                return heightRange(100, 250, _heightUnit);
+                return heightRange(100, 250, _heightUnit, l10n);
               }
               return null;
             },
           );
           final weightField = MeasureField(
             input: _currentWeight,
-            label: 'Current weight',
+            label: l10n.commonCurrentWeight,
             validator: () => _weightError(_currentWeight),
           );
           final unitLabel = TextStyle(
@@ -242,7 +247,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        'Update your health plan',
+                        l10n.planHeading,
                         style: AppTheme.display.copyWith(
                           fontSize: 28,
                           color: AppColors.textPrimary,
@@ -250,7 +255,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        'Change anything below and your plan adjusts to match.',
+                        l10n.planSubtitle,
                         style: TextStyle(
                           fontSize: 15,
                           color: AppColors.textSecondary,
@@ -258,7 +263,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                         ),
                       ),
                       SizedBox(height: 28),
-                      const SectionLabel('PERSONAL DETAILS'),
+                      SectionLabel(l10n.planSectionPersonal),
                       TextFormField(
                         controller: _ageCtrl,
                         keyboardType: TextInputType.number,
@@ -267,21 +272,21 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                           FilteringTextInputFormatter.digitsOnly,
                         ],
                         decoration: InputDecoration(
-                          labelText: 'Age',
+                          labelText: l10n.commonAge,
                           prefixIcon: Icon(Icons.cake_outlined),
                         ),
                         validator: (value) {
                           final age = int.tryParse(value ?? '');
-                          if (age == null) return 'Enter your age.';
+                          if (age == null) return l10n.commonEnterAge;
                           if (age < 18 || age > 120) {
-                            return 'Valid age: 18–120.';
+                            return l10n.commonAgeRange;
                           }
                           return null;
                         },
                       ),
                       SizedBox(height: 18),
                       Text(
-                        'Gender',
+                        l10n.planGender,
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -292,49 +297,49 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                       Row(
                         children: [
                           GenderButton(
-                            label: 'Male',
+                            label: l10n.commonMale,
                             selected: _gender == Gender.male,
                             onTap: () => setState(() => _gender = Gender.male),
                           ),
                           SizedBox(width: 8),
                           GenderButton(
-                            label: 'Female',
+                            label: l10n.commonFemale,
                             selected: _gender == Gender.female,
                             onTap: () =>
                                 setState(() => _gender = Gender.female),
                           ),
                           SizedBox(width: 8),
                           GenderButton(
-                            label: 'Other',
+                            label: l10n.commonOther,
                             selected: _gender == Gender.other,
                             onTap: () => setState(() => _gender = Gender.other),
                           ),
                         ],
                       ),
                       SizedBox(height: 28),
-                      const SectionLabel('UNITS'),
-                      Text('Weight', style: unitLabel),
+                      SectionLabel(l10n.planSectionUnits),
+                      Text(l10n.planWeightUnit, style: unitLabel),
                       SizedBox(height: 10),
                       WeightUnitToggle(
                         unit: _weightUnit,
                         onChanged: (unit) => setState(() {
                           _weightUnit = unit;
-                          _currentWeight.switchTo(unit);
-                          _targetWeight.switchTo(unit);
+                          _currentWeight.switchTo(unit, l10n);
+                          _targetWeight.switchTo(unit, l10n);
                         }),
                       ),
                       SizedBox(height: 18),
-                      Text('Height', style: unitLabel),
+                      Text(l10n.commonHeight, style: unitLabel),
                       SizedBox(height: 10),
                       HeightUnitToggle(
                         unit: _heightUnit,
                         onChanged: (unit) => setState(() {
                           _heightUnit = unit;
-                          _height.switchTo(unit);
+                          _height.switchTo(unit, l10n);
                         }),
                       ),
                       SizedBox(height: 28),
-                      const SectionLabel('YOUR BODY'),
+                      SectionLabel(l10n.planSectionBody),
                       // Side by side when each is one box; stones or feet
                       // need the width.
                       if (!_height.twoBoxes && !_currentWeight.twoBoxes)
@@ -353,15 +358,15 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                       ],
                       SizedBox(height: 28),
                       if (currentBmi != null) ...[
-                        const SectionLabel('YOUR BMI'),
+                        SectionLabel(l10n.planSectionBmi),
                         _BmiCard(bmi: currentBmi),
                         SizedBox(height: 28),
                       ],
-                      const SectionLabel('YOUR GOAL'),
+                      SectionLabel(l10n.planSectionGoal),
                       if (_weightLossPace != WeightLossPace.maintain) ...[
                         MeasureField(
                           input: _targetWeight,
-                          label: 'Target weight',
+                          label: l10n.commonTargetWeight,
                           prefixIcon: Icon(Icons.flag_outlined),
                           textInputAction: TextInputAction.done,
                           validator: () {
@@ -370,7 +375,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                             final current = _currentWeight.value;
                             if (current != null &&
                                 _targetWeight.value! >= current) {
-                              return 'Must be less than your current weight';
+                              return l10n.commonTargetBelowCurrent;
                             }
                             return null;
                           },
@@ -385,7 +390,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                             ),
                           ),
                           child: Text(
-                            'Your target weight stays at your current weight.',
+                            l10n.planTargetStays,
                             style: TextStyle(
                               fontSize: 14,
                               color: AppColors.textSecondary,
@@ -395,9 +400,9 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                         ),
                       ],
                       SizedBox(height: 28),
-                      const SectionLabel('YOUR DAILY MOVEMENT'),
+                      SectionLabel(l10n.planSectionMovement),
                       Text(
-                        'Your normal day outside workouts.',
+                        l10n.planMovementNote,
                         style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
@@ -415,9 +420,9 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                         ),
                       ),
                       SizedBox(height: 20),
-                      const SectionLabel('HOW OFTEN DO YOU TRAIN?'),
+                      SectionLabel(l10n.planSectionTraining),
                       Text(
-                        'Structured workouts on top of your normal day.',
+                        l10n.planTrainingNote,
                         style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
@@ -436,9 +441,9 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                         ),
                       ),
                       SizedBox(height: 20),
-                      const SectionLabel('TRACK PROTEIN TOO?'),
+                      SectionLabel(l10n.planSectionProtein),
                       Text(
-                        'Protein helps keep muscle while you lose weight. Off hides it everywhere.',
+                        l10n.planProteinNote,
                         style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
@@ -446,17 +451,18 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                       ),
                       SizedBox(height: 12),
                       PillToggle<bool>(
-                        options: const [(true, 'Yes'), (false, 'No')],
+                        options: [
+                          (true, l10n.commonYes),
+                          (false, l10n.commonNo),
+                        ],
                         selected: _trackProtein,
                         onChanged: (value) =>
                             setState(() => _trackProtein = value),
                       ),
                       SizedBox(height: 28),
-                      const SectionLabel(
-                        'HOW FAST DO YOU WANT TO LOSE WEIGHT?',
-                      ),
+                      SectionLabel(l10n.planSectionPace),
                       Text(
-                        'Pace sets the calorie target. Target weight sets how long the plan takes.',
+                        l10n.planPaceNote,
                         style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
@@ -475,7 +481,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                         ),
                       ),
                       SizedBox(height: 20),
-                      const SectionLabel('PERSONAL ADJUSTMENT'),
+                      SectionLabel(l10n.planSectionAdjustment),
                       _AdaptiveSection(
                         preview: preview,
                         restarts: _detailsChanged(profile),
@@ -484,7 +490,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                       if (preview != null) ...[
                         HealthPlanPreviewCard(
                           preview: preview,
-                          title: 'Updated plan',
+                          title: l10n.planUpdatedPlan,
                           weightUnit: _weightUnit,
                         ),
                         SizedBox(height: 20),
@@ -505,7 +511,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                                   ),
                                 )
                               : Text(
-                                  'Save plan',
+                                  l10n.planSave,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -524,7 +530,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
             Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (_, _) => Center(
           child: Text(
-            'Could not load your profile.',
+            l10n.planErrorLoad,
             style: TextStyle(color: AppColors.textSecondary),
           ),
         ),
@@ -545,6 +551,7 @@ class _AdaptiveSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final plus = ref.watch(plusProvider);
+    final l10n = context.l10n;
     final muted = TextStyle(
       fontSize: 13,
       height: 1.35,
@@ -562,33 +569,32 @@ class _AdaptiveSection extends ConsumerWidget {
           contentPadding: EdgeInsets.zero,
           title: Row(
             children: [
-              const Flexible(child: Text('Adaptive formula')),
+              Flexible(child: Text(l10n.adaptiveTitle)),
               if (!plus) ...[
                 const SizedBox(width: 6),
                 const PlusStar(size: 20),
               ],
             ],
           ),
-          subtitle: const Text(
-            'Learns from your weigh-ins and adjusts your target each Monday.',
-          ),
+          subtitle: Text(l10n.planAdaptiveNote),
           onTap: plus ? null : () => showPlusPaywall(context),
         ),
         if (plus) ...[
-          if (preview != null) Text(adaptiveSumLine(preview), style: muted),
+          if (preview != null)
+            Text(adaptiveSumLine(preview, l10n), style: muted),
           if (progress != null)
-            if (adaptivePausedLine(progress) case final paused?) ...[
+            if (adaptivePausedLine(progress, l10n) case final paused?) ...[
               const SizedBox(height: 4),
               Text(paused, style: muted),
             ],
           if (restarts) ...[
             const SizedBox(height: 4),
-            Text('Saving starts it again from your new plan.', style: muted),
+            Text(l10n.planAdaptiveRestarts, style: muted),
           ],
           TextButton(
             onPressed: () => showAdaptiveIntro(context),
             style: TextButton.styleFrom(padding: EdgeInsets.zero),
-            child: const Text('How it works'),
+            child: Text(l10n.adaptiveHowItWorks),
           ),
         ],
       ],
@@ -604,17 +610,23 @@ class _BmiCard extends StatelessWidget {
   static const double _minBmi = 12;
   static const double _maxBmi = 40;
 
-  _BmiCategory get _category {
+  _BmiCategory _category(AppLocalizations l10n) {
     if (bmi < 18.5) {
-      return _BmiCategory(label: 'Underweight', color: AppColors.info);
+      return _BmiCategory(
+        label: l10n.planBmiUnderweight,
+        color: AppColors.info,
+      );
     }
     if (bmi < 25) {
-      return _BmiCategory(label: 'Healthy range', color: AppColors.veryGood);
+      return _BmiCategory(
+        label: l10n.planBmiHealthy,
+        color: AppColors.veryGood,
+      );
     }
     if (bmi < 30) {
-      return _BmiCategory(label: 'Overweight', color: AppColors.bad);
+      return _BmiCategory(label: l10n.planBmiOverweight, color: AppColors.bad);
     }
-    return _BmiCategory(label: 'Obese range', color: AppColors.veryBad);
+    return _BmiCategory(label: l10n.planBmiObese, color: AppColors.veryBad);
   }
 
   double get _markerPosition {
@@ -624,7 +636,8 @@ class _BmiCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final category = _category;
+    final l10n = context.l10n;
+    final category = _category(l10n);
 
     return AppCard(
       child: Column(
@@ -638,7 +651,7 @@ class _BmiCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Your BMI',
+                      l10n.planBmiTitle,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -647,7 +660,7 @@ class _BmiCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      bmi.toStringAsFixed(1),
+                      l10n.decimal(bmi),
                       style: AppTheme.display.copyWith(
                         fontSize: 36,
                         color: AppColors.textPrimary,
@@ -802,7 +815,7 @@ class _BmiScaleLabels extends StatelessWidget {
               Positioned(
                 left: leftFor(18.5),
                 width: labelWidth,
-                child: const _BmiTickLabel('18.5'),
+                child: _BmiTickLabel(context.l10n.decimal(18.5)),
               ),
               Positioned(
                 left: leftFor(25),

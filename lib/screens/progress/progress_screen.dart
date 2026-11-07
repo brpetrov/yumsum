@@ -3,12 +3,12 @@ import 'dart:math' as math;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/weight_trend.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/models/weight_entry.dart';
@@ -29,15 +29,16 @@ class ProgressScreen extends ConsumerWidget {
     final entriesAsync = ref.watch(weightEntriesProvider);
     final profile = ref.watch(userProfileProvider).valueOrNull;
     final unit = ref.watch(weightUnitProvider);
+    final l10n = context.l10n;
 
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(),
       appBar: AppBar(
         // Shrinks rather than cuts off beside Log weight on narrow phones.
-        title: const FittedBox(
+        title: FittedBox(
           fit: BoxFit.scaleDown,
-          child: Text('Weight & Progress'),
+          child: Text(l10n.progressTitle),
         ),
         actions: [
           // The empty state has its own button, so only show this one once
@@ -46,7 +47,7 @@ class ProgressScreen extends ConsumerWidget {
             TextButton.icon(
               onPressed: () => _logWeight(context, ref),
               icon: const Icon(Icons.add_rounded),
-              label: const Text('Log weight'),
+              label: Text(l10n.progressLogWeight),
             ),
           const SizedBox(width: 8),
         ],
@@ -93,7 +94,7 @@ class ProgressScreen extends ConsumerWidget {
                         Padding(
                           padding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
                           child: Text(
-                            'History',
+                            l10n.progressHistory,
                             style: AppTheme.display.copyWith(
                               fontSize: 21,
                               color: AppColors.textPrimary,
@@ -114,7 +115,7 @@ class ProgressScreen extends ConsumerWidget {
                             foregroundColor: AppColors.error,
                           ),
                           icon: const Icon(Icons.restart_alt_rounded),
-                          label: const Text('Reset progress'),
+                          label: Text(l10n.progressReset),
                         ),
                       ),
                     );
@@ -134,7 +135,7 @@ class ProgressScreen extends ConsumerWidget {
             Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (_, _) => Center(
           child: Text(
-            'Could not load your weight history.',
+            l10n.progressErrorLoad,
             style: TextStyle(color: AppColors.textSecondary),
           ),
         ),
@@ -146,10 +147,13 @@ class ProgressScreen extends ConsumerWidget {
     final result = await showLogWeightDialog(context);
     if (!context.mounted || result == null) return;
 
+    final l10n = context.l10n;
     final message = result.targetChanged
-        ? 'Weight saved. New target: ${result.newCalorieTarget} kcal '
-              '(was ${result.previousCalorieTarget}).'
-        : 'Weight saved. Your target stays at ${result.newCalorieTarget} kcal.';
+        ? l10n.progressSavedNewTarget(
+            result.newCalorieTarget,
+            result.previousCalorieTarget,
+          )
+        : l10n.progressSavedSameTarget(result.newCalorieTarget);
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
@@ -166,25 +170,31 @@ class ProgressScreen extends ConsumerWidget {
         ? entries[entries.length - 2]
         : null;
     final unit = ref.read(weightUnitProvider);
+    final l10n = context.l10n;
+    final weight = formatWeight(entry.weightKg, unit, l10n);
+    final date = l10n.shortWeekdayDayMonth(entry.date);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete weigh-in?'),
+        title: Text(l10n.progressDeleteTitle),
         content: Text(
-          'Remove ${formatWeight(entry.weightKg, unit)} from '
-          '${DateFormat('EEE, d MMM').format(entry.date)}?'
-          '${previous == null ? '' : ' Your plan adjusts back to '
-                    '${formatWeight(previous.weightKg, unit)}.'}',
+          previous == null
+              ? l10n.progressDeleteBody(weight, date)
+              : l10n.progressDeleteBodyBack(
+                  weight,
+                  date,
+                  formatWeight(previous.weightKg, unit, l10n),
+                ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Delete'),
+            child: Text(l10n.commonDelete),
           ),
         ],
       ),
@@ -196,11 +206,13 @@ class ProgressScreen extends ConsumerWidget {
         .deleteEntry(entry);
     if (!context.mounted) return;
     final message = ref.read(weightLogControllerProvider).hasError
-        ? 'Could not delete the weigh-in. Try again.'
+        ? l10n.progressErrorDelete
         : result != null && result.targetChanged
-        ? 'Weigh-in deleted. New target: ${result.newCalorieTarget} kcal '
-              '(was ${result.previousCalorieTarget}).'
-        : 'Weigh-in deleted.';
+        ? l10n.progressDeletedNewTarget(
+            result.newCalorieTarget,
+            result.previousCalorieTarget,
+          )
+        : l10n.progressDeleted;
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
@@ -208,23 +220,21 @@ class ProgressScreen extends ConsumerWidget {
 
   /// Clears the chart and history so progress counts from the next weigh-in.
   Future<void> _resetHistory(BuildContext context, WidgetRef ref) async {
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Reset progress?'),
-        content: const Text(
-          'This clears all your weight history and chart progress. Are you '
-          'sure?',
-        ),
+        title: Text(l10n.progressResetTitle),
+        content: Text(l10n.progressResetBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Reset'),
+            child: Text(l10n.progressResetButton),
           ),
         ],
       ),
@@ -237,11 +247,7 @@ class ProgressScreen extends ConsumerWidget {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          ok
-              ? 'Weight history cleared.'
-              : 'Could not reset progress. Try again.',
-        ),
+        content: Text(ok ? l10n.progressResetDone : l10n.progressErrorReset),
       ),
     );
   }
@@ -264,27 +270,28 @@ class _StatsHeader extends StatelessWidget {
     final current = entries.last.weightKg;
     final delta = current - start;
     final target = profile?.targetWeightKg;
+    final l10n = context.l10n;
 
     return AppCard(
       child: Row(
         children: [
           Expanded(
             child: _StatBlock(
-              label: 'Current',
-              value: formatWeight(current, unit),
+              label: l10n.progressCurrent,
+              value: formatWeight(current, unit, l10n),
             ),
           ),
           Expanded(
             child: _StatBlock(
-              label: 'Change',
-              value: formatWeightChange(delta, unit),
+              label: l10n.progressChange,
+              value: formatWeightChange(delta, unit, l10n),
               highlight: delta <= 0 ? AppColors.veryGood : AppColors.bad,
             ),
           ),
           Expanded(
             child: _StatBlock(
-              label: 'Target',
-              value: target != null ? formatWeight(target, unit) : '—',
+              label: l10n.progressTarget,
+              value: target != null ? formatWeight(target, unit, l10n) : '—',
             ),
           ),
         ],
@@ -343,6 +350,7 @@ class _WeightChartCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final firstDate = entries.first.date;
+    final l10n = context.l10n;
 
     double xFor(WeightEntry entry) =>
         entry.date.difference(firstDate).inDays.toDouble();
@@ -350,7 +358,8 @@ class _WeightChartCard extends StatelessWidget {
     // Drawn in kg, or in pounds for pounds and stones.
     final metric = unit == WeightUnit.kg;
     double yFor(double kg) => metric ? kg : kgToLb(kg);
-    String weightAt(double y) => formatWeight(metric ? y : lbToKg(y), unit);
+    String weightAt(double y) =>
+        formatWeight(metric ? y : lbToKg(y), unit, l10n);
 
     final spots = entries
         .map((entry) => FlSpot(xFor(entry), yFor(entry.weightKg)))
@@ -433,8 +442,8 @@ class _WeightChartCard extends StatelessWidget {
                           stoneStep == null
                               ? value.toStringAsFixed(0)
                               : pounds % 14 == 0
-                              ? '${pounds ~/ 14} st'
-                              : '${pounds ~/ 14} st ${pounds % 14}',
+                              ? l10n.unitsStAxis(pounds ~/ 14)
+                              : l10n.unitsStLbAxis(pounds ~/ 14, pounds % 14),
                           style: TextStyle(
                             fontSize: 11,
                             color: AppColors.textSecondary,
@@ -461,7 +470,7 @@ class _WeightChartCard extends StatelessWidget {
                         return Padding(
                           padding: const EdgeInsets.only(top: 6),
                           child: Text(
-                            DateFormat('d MMM').format(date),
+                            l10n.shortDayMonth(date),
                             style: TextStyle(
                               fontSize: 10,
                               color: AppColors.textSecondary,
@@ -489,7 +498,7 @@ class _WeightChartCard extends StatelessWidget {
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.veryGood,
                               ),
-                              labelResolver: (_) => 'Target',
+                              labelResolver: (_) => l10n.progressTarget,
                             ),
                           ),
                         ],
@@ -503,7 +512,7 @@ class _WeightChartCard extends StatelessWidget {
                       for (final spot in touched)
                         LineTooltipItem(
                           spot.barIndex == 0
-                              ? 'Trend ${weightAt(spot.y)}'
+                              ? l10n.progressTrend(weightAt(spot.y))
                               : weightAt(spot.y),
                           TextStyle(
                             color: AppColors.veryGood,
@@ -593,6 +602,7 @@ class _WeighInRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: AppCard(
@@ -601,7 +611,7 @@ class _WeighInRow extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                DateFormat('EEE, d MMM yyyy').format(entry.date),
+                l10n.date(entry.date, 'EEE, d MMM yyyy'),
                 style: TextStyle(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w600,
@@ -618,7 +628,7 @@ class _WeighInRow extends StatelessWidget {
               const SizedBox(width: 8),
             ],
             Text(
-              formatWeight(entry.weightKg, unit),
+              formatWeight(entry.weightKg, unit, l10n),
               style: AppTheme.display.copyWith(
                 fontSize: 18,
                 color: AppColors.textPrimary,
@@ -627,7 +637,7 @@ class _WeighInRow extends StatelessWidget {
             const SizedBox(width: 4),
             IconButton(
               onPressed: onDelete,
-              tooltip: 'Delete weigh-in',
+              tooltip: l10n.progressDeleteTooltip,
               iconSize: 20,
               color: AppColors.textSecondary,
               icon: const Icon(Icons.delete_outline_rounded),
@@ -646,6 +656,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -655,7 +666,7 @@ class _EmptyState extends StatelessWidget {
             const AppLogoMark(size: 96),
             const SizedBox(height: 20),
             Text(
-              'No weight logged yet',
+              l10n.progressEmptyTitle,
               style: AppTheme.display.copyWith(
                 fontSize: 24,
                 color: AppColors.textPrimary,
@@ -663,8 +674,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Log your weight to see your progress. Your plan adjusts each '
-              'time.',
+              l10n.progressEmptyBody,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
@@ -676,7 +686,7 @@ class _EmptyState extends StatelessWidget {
             FilledButton.icon(
               onPressed: onLogWeight,
               icon: const Icon(Icons.add_rounded),
-              label: const Text('Log weight'),
+              label: Text(l10n.progressLogWeight),
             ),
           ],
         ),

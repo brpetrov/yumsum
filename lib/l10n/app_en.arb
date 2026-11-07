@@ -2784,5 +2784,866 @@
   "shortcutLogVoice": "Log by voice",
   "@shortcutLogVoice": {
     "description": "The app icon's long-press shortcut that starts a voice log."
+  },
+  "unitsKg": "{value} kg",
+  "@unitsKg": {
+    "description": "A weight in kg: \"80.5 kg\", or a range \"30–300 kg\". {value} comes formatted.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "unitsLb": "{value} lb",
+  "@unitsLb": {
+    "description": "A weight in pounds: \"176.4 lb\", or a range \"67–661 lb\". {value} comes formatted.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "unitsStLb": "{stones} st {pounds} lb",
+  "@unitsStLb": {
+    "description": "A weight in stones and pounds: \"12 st 8 lb\".",
+    "placeholders": {
+      "stones": {
+        "type": "int"
+      },
+      "pounds": {
+        "type": "int"
+      }
+    }
+  },
+  "unitsCm": "{value} cm",
+  "@unitsCm": {
+    "description": "A height in cm: \"180 cm\", or a range \"100–250 cm\".",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "unitsFtIn": "{feet} ft {inches} in",
+  "@unitsFtIn": {
+    "description": "A height in feet and inches: \"5 ft 11 in\".",
+    "placeholders": {
+      "feet": {
+        "type": "int"
+      },
+      "inches": {
+        "type": "int"
+      }
+    }
+  },
+  "unitsStAxis": "{stones} st",
+  "@unitsStAxis": {
+    "description": "Weight chart in stones: a label on the side on a whole stone, \"12 st\".",
+    "placeholders": {
+      "stones": {
+        "type": "int"
+      }
+    }
+  },
+  "unitsStLbAxis": "{stones} st {pounds}",
+  "@unitsStLbAxis": {
+    "description": "Weight chart in stones: a label on the side between whole stones, \"12 st 7\" (pounds left out for room).",
+    "placeholders": {
+      "stones": {
+        "type": "int"
+      },
+      "pounds": {
+        "type": "int"
+      }
+    }
+  },
+  "unitsKgLabel": "kg",
+  "@unitsKgLabel": {
+    "description": "The kilogram on its own: the unit toggle and the weight box's suffix."
+  },
+  "unitsLbLabel": "lb",
+  "@unitsLbLabel": {
+    "description": "The pound on its own: the unit toggle and the pounds box's suffix."
+  },
+  "unitsStLabel": "st",
+  "@unitsStLabel": {
+    "description": "The stone on its own: the stones box's suffix."
+  },
+  "unitsCmLabel": "cm",
+  "@unitsCmLabel": {
+    "description": "The centimetre on its own: the unit toggle and the height box's suffix."
+  },
+  "unitsFtLabel": "ft",
+  "@unitsFtLabel": {
+    "description": "The foot on its own: the feet box's suffix."
+  },
+  "unitsInLabel": "in",
+  "@unitsInLabel": {
+    "description": "The inch on its own: the inches box's suffix."
+  },
+  "unitsStLbToggle": "st & lb",
+  "@unitsStLbToggle": {
+    "description": "Weight unit toggle: stones and pounds."
+  },
+  "unitsFtInToggle": "ft & in",
+  "@unitsFtInToggle": {
+    "description": "Height unit toggle: feet and inches."
+  },
+  "unitsPounds": "Pounds",
+  "@unitsPounds": {
+    "description": "Label of the second weight box when typing stones and pounds."
+  },
+  "unitsInches": "Inches",
+  "@unitsInches": {
+    "description": "Label of the second height box when typing feet and inches."
+  },
+  "commonYes": "Yes",
+  "@commonYes": {
+    "description": "A yes option on a two-way toggle."
+  },
+  "commonNo": "No",
+  "@commonNo": {
+    "description": "A no option on a two-way toggle."
+  },
+  "commonAge": "Age",
+  "@commonAge": {
+    "description": "Onboarding and Plan Settings: label of the age box."
+  },
+  "commonHeight": "Height",
+  "@commonHeight": {
+    "description": "Onboarding and Plan Settings: label of the height box, and the height unit toggle's heading."
+  },
+  "commonCurrentWeight": "Current weight",
+  "@commonCurrentWeight": {
+    "description": "Onboarding, Plan Settings and the weigh-in dialog: label of the weight box."
+  },
+  "commonTargetWeight": "Target weight",
+  "@commonTargetWeight": {
+    "description": "Onboarding and Plan Settings: label of the target weight box."
+  },
+  "commonEnterAge": "Enter your age.",
+  "@commonEnterAge": {
+    "description": "Onboarding and Plan Settings: the age box is empty."
+  },
+  "commonAgeRange": "Valid age: 18–120.",
+  "@commonAgeRange": {
+    "description": "Onboarding and Plan Settings: the age typed is out of range."
+  },
+  "commonTargetBelowCurrent": "Must be less than your current weight",
+  "@commonTargetBelowCurrent": {
+    "description": "Onboarding and Plan Settings: the target weight is not below the current one."
+  },
+  "commonMale": "Male",
+  "@commonMale": {
+    "description": "Onboarding and Plan Settings: gender button."
+  },
+  "commonFemale": "Female",
+  "@commonFemale": {
+    "description": "Onboarding and Plan Settings: gender button."
+  },
+  "commonOther": "Other",
+  "@commonOther": {
+    "description": "Onboarding and Plan Settings: gender button."
+  },
+  "onboardingEnterHeight": "Enter your height.",
+  "@onboardingEnterHeight": {
+    "description": "Onboarding: the height box is empty."
+  },
+  "onboardingEnterWeight": "Enter your weight.",
+  "@onboardingEnterWeight": {
+    "description": "Onboarding: the weight box is empty."
+  },
+  "onboardingNameTitle": "What's your name?",
+  "@onboardingNameTitle": {
+    "description": "Onboarding card heading."
+  },
+  "onboardingName": "Name",
+  "@onboardingName": {
+    "description": "Onboarding: label of the name box."
+  },
+  "onboardingGenderTitle": "Are you…",
+  "@onboardingGenderTitle": {
+    "description": "Onboarding card heading, over the Male, Female and Other buttons."
+  },
+  "onboardingAgeTitle": "How old are you?",
+  "@onboardingAgeTitle": {
+    "description": "Onboarding card heading."
+  },
+  "onboardingHeightTitle": "How tall are you?",
+  "@onboardingHeightTitle": {
+    "description": "Onboarding card heading."
+  },
+  "onboardingWeightTitle": "What do you weigh now?",
+  "@onboardingWeightTitle": {
+    "description": "Onboarding card heading."
+  },
+  "onboardingGoalTitle": "What's your goal?",
+  "@onboardingGoalTitle": {
+    "description": "Onboarding card heading."
+  },
+  "onboardingGoalBody": "A calorie is the energy in food. Eat a little less than your body burns and you lose weight, steadily and safely.",
+  "@onboardingGoalBody": {
+    "description": "Onboarding: the line under What's your goal?"
+  },
+  "onboardingLoseWeight": "Lose weight",
+  "@onboardingLoseWeight": {
+    "description": "Onboarding: goal toggle option."
+  },
+  "onboardingKeepWeight": "Keep my weight",
+  "@onboardingKeepWeight": {
+    "description": "Onboarding: goal toggle option."
+  },
+  "onboardingTargetTitle": "What weight are you aiming for?",
+  "@onboardingTargetTitle": {
+    "description": "Onboarding card heading."
+  },
+  "onboardingActivityTitle": "How active is your normal day?",
+  "@onboardingActivityTitle": {
+    "description": "Onboarding card heading, over the daily movement cards."
+  },
+  "onboardingActivityBody": "Outside workouts.",
+  "@onboardingActivityBody": {
+    "description": "Onboarding: the line under How active is your normal day?"
+  },
+  "onboardingTrainingTitle": "Do you train on top of that?",
+  "@onboardingTrainingTitle": {
+    "description": "Onboarding card heading, over the training cards."
+  },
+  "onboardingTrainingBody": "Structured workouts, if any.",
+  "@onboardingTrainingBody": {
+    "description": "Onboarding: the line under Do you train on top of that?"
+  },
+  "onboardingProteinTitle": "Track protein too?",
+  "@onboardingProteinTitle": {
+    "description": "Onboarding card heading, over a Yes/No toggle."
+  },
+  "onboardingProteinBody": "Protein keeps you full and looks after your muscle. YumSum works it out for each meal you log.",
+  "@onboardingProteinBody": {
+    "description": "Onboarding: the line under Track protein too?"
+  },
+  "onboardingPlanTitle": "Your plan is ready!",
+  "@onboardingPlanTitle": {
+    "description": "Onboarding: the last card's heading. One of the two places allowed an exclamation mark."
+  },
+  "onboardingPlanCardTitle": "Your plan",
+  "@onboardingPlanCardTitle": {
+    "description": "Onboarding: title of the plan card on the last card."
+  },
+  "onboardingPlanNote": "You can go over all of this again, and get into more detail, in Plan Settings.",
+  "@onboardingPlanNote": {
+    "description": "Onboarding: under the plan card."
+  },
+  "onboardingErrorSave": "Something went wrong. Try again.",
+  "@onboardingErrorSave": {
+    "description": "Onboarding: saving the profile failed."
+  },
+  "onboardingBack": "Back",
+  "@onboardingBack": {
+    "description": "Onboarding: goes to the card before."
+  },
+  "onboardingNext": "Next",
+  "@onboardingNext": {
+    "description": "Onboarding: the big button to the next card."
+  },
+  "onboardingStart": "Start",
+  "@onboardingStart": {
+    "description": "Onboarding: the big button on the last card, which saves and opens Home."
+  },
+  "planPreviewMaintenance": "Maintenance plan",
+  "@planPreviewMaintenance": {
+    "description": "Plan card: the pace line when keeping weight."
+  },
+  "planPreviewFloor": "Minimum calorie floor",
+  "@planPreviewFloor": {
+    "description": "Plan card: the pace line when the target is held at the minimum."
+  },
+  "planPreviewSafe": "Sustainable pace",
+  "@planPreviewSafe": {
+    "description": "Plan card: the pace line, green."
+  },
+  "planPreviewCaution": "Faster pace",
+  "@planPreviewCaution": {
+    "description": "Plan card: the pace line, amber."
+  },
+  "planPreviewWarning": "Very aggressive",
+  "@planPreviewWarning": {
+    "description": "Plan card: the pace line, red."
+  },
+  "planPreviewMaintenanceNote": "No calorie deficit is applied.",
+  "@planPreviewMaintenanceNote": {
+    "description": "Plan card: under Maintenance plan."
+  },
+  "planPreviewFloorNote": "This pace would go below the minimum, so the goal date moves later.",
+  "@planPreviewFloorNote": {
+    "description": "Plan card: under Minimum calorie floor."
+  },
+  "planPreviewSafeNote": "A moderate deficit from estimated maintenance.",
+  "@planPreviewSafeNote": {
+    "description": "Plan card: under Sustainable pace."
+  },
+  "planPreviewCautionNote": "This needs consistency and may feel restrictive.",
+  "@planPreviewCautionNote": {
+    "description": "Plan card: under Faster pace."
+  },
+  "planPreviewWarningNote": "Consider a slower pace if this feels hard to maintain.",
+  "@planPreviewWarningNote": {
+    "description": "Plan card: under Very aggressive."
+  },
+  "planPreviewMaintain": "Maintain",
+  "@planPreviewMaintain": {
+    "description": "Plan card: the weekly loss and goal date when keeping weight."
+  },
+  "planPreviewPerWeek": "{amount}/wk",
+  "@planPreviewPerWeek": {
+    "description": "Plan card: the weekly loss, \"0.5 kg/wk\". {amount} is formatted in the user's unit.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "planPreviewDailyTarget": "Daily target",
+  "@planPreviewDailyTarget": {
+    "description": "Plan card: small label over the calories a day; a third of the card wide."
+  },
+  "planPreviewWeeklyLoss": "Weekly loss",
+  "@planPreviewWeeklyLoss": {
+    "description": "Plan card: small label over the weekly loss; a third of the card wide."
+  },
+  "planPreviewGoalBy": "Goal by",
+  "@planPreviewGoalBy": {
+    "description": "Plan card: small label over the date the target weight is reached; a third of the card wide."
+  },
+  "planPreviewInfoTooltip": "How this is calculated",
+  "@planPreviewInfoTooltip": {
+    "description": "Plan card: tooltip of the info button."
+  },
+  "planInfoTitle": "How calories are estimated",
+  "@planInfoTitle": {
+    "description": "Plan card's info dialog: title."
+  },
+  "planInfoBody": "First we estimate your resting burn from weight, height, age, and sex. Then we add your daily movement and training to estimate maintenance.",
+  "@planInfoBody": {
+    "description": "Plan card's info dialog: the text over the sum."
+  },
+  "planInfoResting": "Resting burn",
+  "@planInfoResting": {
+    "description": "Plan card's info dialog: a line's label, 118 wide."
+  },
+  "planInfoMovement": "Daily movement",
+  "@planInfoMovement": {
+    "description": "Plan card's info dialog: a line's label, 118 wide."
+  },
+  "planInfoTraining": "Training bonus",
+  "@planInfoTraining": {
+    "description": "Plan card's info dialog: a line's label, 118 wide."
+  },
+  "planInfoActivity": "Combined activity",
+  "@planInfoActivity": {
+    "description": "Plan card's info dialog: a line's label, 118 wide."
+  },
+  "planInfoMaintenance": "Maintenance",
+  "@planInfoMaintenance": {
+    "description": "Plan card's info dialog: a line's label, 118 wide."
+  },
+  "planInfoAdaptive": "Adaptive",
+  "@planInfoAdaptive": {
+    "description": "Plan card's info dialog: the Adaptive formula's line label, 118 wide."
+  },
+  "planInfoTarget": "Target",
+  "@planInfoTarget": {
+    "description": "Plan card's info dialog: the calorie target's line label, 118 wide."
+  },
+  "planInfoKcalPerDay": "{kcal} kcal/day",
+  "@planInfoKcalPerDay": {
+    "description": "Plan card's info dialog: calories a day, also at the end of a sum (\"1800 - 500 = 1300 kcal/day\").",
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
+  },
+  "planInfoAtMinimum": "{kcal} kcal/day, your minimum",
+  "@planInfoAtMinimum": {
+    "description": "Plan card's info dialog: the target when held at the minimum.",
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
+  },
+  "planInfoFloorNote": "This pace would go below the minimum, so your target stays at the minimum and the goal date moves later.",
+  "@planInfoFloorNote": {
+    "description": "Plan card's info dialog: under the sum when the target is held at the minimum."
+  },
+  "planTitle": "Plan Settings",
+  "@planTitle": {
+    "description": "Plan Settings: the page title."
+  },
+  "planErrorLoad": "Could not load your profile.",
+  "@planErrorLoad": {
+    "description": "Plan Settings: the profile did not load."
+  },
+  "planSelectGender": "Select your gender.",
+  "@planSelectGender": {
+    "description": "Plan Settings: saving with no gender chosen."
+  },
+  "planSaved": "Plan saved.",
+  "@planSaved": {
+    "description": "Plan Settings: after saving."
+  },
+  "planErrorSave": "Could not save your plan. Try again.",
+  "@planErrorSave": {
+    "description": "Plan Settings: saving failed."
+  },
+  "planRequired": "Required",
+  "@planRequired": {
+    "description": "Plan Settings: under an empty height or weight box."
+  },
+  "planHeading": "Update your health plan",
+  "@planHeading": {
+    "description": "Plan Settings: the heading at the top."
+  },
+  "planSubtitle": "Change anything below and your plan adjusts to match.",
+  "@planSubtitle": {
+    "description": "Plan Settings: under the heading."
+  },
+  "planSectionPersonal": "PERSONAL DETAILS",
+  "@planSectionPersonal": {
+    "description": "Plan Settings: section label, in capitals."
+  },
+  "planGender": "Gender",
+  "@planGender": {
+    "description": "Plan Settings: over the gender buttons."
+  },
+  "planSectionUnits": "UNITS",
+  "@planSectionUnits": {
+    "description": "Plan Settings: section label, in capitals."
+  },
+  "planWeightUnit": "Weight",
+  "@planWeightUnit": {
+    "description": "Plan Settings: over the weight unit toggle."
+  },
+  "planSectionBody": "YOUR BODY",
+  "@planSectionBody": {
+    "description": "Plan Settings: section label, in capitals."
+  },
+  "planSectionBmi": "YOUR BMI",
+  "@planSectionBmi": {
+    "description": "Plan Settings: section label, in capitals."
+  },
+  "planSectionGoal": "YOUR GOAL",
+  "@planSectionGoal": {
+    "description": "Plan Settings: section label, in capitals."
+  },
+  "planTargetStays": "Your target weight stays at your current weight.",
+  "@planTargetStays": {
+    "description": "Plan Settings: in place of the target box when keeping weight."
+  },
+  "planSectionMovement": "YOUR DAILY MOVEMENT",
+  "@planSectionMovement": {
+    "description": "Plan Settings: section label, in capitals."
+  },
+  "planMovementNote": "Your normal day outside workouts.",
+  "@planMovementNote": {
+    "description": "Plan Settings: under YOUR DAILY MOVEMENT."
+  },
+  "planSectionTraining": "HOW OFTEN DO YOU TRAIN?",
+  "@planSectionTraining": {
+    "description": "Plan Settings: section label, in capitals."
+  },
+  "planTrainingNote": "Structured workouts on top of your normal day.",
+  "@planTrainingNote": {
+    "description": "Plan Settings: under HOW OFTEN DO YOU TRAIN?"
+  },
+  "planSectionProtein": "TRACK PROTEIN TOO?",
+  "@planSectionProtein": {
+    "description": "Plan Settings: section label, in capitals."
+  },
+  "planProteinNote": "Protein helps keep muscle while you lose weight. Off hides it everywhere.",
+  "@planProteinNote": {
+    "description": "Plan Settings: under TRACK PROTEIN TOO?"
+  },
+  "planSectionPace": "HOW FAST DO YOU WANT TO LOSE WEIGHT?",
+  "@planSectionPace": {
+    "description": "Plan Settings: section label, in capitals."
+  },
+  "planPaceNote": "Pace sets the calorie target. Target weight sets how long the plan takes.",
+  "@planPaceNote": {
+    "description": "Plan Settings: under the pace section label."
+  },
+  "planSectionAdjustment": "PERSONAL ADJUSTMENT",
+  "@planSectionAdjustment": {
+    "description": "Plan Settings: section label over the Adaptive formula, in capitals."
+  },
+  "planUpdatedPlan": "Updated plan",
+  "@planUpdatedPlan": {
+    "description": "Plan Settings: title of the plan card."
+  },
+  "planSave": "Save plan",
+  "@planSave": {
+    "description": "Plan Settings: the save button."
+  },
+  "planAdaptiveNote": "Learns from your weigh-ins and adjusts your target each Monday.",
+  "@planAdaptiveNote": {
+    "description": "Plan Settings: under Adaptive formula."
+  },
+  "planAdaptiveRestarts": "Saving starts it again from your new plan.",
+  "@planAdaptiveRestarts": {
+    "description": "Plan Settings: under the Adaptive formula when a change will start it over."
+  },
+  "planBmiUnderweight": "Underweight",
+  "@planBmiUnderweight": {
+    "description": "Plan Settings: BMI badge."
+  },
+  "planBmiHealthy": "Healthy range",
+  "@planBmiHealthy": {
+    "description": "Plan Settings: BMI badge."
+  },
+  "planBmiOverweight": "Overweight",
+  "@planBmiOverweight": {
+    "description": "Plan Settings: BMI badge."
+  },
+  "planBmiObese": "Obese range",
+  "@planBmiObese": {
+    "description": "Plan Settings: BMI badge."
+  },
+  "planBmiTitle": "Your BMI",
+  "@planBmiTitle": {
+    "description": "Plan Settings: over the BMI number."
+  },
+  "adaptiveTitle": "Adaptive formula",
+  "@adaptiveTitle": {
+    "description": "The Adaptive formula's name as a heading: Plan Settings and Weight & Progress."
+  },
+  "adaptiveHowItWorks": "How it works",
+  "@adaptiveHowItWorks": {
+    "description": "The Adaptive formula: opens its explanation."
+  },
+  "adaptiveTryNote": "A customised formula tailored just for you. Adapting with time and your weigh-ins.",
+  "@adaptiveTryNote": {
+    "description": "Weight & Progress, without YumSum Star: under the Adaptive formula button."
+  },
+  "adaptiveOn": "On",
+  "@adaptiveOn": {
+    "description": "Weight & Progress: the green chip beside Adaptive formula."
+  },
+  "adaptiveBurnFact": "You burn {kcal} a day",
+  "@adaptiveBurnFact": {
+    "description": "Weight & Progress: the Adaptive formula's first fact. {kcal} is shown big, e.g. \"2440 kcal\".",
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "adaptiveTargetFact": "Your target is {kcal} a day",
+  "@adaptiveTargetFact": {
+    "description": "Weight & Progress: the Adaptive formula's second fact. {kcal} is shown big, e.g. \"1940 kcal\".",
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "adaptiveBurnLearnt": "Learnt from your weigh-ins and meals.",
+  "@adaptiveBurnLearnt": {
+    "description": "Weight & Progress: under You burn, once measured."
+  },
+  "adaptiveBurnFirst": "A first estimate. It learns as you weigh in.",
+  "@adaptiveBurnFirst": {
+    "description": "Weight & Progress: under You burn, before it is measured."
+  },
+  "adaptiveTargetKeep": "To keep your weight steady.",
+  "@adaptiveTargetKeep": {
+    "description": "Weight & Progress: under Your target, when keeping weight."
+  },
+  "adaptiveTargetLose": "To lose {amount} a week.",
+  "@adaptiveTargetLose": {
+    "description": "Weight & Progress: under Your target. {amount} is formatted in the user's unit, \"0.5 kg\".",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "adaptivePaused": "Paused: no weigh-in for 10 days. Weigh in to keep it personal.",
+  "@adaptivePaused": {
+    "description": "The Adaptive formula's line on Home, Weight & Progress and Plan Settings when the last weigh-in is 10 days old."
+  },
+  "adaptiveAtMinimum": "Your target is at your minimum, so your goal date is now {date}.",
+  "@adaptiveAtMinimum": {
+    "description": "The Adaptive formula's line on Home: the target is held at the minimum. {date} is \"7 November\".",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "adaptiveLowered": "Adjusted for you: {amount} kcal. You burn a little less than your plan assumed.",
+  "@adaptiveLowered": {
+    "description": "The Adaptive formula's line on Home after Monday lowered the target. {amount} is signed, \"−80\".",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "adaptiveRaised": "Adjusted for you: {amount} kcal. You burn a little more than your plan assumed.",
+  "@adaptiveRaised": {
+    "description": "The Adaptive formula's line on Home after Monday raised the target. {amount} is signed, \"+80\".",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "adaptiveFirstSign": "You may burn a little less than your plan assumed. Checking again next Monday.",
+  "@adaptiveFirstSign": {
+    "description": "The Adaptive formula's line on Home: a first sign, no change yet."
+  },
+  "adaptiveSteadyAdjusted": "Adjusted for you: {amount} kcal. No change this week.",
+  "@adaptiveSteadyAdjusted": {
+    "description": "The Adaptive formula's line on Home: an earlier adjustment stands. {amount} is signed, \"−80\".",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "adaptiveSteady": "No change this week: your weight matches what you eat.",
+  "@adaptiveSteady": {
+    "description": "The Adaptive formula's line on Home: no change."
+  },
+  "adaptiveFewWeighIns": "Not enough weigh-ins this week, so your target stays the same.",
+  "@adaptiveFewWeighIns": {
+    "description": "The Adaptive formula's line on Home."
+  },
+  "adaptiveFewDays": "Not enough days logged this week, so your target stays the same.",
+  "@adaptiveFewDays": {
+    "description": "The Adaptive formula's line on Home."
+  },
+  "adaptiveUnusual": "Your numbers look unusual. Check your logging and weigh-ins.",
+  "@adaptiveUnusual": {
+    "description": "The Adaptive formula's line on Home."
+  },
+  "adaptiveSum": "{plan} from your plan {sign} {amount} adaptive = {target} kcal",
+  "@adaptiveSum": {
+    "description": "Plan Settings: the sum the Adaptive formula makes, \"1670 from your plan − 80 adaptive = 1590 kcal\". {sign} is + or −.",
+    "placeholders": {
+      "plan": {
+        "type": "int"
+      },
+      "sign": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "adaptiveSumMinimum": "{plan} from your plan {sign} {amount} adaptive = {target} kcal, your minimum",
+  "@adaptiveSumMinimum": {
+    "description": "Plan Settings: the Adaptive formula's sum when the target is held at the minimum.",
+    "placeholders": {
+      "plan": {
+        "type": "int"
+      },
+      "sign": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "progressTitle": "Weight & Progress",
+  "@progressTitle": {
+    "description": "Weight & Progress: the page title."
+  },
+  "progressLogWeight": "Log weight",
+  "@progressLogWeight": {
+    "description": "Weight & Progress: the button that opens the weigh-in dialog."
+  },
+  "progressHistory": "History",
+  "@progressHistory": {
+    "description": "Weight & Progress: heading over the weigh-ins."
+  },
+  "progressReset": "Reset progress",
+  "@progressReset": {
+    "description": "Weight & Progress: the button under the weigh-ins."
+  },
+  "progressErrorLoad": "Could not load your weight history.",
+  "@progressErrorLoad": {
+    "description": "Weight & Progress: the weigh-ins did not load."
+  },
+  "progressSavedNewTarget": "Weight saved. New target: {kcal} kcal (was {previous}).",
+  "@progressSavedNewTarget": {
+    "description": "Weight & Progress: after a weigh-in that changed the target.",
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      },
+      "previous": {
+        "type": "int"
+      }
+    }
+  },
+  "progressSavedSameTarget": "Weight saved. Your target stays at {kcal} kcal.",
+  "@progressSavedSameTarget": {
+    "description": "Weight & Progress: after a weigh-in that kept the target.",
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
+  },
+  "progressDeleteTitle": "Delete weigh-in?",
+  "@progressDeleteTitle": {
+    "description": "Weight & Progress: title of the dialog before deleting a weigh-in."
+  },
+  "progressDeleteBody": "Remove {weight} from {date}?",
+  "@progressDeleteBody": {
+    "description": "Weight & Progress: the delete dialog. {weight} is \"80.5 kg\", {date} \"Sat, 7 Nov\".",
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "progressDeleteBodyBack": "Remove {weight} from {date}? Your plan adjusts back to {previous}.",
+  "@progressDeleteBodyBack": {
+    "description": "Weight & Progress: the delete dialog for the newest weigh-in. {previous} is the weigh-in before it.",
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "progressErrorDelete": "Could not delete the weigh-in. Try again.",
+  "@progressErrorDelete": {
+    "description": "Weight & Progress: deleting failed."
+  },
+  "progressDeletedNewTarget": "Weigh-in deleted. New target: {kcal} kcal (was {previous}).",
+  "@progressDeletedNewTarget": {
+    "description": "Weight & Progress: after deleting a weigh-in that changed the target.",
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      },
+      "previous": {
+        "type": "int"
+      }
+    }
+  },
+  "progressDeleted": "Weigh-in deleted.",
+  "@progressDeleted": {
+    "description": "Weight & Progress: after deleting a weigh-in."
+  },
+  "progressResetTitle": "Reset progress?",
+  "@progressResetTitle": {
+    "description": "Weight & Progress: title of the dialog before Reset progress."
+  },
+  "progressResetBody": "This clears all your weight history and chart progress. Are you sure?",
+  "@progressResetBody": {
+    "description": "Weight & Progress: the Reset progress dialog."
+  },
+  "progressResetButton": "Reset",
+  "@progressResetButton": {
+    "description": "Weight & Progress: confirms Reset progress."
+  },
+  "progressResetDone": "Weight history cleared.",
+  "@progressResetDone": {
+    "description": "Weight & Progress: after Reset progress."
+  },
+  "progressErrorReset": "Could not reset progress. Try again.",
+  "@progressErrorReset": {
+    "description": "Weight & Progress: Reset progress failed."
+  },
+  "progressCurrent": "Current",
+  "@progressCurrent": {
+    "description": "Weight & Progress: small label over the current weight; a third of the card wide."
+  },
+  "progressChange": "Change",
+  "@progressChange": {
+    "description": "Weight & Progress: small label over the change since the first weigh-in; a third of the card wide."
+  },
+  "progressTarget": "Target",
+  "@progressTarget": {
+    "description": "Weight & Progress: small label over the target weight, and the chart's target line."
+  },
+  "progressTrend": "Trend {weight}",
+  "@progressTrend": {
+    "description": "Weight & Progress: the chart's touch label on the trend line, \"Trend 80.2 kg\".",
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "progressDeleteTooltip": "Delete weigh-in",
+  "@progressDeleteTooltip": {
+    "description": "Weight & Progress: tooltip of a weigh-in's delete button."
+  },
+  "progressEmptyTitle": "No weight logged yet",
+  "@progressEmptyTitle": {
+    "description": "Weight & Progress: heading with no weigh-ins."
+  },
+  "progressEmptyBody": "Log your weight to see your progress. Your plan adjusts each time.",
+  "@progressEmptyBody": {
+    "description": "Weight & Progress: the text with no weigh-ins."
+  },
+  "progressWeighInTitle": "Log your weight",
+  "@progressWeighInTitle": {
+    "description": "Weigh-in dialog: title."
+  },
+  "progressWeighInNote": "Your plan adjusts to match.",
+  "@progressWeighInNote": {
+    "description": "Weigh-in dialog: under the title."
+  },
+  "progressWeighInRange": "Enter a weight between {range}.",
+  "@progressWeighInRange": {
+    "description": "Weigh-in dialog: the weight is out of range. {range} is \"25 and 400 kg\", joined with progressWeighInRangeAnd.",
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "progressWeighInRangeAnd": " and ",
+  "@progressWeighInRangeAnd": {
+    "description": "Weigh-in dialog: joins the two ends of the weight range, spaces included."
+  },
+  "progressErrorSaveWeight": "Could not save your weight. Try again.",
+  "@progressErrorSaveWeight": {
+    "description": "Weigh-in dialog: saving failed."
+  },
+  "progressWeightSavedTarget": "Weight saved. New target: {kcal} kcal.",
+  "@progressWeightSavedTarget": {
+    "description": "Home and the Adaptive formula: after a weigh-in that changed the target.",
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
+  },
+  "progressWeightSaved": "Weight saved.",
+  "@progressWeightSaved": {
+    "description": "Home and the Adaptive formula: after a weigh-in."
   }
 }

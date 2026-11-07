@@ -2163,4 +2163,600 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get shortcutLogVoice => 'Запиши с глас';
+
+  @override
+  String unitsKg(String value) {
+    return '$value кг';
+  }
+
+  @override
+  String unitsLb(String value) {
+    return '$value lb';
+  }
+
+  @override
+  String unitsStLb(int stones, int pounds) {
+    return '$stones st $pounds lb';
+  }
+
+  @override
+  String unitsCm(String value) {
+    return '$value см';
+  }
+
+  @override
+  String unitsFtIn(int feet, int inches) {
+    return '$feet ft $inches in';
+  }
+
+  @override
+  String unitsStAxis(int stones) {
+    return '$stones st';
+  }
+
+  @override
+  String unitsStLbAxis(int stones, int pounds) {
+    return '$stones st $pounds';
+  }
+
+  @override
+  String get unitsKgLabel => 'кг';
+
+  @override
+  String get unitsLbLabel => 'lb';
+
+  @override
+  String get unitsStLabel => 'st';
+
+  @override
+  String get unitsCmLabel => 'см';
+
+  @override
+  String get unitsFtLabel => 'ft';
+
+  @override
+  String get unitsInLabel => 'in';
+
+  @override
+  String get unitsStLbToggle => 'st и lb';
+
+  @override
+  String get unitsFtInToggle => 'ft и in';
+
+  @override
+  String get unitsPounds => 'Фунтове';
+
+  @override
+  String get unitsInches => 'Инчове';
+
+  @override
+  String get commonYes => 'Да';
+
+  @override
+  String get commonNo => 'Не';
+
+  @override
+  String get commonAge => 'Възраст';
+
+  @override
+  String get commonHeight => 'Ръст';
+
+  @override
+  String get commonCurrentWeight => 'Сегашно тегло';
+
+  @override
+  String get commonTargetWeight => 'Желано тегло';
+
+  @override
+  String get commonEnterAge => 'Въведи възрастта си.';
+
+  @override
+  String get commonAgeRange => 'Въведи възраст от 18 до 120.';
+
+  @override
+  String get commonTargetBelowCurrent => 'Трябва да е под сегашното ти тегло';
+
+  @override
+  String get commonMale => 'Мъж';
+
+  @override
+  String get commonFemale => 'Жена';
+
+  @override
+  String get commonOther => 'Друго';
+
+  @override
+  String get onboardingEnterHeight => 'Въведи ръста си.';
+
+  @override
+  String get onboardingEnterWeight => 'Въведи теглото си.';
+
+  @override
+  String get onboardingNameTitle => 'Как се казваш?';
+
+  @override
+  String get onboardingName => 'Име';
+
+  @override
+  String get onboardingGenderTitle => 'Ти си…';
+
+  @override
+  String get onboardingAgeTitle => 'На колко години си?';
+
+  @override
+  String get onboardingHeightTitle => 'Какъв е ръстът ти?';
+
+  @override
+  String get onboardingWeightTitle => 'Колко тежиш сега?';
+
+  @override
+  String get onboardingGoalTitle => 'Каква е целта ти?';
+
+  @override
+  String get onboardingGoalBody =>
+      'Калориите са енергията в храната. Яж малко по-малко, отколкото гори тялото ти, и ще отслабваш – постепенно и безопасно.';
+
+  @override
+  String get onboardingLoseWeight => 'Да отслабна';
+
+  @override
+  String get onboardingKeepWeight => 'Да запазя теглото';
+
+  @override
+  String get onboardingTargetTitle => 'Към какво тегло се стремиш?';
+
+  @override
+  String get onboardingActivityTitle => 'Колко се движиш в обикновен ден?';
+
+  @override
+  String get onboardingActivityBody => 'Без да броим тренировките.';
+
+  @override
+  String get onboardingTrainingTitle => 'Тренираш ли освен това?';
+
+  @override
+  String get onboardingTrainingBody => 'Планирани тренировки, ако имаш такива.';
+
+  @override
+  String get onboardingProteinTitle => 'Да следим ли и протеина?';
+
+  @override
+  String get onboardingProteinBody =>
+      'Протеинът те засища и пази мускулите ти. YumSum го изчислява за всяко хранене, което запишеш.';
+
+  @override
+  String get onboardingPlanTitle => 'Планът ти е готов!';
+
+  @override
+  String get onboardingPlanCardTitle => 'Твоят план';
+
+  @override
+  String get onboardingPlanNote =>
+      'Можеш да прегледаш всичко отново, и по-подробно, в „Настройки на плана“.';
+
+  @override
+  String get onboardingErrorSave => 'Нещо се обърка. Опитай отново.';
+
+  @override
+  String get onboardingBack => 'Назад';
+
+  @override
+  String get onboardingNext => 'Продължи';
+
+  @override
+  String get onboardingStart => 'Да започваме';
+
+  @override
+  String get planPreviewMaintenance => 'План за поддържане';
+
+  @override
+  String get planPreviewFloor => 'Долна граница на калориите';
+
+  @override
+  String get planPreviewSafe => 'Устойчиво темпо';
+
+  @override
+  String get planPreviewCaution => 'По-бързо темпо';
+
+  @override
+  String get planPreviewWarning => 'Много рязко темпо';
+
+  @override
+  String get planPreviewMaintenanceNote => 'Без калориен дефицит.';
+
+  @override
+  String get planPreviewFloorNote =>
+      'При това темпо калориите ще паднат под минимума, затова желаното тегло ще дойде по-късно.';
+
+  @override
+  String get planPreviewSafeNote =>
+      'Умерен дефицит спрямо поддържащите калории.';
+
+  @override
+  String get planPreviewCautionNote =>
+      'Иска постоянство и може да ти се стори ограничаващо.';
+
+  @override
+  String get planPreviewWarningNote =>
+      'Ако ти е трудно да го спазваш, избери по-бавно темпо.';
+
+  @override
+  String get planPreviewMaintain => 'Поддържане';
+
+  @override
+  String planPreviewPerWeek(String amount) {
+    return '$amount/седм.';
+  }
+
+  @override
+  String get planPreviewDailyTarget => 'Дневна цел';
+
+  @override
+  String get planPreviewWeeklyLoss => 'Темпо';
+
+  @override
+  String get planPreviewGoalBy => 'Цел до';
+
+  @override
+  String get planPreviewInfoTooltip => 'Как се изчислява';
+
+  @override
+  String get planInfoTitle => 'Как изчисляваме калориите';
+
+  @override
+  String get planInfoBody =>
+      'Първо изчисляваме колко гориш в покой според теглото, ръста, възрастта и пола ти. После добавяме движението и тренировките, за да получим поддържащите калории.';
+
+  @override
+  String get planInfoResting => 'В покой';
+
+  @override
+  String get planInfoMovement => 'Движение';
+
+  @override
+  String get planInfoTraining => 'Тренировки';
+
+  @override
+  String get planInfoActivity => 'Обща активност';
+
+  @override
+  String get planInfoMaintenance => 'Поддържащи';
+
+  @override
+  String get planInfoAdaptive => 'Адаптивна';
+
+  @override
+  String get planInfoTarget => 'Цел';
+
+  @override
+  String planInfoKcalPerDay(int kcal) {
+    return '$kcal ккал/ден';
+  }
+
+  @override
+  String planInfoAtMinimum(int kcal) {
+    return '$kcal ккал/ден – твоят минимум';
+  }
+
+  @override
+  String get planInfoFloorNote =>
+      'При това темпо калориите ще паднат под минимума, затова оставаш на минимума, а желаното тегло ще дойде по-късно.';
+
+  @override
+  String get planTitle => 'Настройки на плана';
+
+  @override
+  String get planErrorLoad => 'Не успяхме да заредим профила ти.';
+
+  @override
+  String get planSelectGender => 'Избери пола си.';
+
+  @override
+  String get planSaved => 'Планът е запазен.';
+
+  @override
+  String get planErrorSave => 'Не успяхме да запазим плана ти. Опитай отново.';
+
+  @override
+  String get planRequired => 'Задължително';
+
+  @override
+  String get planHeading => 'Обнови плана си';
+
+  @override
+  String get planSubtitle =>
+      'Промени каквото искаш отдолу и планът ти ще се настрои.';
+
+  @override
+  String get planSectionPersonal => 'ЛИЧНИ ДАННИ';
+
+  @override
+  String get planGender => 'Пол';
+
+  @override
+  String get planSectionUnits => 'МЕРНИ ЕДИНИЦИ';
+
+  @override
+  String get planWeightUnit => 'Тегло';
+
+  @override
+  String get planSectionBody => 'ТЯЛОТО ТИ';
+
+  @override
+  String get planSectionBmi => 'ТВОЯТ ИТМ';
+
+  @override
+  String get planSectionGoal => 'ТВОЯТА ЦЕЛ';
+
+  @override
+  String get planTargetStays => 'Желаното ти тегло остава сегашното.';
+
+  @override
+  String get planSectionMovement => 'ДВИЖЕНИЕТО ТИ ПРЕЗ ДЕНЯ';
+
+  @override
+  String get planMovementNote =>
+      'Обикновеният ти ден, без да броим тренировките.';
+
+  @override
+  String get planSectionTraining => 'КОЛКО ЧЕСТО ТРЕНИРАШ?';
+
+  @override
+  String get planTrainingNote => 'Планирани тренировки освен обичайния ти ден.';
+
+  @override
+  String get planSectionProtein => 'ДА СЛЕДИМ ЛИ И ПРОТЕИНА?';
+
+  @override
+  String get planProteinNote =>
+      'Протеинът помага да запазиш мускулите, докато отслабваш. С „Не“ се скрива навсякъде.';
+
+  @override
+  String get planSectionPace => 'КОЛКО БЪРЗО ИСКАШ ДА ОТСЛАБНЕШ?';
+
+  @override
+  String get planPaceNote =>
+      'Темпото определя дневните калории, а желаното тегло – колко ще продължи планът.';
+
+  @override
+  String get planSectionAdjustment => 'ЛИЧНА НАСТРОЙКА';
+
+  @override
+  String get planUpdatedPlan => 'Обновен план';
+
+  @override
+  String get planSave => 'Запази плана';
+
+  @override
+  String get planAdaptiveNote =>
+      'Учи се от претеглянията ти и настройва целта ти всеки понеделник.';
+
+  @override
+  String get planAdaptiveRestarts =>
+      'Ако запазиш, започва отначало с новия ти план.';
+
+  @override
+  String get planBmiUnderweight => 'Поднормено тегло';
+
+  @override
+  String get planBmiHealthy => 'Нормално тегло';
+
+  @override
+  String get planBmiOverweight => 'Наднормено тегло';
+
+  @override
+  String get planBmiObese => 'Затлъстяване';
+
+  @override
+  String get planBmiTitle => 'Твоят ИТМ';
+
+  @override
+  String get adaptiveTitle => 'Адаптивна формула';
+
+  @override
+  String get adaptiveHowItWorks => 'Как работи';
+
+  @override
+  String get adaptiveTryNote =>
+      'Формула, създадена специално за теб. Настройва се с времето и с всяко претегляне.';
+
+  @override
+  String get adaptiveOn => 'Включена';
+
+  @override
+  String adaptiveBurnFact(String kcal) {
+    return 'Гориш $kcal на ден';
+  }
+
+  @override
+  String adaptiveTargetFact(String kcal) {
+    return 'Целта ти е $kcal на ден';
+  }
+
+  @override
+  String get adaptiveBurnLearnt => 'Научено от претеглянията и храненията ти.';
+
+  @override
+  String get adaptiveBurnFirst =>
+      'Първа оценка. Уточнява се с всяко претегляне.';
+
+  @override
+  String get adaptiveTargetKeep => 'За да запазиш теглото си.';
+
+  @override
+  String adaptiveTargetLose(String amount) {
+    return 'За да сваляш по $amount седмично.';
+  }
+
+  @override
+  String get adaptivePaused =>
+      'На пауза: няма претегляне от 10 дни. Претегли се, за да продължи да се настройва към теб.';
+
+  @override
+  String adaptiveAtMinimum(String date) {
+    return 'Дневната ти цел е на минимума, затова новата дата за желаното тегло е $date.';
+  }
+
+  @override
+  String adaptiveLowered(String amount) {
+    return 'Настроено за теб: $amount ккал. Гориш малко по-малко, отколкото предвиждаше планът.';
+  }
+
+  @override
+  String adaptiveRaised(String amount) {
+    return 'Настроено за теб: $amount ккал. Гориш малко повече, отколкото предвиждаше планът.';
+  }
+
+  @override
+  String get adaptiveFirstSign =>
+      'Може би гориш малко по-малко, отколкото предвижда планът. Ще проверим пак следващия понеделник.';
+
+  @override
+  String adaptiveSteadyAdjusted(String amount) {
+    return 'Настроено за теб: $amount ккал. Без промяна тази седмица.';
+  }
+
+  @override
+  String get adaptiveSteady =>
+      'Без промяна тази седмица: теглото ти отговаря на това, което ядеш.';
+
+  @override
+  String get adaptiveFewWeighIns =>
+      'Тази седмица има твърде малко претегляния, затова целта ти остава същата.';
+
+  @override
+  String get adaptiveFewDays =>
+      'Тази седмица има твърде малко записани дни, затова целта ти остава същата.';
+
+  @override
+  String get adaptiveUnusual =>
+      'Числата ти изглеждат необичайно. Провери записите и претеглянията си.';
+
+  @override
+  String adaptiveSum(int plan, String sign, int amount, int target) {
+    return '$plan по план $sign $amount адаптивно = $target ккал';
+  }
+
+  @override
+  String adaptiveSumMinimum(int plan, String sign, int amount, int target) {
+    return '$plan по план $sign $amount адаптивно = $target ккал – твоят минимум';
+  }
+
+  @override
+  String get progressTitle => 'Тегло и напредък';
+
+  @override
+  String get progressLogWeight => 'Запиши тегло';
+
+  @override
+  String get progressHistory => 'История';
+
+  @override
+  String get progressReset => 'Нулирай напредъка';
+
+  @override
+  String get progressErrorLoad =>
+      'Не успяхме да заредим историята на теглото ти.';
+
+  @override
+  String progressSavedNewTarget(int kcal, int previous) {
+    return 'Теглото е записано. Нова цел: $kcal ккал (беше $previous).';
+  }
+
+  @override
+  String progressSavedSameTarget(int kcal) {
+    return 'Теглото е записано. Целта ти остава $kcal ккал.';
+  }
+
+  @override
+  String get progressDeleteTitle => 'Да изтрием ли претеглянето?';
+
+  @override
+  String progressDeleteBody(String weight, String date) {
+    return 'Да махнем ли $weight от $date?';
+  }
+
+  @override
+  String progressDeleteBodyBack(String weight, String date, String previous) {
+    return 'Да махнем ли $weight от $date? Планът ти ще се върне към $previous.';
+  }
+
+  @override
+  String get progressErrorDelete =>
+      'Не успяхме да изтрием претеглянето. Опитай отново.';
+
+  @override
+  String progressDeletedNewTarget(int kcal, int previous) {
+    return 'Претеглянето е изтрито. Нова цел: $kcal ккал (беше $previous).';
+  }
+
+  @override
+  String get progressDeleted => 'Претеглянето е изтрито.';
+
+  @override
+  String get progressResetTitle => 'Да нулираме ли напредъка?';
+
+  @override
+  String get progressResetBody =>
+      'Това изтрива цялата история на теглото ти и графиката. Не може да се отмени.';
+
+  @override
+  String get progressResetButton => 'Нулирай';
+
+  @override
+  String get progressResetDone => 'Историята на теглото е изтрита.';
+
+  @override
+  String get progressErrorReset =>
+      'Не успяхме да нулираме напредъка. Опитай отново.';
+
+  @override
+  String get progressCurrent => 'Сега';
+
+  @override
+  String get progressChange => 'Промяна';
+
+  @override
+  String get progressTarget => 'Цел';
+
+  @override
+  String progressTrend(String weight) {
+    return 'Тенденция $weight';
+  }
+
+  @override
+  String get progressDeleteTooltip => 'Изтрий претеглянето';
+
+  @override
+  String get progressEmptyTitle => 'Още няма записано тегло';
+
+  @override
+  String get progressEmptyBody =>
+      'Записвай теглото си, за да виждаш напредъка. Планът ти се настройва всеки път.';
+
+  @override
+  String get progressWeighInTitle => 'Запиши теглото си';
+
+  @override
+  String get progressWeighInNote => 'Планът ти ще се настрои според него.';
+
+  @override
+  String progressWeighInRange(String range) {
+    return 'Въведи тегло между $range.';
+  }
+
+  @override
+  String get progressWeighInRangeAnd => ' и ';
+
+  @override
+  String get progressErrorSaveWeight =>
+      'Не успяхме да запишем теглото ти. Опитай отново.';
+
+  @override
+  String progressWeightSavedTarget(int kcal) {
+    return 'Теглото е записано. Нова цел: $kcal ккал.';
+  }
+
+  @override
+  String get progressWeightSaved => 'Теглото е записано.';
 }

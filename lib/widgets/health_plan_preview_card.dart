@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 
@@ -25,52 +25,52 @@ class HealthPlanPreviewCard extends StatelessWidget {
     GoalPaceLevel.warning => AppColors.veryBad,
   };
 
-  String get _paceLabel {
-    if (preview.isMaintaining) return 'Maintenance plan';
-    if (preview.calorieTargetClamped) return 'Minimum calorie floor';
+  String _paceLabel(AppLocalizations l10n) {
+    if (preview.isMaintaining) return l10n.planPreviewMaintenance;
+    if (preview.calorieTargetClamped) return l10n.planPreviewFloor;
     return switch (preview.goalPaceLevel) {
-      GoalPaceLevel.safe => 'Sustainable pace',
-      GoalPaceLevel.caution => 'Faster pace',
-      GoalPaceLevel.warning => 'Very aggressive',
+      GoalPaceLevel.safe => l10n.planPreviewSafe,
+      GoalPaceLevel.caution => l10n.planPreviewCaution,
+      GoalPaceLevel.warning => l10n.planPreviewWarning,
     };
   }
 
-  String get _paceMessage {
-    if (preview.isMaintaining) {
-      return 'No calorie deficit is applied.';
-    }
-    if (preview.calorieTargetClamped) {
-      return 'This pace would go below the minimum, so the goal date moves later.';
-    }
+  String _paceMessage(AppLocalizations l10n) {
+    if (preview.isMaintaining) return l10n.planPreviewMaintenanceNote;
+    if (preview.calorieTargetClamped) return l10n.planPreviewFloorNote;
     return switch (preview.goalPaceLevel) {
-      GoalPaceLevel.safe => 'A moderate deficit from estimated maintenance.',
-      GoalPaceLevel.caution =>
-        'This needs consistency and may feel restrictive.',
-      GoalPaceLevel.warning =>
-        'Consider a slower pace if this feels hard to maintain.',
+      GoalPaceLevel.safe => l10n.planPreviewSafeNote,
+      GoalPaceLevel.caution => l10n.planPreviewCautionNote,
+      GoalPaceLevel.warning => l10n.planPreviewWarningNote,
     };
   }
 
-  String get _goalDateLabel {
-    if (preview.isMaintaining) return 'Maintain';
-    return DateFormat('d MMM yyyy').format(preview.targetDate);
+  String _goalDateLabel(AppLocalizations l10n) {
+    if (preview.isMaintaining) return l10n.planPreviewMaintain;
+    return l10n.shortDayMonthYear(preview.targetDate);
   }
 
-  String get _weeklyLossLabel {
-    if (preview.isMaintaining) return 'Maintain';
-    return '${formatPace(preview.goalPaceKgPerWeek, weightUnit)}/wk';
+  String _weeklyLossLabel(AppLocalizations l10n) {
+    if (preview.isMaintaining) return l10n.planPreviewMaintain;
+    return l10n.planPreviewPerWeek(
+      formatPace(preview.goalPaceKgPerWeek, weightUnit, l10n),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     // Maintenance, deficit and the multipliers live in the info dialog.
     final metrics = [
       _PlanMetric(
-        label: 'Daily target',
-        value: '${preview.dailyCalorieTarget.round()} kcal',
+        label: l10n.planPreviewDailyTarget,
+        value: l10n.commonKcal(preview.dailyCalorieTarget.round()),
       ),
-      _PlanMetric(label: 'Weekly loss', value: _weeklyLossLabel),
-      _PlanMetric(label: 'Goal by', value: _goalDateLabel),
+      _PlanMetric(
+        label: l10n.planPreviewWeeklyLoss,
+        value: _weeklyLossLabel(l10n),
+      ),
+      _PlanMetric(label: l10n.planPreviewGoalBy, value: _goalDateLabel(l10n)),
     ];
 
     return Container(
@@ -93,7 +93,7 @@ class HealthPlanPreviewCard extends StatelessWidget {
                 ),
               ),
               IconButton(
-                tooltip: 'How this is calculated',
+                tooltip: l10n.planPreviewInfoTooltip,
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints.tightFor(
@@ -128,7 +128,7 @@ class HealthPlanPreviewCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _paceLabel,
+                      _paceLabel(l10n),
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -137,7 +137,7 @@ class HealthPlanPreviewCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      _paceMessage,
+                      _paceMessage(l10n),
                       style: TextStyle(
                         fontSize: 13,
                         color: AppColors.textSecondary,
@@ -168,6 +168,7 @@ class _CalculationInfoDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final adaptive = preview.adaptiveKcal.round();
     final sign = adaptive < 0 ? '-' : '+';
     // The Adaptive formula corrects the burn, before the deficit.
@@ -175,11 +176,13 @@ class _CalculationInfoDialog extends StatelessWidget {
         ? '${preview.tdee.round()}'
         : '${preview.tdee.round()} $sign ${adaptive.abs()}';
     final target = preview.dailyCalorieTarget.round();
+    final perDay = l10n.planInfoKcalPerDay(target);
     final targetFormula = preview.isMaintaining
         ? preview.calorieTargetClamped
-              ? '$target kcal/day, your minimum'
-              : '$burn = $target kcal/day'
-        : '$burn - ${_dailyDeficit.round()} = $target kcal/day';
+              ? l10n.planInfoAtMinimum(target)
+              : '$burn = $perDay'
+        : '$burn - ${_dailyDeficit.round()} = $perDay';
+    String times(double multiplier) => l10n.decimal(multiplier, 2);
 
     return AlertDialog(
       title: Row(
@@ -188,7 +191,7 @@ class _CalculationInfoDialog extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'How calories are estimated',
+              l10n.planInfoTitle,
               style: TextStyle(color: AppColors.textPrimary),
             ),
           ),
@@ -200,7 +203,7 @@ class _CalculationInfoDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'First we estimate your resting burn from weight, height, age, and sex. Then we add your daily movement and training to estimate maintenance.',
+              l10n.planInfoBody,
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
@@ -209,36 +212,36 @@ class _CalculationInfoDialog extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             _InfoLine(
-              label: 'Resting burn',
-              value: '${preview.bmr.round()} kcal/day',
+              label: l10n.planInfoResting,
+              value: l10n.planInfoKcalPerDay(preview.bmr.round()),
             ),
             _InfoLine(
-              label: 'Daily movement',
-              value: 'x${preview.lifestyleMultiplier.toStringAsFixed(2)}',
+              label: l10n.planInfoMovement,
+              value: 'x${times(preview.lifestyleMultiplier)}',
             ),
             _InfoLine(
-              label: 'Training bonus',
-              value: '+${preview.trainingMultiplierBonus.toStringAsFixed(2)}',
+              label: l10n.planInfoTraining,
+              value: '+${times(preview.trainingMultiplierBonus)}',
             ),
             _InfoLine(
-              label: 'Combined activity',
-              value: 'x${preview.activityMultiplier.toStringAsFixed(2)}',
+              label: l10n.planInfoActivity,
+              value: 'x${times(preview.activityMultiplier)}',
             ),
             _InfoLine(
-              label: 'Maintenance',
+              label: l10n.planInfoMaintenance,
               value:
-                  '${preview.bmr.round()} x ${preview.activityMultiplier.toStringAsFixed(2)} = ${preview.tdee.round()} kcal/day',
+                  '${preview.bmr.round()} x ${times(preview.activityMultiplier)} = ${l10n.planInfoKcalPerDay(preview.tdee.round())}',
             ),
             if (adaptive != 0)
               _InfoLine(
-                label: 'Adaptive',
-                value: '$sign${adaptive.abs()} kcal/day',
+                label: l10n.planInfoAdaptive,
+                value: '$sign${l10n.planInfoKcalPerDay(adaptive.abs())}',
               ),
-            _InfoLine(label: 'Target', value: targetFormula),
+            _InfoLine(label: l10n.planInfoTarget, value: targetFormula),
             if (preview.calorieTargetClamped && !preview.isMaintaining) ...[
               const SizedBox(height: 10),
               Text(
-                'This pace would go below the minimum, so your target stays at the minimum and the goal date moves later.',
+                l10n.planInfoFloorNote,
                 style: TextStyle(
                   fontSize: 13,
                   color: AppColors.textSecondary,
@@ -252,7 +255,7 @@ class _CalculationInfoDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Got it'),
+          child: Text(l10n.commonGotIt),
         ),
       ],
     );

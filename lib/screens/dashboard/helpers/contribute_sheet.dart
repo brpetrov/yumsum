@@ -218,7 +218,7 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
       _serving.text = reading.servingSize ?? '';
       _lang = reading.lang;
       for (final MapEntry(:key, :value) in reading.per100g.entries) {
-        _figures[key]?.text = _number(value);
+        _figures[key]?.text = _number(value, l10n);
       }
       _note = l10n.contributeAiRead(images.length);
     } on DailyLimitExceededException {
@@ -231,8 +231,12 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
     if (mounted) setState(() => _reading = false);
   }
 
-  static String _number(double value) =>
-      value == value.roundToDouble() ? '${value.round()}' : '$value';
+  /// [value] as typed: "2", "2,5" in Bulgarian, "0.25" in English.
+  static String _number(double value, AppLocalizations l10n) {
+    if (value == value.roundToDouble()) return '${value.round()}';
+    final tenths = value * 10 == (value * 10).roundToDouble();
+    return l10n.decimal(value, tenths ? 1 : 2);
+  }
 
   double? _figure(String id) => parseDecimal(_figures[id]!.text);
 

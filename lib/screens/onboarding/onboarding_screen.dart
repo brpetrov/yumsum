@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
@@ -95,22 +96,26 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   String? _ageError(String text) {
     final n = int.tryParse(text);
-    if (n == null) return 'Enter your age.';
-    if (n < 18 || n > 120) return 'Valid age: 18–120.';
+    if (n == null) return context.l10n.commonEnterAge;
+    if (n < 18 || n > 120) return context.l10n.commonAgeRange;
     return null;
   }
 
   String? _heightError() {
     final cm = _height.value;
-    if (cm == null) return 'Enter your height.';
-    if (cm < 100 || cm > 250) return heightRange(100, 250, _heightUnit);
+    if (cm == null) return context.l10n.onboardingEnterHeight;
+    if (cm < 100 || cm > 250) {
+      return heightRange(100, 250, _heightUnit, context.l10n);
+    }
     return null;
   }
 
   String? _weightError(WeightInput input) {
     final kg = input.value;
-    if (kg == null) return 'Enter your weight.';
-    if (kg < 30 || kg > 300) return weightRange(30, 300, _weightUnit);
+    if (kg == null) return context.l10n.onboardingEnterWeight;
+    if (kg < 30 || kg > 300) {
+      return weightRange(30, 300, _weightUnit, context.l10n);
+    }
     return null;
   }
 
@@ -119,7 +124,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     if (error != null) return error;
     final current = _currentWeight.value;
     if (current != null && _targetWeight.value! >= current) {
-      return 'Must be less than your current weight';
+      return context.l10n.commonTargetBelowCurrent;
     }
     return null;
   }
@@ -285,34 +290,36 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       unit: _weightUnit,
       onChanged: (unit) => setState(() {
         _weightUnit = unit;
-        _currentWeight.switchTo(unit);
-        _targetWeight.switchTo(unit);
+        _currentWeight.switchTo(unit, context.l10n);
+        _targetWeight.switchTo(unit, context.l10n);
       }),
     ),
   );
 
   /// The heading, the line under it (if any) and the answer for [step].
+  AppLocalizations get _l10n => context.l10n;
+
   (String, String?, Widget) _card(_Step step) => switch (step) {
     _Step.name => (
-      'What\'s your name?',
+      _l10n.onboardingNameTitle,
       null,
       _field(
         _nameCtrl,
-        label: 'Name',
+        label: _l10n.onboardingName,
         keyboard: TextInputType.name,
         formatters: const [],
         capitalization: TextCapitalization.words,
       ),
     ),
     _Step.gender => (
-      'Are you…',
+      _l10n.onboardingGenderTitle,
       null,
       Row(
         children: [
           for (final (i, (gender, label)) in [
-            (Gender.male, 'Male'),
-            (Gender.female, 'Female'),
-            (Gender.other, 'Other'),
+            (Gender.male, _l10n.commonMale),
+            (Gender.female, _l10n.commonFemale),
+            (Gender.other, _l10n.commonOther),
           ].indexed) ...[
             if (i > 0) const SizedBox(width: 8),
             GenderButton(
@@ -325,22 +332,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ),
     ),
     _Step.age => (
-      'How old are you?',
+      _l10n.onboardingAgeTitle,
       null,
       _field(
         _ageCtrl,
-        label: 'Age',
+        label: _l10n.commonAge,
         keyboard: TextInputType.number,
         formatters: [FilteringTextInputFormatter.digitsOnly],
         error: _ageError,
       ),
     ),
     _Step.height => (
-      'How tall are you?',
+      _l10n.onboardingHeightTitle,
       null,
       _measure(
         _height,
-        label: 'Height',
+        label: _l10n.commonHeight,
         error: _heightError,
         toggle: SizedBox(
           width: 160,
@@ -348,48 +355,47 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             unit: _heightUnit,
             onChanged: (unit) => setState(() {
               _heightUnit = unit;
-              _height.switchTo(unit);
+              _height.switchTo(unit, _l10n);
             }),
           ),
         ),
       ),
     ),
     _Step.weight => (
-      'What do you weigh now?',
+      _l10n.onboardingWeightTitle,
       null,
       _measure(
         _currentWeight,
-        label: 'Current weight',
+        label: _l10n.commonCurrentWeight,
         error: () => _weightError(_currentWeight),
         toggle: _weightToggle,
       ),
     ),
     _Step.goal => (
-      'What\'s your goal?',
-      'A calorie is the energy in food. Eat a little less than your body '
-          'burns and you lose weight, steadily and safely.',
+      _l10n.onboardingGoalTitle,
+      _l10n.onboardingGoalBody,
       PillToggle<WeightLossPace>(
-        options: const [
-          (WeightLossPace.moderate, 'Lose weight'),
-          (WeightLossPace.maintain, 'Keep my weight'),
+        options: [
+          (WeightLossPace.moderate, _l10n.onboardingLoseWeight),
+          (WeightLossPace.maintain, _l10n.onboardingKeepWeight),
         ],
         selected: _weightLossPace,
         onChanged: (pace) => setState(() => _weightLossPace = pace),
       ),
     ),
     _Step.target => (
-      'What weight are you aiming for?',
+      _l10n.onboardingTargetTitle,
       null,
       _measure(
         _targetWeight,
-        label: 'Target weight',
+        label: _l10n.commonTargetWeight,
         error: _targetError,
         toggle: _weightToggle,
       ),
     ),
     _Step.activity => (
-      'How active is your normal day?',
-      'Outside workouts.',
+      _l10n.onboardingActivityTitle,
+      _l10n.onboardingActivityBody,
       Column(
         children: [
           for (final level in ActivityLevel.values)
@@ -405,8 +411,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ),
     ),
     _Step.training => (
-      'Do you train on top of that?',
-      'Structured workouts, if any.',
+      _l10n.onboardingTrainingTitle,
+      _l10n.onboardingTrainingBody,
       Column(
         children: [
           for (final frequency in TrainingFrequency.values)
@@ -422,17 +428,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       ),
     ),
     _Step.protein => (
-      'Track protein too?',
-      'Protein keeps you full and looks after your muscle. YumSum works it '
-          'out for each meal you log.',
+      _l10n.onboardingProteinTitle,
+      _l10n.onboardingProteinBody,
       PillToggle<bool>(
-        options: const [(true, 'Yes'), (false, 'No')],
+        options: [(true, _l10n.commonYes), (false, _l10n.commonNo)],
         selected: _trackProtein,
         onChanged: (track) => setState(() => _trackProtein = track),
       ),
     ),
     _Step.plan => (
-      'Your plan is ready!',
+      _l10n.onboardingPlanTitle,
       null,
       Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -444,14 +449,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             Shine(
               child: HealthPlanPreviewCard(
                 preview: preview,
-                title: 'Your plan',
+                title: _l10n.onboardingPlanCardTitle,
                 weightUnit: _weightUnit,
               ),
             ),
           const SizedBox(height: 16),
           Text(
-            'You can go over all of this again, and get into more detail, '
-            'in Plan Settings.',
+            _l10n.onboardingPlanNote,
             style: TextStyle(
               fontSize: 14,
               height: 1.4,
@@ -472,7 +476,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     ref.listen<AsyncValue<void>>(onboardingControllerProvider, (_, next) {
       if (next.hasError) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Something went wrong. Try again.')),
+          SnackBar(content: Text(context.l10n.onboardingErrorSave)),
         );
       }
     });
@@ -483,6 +487,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final steps = _steps;
     final step = steps[_index];
     final last = _index == steps.length - 1;
+    final l10n = context.l10n;
     final (heading, helper, answer) = _card(step);
 
     return Scaffold(
@@ -513,10 +518,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       icon: const Icon(Icons.arrow_back_rounded),
                       label: Text(
                         _index > 0 || inPreview
-                            ? 'Back'
+                            ? l10n.onboardingBack
                             : isSigningOut
-                            ? 'Signing out...'
-                            : 'Back to sign in',
+                            ? l10n.commonSigningOut
+                            : l10n.profileBackToSignIn,
                       ),
                     ),
                   ),
@@ -583,7 +588,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               ),
                             )
                           : Text(
-                              last ? 'Start' : 'Next',
+                              last ? l10n.onboardingStart : l10n.onboardingNext,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,

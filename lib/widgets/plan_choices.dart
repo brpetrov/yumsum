@@ -192,11 +192,15 @@ class PaceCard extends StatelessWidget {
   final VoidCallback onTap;
 
   String _title(AppLocalizations l10n, WeightLossPace pace) => switch (pace) {
-    WeightLossPace.slow => l10n.planPaceSlow(formatPace(0.25, weightUnit)),
-    WeightLossPace.moderate => l10n.planPaceModerate(
-      formatPace(0.5, weightUnit),
+    WeightLossPace.slow => l10n.planPaceSlow(
+      formatPace(0.25, weightUnit, l10n),
     ),
-    WeightLossPace.fast => l10n.planPaceFast(formatPace(0.75, weightUnit)),
+    WeightLossPace.moderate => l10n.planPaceModerate(
+      formatPace(0.5, weightUnit, l10n),
+    ),
+    WeightLossPace.fast => l10n.planPaceFast(
+      formatPace(0.75, weightUnit, l10n),
+    ),
     WeightLossPace.maintain => l10n.planPaceMaintain,
   };
 

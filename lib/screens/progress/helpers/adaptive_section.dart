@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/adaptive_formula_provider.dart';
@@ -26,6 +27,7 @@ class AdaptiveSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     if (!ref.watch(plusProvider)) {
       void open() => showAdaptiveIntro(context, plus: false);
       return GestureDetector(
@@ -36,11 +38,10 @@ class AdaptiveSection extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TryButton(label: 'Adaptive formula', onTap: open),
+              TryButton(label: l10n.adaptiveTitle, onTap: open),
               const SizedBox(height: 12),
               Text(
-                'A customised formula tailored just for you. Adapting with '
-                'time and your weigh-ins.',
+                l10n.adaptiveTryNote,
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.35,
@@ -74,7 +75,7 @@ class AdaptiveSection extends ConsumerWidget {
                 children: [
                   Flexible(
                     child: Text(
-                      'Adaptive formula',
+                      l10n.adaptiveTitle,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
@@ -88,7 +89,7 @@ class AdaptiveSection extends ConsumerWidget {
               ),
             ),
             IconButton(
-              tooltip: 'How it works',
+              tooltip: l10n.adaptiveHowItWorks,
               onPressed: () => showAdaptiveIntro(context),
               icon: const Icon(Icons.info_outline_rounded),
               iconSize: 18,
@@ -100,26 +101,28 @@ class AdaptiveSection extends ConsumerWidget {
         _Fact(
           icon: Icons.local_fire_department_rounded,
           color: AppColors.veryGood,
-          before: 'You burn ',
+          sentence: l10n.adaptiveBurnFact,
           kcal: adaptiveBurn(profile, progress),
-          note: learnt
-              ? 'Learnt from your weigh-ins and meals.'
-              : 'A first estimate. It learns as you weigh in.',
+          note: learnt ? l10n.adaptiveBurnLearnt : l10n.adaptiveBurnFirst,
         ),
         const SizedBox(height: 12),
         _Fact(
           icon: Icons.flag_rounded,
           color: AppColors.primary,
-          before: 'Your target is ',
+          sentence: l10n.adaptiveTargetFact,
           kcal: profile.dailyCalorieTarget.round(),
           note: profile.weightLossPace == WeightLossPace.maintain
-              ? 'To keep your weight steady.'
-              : 'To lose '
-                    '${formatPace(profile.goalPaceKgPerWeek, ref.watch(weightUnitProvider))}'
-                    ' a week.',
+              ? l10n.adaptiveTargetKeep
+              : l10n.adaptiveTargetLose(
+                  formatPace(
+                    profile.goalPaceKgPerWeek,
+                    ref.watch(weightUnitProvider),
+                    l10n,
+                  ),
+                ),
         ),
         if (progress != null) ...[
-          if (adaptivePausedLine(progress) case final paused?) ...[
+          if (adaptivePausedLine(progress, l10n) case final paused?) ...[
             const SizedBox(height: 12),
             Text(paused, style: muted),
           ],
@@ -162,7 +165,7 @@ class _OnChip extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Text(
-              'On',
+              context.l10n.adaptiveOn,
               style: AppTheme.display.copyWith(
                 fontSize: 14,
                 height: 1.2,
@@ -182,19 +185,25 @@ class _Fact extends StatelessWidget {
   const _Fact({
     required this.icon,
     required this.color,
-    required this.before,
+    required this.sentence,
     required this.kcal,
     required this.note,
   });
 
   final IconData icon;
   final Color color;
-  final String before;
+
+  /// The sentence's text with the calories put in.
+  final String Function(String kcal) sentence;
   final int kcal;
   final String note;
 
+  /// Stands in for the calories, to find where they go in the sentence.
+  static const _slot = '\u0000';
+
   @override
   Widget build(BuildContext context) {
+    final [before, after] = sentence(_slot).split(_slot);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -214,13 +223,13 @@ class _Fact extends StatelessWidget {
                   children: [
                     TextSpan(text: before),
                     TextSpan(
-                      text: '$kcal kcal',
+                      text: context.l10n.commonKcal(kcal),
                       style: AppTheme.display.copyWith(
                         fontSize: 18,
                         color: tintedTextColor(color),
                       ),
                     ),
-                    const TextSpan(text: ' a day'),
+                    TextSpan(text: after),
                   ],
                 ),
                 style: TextStyle(

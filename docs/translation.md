@@ -1,6 +1,6 @@
 # Translation
 
-YumSum speaks English and Bulgarian. The rules are in `CLAUDE.md` (Text and translation); this is the how-to and the list of what is still English.
+YumSum speaks English and Bulgarian. The rules are in `CLAUDE.md` (Text and translation); this is the how-to, the glossary and the list of what is still English.
 
 ## How it fits together
 
@@ -14,16 +14,16 @@ YumSum speaks English and Bulgarian. The rules are in `CLAUDE.md` (Text and tran
 1. Add the key to `app_en.arb` with a description saying where it shows:
 
    ```json
-   "progressErrorLoad": "Could not load your weight. Try again.",
+   "progressErrorLoad": "Could not load your weight history.",
    "@progressErrorLoad": {
-     "description": "Weight & Progress: shown when the entries don't load."
+     "description": "Weight & Progress: the weigh-ins did not load."
    },
    ```
 
 2. Add the same key to `app_bg.arb` (no description needed there):
 
    ```json
-   "progressErrorLoad": "Не можахме да заредим теглото ви. Опитайте отново.",
+   "progressErrorLoad": "Не успяхме да заредим историята на теглото ти.",
    ```
 
 3. Run `flutter gen-l10n` (a build or `flutter pub get` does it too).
@@ -42,8 +42,8 @@ lowerCamelCase, `<area><Thing>`:
 | `auth`, `onboarding` | Sign-in, onboarding |
 | `home`, `quickLog`, `meal`, `camera`, `food`, `contribute`, `macro` | Home, the quick-log bar, the meal form, Smart Snap and barcodes, packaged foods, contributing, macros |
 | `history`, `coach`, `progress`, `adaptive`, `recipes` | History, AI Coach, Weight & Progress, the Adaptive formula, Recipes |
-| `plan`, `account`, `star`, `notifications`, `feedback`, `legal`, `menu` | Plan Settings, Account Settings, YumSum Star, the Notifications page, feedback, legal links, the menu |
-| `reminder`, `language` | The reminders themselves, the language |
+| `plan`, `account`, `star`, `notifications`, `feedback`, `legal`, `menu` | Plan Settings (and the plan card, `planPreview…`, `planInfo…`), Account Settings, YumSum Star, the Notifications page, feedback, legal links, the menu |
+| `reminder`, `language`, `units` | The reminders themselves, the language, weights and heights with their units |
 
 Then what it is: `…Title`, `…Button`, `…Hint`, `…Error<What>` (`mealErrorSave`: "Could not save the meal. Try again."), `…Tooltip`. Reuse a `common` key only where the word is the same in Bulgarian too.
 
@@ -91,99 +91,63 @@ From `AppFormats` in `lib/l10n/l10n.dart`, on any `AppLocalizations`:
 
 Bulgarian day and month names are lower case; wrap one that starts a line in `capitalised(…)`. Leave `yyyy-MM-dd` keys, `week_facts.dart` and anything sent to the AI as they are.
 
+Weights and heights go through `lib/models/units.dart`, which takes the `AppLocalizations` too: `formatWeight(kg, unit, l10n)` ("80.5 kg", "80,5 кг"), `formatWeightChange`, `formatPace`, `formatHeight`, `weightRange` and `heightRange`, built from the `units…` keys. Pass the result into a text as a `String` placeholder (`homeWeightLatest`, `planPaceSlow`). `MeasureInput.show` and `switchTo` take it as well, so the boxes show "79,8" in Bulgarian; typed numbers take either mark.
+
 ## Notes for translators
 
 - Address the user informally, with "ти" ("Запиши", "твоят", "планът ти"), as a friendly app would; never "Вие". Write it as a good Bulgarian app would say it, not word for word from the English. Keep `CLAUDE.md`'s copy rules: sentence case, no exclamation marks (but "Благодарим ти!" and "Планът ти е готов!"), errors as "Не успяхме да … Опитай отново.", short enough for a 360dp phone.
 - Bulgarian past forms and adjectives about the user carry gender ("ял/яла", "готов/готова"). Phrase around them so every line suits anyone: "Добави храненията си", not "Добави какво си ял".
-- YumSum, YumSum Star and Smart Snap are names: keep them in Latin letters. AI Coach is "AI треньор". Units: kcal → ккал, g → г, kg → кг.
+- YumSum, YumSum Star and Smart Snap are names: keep them in Latin letters. AI Coach is "AI треньор". Units: kcal → ккал, g → г, kg → кг, cm → см; lb, st, ft and in stay as they are (see the glossary).
 - Menu and page names (Plan Settings, Weight & Progress) are titles in English; in Bulgarian, write them as ordinary sentence-case phrases ("Настройки на плана").
 - Static lists of labels (`const _pages = [...]` in `AppDrawer`, enums with labels such as `DayStatus` in `lib/models/daily_summary.dart` and `MealType` in `lib/models/recipe.dart`) can't call `context.l10n`: turn the label into a getter or a function that takes the `AppLocalizations`.
 - Exceptions thrown with English text (`Exception('Not authenticated')`) only need a key where the text reaches the screen; check how the screen shows the error first.
-- `main.dart`'s "YumSum could not start" screen runs before Riverpod and the app's localisations: read the stored `language` from the `SharedPreferences` it already has and use `lookupAppLocalizations`.
-- The app-icon shortcut's title ('Log by voice', `lib/app/launch_actions.dart`) is set once at start-up: set it again when `languageCodeProvider` changes.
-- The Cloud Functions are to get `ref.read(languageCodeProvider)` with each call (`aiEstimate`, `aiWeeklyReview`, `sendVerificationEmail`); the functions themselves still need to use it.
+- `main.dart`'s "YumSum could not start" screen runs before Riverpod and the app's localisations, so it reads the stored `language` from `SharedPreferences` and uses `lookupAppLocalizations`.
+- The app-icon shortcut's title ('Log by voice', `lib/app/launch_actions.dart`) is set again when the language changes.
+- The Cloud Functions get `languageCodeProvider`'s code with each call (`aiEstimate`, `aiWeeklyReview`, `sendVerificationEmail`) and answer in it.
+- Text built outside a widget but shown on one, such as the Adaptive formula's line on Home (`adaptiveTodayLineProvider`), watches `l10nProvider`; a widget that can reach `context.l10n` uses that, so a test with `locale: Locale('bg')` sees Bulgarian without the stored setting.
+
+## Glossary
+
+The Bulgarian the app uses for its own words. Keep to it in new text.
+
+| English | Bulgarian |
+|---|---|
+| Home | Начало |
+| meal | хранене |
+| log (a meal, a weight) | запиши |
+| weigh-in | претегляне |
+| target (calories a day) | цел, дневна цел |
+| target weight | желано тегло |
+| current weight | сегашно тегло |
+| height | ръст |
+| On track / Close / Off track | В целта / Близо / Извън целта |
+| day off | почивен ден |
+| pace | темпо |
+| maintenance (calories) | поддържащи калории |
+| BMI | ИТМ |
+| protein, fibre, carbs, fat, sugars, saturates, salt | протеин, фибри, въглехидрати, мазнини, захари, наситени мазнини, сол |
+| account | профил |
+| sign in / log out | вход, влез / изход |
+| reset | нулирай |
+| feedback | обратна връзка |
+| Plan Settings | Настройки на плана |
+| Weight & Progress | Тегло и напредък |
+| Account Settings | Настройки на профила |
+| History | История |
+| Recipes | Рецепти |
+| Notifications | Известия |
+| AI Coach | AI треньор |
+| Adaptive formula | адаптивна формула („Адаптивна формула“ as a heading) |
+| YumSum, YumSum Star, Smart Snap | as they are, in Latin letters |
+| kcal, g, kg, cm | ккал, г, кг, см |
+| lb, st, ft, in | lb, st, ft, in: kept, as imperial units are rare in Bulgaria and the Bulgarian words (фунт, стоун, фут, инч) have no short forms; the toggles read „st и lb“, „ft и in“ and the second boxes „Фунтове“, „Инчове“ |
+| decimals | with a comma: 80,5 кг, 0,25 кг |
+
+Address the user as "ти" and keep lines free of the user's gender: „Колко тежиш сега?“ and „Какъв е ръстът ти?“, not „Колко си висок?“; „Не може да се отмени.“ rather than „Сигурен ли си?“.
 
 ## To translate
 
-Rough counts of user-facing strings, from a script over the string literals, so ±20%. Owner-only Debug tools (`lib/screens/debug/`, `lib/providers/debug_provider.dart`), the AI's facts (`lib/helpers/week_facts.dart`), the country names sent to the AI (`lib/models/user_profile.dart`) and log lines stay English and aren't listed. Grouped into three parts of about 300 strings each, by area, so the parts rarely touch the same file.
-
-### Part 1: start, account and the app's frame (about 300)
-
-| File | Strings |
-|---|---|
-| `lib/screens/auth/auth_screen.dart` | 29 |
-| `lib/screens/onboarding/onboarding_screen.dart` | 42 |
-| `lib/widgets/plan_choices.dart` | 24 |
-| `lib/widgets/health_plan_preview_card.dart` | 35 |
-| `lib/screens/profile/profile_screen.dart` (Plan Settings) | 52 |
-| `lib/screens/profile/profile_load_error_screen.dart` | 5 |
-| `lib/screens/account/account_settings_screen.dart` | 51 |
-| `lib/providers/account_controller.dart` | 16 |
-| `lib/widgets/password_confirm_dialog.dart` | 2 |
-| `lib/widgets/legal_links.dart` | 10 |
-| `lib/widgets/app_frame.dart` (menu) | 16 |
-| `lib/widgets/feedback_dialog.dart` | 14 |
-| `lib/widgets/splash_screen.dart` | 2 |
-| `lib/main.dart` (start-up error) | 4 |
-| `lib/app/launch_actions.dart` (shortcut) | 1 |
-
-### Part 2: Home and logging (about 300)
-
-| File | Strings |
-|---|---|
-| `lib/screens/dashboard/dashboard_screen.dart` | 31 |
-| `lib/screens/dashboard/helpers/quick_log_bar.dart` | 26 |
-| `lib/screens/dashboard/helpers/adaptive_dialogs.dart` | 16 |
-| `lib/screens/dashboard/helpers/contribute_sheet.dart` | 42 |
-| `lib/screens/dashboard/helpers/creatine_offer.dart` | 7 |
-| `lib/screens/dashboard/helpers/day_off_dialog.dart` | 11 |
-| `lib/screens/dashboard/helpers/food_search_sheet.dart` | 4 |
-| `lib/screens/dashboard/helpers/meal_camera_page.dart` | 16 |
-| `lib/screens/dashboard/helpers/meal_photo.dart` | 6 |
-| `lib/screens/dashboard/helpers/plus_prompt_card.dart` | 2 |
-| `lib/screens/dashboard/helpers/portion_sheet.dart` | 5 |
-| `lib/screens/dashboard/helpers/smart_snap_dialog.dart` | 8 |
-| `lib/screens/dashboard/helpers/web_camera_web.dart` | 10 |
-| `lib/screens/meals/log_meal_sheet.dart` | 15 |
-| `lib/widgets/estimate_breakdown.dart` | 6 |
-| `lib/widgets/estimate_choice_dialog.dart` | 3 |
-| `lib/widgets/meal_row.dart` | 7 |
-| `lib/widgets/fibre_badge.dart` | 1 |
-| `lib/widgets/macro_rings.dart` | 13 |
-| `lib/widgets/macro_totals.dart` | 8 |
-| `lib/widgets/macro_guide.dart` | 35 |
-| `lib/services/calorie_estimate_service.dart` | 14 |
-| `lib/services/food_contribution_service.dart` | 7 |
-| `lib/services/food_lookup_service.dart` | 7 |
-
-### Part 3: History, AI Coach, weight, recipes, reminders and YumSum Star (about 280)
-
-| File | Strings |
-|---|---|
-| `lib/screens/review/review_screen.dart` | 25 |
-| `lib/screens/review/day_meals_sheet.dart` | 15 |
-| `lib/screens/review/weekly_notes.dart` | 6 |
-| `lib/widgets/period_bar.dart` | 3 |
-| `lib/widgets/calorie_bars.dart` | 2 |
-| `lib/models/daily_summary.dart` (day statuses) | 3 |
-| `lib/services/period_review_service.dart` | 5 |
-| `lib/screens/coach/coach_screen.dart` | 31 |
-| `lib/screens/progress/progress_screen.dart` | 36 |
-| `lib/screens/progress/helpers/adaptive_section.dart` | 13 |
-| `lib/screens/progress/helpers/log_weight_dialog.dart` | 9 |
-| `lib/providers/adaptive_formula_provider.dart` (Adaptive lines) | 16 |
-| `lib/screens/recipes/recipes_screen.dart` | 12 |
-| `lib/screens/recipes/recipe_screen.dart` | 16 |
-| `lib/screens/recipes/recipe_portions_sheet.dart` | 6 |
-| `lib/screens/recipes/log_recipe_portion.dart` | 2 |
-| `lib/models/recipe.dart` (meal types, tags) | 7 |
-| `lib/screens/notifications/notifications_screen.dart` | 17 |
-| `lib/screens/plus/plus_screen.dart` | 45 |
-| `lib/widgets/plus_mark.dart` | 4 |
-| `lib/providers/plus_purchase_controller.dart` | 5 |
-
-### Outside `lib/`, for the owner to decide
+Everything the app shows in `lib/` is in the ARBs. Owner-only Debug tools (`lib/screens/debug/`, `lib/providers/debug_provider.dart`), the AI's facts (`lib/helpers/week_facts.dart`), the country names sent to the AI (`lib/models/user_profile.dart`), log lines and exceptions nobody sees stay English. Still English, for the owner to decide:
 
 - `assets/recipes/recipes.json`: 40 recipes' names, ingredients and steps, which are content, not ARB strings.
-- `android/app/src/main/res/values/strings.xml`: the home-screen widget's 4 strings. Android picks them by the phone's language, so they go in a new `values-bg/strings.xml`.
-- The website (`tools/hosting/`: legal pages) and the Cloud Functions' emails and AI replies.
+- The website (`tools/hosting/`): the legal pages.
