@@ -325,7 +325,12 @@ let client: GoogleGenAI | undefined;
 
 /** Asks Gemini, and logs the tokens the call used, which is what it costs. */
 const gemini: Generate = async ({ use, contents, config }) => {
-  client ??= new GoogleGenAI({ vertexai: false, apiKey: geminiApiKey.value() });
+  // v1beta, as before @google/genai 3 made v1 the default.
+  client ??= new GoogleGenAI({
+    vertexai: false,
+    apiKey: geminiApiKey.value(),
+    apiVersion: "v1beta",
+  });
   const response = await client.models.generateContent({
     model: use === "coach" ? coachModelId : aiModelId,
     contents,

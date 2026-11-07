@@ -3,7 +3,7 @@ import 'dart:js_interop';
 import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:camera_web/camera_web.dart';
 // camera_web keeps a camera's id in a type it doesn't export; pinned to
-// 0.3.5+6 in pubspec.yaml for that reason.
+// 0.3.6 in pubspec.yaml for that reason.
 // ignore: implementation_imports
 import 'package:camera_web/src/types/camera_metadata.dart';
 

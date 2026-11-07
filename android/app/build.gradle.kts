@@ -20,17 +20,14 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.bpetrov.yumsum"
-    compileSdk = flutter.compileSdkVersion
+    // 37 for flutter_local_notifications 23; Flutter's default is 36.
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
         isCoreLibraryDesugaringEnabled = true
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     defaultConfig {
@@ -60,6 +57,12 @@ android {
                 if (keystorePropertiesFile.exists()) "release" else "debug"
             )
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 

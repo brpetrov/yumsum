@@ -36,7 +36,7 @@ const apiKey =
   })
     .toString()
     .trim();
-const ai = new GoogleGenAI({ apiKey });
+const ai = new GoogleGenAI({ apiKey, apiVersion: "v1beta" });
 const profile = { country: "United Kingdom" };
 const config = { ...mealConfig(false), ...(temperature === undefined ? {} : { temperature }) };
 

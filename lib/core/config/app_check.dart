@@ -19,10 +19,12 @@ const _debugTokenOnAndroid = bool.fromEnvironment('APP_CHECK_DEBUG');
 Future<void> activateAppCheck() async {
   if (!appCheckAvailable) return;
   await FirebaseAppCheck.instance.activate(
-    androidProvider: kDebugMode || _debugTokenOnAndroid
-        ? AndroidProvider.debug
-        : AndroidProvider.playIntegrity,
-    appleProvider: kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
-    webProvider: kIsWeb ? ReCaptchaEnterpriseProvider(recaptchaSiteKey) : null,
+    providerAndroid: kDebugMode || _debugTokenOnAndroid
+        ? const AndroidDebugProvider()
+        : const AndroidPlayIntegrityProvider(),
+    providerApple: kDebugMode
+        ? const AppleDebugProvider()
+        : const AppleDeviceCheckProvider(),
+    providerWeb: kIsWeb ? ReCaptchaEnterpriseProvider(recaptchaSiteKey) : null,
   );
 }
