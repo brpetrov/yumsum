@@ -111,6 +111,9 @@ class CoachScreen extends ConsumerStatefulWidget {
 class _CoachScreenState extends ConsumerState<CoachScreen> {
   late DateTime _monday;
 
+  /// Where a sideways swipe began, to measure a slow one.
+  double _swipeFrom = 0;
+
   @override
   void initState() {
     super.initState();
@@ -145,7 +148,34 @@ class _CoachScreenState extends ConsumerState<CoachScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      body: ListView(
+      body: plus || kept ? _weeks(plus) : _page(const _CoachPitch()),
+    );
+  }
+
+  /// The page's scrolling column with [child]. A swipe sideways, by touch
+  /// or mouse, does what the arrows do: to the left [onNext], to the right
+  /// [onPrevious]. A fling counts, or a slower drag (a mouse's, often) of
+  /// 80 px.
+  Widget _page(Widget child, {VoidCallback? onPrevious, VoidCallback? onNext}) {
+    return RawGestureDetector(
+      gestures: {
+        _SwipeRecognizer:
+            GestureRecognizerFactoryWithHandlers<_SwipeRecognizer>(
+              _SwipeRecognizer.new,
+              (swipe) => swipe
+                ..onStart = ((start) => _swipeFrom = start.globalPosition.dx)
+                ..onEnd = (end) {
+                  final velocity = end.primaryVelocity ?? 0;
+                  final dragged = end.globalPosition.dx - _swipeFrom;
+                  final way = velocity != 0
+                      ? velocity
+                      : (dragged.abs() >= 80 ? dragged : 0);
+                  if (way < 0) onNext?.call();
+                  if (way > 0) onPrevious?.call();
+                },
+            ),
+      },
+      child: ListView(
         padding: EdgeInsets.zero,
         children: [
           ResponsivePage(
@@ -156,7 +186,7 @@ class _CoachScreenState extends ConsumerState<CoachScreen> {
               20,
               28 + MediaQuery.paddingOf(context).bottom,
             ),
-            child: plus || kept ? _weeks(plus) : const _CoachPitch(),
+            child: child,
           ),
         ],
       ),
@@ -170,7 +200,7 @@ class _CoachScreenState extends ConsumerState<CoachScreen> {
       ref.watch(entitlementProvider).valueOrNull,
     );
     if (plus && firstWeek != null && firstWeek.isAfter(latest)) {
-      return _FirstNotes(now: now);
+      return _page(_FirstNotes(now: now));
     }
     final firstDay = ref.watch(firstLoggedDayProvider).valueOrNull;
     var first = firstDay == null
@@ -183,25 +213,45 @@ class _CoachScreenState extends ConsumerState<CoachScreen> {
     if (firstWeek != null && firstWeek.isAfter(first)) first = firstWeek;
     DateTime shift(int weeks) =>
         DateTime(_monday.year, _monday.month, _monday.day + 7 * weeks);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _WeekHeader(
-          monday: _monday,
-          latest: latest,
-          onPrevious: _monday.isAfter(first)
-              ? () => setState(() => _monday = shift(-1))
-              : null,
-          onNext: _monday.isBefore(latest)
-              ? () => setState(() => _monday = shift(1))
-              : null,
-        ),
-        const SizedBox(height: 18),
-        if (!plus) ...[const _Ended(), const SizedBox(height: 18)],
-        _WeekNotes(monday: _monday, plus: plus),
-      ],
+    final onPrevious = _monday.isAfter(first)
+        ? () => setState(() => _monday = shift(-1))
+        : null;
+    final onNext = _monday.isBefore(latest)
+        ? () => setState(() => _monday = shift(1))
+        : null;
+    return _page(
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _WeekHeader(
+            monday: _monday,
+            latest: latest,
+            onPrevious: onPrevious,
+            onNext: onNext,
+          ),
+          const SizedBox(height: 18),
+          if (!plus) ...[const _Ended(), const SizedBox(height: 18)],
+          _WeekNotes(monday: _monday, plus: plus),
+        ],
+      ),
+      onPrevious: onPrevious,
+      onNext: onNext,
     );
   }
+}
+
+/// A sideways drag that waits for a finger's slop (18 px) from a mouse too,
+/// where Flutter would start it after 1 px, so a click on a note or a recipe
+/// that drifts a little still taps.
+class _SwipeRecognizer extends HorizontalDragGestureRecognizer {
+  @override
+  bool hasSufficientGlobalDistanceToAccept(
+    PointerDeviceKind pointerDeviceKind,
+    double? deviceTouchSlop,
+  ) => super.hasSufficientGlobalDistanceToAccept(
+    PointerDeviceKind.touch,
+    deviceTouchSlop,
+  );
 }
 
 /// The week's name beside the coach, with Previous and Next: "Last week"

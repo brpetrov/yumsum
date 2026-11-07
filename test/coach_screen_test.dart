@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -392,6 +393,75 @@ void main() {
       expect(find.text('Last week'), findsOneWidget);
       expect(_enabled(tester, _next), isFalse);
       expect(_enabled(tester, _previous), isTrue);
+    });
+
+    testWidgets('a swipe left goes to the later week and right to the '
+        'earlier, as Next and Previous do, by touch or mouse', (tester) async {
+      await pump(tester);
+      final page = find.byType(ListView);
+      Future<void> fling(double dx) async {
+        await tester.fling(page, Offset(dx, 0), 1000);
+        await tester.pumpAndSettle();
+      }
+
+      // Next is off on the latest week, and so is a swipe left.
+      await fling(-200);
+      expect(find.text('Last week'), findsOneWidget);
+
+      await fling(200);
+      expect(find.text(_dates(_days(latest, -7))), findsOneWidget);
+      await fling(200);
+      expect(find.text(_dates(_days(latest, -14))), findsOneWidget);
+      // On the first week Previous is off, and so is a swipe right.
+      await fling(200);
+      expect(find.text(_dates(_days(latest, -14))), findsOneWidget);
+      expect(asked, [latest, _days(latest, -7), _days(latest, -14)]);
+
+      await fling(-200);
+      expect(find.text(_dates(_days(latest, -7))), findsOneWidget);
+
+      // A mouse's slow drag counts once it's gone 80 px.
+      await tester.drag(
+        page,
+        const Offset(-40, 0),
+        kind: PointerDeviceKind.mouse,
+      );
+      await tester.pumpAndSettle();
+      expect(find.text(_dates(_days(latest, -7))), findsOneWidget);
+      await tester.drag(
+        page,
+        const Offset(-120, 0),
+        kind: PointerDeviceKind.mouse,
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Last week'), findsOneWidget);
+
+      // The page still scrolls up and down.
+      await tester.drag(page, const Offset(0, -300));
+      await tester.pumpAndSettle();
+      expect(
+        tester.state<ScrollableState>(find.byType(Scrollable)).position.pixels,
+        greaterThan(0),
+      );
+    });
+
+    testWidgets('a mouse click on a recipe that drifts a few pixels still '
+        'opens it', (tester) async {
+      await pump(tester, recipes: [testRecipe('Lentil soup')]);
+      final chip = find.descendant(
+        of: find.byType(Wrap),
+        matching: find.widgetWithText(InkWell, 'Lentil soup'),
+      );
+      await tester.ensureVisible(chip);
+      await tester.pumpAndSettle();
+      final click = await tester.startGesture(
+        tester.getCenter(chip),
+        kind: PointerDeviceKind.mouse,
+      );
+      await click.moveBy(const Offset(6, 0));
+      await click.up();
+      await tester.pumpAndSettle();
+      expect(find.text('Recipe lentil-soup'), findsOneWidget);
     });
 
     testWidgets('the weeks go back only to the one YumSum Star began in', (
