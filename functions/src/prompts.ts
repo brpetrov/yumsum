@@ -349,7 +349,7 @@ const coachIntro =
 /** A note's parts, with lengths and example titles for [language]. */
 function noteShape(language: Language): string {
   const [title, text, why, tip, examples] = language === "bg"
-    ? [50, 260, 190, 140, `"Малко фибри трета седмица поред" or "Уикендите излизат над целта"`]
+    ? [50, 260, 190, 140, `"Малко фибри трета седмица поред" or "Уикендите са над целта"`]
     : [40, 220, 160, 120, `"Fibre low for a third week" or "Weekends run high"`];
   return "Each note has a title, a text, a why, tips and recipes. The title is a " +
     `short plain heading of at most ${title} characters, such as ${examples}. ` +
@@ -380,11 +380,16 @@ const bulgarianWriting =
   "How to write: in Bulgarian, the way a Bulgarian would write for a " +
   "well-made Bulgarian app: natural, plain, everyday Bulgarian, never a " +
   "word-for-word translation from English. Talk to the user informally, " +
-  `with "ти" ("ти", "твоят", "си"), never "Вие". Warm and matter-of-fact, ` +
-  "like a good coach. No emoji, no exclamation marks. The user's gender " +
-  "isn't known, and Bulgarian past participles and adjectives about a " +
-  `person show it ("ял/яла", "успял/успяла", "доволен/доволна"): never use ` +
-  "one about the user. Use the present or the simple past, which don't " +
+  `with "ти" ("ти", "твоят", "си"), never "Вие". Warm, encouraging and ` +
+  "matter-of-fact, like a good coach who is also a friend: short " +
+  `sentences and everyday verbs ("яж", "хапни", "добави"), not stiff ` +
+  `nouns or officialese ("консумация", "консумирай", "с цел", ` +
+  `"осъществи", "следва да"). No emoji, no exclamation marks. The user's ` +
+  "gender isn't known, and Bulgarian past participles and adjectives " +
+  `about a person show it ("ял/яла", "успял/успяла", "доволен/доволна", ` +
+  `"постоянен/постоянна", "готов/готова"): never use one about the user, ` +
+  `not even in the perfect tense ("си изял", "си записал"). Use the ` +
+  "present or the simple past, which don't " +
   `("изяде", "прие", "записа", "стигна"), or make the food, the day or the ` +
   `nutrient the subject ("Протеинът стигна целта през уикенда"). Tips ` +
   `start with a verb telling the user what to do ("Добави", "Сложи", ` +
@@ -429,9 +434,10 @@ const bulgarianWords =
   "with what the facts say in English put into Bulgarian: days in lower " +
   `case ("в понеделник", "през уикенда"); "ккал", "г" and "кг"; protein ` +
   `"протеин", fibre "фибри", salt "сол", sugars "захари", saturates ` +
-  `"наситени мазнини"; the daily target "дневната цел", a day off ` +
-  `"почивен ден", a weigh-in "претегляне", a logged meal "записано ` +
-  `хранене". No word of blame either, such as "провал", "виновен", ` +
+  `"наситени мазнини"; the daily target "дневната цел", a day on track ` +
+  `"ден в целта", a day off "почивен ден", a weigh-in "претегляне", a ` +
+  `logged meal "записано хранене", the Adaptive formula "адаптивната ` +
+  `формула". No word of blame either, such as "провал", "виновен", ` +
   `"мързел" or "боклучава храна". Numbers stay the facts' own, written ` +
   `the Bulgarian way: a decimal comma where the facts have a point ("7,4 ` +
   `г" for 7.4 g) and no separator in thousands ("1850 ккал" for 1,850 ` +
