@@ -61,6 +61,17 @@ Short and plain, in British English, saying "you":
 - Plain words over jargon: "adjusts", not "recalculates".
 - Keep lines and button labels short enough for a 360dp phone.
 
+## Text and translation
+
+The app is in English and Bulgarian (`docs/translation.md` has the how-to and what is still to move):
+- Every user-facing string goes in both `lib/l10n/app_en.arb` (with an `@key` description) and `app_bg.arb`, never as a literal in Dart. Widgets read it with `context.l10n.key`; code without a context (controllers, services, notifications) with `ref.read(l10nProvider)`. Run `flutter gen-l10n` after editing the ARBs and commit the generated `app_localizations*.dart`.
+- Keys are lowerCamelCase, `<area><Thing>`: the screen or feature first (`auth`, `home`, `quickLog`, `coach`, `progress`, …, `common` for shared words like Cancel), then what it is (`homeTitle`, `progressErrorLoad`).
+- Values in text are ICU placeholders (`{name}`), never glued strings; counts use ICU plurals, and Bulgarian needs only `one` and `other` (plus `=0` where the text differs).
+- Dates and decimals go through the `AppFormats` helpers in `lib/l10n/l10n.dart` (`l10n.dayMonth(date)`, `l10n.decimal(kg)`), not `DateFormat` or `toStringAsFixed` in shown text. Date keys (`yyyy-MM-dd`) and what the AI is sent stay as they are.
+- The language sent to the Cloud Functions comes from `languageCodeProvider` only.
+- Owner-only Debug tools (`lib/screens/debug/`, `debug_provider.dart`) stay English. So do the AI's facts and prompts, log lines and exceptions nobody sees.
+- Bulgarian copy addresses the user with the polite plural ("Запишете", "вашият"), keeps the rules above (sentence case, no exclamation marks, "Не можахме да … Опитайте отново."), and must fit a 360dp phone: Bulgarian runs about a fifth longer.
+
 ## Where things live
 
 | Feature | Code | Plan |
@@ -78,6 +89,7 @@ Short and plain, in British English, saying "you":
 | YumSum Star, Debug tools | `lib/providers/plus_provider.dart`, `lib/screens/plus/`, `lib/widgets/plus_mark.dart`, `lib/screens/debug/` | 06, 07 |
 | Billing | `lib/services/billing_service.dart`, `lib/providers/plus_purchase_controller.dart`, `lib/repositories/billing_repository.dart`, `functions/` | 07 |
 | Reminders, widget, shortcuts | `lib/services/notification_service.dart`, `lib/app/launch_actions.dart` | |
+| Language, texts, dates and numbers | `lib/l10n/`, `lib/providers/language_provider.dart`, `lib/screens/language/` | |
 | Legal pages, website | `tools/hosting/`, `tools/build_hosting.ps1` | 02 |
 
 `docs/plans/` holds the owner's plans with their set-up steps and checklists:

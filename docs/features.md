@@ -27,6 +27,17 @@ How each part of the app works, for when you're working on it. `CLAUDE.md` has t
   - AI Coach (`WeeklyNotesCard`, plan 09) sits under the calendar in both views as a card that opens the AI Coach page on that week: the week shown in the week view, and in the month view the latest week that ended in that month, named ("Week of 26 October"). Free users get its prompt (`CoachPrompt`) in both, which opens the page too.
 - Plan Settings is `PlanSettingsScreen` in `lib/screens/profile/profile_screen.dart`; Account Settings is `AccountSettingsScreen` on `/profile`.
 - Routing: `goRouterProvider` listens to `authStateProvider` and `userProfileProvider` and enforces Splash → Auth → Onboarding → Home; a profile that fails to load goes to `ProfileLoadErrorScreen`.
+  - Before all of them, `LanguageScreen` (`/language`, `lib/screens/language/language_screen.dart`) when `languagePromptProvider` says so: no language chosen yet, and the device's region is BG or MT or its language is Bulgarian. It shows "Choose your language" and "Изберете език" with English and Български; choosing saves the setting and the redirect moves on (to Auth, or Home for a signed-in user). Everyone else never sees it and gets English.
+
+## Language
+
+English and Bulgarian, with gen-l10n (`l10n.yaml`): the texts are in `lib/l10n/app_en.arb` (the template) and `app_bg.arb`; `flutter gen-l10n` (or any build or `flutter pub get`) writes `lib/l10n/app_localizations*.dart`, which are committed. How to add a string, the key names and what is still English: `docs/translation.md`.
+- The setting: `languageControllerProvider` (`lib/providers/language_provider.dart`), the device setting `language`: `en`, `bg` or unset (English). Changed in the menu's Language switch (`AppDrawer`) and on the first-launch `LanguageScreen`; applied at once, as `LeanStreakApp` gives `MaterialApp.router` the locale (`languageCodeProvider`), and with it Material's own texts (date pickers, tooltips) in Bulgarian.
+- Widgets read texts with `context.l10n.key` (`lib/l10n/l10n.dart`), English where no localisations are in the tree, as in widget tests. Code without a context (controllers, services, notifications) reads `ref.read(l10nProvider)`, or watches it where the text must follow a change.
+- `languageCodeProvider` is also what the Cloud Functions are to be sent, so AI replies and emails match the app.
+- Dates and numbers: the `AppFormats` extension on `AppLocalizations` (`weekdayDayMonth`, `dayMonth`, `shortDayMonth`, `monthYear`, `time`, `decimal`, …) formats with intl in the texts' language ("събота, 7 ноември", "1,5"), loading intl's date data on first use. `parseDecimal` reads a typed number with a comma or a point. Dates used as keys (`yyyy-MM-dd`) and the AI's facts stay as they are.
+- `reminderSyncProvider` watches `l10nProvider`, so the scheduled reminders are scheduled again in the new language.
+- iOS lists `en` and `bg` in `CFBundleLocalizations` (`ios/Runner/Info.plist`).
 
 ## Look and feel
 
@@ -34,7 +45,7 @@ How each part of the app works, for when you're working on it. `CLAUDE.md` has t
 - `AppColors` is static getters switched by `AppColors.isDark`, which `LeanStreakApp` sets from the stored ThemeMode (System/Light/Dark in the menu, `themeControllerProvider`) and the platform brightness. So expressions using `AppColors` can't be `const`.
 - `AppTheme.light`/`dark` are built from the palettes. On wide browser windows `appShellBuilder` (`lib/app/app.dart`) shows the app as one centred column.
 - Colours follow the YumSum icon: cream backgrounds; the icon's orange (`primary`) for actions (buttons, links, focus, the mic); its arc green (`veryGood`) for on track and progress (Home's bars and rings, the month bars, the weight chart); amber for close; raspberry red for off track and errors.
-- Fonts: Nunito for body text; Fredoka for headings, app bar titles and big numbers (no Cyrillic, so it falls back to Nunito). Both are bundled in `assets/fonts`, their OFL licences registered in `main()`.
+- Fonts: Nunito for body text; Fredoka for headings, app bar titles and big numbers. Fredoka has no Cyrillic, so `AppTheme.display` falls back to `NunitoDisplay`, a pubspec family holding only Nunito ExtraBold: Nunito at Fredoka's own 600 looks thin beside it, and the engines pick a family's face by the file's real weight, so ExtraBold has to be the only one. Rubik (Cyrillic) was compared and not chosen: no closer to Fredoka's round ends than Nunito. All are bundled in `assets/fonts`, their OFL licences registered in `main()`, so Bulgarian never falls back to a system font.
 - Shapes are round and roomy: pill buttons and chips, 28px cards on a warm shadow (`AppCard`, `lib/widgets/app_card.dart`), round calendar days, `PillToggle` for two- and three-way switches, `IconBubble` behind icons, `BowlNote` (the smiling bowl) for empty states.
 - `AppLogoMark` shows `assets/logo.png` on the icon's gradient tile on phones; the web paints a drawn version (`_BowlPainter`), which stays sharp small.
 - App icons for every platform come from `design/` via `python -I tools/make_icons.py`, along with `drawable-xxxhdpi/splash_icon.png`, the bowl alone that Android 12's launch screen shows (`values-v31/styles.xml` and the night one).
@@ -44,6 +55,7 @@ How each part of the app works, for when you're working on it. `CLAUDE.md` has t
 
 SharedPreferences through `sharedPreferencesProvider` (`lib/providers/preferences_provider.dart`), overridden in `main()` so readers never wait (unoverridden it throws). Keys:
 - `theme_mode`
+- `language` (`en`, `bg`, or unset for English; see Language)
 - `reminders.*` (switches, times, `creatine_offered`)
 - `off.app_uuid`, `contributions.count`
 - `feedback.sent_day`, `feedback.sent_count` (3 feedback messages a day)
@@ -314,7 +326,7 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
 
 - **Reminders:** `NotificationService` (`flutter_local_notifications`, Android/iOS only) schedules a daily meal reminder (20:30), a weigh-in reminder (Saturday 20:00 by default; a day or every day, and a time) and a daily creatine reminder (off by default, 09:00).
   - The switches are on the Notifications page (`NotificationsScreen`).
-  - `reminderSyncProvider` keeps the schedules in step, asking for permission once on first run.
+  - `reminderSyncProvider` keeps the schedules in step, asking for permission once on first run. Their texts (and Android's channel names) come from `l10nProvider`, and a change of language schedules them again.
 - **The creatine offer:** Home offers the creatine reminder once (`offerCreatineReminder`), from the day after sign-up to the end of the first week (`shouldOfferCreatine`), and either way says where to find it.
 - **Launch actions:** a tap on the weigh-in reminder becomes `LaunchAction.logWeight` (`lib/app/launch_actions.dart`, bound in `main()` before Firebase so a cold-start tap isn't lost), and Home opens the log-weight dialog.
 - **Android widget:** `LogWidgetProvider.kt` (a `home_widget` `HomeWidgetProvider`) draws `res/layout/log_widget.xml`, a 2×1 mini log bar (`res/xml/log_widget_info.xml`, colours in `values(-night)/colors.xml`).
