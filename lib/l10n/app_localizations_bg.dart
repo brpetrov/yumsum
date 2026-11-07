@@ -2673,12 +2673,12 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String progressDeleteBody(String weight, String date) {
-    return 'Да махнем ли $weight от $date?';
+    return 'Да премахнем ли $weight от $date?';
   }
 
   @override
   String progressDeleteBodyBack(String weight, String date, String previous) {
-    return 'Да махнем ли $weight от $date? Планът ти ще се върне към $previous.';
+    return 'Да премахнем ли $weight от $date? Планът ти ще се върне към $previous.';
   }
 
   @override
