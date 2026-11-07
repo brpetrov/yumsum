@@ -7,6 +7,7 @@ import 'package:lean_streak/helpers/week_facts.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/models/weekly_review.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/country_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
@@ -129,6 +130,7 @@ final weeklyReviewProvider = FutureProvider.autoDispose
           endDate: end,
         ),
         profile: user,
+        country: ref.watch(countryProvider),
         recipes: recipes,
       );
       if (facts.judgedDays < 4) return const [];

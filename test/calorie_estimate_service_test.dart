@@ -30,7 +30,6 @@ void main() {
       _Usage(used),
       functions,
       country: 'Bulgaria',
-      usualFood: 'home cooking',
       dailyLimit: dailyLimit,
       plus: plus,
     );
@@ -40,7 +39,7 @@ void main() {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     test(
-      'an estimate sends the meal and the profile, never a prompt',
+      'an estimate sends the meal and the country, never a prompt',
       () async {
         final estimates = service(plus: true);
         functions.reply = {
@@ -59,7 +58,6 @@ void main() {
         expect(data, {
           'kind': 'meal',
           'country': 'Bulgaria',
-          'usualFood': 'home cooking',
           'macros': true,
           'text': 'Musaka',
           'dateKey': today,

@@ -289,6 +289,14 @@ describe("estimateAsk", () => {
     ));
   });
 
+  test("an older app's usual food is ignored, whatever it is", () => {
+    const plain = estimateAsk({ kind: "meal", text: "Musaka", country: "Bulgaria" });
+    for (const usualFood of ["vegetarian home cooking", 5, "x".repeat(501)]) {
+      const ask = estimateAsk({ kind: "meal", text: "Musaka", country: "Bulgaria", usualFood });
+      assert.equal(ask.contents, plain.contents);
+    }
+  });
+
   test("a voice note, a photo and a label go as files after the prompt", () => {
     const parts = (ask: Ask) =>
       (ask.contents as { parts: { text?: string; inlineData?: { mimeType: string } }[] }[])[0].parts;
@@ -321,7 +329,6 @@ describe("estimateAsk", () => {
       { kind: "meal", text: "  " },
       { kind: "meal", text: "x".repeat(1001) },
       { kind: "meal", text: "Musaka", country: "x".repeat(101) },
-      { kind: "meal", text: "Musaka", usualFood: 5 },
       { kind: "voice" },
       { kind: "voice", audio: "not base64!" },
       { kind: "photo", photo: "A".repeat(7_000_000) },
@@ -346,7 +353,7 @@ describe("estimateAsk", () => {
 });
 
 describe("the prompts", () => {
-  const profile = { country: "United Kingdom", usualFood: "" };
+  const profile = { country: "United Kingdom" };
   const prompts = (ask: boolean) => [
     mealPrompt(profile, ask, "Musaka"),
     voicePrompt(profile, ask),
@@ -379,22 +386,13 @@ describe("the prompts", () => {
     }
   });
 
-  test("nutritionContext names the country and the usual food", () => {
-    const context = nutritionContext({
-      country: "Bulgaria",
-      usualFood: " vegetarian home cooking ",
-    });
+  test("nutritionContext names the country and nothing else about the user", () => {
+    const context = nutritionContext({ country: "Bulgaria" });
     assert.ok(context.startsWith(
-      "You are a nutrition assistant. The user lives in Bulgaria and " +
-        "often eats vegetarian home cooking.",
+      "You are a nutrition assistant. The user lives in Bulgaria. Read",
     ));
     assert.ok(!context.includes("UK"));
-  });
-
-  test("nutritionContext leaves the food out when none is given", () => {
-    assert.ok(nutritionContext({ country: "Germany", usualFood: "" }).startsWith(
-      "You are a nutrition assistant. The user lives in Germany. Read",
-    ));
+    assert.ok(!context.includes("often eats"));
   });
 
   test("AI Coach thinks only a little, so it answers in seconds", () => {

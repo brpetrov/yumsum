@@ -20,7 +20,6 @@ class OnboardingController extends AsyncNotifier<void> {
     required TrainingFrequency trainingFrequency,
     required WeightLossPace weightLossPace,
     required String country,
-    required String usualFood,
     required bool trackProtein,
   }) async {
     state = const AsyncLoading();
@@ -46,7 +45,6 @@ class OnboardingController extends AsyncNotifier<void> {
         email: email,
         name: name.trim(),
         country: country.trim(),
-        usualFood: usualFood.trim(),
         trackProtein: trackProtein,
         age: age,
         gender: gender,

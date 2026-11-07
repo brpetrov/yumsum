@@ -31,8 +31,6 @@ class _FakeProfileController extends ProfileController {
     required ActivityLevel activityLevel,
     required TrainingFrequency trainingFrequency,
     required WeightLossPace weightLossPace,
-    required String country,
-    required String usualFood,
     required bool trackProtein,
   }) async {
     saved.add(trainingFrequency);
@@ -95,6 +93,12 @@ void main() {
   }
 
   final adaptiveRow = find.widgetWithText(ListTile, 'Adaptive formula');
+
+  testWidgets('asks neither the country nor the usual food', (tester) async {
+    await pumpSettings(tester);
+    expect(find.text('Country you live in'), findsNothing);
+    expect(find.textContaining('Food you usually eat'), findsNothing);
+  });
 
   Future<void> showRow(WidgetTester tester) async {
     await tester.ensureVisible(adaptiveRow);

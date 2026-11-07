@@ -391,6 +391,7 @@ WeekFacts _facts({
   List<Meal>? meals,
   int weighIns = 3,
   UserProfile? profile,
+  String country = 'United Kingdom',
   List<Recipe>? recipes,
 }) => buildWeekFacts(
   monday: monday ?? _monday,
@@ -398,6 +399,7 @@ WeekFacts _facts({
   meals: meals ?? _meals,
   weighIns: weighIns,
   profile: profile ?? _profile,
+  country: country,
   recipes: recipes ?? _recipes,
 );
 
@@ -475,19 +477,20 @@ void main() {
     ]);
   });
 
-  test('the country and the usual food come first, on one line each', () {
+  test('the country comes first; the stored country and usual food never '
+      'do', () {
     final lines = _facts(
       profile: _profile.copyWith(
-        country: 'Bulgaria',
-        usualFood: '  Bulgarian home cooking:\nbanitsa, shopska  salad ',
+        country: 'Germany',
+        usualFood: 'Bulgarian home cooking',
       ),
+      country: 'Bulgaria',
     ).lines;
-    expect(lines.take(3), [
+    expect(lines.take(2), [
       'The user lives in Bulgaria.',
-      'What they usually eat, in their words: "Bulgarian home cooking: '
-          'banitsa, shopska salad".',
       'Week: Monday 26 October to Sunday 1 November.',
     ]);
+    expect(lines.where((line) => line.contains('home cooking')), isEmpty);
   });
 
   test('last week is compared only when both weeks have 4 judged days', () {

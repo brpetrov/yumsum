@@ -84,8 +84,8 @@ export type Generate = (ask: Ask) => Promise<string | undefined>;
  *   of the pack, JPEGs in base64, for a contribution;
  * - `nutrients`: `name` and `kcal`, the fill-in when a named meal is saved.
  * All take `dateKey` (the phone's date, yyyy-MM-dd), and all but `label`
- * take `country`, `usualFood` and `macros` (true for YumSum Star). Returns
- * the model's JSON reply as it is, which the app reads.
+ * take `country` and `macros` (true for YumSum Star); older apps' `usualFood`
+ * is ignored. Returns the model's JSON reply as it is, which the app reads.
  */
 export const aiEstimate = onCall(options, (request) => {
   const uid = signedIn(request);
@@ -112,7 +112,6 @@ export function estimateAsk(raw: unknown): Ask {
   const data = dataOf(raw);
   const profile: Profile = {
     country: text(data.country, 100) || "United Kingdom",
-    usualFood: text(data.usualFood, 500),
   };
   const macros = data.macros === true;
   const estimate = (contents: ContentListUnion): Ask => ({

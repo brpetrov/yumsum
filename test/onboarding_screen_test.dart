@@ -20,7 +20,6 @@ typedef _Answers = ({
   TrainingFrequency trainingFrequency,
   WeightLossPace weightLossPace,
   String country,
-  String usualFood,
   bool trackProtein,
 });
 
@@ -39,7 +38,6 @@ class _FakeOnboardingController extends OnboardingController {
     required TrainingFrequency trainingFrequency,
     required WeightLossPace weightLossPace,
     required String country,
-    required String usualFood,
     required bool trackProtein,
   }) async {
     submitted.add((
@@ -53,7 +51,6 @@ class _FakeOnboardingController extends OnboardingController {
       trainingFrequency: trainingFrequency,
       weightLossPace: weightLossPace,
       country: country,
-      usualFood: usualFood,
       trackProtein: trackProtein,
     ));
   }
@@ -183,7 +180,6 @@ void main() {
         trainingFrequency: TrainingFrequency.oneToTwo,
         weightLossPace: WeightLossPace.moderate,
         country: 'Bulgaria',
-        usualFood: '',
         trackProtein: true,
       ),
     ]);

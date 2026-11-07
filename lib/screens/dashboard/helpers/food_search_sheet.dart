@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/providers/country_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
-import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
 import 'package:lean_streak/widgets/pack_photo.dart';
 
@@ -29,10 +29,7 @@ class _FoodSearchSheet extends ConsumerStatefulWidget {
 class _FoodSearchSheetState extends ConsumerState<_FoodSearchSheet> {
   late final _results = ref
       .read(foodLookupServiceProvider)
-      .search(
-        widget.query,
-        country: ref.read(userProfileProvider).valueOrNull?.country,
-      );
+      .search(widget.query, country: ref.read(countryProvider));
 
   @override
   Widget build(BuildContext context) {

@@ -63,13 +63,15 @@ double _average(Iterable<double> values) =>
 
 /// The facts about the week starting [monday]. [summaries] and [meals]
 /// cover the 4 weeks ending on its Sunday (for the usual big day and the
-/// nutrients over the weeks); [weighIns] is how many fell in the week.
+/// nutrients over the weeks); [weighIns] is how many fell in the week;
+/// [country] is where the user lives (`countryProvider`).
 WeekFacts buildWeekFacts({
   required DateTime monday,
   required List<DailySummary> summaries,
   required List<Meal> meals,
   required int weighIns,
   required UserProfile profile,
+  required String country,
   required List<Recipe> recipes,
 }) {
   DateTime dayOf(int offset) =>
@@ -136,12 +138,8 @@ WeekFacts buildWeekFacts({
         '(${day.status.label.toLowerCase()}, $away)';
   }
 
-  final usualFood = profile.usualFood.trim().replaceAll(RegExp(r'\s+'), ' ');
   final lines = <String>[
-    'The user lives in ${profile.country}.',
-    if (usualFood.isNotEmpty)
-      'What they usually eat, in their words: '
-          '"${String.fromCharCodes(usualFood.runes.take(200))}".',
+    'The user lives in $country.',
     'Week: ${DateFormat('EEEE d MMMM').format(monday)} to '
         '${DateFormat('EEEE d MMMM').format(dayOf(6))}.',
     'On track means within 10% of the daily target; close means within 20%.',

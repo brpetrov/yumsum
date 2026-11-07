@@ -9,9 +9,9 @@ import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/country_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
-import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/services/food_contribution_service.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
@@ -260,7 +260,7 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
     }
     final prefs = ref.read(sharedPreferencesProvider);
     final service = ref.read(foodContributionServiceProvider);
-    final country = ref.read(userProfileProvider).valueOrNull?.country;
+    final country = ref.read(countryProvider);
     final per100g = {for (final id in labelNutrientIds) id: ?_figure(id)};
     setState(() {
       _sending = true;

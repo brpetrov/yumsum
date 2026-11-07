@@ -317,11 +317,9 @@ class CalorieEstimateService {
     this._usageRepo,
     this._functions, {
     required String country,
-    required String usualFood,
     int? dailyLimit = AiUsageRepository.dailyLimit,
     bool plus = false,
   }) : _country = country,
-       _usualFood = usualFood,
        _dailyLimit = dailyLimit,
        _plus = plus;
 
@@ -331,21 +329,19 @@ class CalorieEstimateService {
   /// Estimates allowed a day; null for no limit (the owner's account).
   final int? _dailyLimit;
 
-  /// From the profile: where the user lives and what they usually eat.
+  /// Where the user lives (`countryProvider`).
   final String _country;
-  final String _usualFood;
 
   /// YumSum Star, whose estimates always come with macros. The server
   /// refuses macros to an account without it.
   final bool _plus;
 
-  /// Asks `aiEstimate` for [kind] with the profile, which the server's
+  /// Asks `aiEstimate` for [kind] with the country, which the server's
   /// prompts open with.
   Future<Map<String, dynamic>> _ask(String kind, Map<String, Object?> data) =>
       callAi(_functions, 'aiEstimate', {
         'kind': kind,
         'country': _country,
-        'usualFood': _usualFood,
         'macros': _plus,
         ...data,
       });

@@ -21,24 +21,21 @@ export const jsonReply: GenerateContentConfig = {
   responseMimeType: "application/json",
 };
 
-/** From the profile: where the user lives and what they usually eat. */
+/** From the app: where the user lives, from the device's region. */
 export interface Profile {
   country: string;
-  usualFood: string;
 }
 
 /**
  * The opening of every estimate prompt, so dish names and portions are read
  * the way the user means them.
  */
-export function nutritionContext({ country, usualFood }: Profile): string {
-  const food = usualFood.trim();
-  return `You are a nutrition assistant. The user lives in ${country}` +
-    `${food ? ` and often eats ${food}` : ""}. Read dish names the ` +
-    "way they are used there: the same name can mean a different dish in " +
-    "different cuisines. The user may write in English or their own " +
-    "language; write the meal name and item names in the language they " +
-    "used.\n";
+export function nutritionContext({ country }: Profile): string {
+  return `You are a nutrition assistant. The user lives in ${country}. Read ` +
+    "dish names the way they are used there: the same name can mean a " +
+    "different dish in different cuisines. The user may write in English or " +
+    "their own language; write the meal name and item names in the " +
+    "language they used.\n";
 }
 
 // The weights let the user correct a portion in the app without asking the

@@ -7,6 +7,7 @@ import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/weekly_review.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/country_provider.dart';
 import 'package:lean_streak/providers/daily_summary_provider.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
@@ -132,6 +133,7 @@ void main() {
     Entitlement? entitlement = _plus,
     DateTime? week,
     Map<String, WeeklyReview> saved = const {},
+    String region = 'GB',
   }) {
     meals = _FakeMeals();
     weighIns = _FakeWeighIns();
@@ -140,6 +142,7 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         currentUidProvider.overrideWithValue('user-1'),
+        deviceRegionProvider.overrideWithValue(region),
         entitlementProvider.overrideWith((ref) => Stream.value(entitlement)),
         userProfileProvider.overrideWith((ref) => Stream.value(planProfile())),
         recipesProvider.overrideWith((ref) async => const []),
@@ -168,6 +171,12 @@ void main() {
     await pumpEventQueue();
     expect(weighIns.ranges, [(week, sunday)]);
     expect(coach.facts, contains('Weigh-ins this week: 2.'));
+  });
+
+  test('the country is the device\'s region, not the stored one', () async {
+    container(region: 'BG');
+    await pumpEventQueue();
+    expect(coach.facts, startsWith('The user lives in Bulgaria.\n'));
   });
 
   test('reads 4 weeks of meals, for the nutrients over the weeks', () async {

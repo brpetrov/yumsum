@@ -23,8 +23,6 @@ class ProfileController extends AsyncNotifier<void> {
     required ActivityLevel activityLevel,
     required TrainingFrequency trainingFrequency,
     required WeightLossPace weightLossPace,
-    required String country,
-    required String usualFood,
     required bool trackProtein,
   }) async {
     state = const AsyncLoading();
@@ -69,8 +67,6 @@ class ProfileController extends AsyncNotifier<void> {
 
       final updatedProfile = currentProfile.copyWith(
         name: name.trim(),
-        country: country.trim(),
-        usualFood: usualFood.trim(),
         trackProtein: trackProtein,
         age: age,
         gender: gender,

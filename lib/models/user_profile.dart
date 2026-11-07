@@ -108,10 +108,9 @@ enum GoalPaceLevel {
 const defaultCountry = 'United Kingdom';
 const legacyUsualFood = 'Bulgarian home cooking';
 
-/// The country the profile stores for the phone's region [code] (ISO, e.g.
-/// GB): its English name where YumSum knows it, else the code itself, which
-/// the AI still understands and Plan Settings shows to correct. No code
-/// gives [defaultCountry].
+/// The country for the device's region [code] (ISO, e.g. GB): its English
+/// name where YumSum knows it, else the code itself, which the AI still
+/// understands. No code gives [defaultCountry].
 String countryNameFor(String? code) {
   if (code == null || code.isEmpty) return defaultCountry;
   final upper = code.toUpperCase();
@@ -176,8 +175,9 @@ class UserProfile {
   final String email;
   final String name;
 
-  /// Where the user lives and what they usually eat; both open every AI
-  /// prompt so dish names and portions are read the way they mean them.
+  /// The stored country, which `countryProvider` falls back to when the
+  /// device gives no region. Usual food is no longer asked or used. Both are
+  /// kept as stored.
   final String country;
   final String usualFood;
 

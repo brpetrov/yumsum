@@ -58,8 +58,6 @@ void main() {
           activityLevel: profile.activityLevel,
           trainingFrequency: training,
           weightLossPace: pace,
-          country: profile.country,
-          usualFood: profile.usualFood,
           trackProtein: profile.trackProtein,
         );
     expect(saved, isTrue);

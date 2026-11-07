@@ -37,7 +37,7 @@ const apiKey =
     .toString()
     .trim();
 const ai = new GoogleGenAI({ apiKey });
-const profile = { country: "United Kingdom", usualFood: "" };
+const profile = { country: "United Kingdom" };
 const config = { ...mealConfig(false), ...(temperature === undefined ? {} : { temperature }) };
 
 // The app's filter: options at least 30 kcal from the item and each other,

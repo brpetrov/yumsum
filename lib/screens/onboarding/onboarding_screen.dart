@@ -7,6 +7,7 @@ import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
+import 'package:lean_streak/providers/country_provider.dart';
 import 'package:lean_streak/providers/debug_provider.dart';
 import 'package:lean_streak/providers/onboarding_controller.dart';
 import 'package:lean_streak/widgets/app_logo_mark.dart';
@@ -32,9 +33,9 @@ enum _Step {
   plan,
 }
 
-/// First run: one question per card, then the plan. The country comes from
-/// the phone's region, usual food is left blank and the pace is moderate;
-/// Plan Settings changes any of them.
+/// First run: one question per card, then the plan. The pace is moderate
+/// until Plan Settings changes it; the country is stored from the phone's
+/// region, as `countryProvider`'s fallback.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -48,11 +49,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _heightCtrl = TextEditingController();
   final _currentWeightCtrl = TextEditingController();
   final _targetWeightCtrl = TextEditingController();
-
-  // Read once, as the screen opens.
-  final _country = countryNameFor(
-    WidgetsBinding.instance.platformDispatcher.locale.countryCode,
-  );
 
   Gender? _gender;
   ActivityLevel _activityLevel = ActivityLevel.sedentary;
@@ -209,8 +205,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           activityLevel: _activityLevel,
           trainingFrequency: _trainingFrequency,
           weightLossPace: _weightLossPace,
-          country: _country,
-          usualFood: '',
+          country: countryNameFor(ref.read(deviceRegionProvider)),
           trackProtein: _trackProtein,
         );
   }
