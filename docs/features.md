@@ -21,18 +21,18 @@ How each part of the app works, for when you're working on it. `CLAUDE.md` has t
 
 **Other pages:**
 - Editing a meal, or adding one to a past day, uses the meal form `showLogMealSheet` (`lib/screens/meals/log_meal_sheet.dart`), which has its own AI estimate.
-- The top-left menu (`AppDrawer` in `lib/widgets/app_frame.dart`, on every page) lists Home, History, AI Coach, Recipes, Weight & Progress, Plan Settings, Notifications and Account Settings, then YumSum Star, and Debug tools where they're on offer. There are no bottom tabs.
+- The top-left menu (`AppDrawer` in `lib/widgets/app_frame.dart`, on every page) lists Home, Recipes, History, Weight & Progress, AI Coach (with the YumSum Star at its end, as a Star feature; the page's title carries it too), Plan Settings, YumSum Star and Settings, then Debug tools where they're on offer, and Log out. There are no bottom tabs.
 - Home is the root and every other page sits one level above it: picking a page from inside another swaps it (`pushReplacement`), so Back always returns Home. YumSum Star opens over the current page instead.
 - History (`ReviewScreen`, `/review`): a week/month calendar with the period review; tapping a day opens `showDayMealsSheet` (`lib/screens/review/day_meals_sheet.dart`) to add, edit or delete its meals.
   - AI Coach (`WeeklyNotesCard`, plan 09) sits under the calendar in both views as a card that opens the AI Coach page on that week: the week shown in the week view, and in the month view the latest week that ended in that month, named ("Week of 26 October"). Free users get its prompt (`CoachPrompt`) in both, which opens the page too.
-- Plan Settings is `PlanSettingsScreen` in `lib/screens/profile/profile_screen.dart`; Account Settings is `AccountSettingsScreen` on `/profile`.
+- Plan Settings is `PlanSettingsScreen` in `lib/screens/profile/profile_screen.dart`; Settings is `AccountSettingsScreen` on `/profile`: Account, Password, Notifications (the reminders, `NotificationSettings` in `lib/screens/account/notification_settings.dart`, not on the web), Appearance (System / Light / Dark), Language, YumSum Star, Help & legal and Danger zone.
 - Routing: `goRouterProvider` listens to `authStateProvider` and `userProfileProvider` and enforces Splash → Auth → Onboarding → Home; a profile that fails to load goes to `ProfileLoadErrorScreen`.
   - Before all of them, `LanguageScreen` (`/language`, `lib/screens/language/language_screen.dart`) when `languagePromptProvider` says so: no language chosen yet, and the device's region is BG or MT or its language is Bulgarian. It shows "Choose your language" and "Изберете език" with English and Български; choosing saves the setting and the redirect moves on (to Auth, or Home for a signed-in user). Everyone else never sees it and gets English.
 
 ## Language
 
 English and Bulgarian, with gen-l10n (`l10n.yaml`): the texts are in `lib/l10n/app_en.arb` (the template) and `app_bg.arb`; `flutter gen-l10n` (or any build or `flutter pub get`) writes `lib/l10n/app_localizations*.dart`, which are committed. How to add a string, the key names and what is still English: `docs/translation.md`.
-- The setting: `languageControllerProvider` (`lib/providers/language_provider.dart`), the device setting `language`: `en`, `bg` or unset (English). Changed in the menu's Language switch (`AppDrawer`) and on the first-launch `LanguageScreen`; applied at once, as `LeanStreakApp` gives `MaterialApp.router` the locale (`languageCodeProvider`), and with it Material's own texts (date pickers, tooltips) in Bulgarian.
+- The setting: `languageControllerProvider` (`lib/providers/language_provider.dart`), the device setting `language`: `en`, `bg` or unset (English). Changed in Settings' Language switch and on the first-launch `LanguageScreen`; applied at once, as `LeanStreakApp` gives `MaterialApp.router` the locale (`languageCodeProvider`), and with it Material's own texts (date pickers, tooltips) in Bulgarian.
 - Widgets read texts with `context.l10n.key` (`lib/l10n/l10n.dart`), English where no localisations are in the tree, as in widget tests. Code without a context (controllers, services, notifications) reads `ref.read(l10nProvider)`, or watches it where the text must follow a change.
 - `languageCodeProvider` is also what the Cloud Functions are sent, as `language` with `aiEstimate`, `aiWeeklyReview` and `sendVerificationEmail`, so AI replies and emails match the app. The functions read it with `languageOf` (`functions/src/prompts.ts`): `bg`, or English for anything else and for older apps that send none.
 - What shows before Riverpod reads the stored setting itself (`LanguageController.storedIn`): `main()`'s first splash and the "YumSum could not start" screen (`_StartupErrorApp`, through `lookupAppLocalizations`).
@@ -71,7 +71,7 @@ SharedPreferences through `sharedPreferencesProvider` (`lib/providers/preference
 - The profile is `/users/{uid}`; everything else is in subcollections: `meals`, `daily_summaries` and `weight_entries` (both keyed by date), `ai_usage/{yyyy-MM-dd}`, `day_edits/{yyyy-MM}`, `days_off/{yyyy-MM-dd}` and `weekly_reviews/{yyyy-MM-dd}`, plus the functions' daily limits `contribution_usage/{yyyy-MM-dd}` and `feedback_usage/{yyyy-MM-dd}` (UTC days), which the app can't read or write.
 - Period reviews are computed, never stored; only the AI Coach's notes are cached, in `weekly_reviews`, with the facts they were written from. Legacy `check_ins` and `check_in_prompt_status` documents are only deleted with the account.
 - Repositories in `lib/repositories/` do the reads and writes; `AccountRepository` does the bulk deletes.
-- Reset progress (Weight & Progress) clears `weight_entries` only. Reset all data (Account Settings, `AccountRepository.resetAllData`) clears meals, summaries, weigh-ins, days off and the AI Coach's notes, but keeps the profile and the AI and past-day counters.
+- Reset progress (Weight & Progress) clears `weight_entries` only. Reset all data (Settings, `AccountRepository.resetAllData`) clears meals, summaries, weigh-ins, days off and the AI Coach's notes, but keeps the profile and the AI and past-day counters.
 - The app can only read the AI counter, which the AI functions keep (see AI). The rules let the past-day counter only go up by one, and never let the app delete either. `day_edits` only takes the server's month, give or take a day for time zones, so changing the phone's date doesn't start a new count.
 - Account deletion: `AccountRepository.deleteAccountData` deletes the data and the profile, then `deleteAccount` (the function) deletes the counters and the login itself, so the counters only start again with a new account.
 - Reset all data and account deletion re-authenticate first (`AccountController`): with the email password, or with Google for a Google-only account.
@@ -108,7 +108,7 @@ The paid tier (plan 06; the code says `plus`).
   - A row in the menu.
   - `StarBadge` beside the logo in the menu header and beside the name on Home: the star for members, a "Become a Star" chip for everyone else, nothing while the record loads.
   - The members' star shines when it appears (`Shine`, `lib/widgets/shine.dart`): a white glint sweeps across it three times, then rests, and again when a page that covered it goes away (so each return to Home, which stays under the menu's pages), but not after a dialog or sheet; none when the phone asks for less motion. The Adaptive formula's On chip and the free Adaptive formula and AI Coach buttons use it too.
-  - A card in Account Settings.
+  - A card in Settings.
   - `PlusPromptCard` on Home.
   - The dimmed macro rings for free users, the shining Adaptive formula button under the weight chart, and the shining AI Coach button on finished weeks in History.
 - **Debug tools** (`/debug`, `DebugScreen`), in debug builds and for dev accounts in any build:
@@ -335,12 +335,12 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
   - The web uses Firebase's popup.
   - Phones use `google_sign_in` 7, which needs the web client ID that the google-services plugin reads from `google-services.json`. `googleSignIn()` in `auth_controller.dart` initialises the plugin once, as it requires.
   - Backing out (`backedOutOfGoogle`) isn't shown as an error.
-- **Google-only accounts** (`hasPasswordLogin` false in `account_controller.dart`): Reset all data and Delete account are confirmed with Google instead of a password (`showPasswordConfirmDialog(askPassword: false)`), and Account Settings hides Change email and the password reset.
+- **Google-only accounts** (`hasPasswordLogin` false in `account_controller.dart`): Reset all data and Delete account are confirmed with Google instead of a password (`showPasswordConfirmDialog(askPassword: false)`), and Settings hides Change email and the password reset.
 
 ## Notifications, widget and shortcuts
 
 - **Reminders:** `NotificationService` (`flutter_local_notifications`, Android/iOS only) schedules a daily meal reminder (20:30), a weigh-in reminder (Saturday 20:00 by default; a day or every day, and a time) and a daily creatine reminder (off by default, 09:00).
-  - The switches are on the Notifications page (`NotificationsScreen`).
+  - The switches are Settings' Notifications section (`NotificationSettings`).
   - `reminderSyncProvider` keeps the schedules in step, asking for permission once on first run. Their texts (and Android's channel names) come from `l10nProvider`, and a change of language schedules them again.
 - **The creatine offer:** Home offers the creatine reminder once (`offerCreatineReminder`), from the day after sign-up to the end of the first week (`shouldOfferCreatine`), and either way says where to find it.
 - **Launch actions:** a tap on the weigh-in reminder becomes `LaunchAction.logWeight` (`lib/app/launch_actions.dart`, bound in `main()` before Firebase so a cold-start tap isn't lost), and Home opens the log-weight dialog.
@@ -354,13 +354,13 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
 ## Feedback, crashes and legal pages
 
 - **Crash reporting:** `firebase_crashlytics`, on Android/iOS only (it has no web build); the handlers are set in `main()` after Firebase.
-- **Feedback:** Account Settings' feedback tile opens `showFeedbackDialog` (`lib/widgets/feedback_dialog.dart`): a Problem/Idea/Other `PillToggle`, which sets the prompt and the subject, over one message box.
+- **Feedback:** Settings' feedback tile opens `showFeedbackDialog` (`lib/widgets/feedback_dialog.dart`): a Problem/Idea/Other `PillToggle`, which sets the prompt and the subject, over one message box.
   - `FeedbackRepository` sends the kind, text and app version to the `sendFeedback` function (`functions/src/feedback.ts`), which adds the uid and email from the sign-in and posts it as JSON to the Formspree form (in the help.yumsum Formspree account), which emails `supportEmail` (help.yumsum@gmail.com, `lib/core/constants/app_info.dart`) with the user's email as reply-to.
   - The function holds each account to 3 a day (`feedback_usage`, UTC days; a failed send doesn't count). The dialog's count on the device says so before sending; when the server refuses (`FeedbackLimitReached`), the dialog shows the same limit line. The free plan takes 50 messages a month.
 - **Legal pages:** `tools/hosting/privacy.html` and `terms.html`, copied to the hosting root by `build_hosting.ps1` and served at `/privacy` and `/terms` (`cleanUrls`).
   - Bulgarian copies, `privacy-bg.html` and `terms-bg.html`, are served at `/privacy-bg` and `/terms-bg`, with the same design, `lang="bg"`, and a line at the top saying the English wins where they differ. Each page links to its other language in the top line. A change to the English needs the same change in the Bulgarian.
   - `LegalLinks` (`lib/core/constants/legal_links.dart`) holds the URLs, including the Open Food Facts credit; `privacyPolicy(language)` and `terms(language)` take `languageCodeProvider`'s code and give the `-bg` page for Bulgarian.
-  - `LegalFooter` (on sign-in; on the web it also has the reCAPTCHA attribution line), Account Settings' legal section and the YumSum Star page open them (`test/legal_links_test.dart`).
+  - `LegalFooter` (on sign-in; on the web it also has the reCAPTCHA attribution line), Settings' legal section and the YumSum Star page open them (`test/legal_links_test.dart`).
   - `MedicalNote` is the health disclaimer under the plan preview. Both widgets are in `lib/widgets/legal_links.dart`.
 
 ## Hosting and release

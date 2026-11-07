@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,14 +12,17 @@ import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
+import 'package:lean_streak/providers/theme_controller.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/core/constants/legal_links.dart';
+import 'package:lean_streak/screens/account/notification_settings.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:lean_streak/widgets/feedback_dialog.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
 import 'package:lean_streak/widgets/password_confirm_dialog.dart';
+import 'package:lean_streak/widgets/pill_toggle.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 
 class AccountSettingsScreen extends ConsumerStatefulWidget {
@@ -278,6 +282,37 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                           label: Text(l10n.accountSendReset),
                         ),
                       ],
+                      // Reminders are Android and iOS only.
+                      if (!kIsWeb) ...[
+                        SizedBox(height: 28),
+                        _AccountSectionLabel(l10n.accountSectionNotifications),
+                        const NotificationSettings(),
+                      ],
+                      SizedBox(height: 28),
+                      _AccountSectionLabel(l10n.accountSectionAppearance),
+                      PillToggle<ThemeMode>(
+                        options: [
+                          (ThemeMode.system, l10n.menuThemeSystem),
+                          (ThemeMode.light, l10n.menuThemeLight),
+                          (ThemeMode.dark, l10n.menuThemeDark),
+                        ],
+                        selected: ref.watch(themeControllerProvider),
+                        onChanged: (mode) => ref
+                            .read(themeControllerProvider.notifier)
+                            .setMode(mode),
+                      ),
+                      SizedBox(height: 28),
+                      _AccountSectionLabel(l10n.accountSectionLanguage),
+                      PillToggle<String>(
+                        options: [
+                          ('en', l10n.languageEnglish),
+                          ('bg', l10n.languageBulgarian),
+                        ],
+                        selected: ref.watch(languageCodeProvider),
+                        onChanged: (code) => ref
+                            .read(languageControllerProvider.notifier)
+                            .setLanguage(code),
+                      ),
                       SizedBox(height: 28),
                       _AccountSectionLabel(l10n.accountSectionStar),
                       const _PlusTile(),

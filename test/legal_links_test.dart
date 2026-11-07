@@ -9,10 +9,12 @@ import 'package:lean_streak/providers/account_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
+import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/account/account_settings_screen.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'adaptive_fixtures.dart';
 import 'billing_fixtures.dart';
@@ -52,12 +54,15 @@ void main() {
 
   /// [home] in [language], with what the account and YumSum Star pages read.
   Future<void> pump(WidgetTester tester, Widget home, String language) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
     tester.view.physicalSize = const Size(1080, 2340);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
           languageCodeProvider.overrideWithValue(language),
           currentUidProvider.overrideWithValue('user-1'),
           userProfileProvider.overrideWith(

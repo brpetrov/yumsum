@@ -16,7 +16,6 @@ import 'package:lean_streak/screens/dashboard/helpers/meal_camera_page.dart';
 import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 import 'package:lean_streak/screens/debug/debug_screen.dart';
 import 'package:lean_streak/screens/language/language_screen.dart';
-import 'package:lean_streak/screens/notifications/notifications_screen.dart';
 import 'package:lean_streak/screens/onboarding/onboarding_screen.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/screens/profile/profile_load_error_screen.dart';
@@ -44,7 +43,6 @@ class AppRoutes {
   static const profile = '/profile';
   static const planSettings = '/plan-settings';
   static const progress = '/progress';
-  static const notifications = '/notifications';
   static const recipes = '/recipes';
   static const recipe = '/recipes/:id';
   static String recipePath(String id) => '/recipes/$id';
@@ -158,10 +156,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.progress,
         builder: (context, state) => const ProgressScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.notifications,
-        builder: (context, state) => const NotificationsScreen(),
       ),
       GoRoute(
         path: AppRoutes.recipes,

@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/reminder_provider.dart';
-import 'package:lean_streak/screens/notifications/notifications_screen.dart';
+import 'package:lean_streak/screens/account/notification_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -21,7 +21,9 @@ void main() {
         overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
         child: MaterialApp(
           theme: AppTheme.light,
-          home: const NotificationsScreen(),
+          home: const Scaffold(
+            body: SingleChildScrollView(child: NotificationSettings()),
+          ),
         ),
       ),
     );

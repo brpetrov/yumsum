@@ -7,12 +7,9 @@ import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
-import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
-import 'package:lean_streak/providers/theme_controller.dart';
 import 'package:lean_streak/widgets/app_logo_mark.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
-import 'package:lean_streak/widgets/pill_toggle.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 
 /// The home shell: app bar with the menu, the page body, and an optional bar
@@ -99,53 +96,51 @@ void openPage(BuildContext context, String route) {
   }
 }
 
-/// The menu, shown on every page: Home first, then the other pages,
-/// appearance, language and log out.
+/// The menu, shown on every page: Home, the pages for the day and for
+/// looking back, Plan Settings, YumSum Star, Settings and log out.
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
-  static List<({String route, IconData icon, String label})> _pages(
+  /// The pages above YumSum Star; AI Coach carries the star, being a
+  /// YumSum Star feature.
+  static List<({String route, IconData icon, String label, bool star})> _pages(
     AppLocalizations l10n,
   ) => [
     (
       route: AppRoutes.dashboard,
       icon: Icons.home_outlined,
       label: l10n.menuHome,
-    ),
-    (
-      route: AppRoutes.review,
-      icon: Icons.calendar_month_outlined,
-      label: l10n.menuHistory,
-    ),
-    (
-      route: AppRoutes.coach,
-      icon: Icons.auto_awesome_outlined,
-      label: l10n.menuCoach,
+      star: false,
     ),
     (
       route: AppRoutes.recipes,
       icon: Icons.menu_book_outlined,
       label: l10n.menuRecipes,
+      star: false,
+    ),
+    (
+      route: AppRoutes.review,
+      icon: Icons.calendar_month_outlined,
+      label: l10n.menuHistory,
+      star: false,
     ),
     (
       route: AppRoutes.progress,
       icon: Icons.monitor_weight_outlined,
       label: l10n.menuProgress,
+      star: false,
+    ),
+    (
+      route: AppRoutes.coach,
+      icon: Icons.auto_awesome_outlined,
+      label: l10n.menuCoach,
+      star: true,
     ),
     (
       route: AppRoutes.planSettings,
       icon: Icons.assignment_outlined,
       label: l10n.menuPlanSettings,
-    ),
-    (
-      route: AppRoutes.notifications,
-      icon: Icons.notifications_outlined,
-      label: l10n.menuNotifications,
-    ),
-    (
-      route: AppRoutes.profile,
-      icon: Icons.manage_accounts_outlined,
-      label: l10n.menuAccountSettings,
+      star: false,
     ),
   ];
 
@@ -213,9 +208,16 @@ class AppDrawer extends ConsumerWidget {
                       icon: page.icon,
                       label: page.label,
                       selected: page.route == current,
+                      star: page.star,
                       onTap: () => _open(context, page.route),
                     ),
                   _PlusMenuItem(onTap: openPlus),
+                  _MenuItem(
+                    icon: Icons.settings_outlined,
+                    label: l10n.menuSettings,
+                    selected: current == AppRoutes.profile,
+                    onTap: () => _open(context, AppRoutes.profile),
+                  ),
                   if (ref.watch(debugToolsProvider))
                     _MenuItem(
                       icon: Icons.bug_report_outlined,
@@ -223,57 +225,6 @@ class AppDrawer extends ConsumerWidget {
                       selected: current == AppRoutes.debug,
                       onTap: () => _open(context, AppRoutes.debug),
                     ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 18, 20, 8),
-                    child: Text(
-                      l10n.menuAppearance,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                    child: PillToggle<ThemeMode>(
-                      options: [
-                        (ThemeMode.system, l10n.menuThemeSystem),
-                        (ThemeMode.light, l10n.menuThemeLight),
-                        (ThemeMode.dark, l10n.menuThemeDark),
-                      ],
-                      selected: ref.watch(themeControllerProvider),
-                      onChanged: (mode) => ref
-                          .read(themeControllerProvider.notifier)
-                          .setMode(mode),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 18, 20, 8),
-                    child: Text(
-                      l10n.languageSetting,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                    child: PillToggle<String>(
-                      options: [
-                        ('en', l10n.languageEnglish),
-                        ('bg', l10n.languageBulgarian),
-                      ],
-                      selected: ref.watch(languageCodeProvider),
-                      onChanged: (code) => ref
-                          .read(languageControllerProvider.notifier)
-                          .setLanguage(code),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -325,19 +276,21 @@ class _PlusMenuItem extends StatelessWidget {
 }
 
 /// One menu entry: a soft pill, tinted when it is the open page, with its
-/// icon in a bubble.
+/// icon in a bubble, and the YumSum Star at the end of a [star] feature.
 class _MenuItem extends StatelessWidget {
   const _MenuItem({
     required this.icon,
     required this.label,
     required this.onTap,
     this.selected = false,
+    this.star = false,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback? onTap;
   final bool selected;
+  final bool star;
 
   @override
   Widget build(BuildContext context) {
@@ -367,6 +320,7 @@ class _MenuItem extends StatelessWidget {
             fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
           ),
         ),
+        trailing: star ? const PlusStar(size: 22) : null,
         onTap: onTap,
       ),
     );

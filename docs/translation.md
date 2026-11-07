@@ -42,7 +42,7 @@ lowerCamelCase, `<area><Thing>`:
 | `auth`, `onboarding` | Sign-in, onboarding |
 | `home`, `quickLog`, `meal`, `camera`, `food`, `contribute`, `macro` | Home, the quick-log bar, the meal form, Smart Snap and barcodes, packaged foods, contributing, macros |
 | `history`, `coach`, `progress`, `adaptive`, `recipes` | History, AI Coach, Weight & Progress, the Adaptive formula, Recipes |
-| `plan`, `account`, `star`, `notifications`, `feedback`, `legal`, `menu` | Plan Settings (and the plan card, `planPreview…`, `planInfo…`), Account Settings, YumSum Star, the Notifications page, feedback, legal links, the menu |
+| `plan`, `account`, `star`, `notifications`, `feedback`, `legal`, `menu` | Plan Settings (and the plan card, `planPreview…`, `planInfo…`), Settings (with the reminders), YumSum Star, feedback, legal links, the menu |
 | `reminder`, `language`, `units` | The reminders themselves, the language, weights and heights with their units |
 
 Then what it is: `…Title`, `…Button`, `…Hint`, `…Error<What>` (`mealErrorSave`: "Could not save the meal. Try again."), `…Tooltip`. Reuse a `common` key only where the word is the same in Bulgarian too.

@@ -12,10 +12,6 @@
   "@languageBulgarian": {
     "description": "The Bulgarian option, always written in Bulgarian, in both files."
   },
-  "languageSetting": "Language",
-  "@languageSetting": {
-    "description": "Menu: the heading over the English / Български switch."
-  },
   "reminderMealTitle": "Log today's meals",
   "@reminderMealTitle": {
     "description": "Evening reminder notification: title."
@@ -318,7 +314,7 @@
   "@homeCreatineYes": {
     "description": "Home: button turning on the creatine reminder."
   },
-  "homeCreatineOn": "Creatine reminder on for {time}. Change it under Notifications in the menu.",
+  "homeCreatineOn": "Creatine reminder on for {time}. Change it under Notifications in Settings.",
   "@homeCreatineOn": {
     "description": "Home: snack bar once the creatine reminder is on. time is e.g. 09:00; Notifications is the menu page.",
     "placeholders": {
@@ -327,11 +323,11 @@
       }
     }
   },
-  "homeCreatineBlocked": "Allow notifications in your phone's Settings, then turn it on under Notifications in the menu.",
+  "homeCreatineBlocked": "Allow notifications in your phone's settings, then turn it on under Notifications in Settings.",
   "@homeCreatineBlocked": {
     "description": "Home: snack bar when the creatine reminder was wanted but notifications are blocked."
   },
-  "homeCreatineLater": "You can turn it on any time under Notifications in the menu.",
+  "homeCreatineLater": "You can turn it on any time under Notifications in Settings.",
   "@homeCreatineLater": {
     "description": "Home: snack bar when the creatine reminder was turned down."
   },
@@ -1801,10 +1797,6 @@
       }
     }
   },
-  "notificationsTitle": "Notifications",
-  "@notificationsTitle": {
-    "description": "Notifications: the page title."
-  },
   "notificationsDenied": "Allow notifications for YumSum in system settings.",
   "@notificationsDenied": {
     "description": "Notifications: the system refused permission."
@@ -2418,9 +2410,9 @@
   "@profileBackToSignIn": {
     "description": "Page shown when the profile doesn't load: signs out."
   },
-  "accountTitle": "Account Settings",
+  "accountTitle": "Settings",
   "@accountTitle": {
-    "description": "Account Settings: the page title."
+    "description": "Settings: the page title."
   },
   "accountConfirmWithGoogle": "{description} You'll confirm with Google next.",
   "@accountConfirmWithGoogle": {
@@ -2538,6 +2530,18 @@
   "accountSendReset": "Send password reset email",
   "@accountSendReset": {
     "description": "Account Settings: emails a new-password link."
+  },
+  "accountSectionNotifications": "NOTIFICATIONS",
+  "@accountSectionNotifications": {
+    "description": "Settings: the reminders section, in capitals."
+  },
+  "accountSectionAppearance": "APPEARANCE",
+  "@accountSectionAppearance": {
+    "description": "Settings: the section over the System / Light / Dark switch, in capitals."
+  },
+  "accountSectionLanguage": "LANGUAGE",
+  "@accountSectionLanguage": {
+    "description": "Settings: the section over the English / Български switch, in capitals."
   },
   "accountSectionStar": "YUMSUM STAR",
   "@accountSectionStar": {
@@ -2679,17 +2683,9 @@
   "@menuPlanSettings": {
     "description": "Menu: Plan Settings."
   },
-  "menuNotifications": "Notifications",
-  "@menuNotifications": {
-    "description": "Menu: Notifications."
-  },
-  "menuAccountSettings": "Account Settings",
-  "@menuAccountSettings": {
-    "description": "Menu: Account Settings."
-  },
-  "menuAppearance": "Appearance",
-  "@menuAppearance": {
-    "description": "Menu: the heading over the System / Light / Dark switch."
+  "menuSettings": "Settings",
+  "@menuSettings": {
+    "description": "Menu: the Settings page (account, reminders, appearance, language, YumSum Star, help)."
   },
   "menuThemeSystem": "System",
   "@menuThemeSystem": {

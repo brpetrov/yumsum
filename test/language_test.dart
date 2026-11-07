@@ -6,6 +6,8 @@ import 'package:lean_streak/app/app.dart';
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/l10n/l10n.dart';
+import 'package:lean_streak/models/user_profile.dart';
+import 'package:lean_streak/providers/account_controller.dart';
 import 'package:lean_streak/providers/activity_scale_migration_provider.dart';
 import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
@@ -15,24 +17,32 @@ import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/reminder_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
+import 'package:lean_streak/screens/account/account_settings_screen.dart';
 import 'package:lean_streak/screens/auth/auth_screen.dart';
 import 'package:lean_streak/screens/language/language_screen.dart';
-import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'adaptive_fixtures.dart';
 import 'billing_fixtures.dart';
+
+class _FakeAccountController extends AccountController {
+  @override
+  Future<void> syncAuthEmailToProfile() async {}
+}
 
 void main() {
   late SharedPreferences prefs;
 
-  /// The whole app, signed out, on a device set to [region] and [language],
-  /// with [router] standing in for the real one when given.
+  /// The whole app, signed out (or with [profile]), on a device set to
+  /// [region] and [language], with [router] standing in for the real one
+  /// when given.
   Future<void> pumpApp(
     WidgetTester tester, {
     String? region = 'GB',
     String language = 'en',
     String? stored,
     GoRouter? router,
+    UserProfile? profile,
   }) async {
     SharedPreferences.setMockInitialValues({'language': ?stored});
     prefs = await SharedPreferences.getInstance();
@@ -43,7 +53,8 @@ void main() {
           deviceRegionProvider.overrideWithValue(region),
           deviceLanguageProvider.overrideWithValue(language),
           authStateProvider.overrideWith((ref) => Stream.value(null)),
-          userProfileProvider.overrideWith((ref) => Stream.value(null)),
+          userProfileProvider.overrideWith((ref) => Stream.value(profile)),
+          accountControllerProvider.overrideWith(_FakeAccountController.new),
           entitlementProvider.overrideWith((ref) => Stream.value(null)),
           realEntitlementProvider.overrideWith((ref) => Stream.value(null)),
           billingServiceProvider.overrideWithValue(FakeBillingService()),
@@ -71,14 +82,14 @@ void main() {
         home: Builder(
           builder: (context) {
             l10n = context.l10n;
-            return Text(l10n.languageSetting);
+            return Text(l10n.languageEnglish);
           },
         ),
       ),
     );
 
     expect(l10n.localeName, 'en');
-    expect(find.text('Language'), findsOneWidget);
+    expect(find.text('English'), findsOneWidget);
   });
 
   group('the language question before sign-in', () {
@@ -143,36 +154,27 @@ void main() {
     });
   });
 
-  testWidgets('the menu switches the language at once', (tester) async {
+  testWidgets('Settings switches the language at once', (tester) async {
     final router = GoRouter(
       routes: [
-        GoRoute(
-          path: '/',
-          builder: (_, _) =>
-              const AppFrame(title: 'Today', body: SizedBox.expand()),
-        ),
+        GoRoute(path: '/', builder: (_, _) => const AccountSettingsScreen()),
       ],
     );
-    await pumpApp(tester, router: router);
+    await pumpApp(tester, router: router, profile: planProfile());
 
-    await tester.tap(find.byTooltip('Open navigation menu'));
-    await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
       find.text('Български'),
       100,
-      scrollable: find.descendant(
-        of: find.byType(Drawer),
-        matching: find.byType(Scrollable),
-      ),
+      scrollable: find.byType(Scrollable).first,
     );
     await tester.pump();
-    expect(find.text('Language'), findsOneWidget);
+    expect(find.text('LANGUAGE'), findsOneWidget);
 
     await tester.tap(find.text('Български'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Език'), findsOneWidget);
-    expect(find.text('Language'), findsNothing);
+    expect(find.text('ЕЗИК'), findsOneWidget);
+    expect(find.text('LANGUAGE'), findsNothing);
     expect(appLocale(tester), const Locale('bg'));
     expect(prefs.getString('language'), 'bg');
   });

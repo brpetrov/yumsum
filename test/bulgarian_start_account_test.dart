@@ -166,13 +166,12 @@ void main() {
 
     for (final page in [
       'Начало',
-      'История',
-      'AI треньор',
       'Рецепти',
+      'История',
       'Тегло и напредък',
+      'AI треньор',
       'Настройки на плана',
-      'Известия',
-      'Настройки на профила',
+      'Настройки',
       'Изход',
     ]) {
       expect(
@@ -181,18 +180,8 @@ void main() {
         reason: page,
       );
     }
-    await tester.scrollUntilVisible(
-      find.text('Български'),
-      100,
-      scrollable: find.descendant(
-        of: find.byType(Drawer),
-        matching: find.byType(Scrollable),
-      ),
-    );
-    expect(find.text('Изглед'), findsOneWidget);
-    expect(find.text('Системен'), findsOneWidget);
-    expect(find.text('Тъмен'), findsOneWidget);
-    expect(find.text('Език'), findsOneWidget);
+    expect(find.text('Известия'), findsNothing);
+    expect(find.text('Български'), findsNothing);
     fits(tester);
   });
 
@@ -208,8 +197,13 @@ void main() {
       ],
     );
 
-    expect(find.text('Настройки на профила'), findsOneWidget);
+    expect(find.text('Настройки'), findsOneWidget);
     expect(find.text('Управлявай профила си'), findsOneWidget);
+    for (final section in ['ИЗВЕСТИЯ', 'ИЗГЛЕД', 'ЕЗИК']) {
+      expect(find.text(section, skipOffstage: false), findsOneWidget);
+    }
+    expect(find.text('Системен', skipOffstage: false), findsOneWidget);
+    expect(find.text('Български', skipOffstage: false), findsOneWidget);
     expect(find.text('Смени името, имейла или паролата си.'), findsOneWidget);
     expect(find.text('ПРОФИЛ'), findsOneWidget);
     expect(find.text('Запази името'), findsOneWidget);

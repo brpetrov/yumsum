@@ -31,7 +31,6 @@ void main() {
           AppRoutes.recipes,
           AppRoutes.progress,
           AppRoutes.planSettings,
-          AppRoutes.notifications,
           AppRoutes.profile,
           AppRoutes.plus,
         ])
@@ -106,6 +105,50 @@ void main() {
     await pumpAt(tester, AppRoutes.dashboard);
     await pick(tester, 'Recipes');
     expect(location(), AppRoutes.recipes);
+  });
+
+  testWidgets('the pages in order, AI Coach with the star, then Settings', (
+    tester,
+  ) async {
+    await pumpAt(tester, AppRoutes.dashboard);
+    await tester.tap(find.byTooltip('Open navigation menu'));
+    await tester.pumpAndSettle();
+    final labels = tester
+        .widgetList<ListTile>(
+          find.descendant(
+            of: find.byType(Drawer),
+            matching: find.byType(ListTile, skipOffstage: false),
+            skipOffstage: false,
+          ),
+        )
+        .map((tile) => tile.title)
+        .whereType<Text>()
+        .map((text) => text.data)
+        .toList();
+    expect(labels, [
+      'Home',
+      'Recipes',
+      'History',
+      'Weight & Progress',
+      'AI Coach',
+      'Plan Settings',
+      'Settings',
+      'Debug tools',
+      'Log out',
+    ]);
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'AI Coach'),
+        matching: find.byType(PlusStar),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Notifications'), findsNothing);
+    expect(find.text('Language'), findsNothing);
+
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+    expect(location(), AppRoutes.profile);
   });
 
   testWidgets('Home in the menu goes straight home', (tester) async {

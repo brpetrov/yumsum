@@ -20,7 +20,7 @@ import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/providers/weekly_review_provider.dart';
 import 'package:lean_streak/screens/coach/coach_screen.dart';
-import 'package:lean_streak/screens/notifications/notifications_screen.dart';
+import 'package:lean_streak/screens/account/notification_settings.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
 import 'package:lean_streak/screens/recipes/recipe_screen.dart';
 import 'package:lean_streak/screens/recipes/recipes_screen.dart';
@@ -294,11 +294,10 @@ void main() {
     await tester.pumpWidget(
       _bulgarian([
         sharedPreferencesProvider.overrideWithValue(prefs),
-      ], const NotificationsScreen()),
+      ], const Scaffold(body: NotificationSettings())),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Известия'), findsOneWidget);
     expect(find.text('Всяка вечер в 20:30'), findsOneWidget);
     expect(find.text('Всяка събота в 20:00'), findsOneWidget);
     expect(find.text('Събота'), findsOneWidget);

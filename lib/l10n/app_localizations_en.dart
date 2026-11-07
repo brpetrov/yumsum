@@ -18,9 +18,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageBulgarian => 'Български';
 
   @override
-  String get languageSetting => 'Language';
-
-  @override
   String get reminderMealTitle => 'Log today\'s meals';
 
   @override
@@ -248,16 +245,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String homeCreatineOn(String time) {
-    return 'Creatine reminder on for $time. Change it under Notifications in the menu.';
+    return 'Creatine reminder on for $time. Change it under Notifications in Settings.';
   }
 
   @override
   String get homeCreatineBlocked =>
-      'Allow notifications in your phone\'s Settings, then turn it on under Notifications in the menu.';
+      'Allow notifications in your phone\'s settings, then turn it on under Notifications in Settings.';
 
   @override
   String get homeCreatineLater =>
-      'You can turn it on any time under Notifications in the menu.';
+      'You can turn it on any time under Notifications in Settings.';
 
   @override
   String get homeDayOffBackTitle => 'Back on plan?';
@@ -1378,9 +1375,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get notificationsTitle => 'Notifications';
-
-  @override
   String get notificationsDenied =>
       'Allow notifications for YumSum in system settings.';
 
@@ -1848,7 +1842,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileBackToSignIn => 'Back to sign in';
 
   @override
-  String get accountTitle => 'Account Settings';
+  String get accountTitle => 'Settings';
 
   @override
   String accountConfirmWithGoogle(String description) {
@@ -1941,6 +1935,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountSendReset => 'Send password reset email';
+
+  @override
+  String get accountSectionNotifications => 'NOTIFICATIONS';
+
+  @override
+  String get accountSectionAppearance => 'APPEARANCE';
+
+  @override
+  String get accountSectionLanguage => 'LANGUAGE';
 
   @override
   String get accountSectionStar => 'YUMSUM STAR';
@@ -2056,13 +2059,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get menuPlanSettings => 'Plan Settings';
 
   @override
-  String get menuNotifications => 'Notifications';
-
-  @override
-  String get menuAccountSettings => 'Account Settings';
-
-  @override
-  String get menuAppearance => 'Appearance';
+  String get menuSettings => 'Settings';
 
   @override
   String get menuThemeSystem => 'System';

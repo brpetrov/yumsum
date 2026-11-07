@@ -18,9 +18,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get languageBulgarian => 'Български';
 
   @override
-  String get languageSetting => 'Език';
-
-  @override
   String get reminderMealTitle => 'Запиши днешните хранения';
 
   @override
@@ -253,16 +250,16 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String homeCreatineOn(String time) {
-    return 'Ще ти напомняме за креатин в $time. Можеш да го смениш от „Известия“ в менюто.';
+    return 'Ще ти напомняме за креатин в $time. Можеш да го смениш от „Известия“ в настройките.';
   }
 
   @override
   String get homeCreatineBlocked =>
-      'Разреши известията в настройките на телефона, после включи напомнянето от „Известия“ в менюто.';
+      'Разреши известията в настройките на телефона, после включи напомнянето от „Известия“ в настройките.';
 
   @override
   String get homeCreatineLater =>
-      'Можеш да включиш напомнянето по всяко време от „Известия“ в менюто.';
+      'Можеш да включиш напомнянето по всяко време от „Известия“ в настройките.';
 
   @override
   String get homeDayOffBackTitle => 'Обратно към плана?';
@@ -1403,9 +1400,6 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
-  String get notificationsTitle => 'Известия';
-
-  @override
   String get notificationsDenied =>
       'Разреши известията за YumSum в системните настройки.';
 
@@ -1875,7 +1869,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get profileBackToSignIn => 'Обратно към входа';
 
   @override
-  String get accountTitle => 'Настройки на профила';
+  String get accountTitle => 'Настройки';
 
   @override
   String accountConfirmWithGoogle(String description) {
@@ -1969,6 +1963,15 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get accountSendReset => 'Изпрати имейл за нова парола';
+
+  @override
+  String get accountSectionNotifications => 'ИЗВЕСТИЯ';
+
+  @override
+  String get accountSectionAppearance => 'ИЗГЛЕД';
+
+  @override
+  String get accountSectionLanguage => 'ЕЗИК';
 
   @override
   String get accountSectionStar => 'YUMSUM STAR';
@@ -2083,13 +2086,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get menuPlanSettings => 'Настройки на плана';
 
   @override
-  String get menuNotifications => 'Известия';
-
-  @override
-  String get menuAccountSettings => 'Настройки на профила';
-
-  @override
-  String get menuAppearance => 'Изглед';
+  String get menuSettings => 'Настройки';
 
   @override
   String get menuThemeSystem => 'Системен';

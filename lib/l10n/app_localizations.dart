@@ -116,12 +116,6 @@ abstract class AppLocalizations {
   /// **'Български'**
   String get languageBulgarian;
 
-  /// Menu: the heading over the English / Български switch.
-  ///
-  /// In en, this message translates to:
-  /// **'Language'**
-  String get languageSetting;
-
   /// Evening reminder notification: title.
   ///
   /// In en, this message translates to:
@@ -497,19 +491,19 @@ abstract class AppLocalizations {
   /// Home: snack bar once the creatine reminder is on. time is e.g. 09:00; Notifications is the menu page.
   ///
   /// In en, this message translates to:
-  /// **'Creatine reminder on for {time}. Change it under Notifications in the menu.'**
+  /// **'Creatine reminder on for {time}. Change it under Notifications in Settings.'**
   String homeCreatineOn(String time);
 
   /// Home: snack bar when the creatine reminder was wanted but notifications are blocked.
   ///
   /// In en, this message translates to:
-  /// **'Allow notifications in your phone\'s Settings, then turn it on under Notifications in the menu.'**
+  /// **'Allow notifications in your phone\'s settings, then turn it on under Notifications in Settings.'**
   String get homeCreatineBlocked;
 
   /// Home: snack bar when the creatine reminder was turned down.
   ///
   /// In en, this message translates to:
-  /// **'You can turn it on any time under Notifications in the menu.'**
+  /// **'You can turn it on any time under Notifications in Settings.'**
   String get homeCreatineLater;
 
   /// Day off dialog: title when today is already a day off.
@@ -2342,12 +2336,6 @@ abstract class AppLocalizations {
   /// **'{meal} logged.'**
   String recipesLogged(String meal);
 
-  /// Notifications: the page title.
-  ///
-  /// In en, this message translates to:
-  /// **'Notifications'**
-  String get notificationsTitle;
-
   /// Notifications: the system refused permission.
   ///
   /// In en, this message translates to:
@@ -3080,10 +3068,10 @@ abstract class AppLocalizations {
   /// **'Back to sign in'**
   String get profileBackToSignIn;
 
-  /// Account Settings: the page title.
+  /// Settings: the page title.
   ///
   /// In en, this message translates to:
-  /// **'Account Settings'**
+  /// **'Settings'**
   String get accountTitle;
 
   /// Account Settings: a confirmation's text for a Google account; {description} is the text before it.
@@ -3253,6 +3241,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send password reset email'**
   String get accountSendReset;
+
+  /// Settings: the reminders section, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'NOTIFICATIONS'**
+  String get accountSectionNotifications;
+
+  /// Settings: the section over the System / Light / Dark switch, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'APPEARANCE'**
+  String get accountSectionAppearance;
+
+  /// Settings: the section over the English / Български switch, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'LANGUAGE'**
+  String get accountSectionLanguage;
 
   /// Account Settings: section label, in capitals; a name.
   ///
@@ -3464,23 +3470,11 @@ abstract class AppLocalizations {
   /// **'Plan Settings'**
   String get menuPlanSettings;
 
-  /// Menu: Notifications.
+  /// Menu: the Settings page (account, reminders, appearance, language, YumSum Star, help).
   ///
   /// In en, this message translates to:
-  /// **'Notifications'**
-  String get menuNotifications;
-
-  /// Menu: Account Settings.
-  ///
-  /// In en, this message translates to:
-  /// **'Account Settings'**
-  String get menuAccountSettings;
-
-  /// Menu: the heading over the System / Light / Dark switch.
-  ///
-  /// In en, this message translates to:
-  /// **'Appearance'**
-  String get menuAppearance;
+  /// **'Settings'**
+  String get menuSettings;
 
   /// Menu: follow the device's light or dark mode.
   ///

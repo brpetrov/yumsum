@@ -126,7 +126,19 @@ class _CoachScreenState extends ConsumerState<CoachScreen> {
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(),
       appBar: AppBar(
-        title: Text(context.l10n.coachTitle),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(
+                context.l10n.coachTitle,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 8),
+            const PlusStar(size: 24),
+          ],
+        ),
         actions: [
           if (plus)
             IconButton(
