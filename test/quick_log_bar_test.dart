@@ -886,6 +886,15 @@ void main() {
     expect(boxes(tester), ['', '', '']);
   });
 
+  testWidgets('no search chip for a typed name while it is hidden', (
+    tester,
+  ) async {
+    await pumpCard(tester);
+    await tester.enterText(nameBox, 'tikka wrap');
+    await tester.pump();
+    expect(find.text('Search foods'), findsNothing);
+  }, skip: showFoodSearchChip);
+
   testWidgets('a typed name can be searched for; the pick fills the box', (
     tester,
   ) async {
@@ -904,7 +913,8 @@ void main() {
 
     expect(boxes(tester), ['Chicken Tikka Wrap', '473', '20']);
     expect(find.text('Search foods'), findsNothing);
-  });
+    // Hidden for now (showFoodSearchChip); kept for when it's back.
+  }, skip: !showFoodSearchChip);
 
   testWidgets('an idle box offers photo, barcode and mic; in use, one button', (
     tester,
@@ -1029,7 +1039,10 @@ void main() {
 
     await tester.enterText(nameBox, 'wrap');
     await tester.pump();
-    expect(find.text('Search foods'), findsOneWidget);
+    expect(
+      find.text('Search foods'),
+      showFoodSearchChip ? findsOneWidget : findsNothing,
+    );
     expect(find.text('Ham sandwich · 500 kcal'), findsNothing);
 
     await tester.tap(find.text('Chicken wrap · 450 kcal'));

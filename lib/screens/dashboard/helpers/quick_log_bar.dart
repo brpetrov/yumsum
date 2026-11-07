@@ -34,6 +34,10 @@ import 'package:lean_streak/widgets/estimate_breakdown.dart';
 import 'package:lean_streak/widgets/estimate_choice_dialog.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 
+/// Whether a typed name offers "Search foods" (Open Food Facts' search).
+/// Hidden for now; the barcode scan still looks packets up there.
+const showFoodSearchChip = false;
+
 /// The microphone behind the bar's mic button; overridable in tests.
 final audioRecorderProvider = Provider<AudioRecorder>((ref) {
   final recorder = AudioRecorder();
@@ -53,7 +57,8 @@ typedef _Entry = ({String? name, int? kcal, int? protein});
 /// has the room: a sparkle to estimate a named meal, a tick to save one
 /// with calories. While the box is focused, meals are offered as chips for
 /// one-tap re-logging: the usual ones for this time of day, then recent
-/// ones matching what is typed, along with a search of packaged foods.
+/// ones matching what is typed, along with a search of packaged foods
+/// while [showFoodSearchChip] is on.
 enum _Offer { declined, abandoned, contributed }
 
 class QuickLogBar extends ConsumerStatefulWidget {
@@ -627,10 +632,13 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
             now: DateTime.now(),
           )
         : const <MealSuggestion>[];
-    // A name without calories can be searched for; the web can't reach
-    // the search service.
+    // A name without calories can be searched for, while the chip is
+    // shown; the web can't reach the search service.
     final query = _name.text.trim();
-    final search = !kIsWeb && offering && query.length >= 3 ? query : null;
+    final search =
+        showFoodSearchChip && !kIsWeb && offering && query.length >= 3
+        ? query
+        : null;
     // Once half of today's AI estimates are used, a quiet count of what's
     // left, while the bar could still use one.
     ref.watch(aiUsageTodayProvider);
