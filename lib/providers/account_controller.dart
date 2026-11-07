@@ -2,10 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/account_provider.dart';
 import 'package:lean_streak/providers/adaptive_formula_provider.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
@@ -18,6 +20,7 @@ bool hasPasswordLogin(User user) =>
 class AccountActionException implements Exception {
   const AccountActionException(this.message);
 
+  /// Shown as it is, so in the app's language.
   final String message;
 
   @override
@@ -53,10 +56,10 @@ class AccountController extends AsyncNotifier<void> {
       final uid = ref.read(currentUidProvider);
       final trimmedName = name.trim();
       if (uid == null) {
-        throw const AccountActionException('You are not signed in.');
+        throw AccountActionException(_l10n.accountErrorSignedOut);
       }
       if (trimmedName.isEmpty) {
-        throw const AccountActionException('Enter your name.');
+        throw AccountActionException(_l10n.accountEnterName);
       }
 
       await ref.read(userProfileRepositoryProvider).updateProfile(uid, {
@@ -77,9 +80,7 @@ class AccountController extends AsyncNotifier<void> {
       final user = FirebaseAuth.instance.currentUser;
       final email = user?.email;
       if (email == null || email.isEmpty) {
-        throw const AccountActionException(
-          'This account does not have an email address.',
-        );
+        throw AccountActionException(_l10n.accountErrorNoEmail);
       }
 
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
@@ -102,14 +103,14 @@ class AccountController extends AsyncNotifier<void> {
     try {
       final trimmedEmail = newEmail.trim();
       if (trimmedEmail.isEmpty) {
-        throw const AccountActionException('Enter a new email address.');
+        throw AccountActionException(_l10n.accountErrorEnterNewEmail);
       }
 
       final user = await _reauthenticate(password);
       final currentEmail = user.email;
       if (currentEmail != null &&
           currentEmail.toLowerCase() == trimmedEmail.toLowerCase()) {
-        throw const AccountActionException('That\'s already your email.');
+        throw AccountActionException(_l10n.accountErrorSameEmail);
       }
 
       await user.verifyBeforeUpdateEmail(trimmedEmail);
@@ -166,7 +167,7 @@ class AccountController extends AsyncNotifier<void> {
     final uid = ref.read(currentUidProvider);
 
     if (user == null || uid == null) {
-      throw const AccountActionException('You are not signed in.');
+      throw AccountActionException(_l10n.accountErrorSignedOut);
     }
 
     // A Google account has no password, so it confirms with Google and
@@ -189,7 +190,7 @@ class AccountController extends AsyncNotifier<void> {
         if (backedOutOfGoogle(error)) rethrow;
         throw AccountActionException(
           error.code == 'user-mismatch'
-              ? 'Choose the Google account you signed in with.'
+              ? _l10n.accountErrorWrongGoogle
               : _mapAuthError(error),
         );
       }
@@ -197,14 +198,12 @@ class AccountController extends AsyncNotifier<void> {
 
     final email = user.email;
     if (email == null || email.isEmpty) {
-      throw const AccountActionException(
-        'This account cannot confirm with a password.',
-      );
+      throw AccountActionException(_l10n.accountErrorNoPassword);
     }
 
     final trimmedPassword = password.trim();
     if (trimmedPassword.isEmpty) {
-      throw const AccountActionException('Enter your password.');
+      throw AccountActionException(_l10n.commonEnterPassword);
     }
 
     try {
@@ -219,24 +218,26 @@ class AccountController extends AsyncNotifier<void> {
     }
   }
 
+  AppLocalizations get _l10n => ref.read(l10nProvider);
+
   String _mapAuthError(FirebaseAuthException error) {
     switch (error.code) {
       case 'wrong-password':
       case 'invalid-credential':
       case 'user-mismatch':
-        return 'Incorrect password.';
+        return _l10n.accountErrorWrongPassword;
       case 'too-many-requests':
-        return 'Too many attempts. Try again later.';
+        return _l10n.commonErrorTooManyAttempts;
       case 'network-request-failed':
-        return 'Could not connect. Check your internet and try again.';
+        return _l10n.accountErrorNoConnection;
       case 'invalid-email':
-        return 'Enter a valid email address.';
+        return _l10n.commonEnterValidEmailAddress;
       case 'email-already-in-use':
-        return 'An account already uses that email address.';
+        return _l10n.accountErrorEmailInUse;
       case 'requires-recent-login':
-        return 'Confirm your password and try again.';
+        return _l10n.accountErrorConfirmPassword;
       default:
-        return 'Could not verify your password.';
+        return _l10n.accountErrorVerifyPassword;
     }
   }
 }

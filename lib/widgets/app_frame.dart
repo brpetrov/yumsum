@@ -104,42 +104,48 @@ void openPage(BuildContext context, String route) {
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
-  static const _pages = [
-    (route: AppRoutes.dashboard, icon: Icons.home_outlined, label: 'Home'),
+  static List<({String route, IconData icon, String label})> _pages(
+    AppLocalizations l10n,
+  ) => [
+    (
+      route: AppRoutes.dashboard,
+      icon: Icons.home_outlined,
+      label: l10n.menuHome,
+    ),
     (
       route: AppRoutes.review,
       icon: Icons.calendar_month_outlined,
-      label: 'History',
+      label: l10n.menuHistory,
     ),
     (
       route: AppRoutes.coach,
       icon: Icons.auto_awesome_outlined,
-      label: 'AI Coach',
+      label: l10n.menuCoach,
     ),
     (
       route: AppRoutes.recipes,
       icon: Icons.menu_book_outlined,
-      label: 'Recipes',
+      label: l10n.menuRecipes,
     ),
     (
       route: AppRoutes.progress,
       icon: Icons.monitor_weight_outlined,
-      label: 'Weight & Progress',
+      label: l10n.menuProgress,
     ),
     (
       route: AppRoutes.planSettings,
       icon: Icons.assignment_outlined,
-      label: 'Plan Settings',
+      label: l10n.menuPlanSettings,
     ),
     (
       route: AppRoutes.notifications,
       icon: Icons.notifications_outlined,
-      label: 'Notifications',
+      label: l10n.menuNotifications,
     ),
     (
       route: AppRoutes.profile,
       icon: Icons.manage_accounts_outlined,
-      label: 'Account Settings',
+      label: l10n.menuAccountSettings,
     ),
   ];
 
@@ -150,6 +156,7 @@ class AppDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final authState = ref.watch(authControllerProvider);
     final isWorking = authState.isLoading;
     final current = GoRouter.maybeOf(context)?.state.uri.path;
@@ -201,7 +208,7 @@ class AppDrawer extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  for (final page in _pages)
+                  for (final page in _pages(l10n))
                     _MenuItem(
                       icon: page.icon,
                       label: page.label,
@@ -219,7 +226,7 @@ class AppDrawer extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(24, 18, 20, 8),
                     child: Text(
-                      'Appearance',
+                      l10n.menuAppearance,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -231,10 +238,10 @@ class AppDrawer extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
                     child: PillToggle<ThemeMode>(
-                      options: const [
-                        (ThemeMode.system, 'System'),
-                        (ThemeMode.light, 'Light'),
-                        (ThemeMode.dark, 'Dark'),
+                      options: [
+                        (ThemeMode.system, l10n.menuThemeSystem),
+                        (ThemeMode.light, l10n.menuThemeLight),
+                        (ThemeMode.dark, l10n.menuThemeDark),
                       ],
                       selected: ref.watch(themeControllerProvider),
                       onChanged: (mode) => ref
@@ -245,7 +252,7 @@ class AppDrawer extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(24, 18, 20, 8),
                     child: Text(
-                      context.l10n.languageSetting,
+                      l10n.languageSetting,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -258,8 +265,8 @@ class AppDrawer extends ConsumerWidget {
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
                     child: PillToggle<String>(
                       options: [
-                        ('en', context.l10n.languageEnglish),
-                        ('bg', context.l10n.languageBulgarian),
+                        ('en', l10n.languageEnglish),
+                        ('bg', l10n.languageBulgarian),
                       ],
                       selected: ref.watch(languageCodeProvider),
                       onChanged: (code) => ref
@@ -272,7 +279,9 @@ class AppDrawer extends ConsumerWidget {
             ),
             _MenuItem(
               icon: Icons.logout_rounded,
-              label: authState.isLoading ? 'Signing out...' : 'Log out',
+              label: authState.isLoading
+                  ? l10n.commonSigningOut
+                  : l10n.menuLogOut,
               onTap: isWorking
                   ? null
                   : () async {

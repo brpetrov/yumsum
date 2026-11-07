@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/widgets/app_logo_mark.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
@@ -56,35 +57,36 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       ref.read(authControllerProvider.notifier).signInWithGoogle();
 
   String _parseError(Object error) {
+    final l10n = context.l10n;
     if (error is EmailNotVerifiedException) {
-      return 'Verify your email first. Check your inbox for the link.';
+      return l10n.authErrorVerifyEmail;
     }
     if (error is GoogleSignInException) {
-      return 'Google sign-in didn\'t work. Try again.';
+      return l10n.authErrorGoogle;
     }
     if (error is FirebaseAuthException) {
       switch (error.code) {
         case 'account-exists-with-different-credential':
-          return 'This email already has a password. Sign in with it instead.';
+          return l10n.authErrorUsePassword;
         case 'user-not-found':
         case 'wrong-password':
         case 'invalid-credential':
-          return 'Incorrect email or password.';
+          return l10n.authErrorWrongCredentials;
         case 'email-already-in-use':
-          return 'An account with this email already exists. Sign in instead.';
+          return l10n.authErrorEmailInUse;
         case 'weak-password':
-          return 'Password must be at least 6 characters.';
+          return l10n.authPasswordTooShort;
         case 'invalid-email':
-          return 'Enter a valid email address.';
+          return l10n.commonEnterValidEmailAddress;
         case 'too-many-requests':
-          return 'Too many attempts. Try again later.';
+          return l10n.commonErrorTooManyAttempts;
         case 'network-request-failed':
-          return 'No internet connection. Try again.';
+          return l10n.authErrorNoInternet;
         default:
-          return 'Something went wrong. Try again.';
+          return l10n.authErrorGeneric;
       }
     }
-    return 'Something went wrong. Try again.';
+    return l10n.authErrorGeneric;
   }
 
   static final _emailRe = RegExp(r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,}$');
@@ -95,11 +97,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final email = _emailController.text.trim();
     if (!_isValidEmail(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Enter your email above first, then tap Forgot password.',
-          ),
-        ),
+        SnackBar(content: Text(context.l10n.authForgotPasswordNeedsEmail)),
       );
       return;
     }
@@ -122,19 +120,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       }
     });
 
+    final l10n = context.l10n;
     final authState = ref.watch(authControllerProvider);
     final isLoading = authState.isLoading;
     final email = _emailController.text.trim();
     final (bannerTitle, bannerBody) = switch (authState.valueOrNull) {
       AuthStatus.verificationSent => (
-        'Verification email sent',
-        'We sent a link to $email. Open it to verify your account, then '
-            'sign in.',
+        l10n.authVerificationSentTitle,
+        l10n.authVerificationSentBody(email),
       ),
       AuthStatus.resetSent => (
-        'Password reset email sent.',
-        'We sent a link to $email. Open it to choose a new password, then '
-            'sign in.',
+        l10n.authResetSentTitle,
+        l10n.authResetSentBody(email),
       ),
       _ => (null, null),
     };
@@ -195,12 +192,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       child: Row(
                         children: [
                           _TabButton(
-                            label: 'Sign in',
+                            label: l10n.authSignInTab,
                             selected: _isSignIn,
                             onTap: _isSignIn ? null : _switchMode,
                           ),
                           _TabButton(
-                            label: 'Sign up',
+                            label: l10n.authSignUpTab,
                             selected: !_isSignIn,
                             onTap: !_isSignIn ? null : _switchMode,
                           ),
@@ -310,15 +307,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       autocorrect: false,
                       enableSuggestions: false,
                       decoration: InputDecoration(
-                        labelText: 'Email',
+                        labelText: l10n.commonEmail,
                         prefixIcon: Icon(Icons.email_outlined),
                       ),
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) {
-                          return 'Enter your email.';
+                          return l10n.authEnterEmail;
                         }
                         if (!_isValidEmail(v.trim())) {
-                          return 'Enter a valid email.';
+                          return l10n.commonEnterValidEmail;
                         }
                         return null;
                       },
@@ -337,7 +334,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         if (!isLoading) _submit();
                       },
                       decoration: InputDecoration(
-                        labelText: 'Password',
+                        labelText: l10n.commonPassword,
                         prefixIcon: Icon(Icons.lock_outline_rounded),
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -352,10 +349,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       ),
                       validator: (v) {
                         if (v == null || v.isEmpty) {
-                          return 'Enter your password.';
+                          return l10n.commonEnterPassword;
                         }
                         if (!_isSignIn && v.length < 6) {
-                          return 'Password must be at least 6 characters.';
+                          return l10n.authPasswordTooShort;
                         }
                         return null;
                       },
@@ -365,7 +362,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: isLoading ? null : _forgotPassword,
-                          child: const Text('Forgot password?'),
+                          child: Text(l10n.authForgotPassword),
                         ),
                       ),
                     SizedBox(height: _isSignIn ? 12 : 28),
@@ -385,7 +382,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 ),
                               )
                             : Text(
-                                _isSignIn ? 'Sign in' : 'Create account',
+                                _isSignIn
+                                    ? l10n.authSignInButton
+                                    : l10n.authCreateAccountButton,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
@@ -400,7 +399,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
-                            'or',
+                            l10n.authOr,
                             style: TextStyle(
                               fontSize: 13,
                               color: AppColors.textSecondary,
@@ -414,7 +413,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     OutlinedButton.icon(
                       onPressed: isLoading ? null : _signInWithGoogle,
                       icon: const _GoogleMark(),
-                      label: const Text('Continue with Google'),
+                      label: Text(l10n.authContinueWithGoogle),
                     ),
                     SizedBox(height: 28),
                     const LegalFooter(),

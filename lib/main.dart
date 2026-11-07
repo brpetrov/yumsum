@@ -10,6 +10,8 @@ import 'package:lean_streak/core/config/app_check.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/firebase_options.dart';
+import 'package:lean_streak/l10n/l10n.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/theme_controller.dart';
 import 'package:lean_streak/widgets/splash_screen.dart';
@@ -27,8 +29,13 @@ void main() async {
     debugPrint(details.stack?.toString());
   };
 
+  // English until the stored language is read, below.
+  var language = 'en';
   ErrorWidget.builder = (details) {
-    return _StartupErrorApp(message: details.exceptionAsString());
+    return _StartupErrorApp(
+      message: details.exceptionAsString(),
+      language: language,
+    );
   };
 
   // Nunito and Fredoka are bundled under the SIL Open Font License, which
@@ -41,6 +48,7 @@ void main() async {
   });
 
   final prefs = await SharedPreferences.getInstance();
+  language = LanguageController.storedIn(prefs) ?? 'en';
   final container = ProviderContainer(
     overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
   );
@@ -52,6 +60,9 @@ void main() async {
     MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppColors.isDark ? AppTheme.dark : AppTheme.light,
+      locale: Locale(language),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: const SplashScreen(),
     ),
   );
@@ -95,7 +106,7 @@ void main() async {
     AppColors.isDark =
         WidgetsBinding.instance.platformDispatcher.platformBrightness ==
         Brightness.dark;
-    runApp(_StartupErrorApp(message: error.toString()));
+    runApp(_StartupErrorApp(message: error.toString(), language: language));
     return;
   }
 
@@ -113,13 +124,17 @@ void main() async {
   );
 }
 
+/// Shown when the app can't start, before Riverpod and the app's
+/// localisations: [language] is the stored setting, read in main().
 class _StartupErrorApp extends StatelessWidget {
-  const _StartupErrorApp({required this.message});
+  const _StartupErrorApp({required this.message, required this.language});
 
   final String message;
+  final String language;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = lookupAppLocalizations(Locale(language));
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -135,7 +150,7 @@ class _StartupErrorApp extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'YumSum could not start',
+                      l10n.startupErrorTitle,
                       textAlign: TextAlign.center,
                       style: AppTheme.display.copyWith(
                         color: AppColors.textPrimary,
@@ -144,7 +159,7 @@ class _StartupErrorApp extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Refresh the page. If it keeps happening, send the message below to the developer.',
+                      l10n.startupErrorBody,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: AppColors.textSecondary,

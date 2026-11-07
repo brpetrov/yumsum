@@ -5,9 +5,38 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/constants/legal_links.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 
 Future<void> openLegalPage(Uri page) =>
     launchUrl(page, mode: LaunchMode.externalApplication);
+
+/// [text] with each of [links]' texts in it made a tappable link, in the
+/// order the language puts them.
+List<InlineSpan> _linked(
+  String text,
+  List<(String, Uri)> links,
+  TextStyle style,
+) {
+  final found = [
+    for (final (label, page) in links)
+      if (text.indexOf(label) case final at when at >= 0) (at, label, page),
+  ]..sort((a, b) => a.$1.compareTo(b.$1));
+  final spans = <InlineSpan>[];
+  var from = 0;
+  for (final (at, label, page) in found) {
+    spans
+      ..add(TextSpan(text: text.substring(from, at)))
+      ..add(
+        TextSpan(
+          text: label,
+          style: style,
+          recognizer: TapGestureRecognizer()..onTap = () => openLegalPage(page),
+        ),
+      );
+    from = at + label.length;
+  }
+  return spans..add(TextSpan(text: text.substring(from)));
+}
 
 /// "By continuing you agree to..." with tappable Terms and Privacy links.
 class LegalFooter extends StatelessWidget {
@@ -15,6 +44,7 @@ class LegalFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final muted = TextStyle(fontSize: 13, color: AppColors.textSecondary);
     final link = TextStyle(
       fontSize: 13,
@@ -24,23 +54,14 @@ class LegalFooter extends StatelessWidget {
     final agreement = Text.rich(
       TextSpan(
         style: muted,
-        children: [
-          const TextSpan(text: 'By continuing you agree to the '),
-          TextSpan(
-            text: 'Terms of Use',
-            style: link,
-            recognizer: TapGestureRecognizer()
-              ..onTap = () => openLegalPage(LegalLinks.terms),
-          ),
-          const TextSpan(text: ' and '),
-          TextSpan(
-            text: 'Privacy Policy',
-            style: link,
-            recognizer: TapGestureRecognizer()
-              ..onTap = () => openLegalPage(LegalLinks.privacyPolicy),
-          ),
-          const TextSpan(text: '.'),
-        ],
+        children: _linked(
+          l10n.legalAgreement(l10n.legalTermsOfUse, l10n.legalPrivacyPolicy),
+          [
+            (l10n.legalTermsOfUse, LegalLinks.terms),
+            (l10n.legalPrivacyPolicy, LegalLinks.privacyPolicy),
+          ],
+          link,
+        ),
       ),
       textAlign: TextAlign.center,
     );
@@ -54,27 +75,23 @@ class LegalFooter extends StatelessWidget {
         Text.rich(
           TextSpan(
             style: muted,
-            children: [
-              const TextSpan(text: 'Protected by reCAPTCHA Enterprise. Google\'s '),
-              TextSpan(
-                text: 'Privacy Policy',
-                style: link,
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () => openLegalPage(
-                    Uri.parse('https://policies.google.com/privacy'),
-                  ),
+            children: _linked(
+              l10n.legalRecaptcha(
+                l10n.legalGooglePrivacy,
+                l10n.legalGoogleTerms,
               ),
-              const TextSpan(text: ' and '),
-              TextSpan(
-                text: 'Terms of Service',
-                style: link,
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () => openLegalPage(
-                    Uri.parse('https://policies.google.com/terms'),
-                  ),
-              ),
-              const TextSpan(text: ' apply.'),
-            ],
+              [
+                (
+                  l10n.legalGooglePrivacy,
+                  Uri.parse('https://policies.google.com/privacy'),
+                ),
+                (
+                  l10n.legalGoogleTerms,
+                  Uri.parse('https://policies.google.com/terms'),
+                ),
+              ],
+              link,
+            ),
           ),
           textAlign: TextAlign.center,
         ),
@@ -90,9 +107,7 @@ class MedicalNote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      'YumSum gives general estimates, not medical advice. Talk to a '
-      'doctor or dietitian before changing your diet, especially if you have '
-      'a health condition.',
+      context.l10n.legalMedicalNote,
       style: TextStyle(
         fontSize: 13,
         color: AppColors.textSecondary,

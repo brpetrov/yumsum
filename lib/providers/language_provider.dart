@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/country_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// The language chosen on this device: 'en', 'bg', or null when never
 /// chosen, which shows English.
@@ -11,8 +12,12 @@ class LanguageController extends Notifier<String?> {
   static const _key = 'language';
 
   @override
-  String? build() {
-    final stored = ref.watch(sharedPreferencesProvider).getString(_key);
+  String? build() => storedIn(ref.watch(sharedPreferencesProvider));
+
+  /// The setting as stored in [prefs], for main()'s first screens, which
+  /// show before Riverpod.
+  static String? storedIn(SharedPreferences prefs) {
+    final stored = prefs.getString(_key);
     return AppLocalizations.supportedLocales.any(
           (locale) => locale.languageCode == stored,
         )

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/account_controller.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
@@ -48,7 +49,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
   /// A Google user is asked to confirm with Google next.
   String _confirmNote(String description) => _usesPassword
       ? description
-      : '$description You\'ll confirm with Google next.';
+      : context.l10n.accountConfirmWithGoogle(description);
 
   void _seedName(String uid, String name) {
     if (_loadedProfileUid == uid) return;
@@ -66,13 +67,10 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Name saved.')));
+      ).showSnackBar(SnackBar(content: Text(context.l10n.accountNameSaved)));
     } catch (error) {
       if (!mounted) return;
-      _showAccountError(
-        error,
-        fallback: 'Could not save your name. Try again.',
-      );
+      _showAccountError(error, fallback: context.l10n.accountErrorSaveName);
     }
   }
 
@@ -82,12 +80,12 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
           .read(accountControllerProvider.notifier)
           .sendPasswordResetEmail();
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Password reset email sent.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.accountResetEmailSent)),
+      );
     } catch (error) {
       if (!mounted) return;
-      _showAccountError(error, fallback: 'Could not send reset email.');
+      _showAccountError(error, fallback: context.l10n.accountErrorSendReset);
     }
   }
 
@@ -104,26 +102,21 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
           );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Check your new email to confirm the change.')),
+        SnackBar(content: Text(context.l10n.accountCheckNewEmail)),
       );
     } catch (error) {
       if (!mounted) return;
-      _showAccountError(
-        error,
-        fallback: 'Could not change your email. Try again.',
-      );
+      _showAccountError(error, fallback: context.l10n.accountErrorChangeEmail);
     }
   }
 
   Future<void> _confirmAndResetAllData() async {
+    final l10n = context.l10n;
     final password = await showPasswordConfirmDialog(
       context,
-      title: 'Reset all data?',
-      description: _confirmNote(
-        'This deletes all your meals, weigh-ins and days off. Your '
-        'account, profile and plan stay.',
-      ),
-      confirmLabel: 'Reset all data',
+      title: l10n.accountResetTitle,
+      description: _confirmNote(l10n.accountResetBody),
+      confirmLabel: l10n.accountResetButton,
       destructive: true,
       askPassword: _usesPassword,
     );
@@ -137,22 +130,24 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('All logged data deleted.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.accountResetDone)));
     } catch (error) {
       if (!mounted || backedOutOfGoogle(error)) return;
-      _showAccountError(error, fallback: 'Could not reset your data.');
+      _showAccountError(error, fallback: l10n.accountErrorReset);
     }
   }
 
   Future<void> _confirmAndDeleteAccount() async {
+    final l10n = context.l10n;
     final password = await showPasswordConfirmDialog(
       context,
-      title: 'Delete account?',
+      title: l10n.accountDeleteTitle,
       description: _confirmNote(
-        'This deletes your account and everything in it. It can\'t be '
-        'undone.${renewsInPlay(ref.read(entitlementProvider).valueOrNull) ? ' Deleting your account doesn\'t cancel YumSum Star. Cancel it in Google Play first, or it keeps renewing.' : ''}',
+        renewsInPlay(ref.read(entitlementProvider).valueOrNull)
+            ? l10n.accountDeleteBodyStar
+            : l10n.accountDeleteBody,
       ),
-      confirmLabel: 'Delete account',
+      confirmLabel: l10n.accountDeleteButton,
       destructive: true,
       askPassword: _usesPassword,
     );
@@ -165,7 +160,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
           .deleteAccount(password: password);
     } catch (error) {
       if (!mounted || backedOutOfGoogle(error)) return;
-      _showAccountError(error, fallback: 'Could not delete your account.');
+      _showAccountError(error, fallback: l10n.accountErrorDelete);
     }
   }
 
@@ -178,6 +173,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final profileAsync = ref.watch(userProfileProvider);
     final authUser = ref.watch(authStateProvider).valueOrNull;
     final accountState = ref.watch(accountControllerProvider);
@@ -187,13 +183,13 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(),
-      appBar: AppBar(title: Text('Account Settings')),
+      appBar: AppBar(title: Text(l10n.accountTitle)),
       body: profileAsync.when(
         data: (profile) {
           if (profile == null) {
             return Center(
               child: Text(
-                'Could not load your account.',
+                l10n.accountErrorLoad,
                 style: TextStyle(color: AppColors.textSecondary),
               ),
             );
@@ -213,7 +209,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        'Manage your account',
+                        l10n.accountHeading,
                         style: AppTheme.display.copyWith(
                           fontSize: 26,
                           color: AppColors.textPrimary,
@@ -222,9 +218,8 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                       SizedBox(height: 6),
                       Text(
                         usesPassword
-                            ? 'Change your name, email or password.'
-                            : 'Change your name. Google looks after your '
-                                  'email and password.',
+                            ? l10n.accountSubtitle
+                            : l10n.accountSubtitleGoogle,
                         style: TextStyle(
                           fontSize: 15,
                           color: AppColors.textSecondary,
@@ -232,19 +227,19 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         ),
                       ),
                       SizedBox(height: 28),
-                      const _AccountSectionLabel('ACCOUNT'),
+                      _AccountSectionLabel(l10n.accountSectionAccount),
                       TextFormField(
                         controller: _nameCtrl,
                         textCapitalization: TextCapitalization.words,
                         textInputAction: TextInputAction.done,
                         inputFormatters: [LengthLimitingTextInputFormatter(60)],
                         decoration: InputDecoration(
-                          labelText: 'Name',
+                          labelText: l10n.accountName,
                           prefixIcon: Icon(Icons.person_outline_rounded),
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Enter your name.';
+                            return l10n.accountEnterName;
                           }
                           return null;
                         },
@@ -254,7 +249,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         initialValue: authUser?.email ?? profile.email,
                         readOnly: true,
                         decoration: InputDecoration(
-                          labelText: 'Email',
+                          labelText: l10n.commonEmail,
                           prefixIcon: Icon(Icons.email_outlined),
                         ),
                       ),
@@ -263,7 +258,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         OutlinedButton.icon(
                           onPressed: isWorking ? null : _changeEmail,
                           icon: Icon(Icons.mark_email_read_outlined),
-                          label: Text('Change email'),
+                          label: Text(l10n.accountChangeEmail),
                         ),
                       ],
                       SizedBox(height: 18),
@@ -271,26 +266,26 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         onPressed: isWorking ? null : _saveName,
                         child: isWorking
                             ? const _SmallButtonSpinner()
-                            : Text('Save name'),
+                            : Text(l10n.accountSaveName),
                       ),
                       if (usesPassword) ...[
                         SizedBox(height: 28),
-                        const _AccountSectionLabel('PASSWORD'),
+                        _AccountSectionLabel(l10n.accountSectionPassword),
                         OutlinedButton.icon(
                           onPressed: isWorking ? null : _sendPasswordReset,
                           icon: Icon(Icons.lock_reset_rounded),
-                          label: Text('Send password reset email'),
+                          label: Text(l10n.accountSendReset),
                         ),
                       ],
                       SizedBox(height: 28),
-                      const _AccountSectionLabel('YUMSUM STAR'),
+                      _AccountSectionLabel(l10n.accountSectionStar),
                       const _PlusTile(),
                       SizedBox(height: 28),
-                      const _AccountSectionLabel('HELP & LEGAL'),
+                      _AccountSectionLabel(l10n.accountSectionHelp),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Send feedback'),
-                        subtitle: const Text('Write to the developer'),
+                        title: Text(l10n.accountSendFeedback),
+                        subtitle: Text(l10n.accountSendFeedbackHint),
                         trailing: const Icon(
                           Icons.mail_outline_rounded,
                           size: 18,
@@ -299,7 +294,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                       ),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Privacy policy'),
+                        title: Text(l10n.accountPrivacyPolicy),
                         trailing: const Icon(
                           Icons.open_in_new_rounded,
                           size: 18,
@@ -308,7 +303,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                       ),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Terms of use'),
+                        title: Text(l10n.accountTerms),
                         trailing: const Icon(
                           Icons.open_in_new_rounded,
                           size: 18,
@@ -317,11 +312,8 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                       ),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Food data from Open Food Facts'),
-                        subtitle: const Text(
-                          'A free database built by volunteers, under the '
-                          'Open Database License',
-                        ),
+                        title: Text(l10n.accountOpenFoodFacts),
+                        subtitle: Text(l10n.accountOpenFoodFactsHint),
                         trailing: const Icon(
                           Icons.open_in_new_rounded,
                           size: 18,
@@ -329,7 +321,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         onTap: () => openLegalPage(LegalLinks.openFoodFacts),
                       ),
                       SizedBox(height: 28),
-                      const _AccountSectionLabel('DANGER ZONE'),
+                      _AccountSectionLabel(l10n.accountSectionDanger),
                       OutlinedButton.icon(
                         onPressed: isWorking ? null : _confirmAndResetAllData,
                         style: OutlinedButton.styleFrom(
@@ -338,7 +330,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                           foregroundColor: AppColors.error,
                         ),
                         icon: Icon(Icons.restart_alt_rounded),
-                        label: Text('Reset all data'),
+                        label: Text(l10n.accountResetButton),
                       ),
                       SizedBox(height: 12),
                       OutlinedButton.icon(
@@ -349,7 +341,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                           foregroundColor: AppColors.error,
                         ),
                         icon: Icon(Icons.delete_outline_rounded),
-                        label: Text('Delete account'),
+                        label: Text(l10n.accountDeleteButton),
                       ),
                     ],
                   ),
@@ -362,7 +354,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
             Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (_, _) => Center(
           child: Text(
-            'Could not load your account.',
+            l10n.accountErrorLoad,
             style: TextStyle(color: AppColors.textSecondary),
           ),
         ),
@@ -507,15 +499,16 @@ class _ChangeEmailDialogState extends State<_ChangeEmailDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AlertDialog(
-      title: Text('Change email'),
+      title: Text(l10n.accountChangeEmailTitle),
       content: Form(
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'We\'ll email a link to your new address. Your email changes once you open it.',
+              l10n.accountChangeEmailBody,
               style: TextStyle(color: AppColors.textSecondary),
             ),
             SizedBox(height: 16),
@@ -524,17 +517,17 @@ class _ChangeEmailDialogState extends State<_ChangeEmailDialog> {
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
-                labelText: 'New email',
+                labelText: l10n.accountNewEmail,
                 prefixIcon: Icon(Icons.email_outlined),
               ),
               validator: (value) {
                 final email = value?.trim() ?? '';
-                if (email.isEmpty) return 'Enter your new email.';
+                if (email.isEmpty) return l10n.accountEnterNewEmail;
                 final emailRe = RegExp(
                   r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$',
                 );
                 if (!emailRe.hasMatch(email)) {
-                  return 'Enter a valid email.';
+                  return l10n.commonEnterValidEmail;
                 }
                 return null;
               },
@@ -546,10 +539,12 @@ class _ChangeEmailDialogState extends State<_ChangeEmailDialog> {
               textInputAction: TextInputAction.done,
               onFieldSubmitted: (_) => _submit(),
               decoration: InputDecoration(
-                labelText: 'Current password',
+                labelText: l10n.accountCurrentPassword,
                 prefixIcon: Icon(Icons.lock_outline_rounded),
                 suffixIcon: IconButton(
-                  tooltip: _obscurePassword ? 'Show password' : 'Hide password',
+                  tooltip: _obscurePassword
+                      ? l10n.accountShowPassword
+                      : l10n.accountHidePassword,
                   onPressed: () {
                     setState(() => _obscurePassword = !_obscurePassword);
                   },
@@ -562,7 +557,7 @@ class _ChangeEmailDialogState extends State<_ChangeEmailDialog> {
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Enter your current password.';
+                  return l10n.accountEnterCurrentPassword;
                 }
                 return null;
               },
@@ -573,9 +568,9 @@ class _ChangeEmailDialogState extends State<_ChangeEmailDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text('Cancel'),
+          child: Text(l10n.commonCancel),
         ),
-        FilledButton(onPressed: _submit, child: Text('Send link')),
+        FilledButton(onPressed: _submit, child: Text(l10n.accountSendLink)),
       ],
     );
   }

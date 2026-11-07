@@ -1632,4 +1632,509 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get starPaymentPending =>
       'Google Play is waiting for your payment. YumSum Star switches on once it goes through.';
+
+  @override
+  String get commonEmail => 'Email';
+
+  @override
+  String get commonPassword => 'Password';
+
+  @override
+  String get commonSigningOut => 'Signing out...';
+
+  @override
+  String get commonEnterPassword => 'Enter your password.';
+
+  @override
+  String get commonEnterValidEmail => 'Enter a valid email.';
+
+  @override
+  String get commonEnterValidEmailAddress => 'Enter a valid email address.';
+
+  @override
+  String get commonErrorTooManyAttempts =>
+      'Too many attempts. Try again later.';
+
+  @override
+  String get authSignInTab => 'Sign in';
+
+  @override
+  String get authSignUpTab => 'Sign up';
+
+  @override
+  String get authSignInButton => 'Sign in';
+
+  @override
+  String get authCreateAccountButton => 'Create account';
+
+  @override
+  String get authEnterEmail => 'Enter your email.';
+
+  @override
+  String get authPasswordTooShort => 'Password must be at least 6 characters.';
+
+  @override
+  String get authForgotPassword => 'Forgot password?';
+
+  @override
+  String get authForgotPasswordNeedsEmail =>
+      'Enter your email above first, then tap Forgot password.';
+
+  @override
+  String get authOr => 'or';
+
+  @override
+  String get authContinueWithGoogle => 'Continue with Google';
+
+  @override
+  String get authVerificationSentTitle => 'Verification email sent';
+
+  @override
+  String authVerificationSentBody(String email) {
+    return 'We sent a link to $email. Open it to verify your account, then sign in.';
+  }
+
+  @override
+  String get authResetSentTitle => 'Password reset email sent.';
+
+  @override
+  String authResetSentBody(String email) {
+    return 'We sent a link to $email. Open it to choose a new password, then sign in.';
+  }
+
+  @override
+  String get authErrorVerifyEmail =>
+      'Verify your email first. Check your inbox for the link.';
+
+  @override
+  String get authErrorGoogle => 'Google sign-in didn\'t work. Try again.';
+
+  @override
+  String get authErrorUsePassword =>
+      'This email already has a password. Sign in with it instead.';
+
+  @override
+  String get authErrorWrongCredentials => 'Incorrect email or password.';
+
+  @override
+  String get authErrorEmailInUse =>
+      'An account with this email already exists. Sign in instead.';
+
+  @override
+  String get authErrorNoInternet => 'No internet connection. Try again.';
+
+  @override
+  String get authErrorGeneric => 'Something went wrong. Try again.';
+
+  @override
+  String legalAgreement(String terms, String privacy) {
+    return 'By continuing you agree to the $terms and $privacy.';
+  }
+
+  @override
+  String get legalTermsOfUse => 'Terms of Use';
+
+  @override
+  String get legalPrivacyPolicy => 'Privacy Policy';
+
+  @override
+  String legalRecaptcha(String privacy, String terms) {
+    return 'Protected by reCAPTCHA Enterprise. Google\'s $privacy and $terms apply.';
+  }
+
+  @override
+  String get legalGooglePrivacy => 'Privacy Policy';
+
+  @override
+  String get legalGoogleTerms => 'Terms of Service';
+
+  @override
+  String get legalMedicalNote =>
+      'YumSum gives general estimates, not medical advice. Talk to a doctor or dietitian before changing your diet, especially if you have a health condition.';
+
+  @override
+  String get planActivitySedentary => 'Mostly sitting';
+
+  @override
+  String get planActivitySedentaryHint =>
+      'Desk day, low steps, little standing.';
+
+  @override
+  String get planActivityLight => 'Light daily movement';
+
+  @override
+  String get planActivityLightHint => 'Some walking, errands, or light chores.';
+
+  @override
+  String get planActivityModerate => 'On feet often';
+
+  @override
+  String get planActivityModerateHint =>
+      'Standing or walking for much of the day.';
+
+  @override
+  String get planActivityHigh => 'Physical job or high movement';
+
+  @override
+  String get planActivityHighHint =>
+      'Manual work, high steps, or very active days.';
+
+  @override
+  String get planTrainingNone => 'No regular training';
+
+  @override
+  String get planTrainingNoneHint => 'No planned workouts most weeks.';
+
+  @override
+  String get planTrainingOneToTwo => '1 to 2 sessions/week';
+
+  @override
+  String get planTrainingOneToTwoHint =>
+      'A couple of lifting, cardio, or sport days.';
+
+  @override
+  String get planTrainingThreeToFour => '3 to 4 sessions/week';
+
+  @override
+  String get planTrainingThreeToFourHint => 'Regular training most weeks.';
+
+  @override
+  String get planTrainingFivePlus => '5+ sessions/week';
+
+  @override
+  String get planTrainingFivePlusHint => 'Frequent structured workouts.';
+
+  @override
+  String planPaceSlow(String amount) {
+    return 'Slow - $amount/week';
+  }
+
+  @override
+  String get planPaceSlowHint =>
+      'Gentle and easier to maintain over a longer period.';
+
+  @override
+  String planPaceModerate(String amount) {
+    return 'Moderate - $amount/week';
+  }
+
+  @override
+  String get planPaceModerateHint =>
+      'Steady progress with a moderate calorie deficit.';
+
+  @override
+  String planPaceFast(String amount) {
+    return 'Fast - $amount/week';
+  }
+
+  @override
+  String get planPaceFastHint =>
+      'Faster results, but more restrictive for most people.';
+
+  @override
+  String get planPaceMaintain => 'Maintain weight';
+
+  @override
+  String get planPaceMaintainHint =>
+      'Keeps your calories around maintenance instead of creating a deficit.';
+
+  @override
+  String get profileErrorLoadTitle => 'Could not load your profile';
+
+  @override
+  String get profileErrorLoadBody => 'Check your connection and try again.';
+
+  @override
+  String get profileBackToSignIn => 'Back to sign in';
+
+  @override
+  String get accountTitle => 'Account Settings';
+
+  @override
+  String accountConfirmWithGoogle(String description) {
+    return '$description You\'ll confirm with Google next.';
+  }
+
+  @override
+  String get accountNameSaved => 'Name saved.';
+
+  @override
+  String get accountErrorSaveName => 'Could not save your name. Try again.';
+
+  @override
+  String get accountResetEmailSent => 'Password reset email sent.';
+
+  @override
+  String get accountErrorSendReset => 'Could not send reset email.';
+
+  @override
+  String get accountCheckNewEmail =>
+      'Check your new email to confirm the change.';
+
+  @override
+  String get accountErrorChangeEmail =>
+      'Could not change your email. Try again.';
+
+  @override
+  String get accountResetTitle => 'Reset all data?';
+
+  @override
+  String get accountResetBody =>
+      'This deletes all your meals, weigh-ins and days off. Your account, profile and plan stay.';
+
+  @override
+  String get accountResetButton => 'Reset all data';
+
+  @override
+  String get accountResetDone => 'All logged data deleted.';
+
+  @override
+  String get accountErrorReset => 'Could not reset your data.';
+
+  @override
+  String get accountDeleteTitle => 'Delete account?';
+
+  @override
+  String get accountDeleteBody =>
+      'This deletes your account and everything in it. It can\'t be undone.';
+
+  @override
+  String get accountDeleteBodyStar =>
+      'This deletes your account and everything in it. It can\'t be undone. Deleting your account doesn\'t cancel YumSum Star. Cancel it in Google Play first, or it keeps renewing.';
+
+  @override
+  String get accountDeleteButton => 'Delete account';
+
+  @override
+  String get accountErrorDelete => 'Could not delete your account.';
+
+  @override
+  String get accountErrorLoad => 'Could not load your account.';
+
+  @override
+  String get accountHeading => 'Manage your account';
+
+  @override
+  String get accountSubtitle => 'Change your name, email or password.';
+
+  @override
+  String get accountSubtitleGoogle =>
+      'Change your name. Google looks after your email and password.';
+
+  @override
+  String get accountSectionAccount => 'ACCOUNT';
+
+  @override
+  String get accountName => 'Name';
+
+  @override
+  String get accountEnterName => 'Enter your name.';
+
+  @override
+  String get accountChangeEmail => 'Change email';
+
+  @override
+  String get accountSaveName => 'Save name';
+
+  @override
+  String get accountSectionPassword => 'PASSWORD';
+
+  @override
+  String get accountSendReset => 'Send password reset email';
+
+  @override
+  String get accountSectionStar => 'YUMSUM STAR';
+
+  @override
+  String get accountSectionHelp => 'HELP & LEGAL';
+
+  @override
+  String get accountSendFeedback => 'Send feedback';
+
+  @override
+  String get accountSendFeedbackHint => 'Write to the developer';
+
+  @override
+  String get accountPrivacyPolicy => 'Privacy policy';
+
+  @override
+  String get accountTerms => 'Terms of use';
+
+  @override
+  String get accountOpenFoodFacts => 'Food data from Open Food Facts';
+
+  @override
+  String get accountOpenFoodFactsHint =>
+      'A free database built by volunteers, under the Open Database License';
+
+  @override
+  String get accountSectionDanger => 'DANGER ZONE';
+
+  @override
+  String get accountChangeEmailTitle => 'Change email';
+
+  @override
+  String get accountChangeEmailBody =>
+      'We\'ll email a link to your new address. Your email changes once you open it.';
+
+  @override
+  String get accountNewEmail => 'New email';
+
+  @override
+  String get accountEnterNewEmail => 'Enter your new email.';
+
+  @override
+  String get accountCurrentPassword => 'Current password';
+
+  @override
+  String get accountShowPassword => 'Show password';
+
+  @override
+  String get accountHidePassword => 'Hide password';
+
+  @override
+  String get accountEnterCurrentPassword => 'Enter your current password.';
+
+  @override
+  String get accountSendLink => 'Send link';
+
+  @override
+  String get accountErrorSignedOut => 'You are not signed in.';
+
+  @override
+  String get accountErrorNoEmail =>
+      'This account does not have an email address.';
+
+  @override
+  String get accountErrorEnterNewEmail => 'Enter a new email address.';
+
+  @override
+  String get accountErrorSameEmail => 'That\'s already your email.';
+
+  @override
+  String get accountErrorWrongGoogle =>
+      'Choose the Google account you signed in with.';
+
+  @override
+  String get accountErrorNoPassword =>
+      'This account cannot confirm with a password.';
+
+  @override
+  String get accountErrorWrongPassword => 'Incorrect password.';
+
+  @override
+  String get accountErrorNoConnection =>
+      'Could not connect. Check your internet and try again.';
+
+  @override
+  String get accountErrorEmailInUse =>
+      'An account already uses that email address.';
+
+  @override
+  String get accountErrorConfirmPassword =>
+      'Confirm your password and try again.';
+
+  @override
+  String get accountErrorVerifyPassword => 'Could not verify your password.';
+
+  @override
+  String get menuHome => 'Home';
+
+  @override
+  String get menuHistory => 'History';
+
+  @override
+  String get menuCoach => 'AI Coach';
+
+  @override
+  String get menuRecipes => 'Recipes';
+
+  @override
+  String get menuProgress => 'Weight & Progress';
+
+  @override
+  String get menuPlanSettings => 'Plan Settings';
+
+  @override
+  String get menuNotifications => 'Notifications';
+
+  @override
+  String get menuAccountSettings => 'Account Settings';
+
+  @override
+  String get menuAppearance => 'Appearance';
+
+  @override
+  String get menuThemeSystem => 'System';
+
+  @override
+  String get menuThemeLight => 'Light';
+
+  @override
+  String get menuThemeDark => 'Dark';
+
+  @override
+  String get menuLogOut => 'Log out';
+
+  @override
+  String get feedbackTitle => 'Send feedback';
+
+  @override
+  String get feedbackSent => 'Feedback sent. Thank you.';
+
+  @override
+  String get feedbackKindProblem => 'Problem';
+
+  @override
+  String get feedbackKindIdea => 'Idea';
+
+  @override
+  String get feedbackKindOther => 'Other';
+
+  @override
+  String get feedbackHintProblem => 'What happened, and what did you expect?';
+
+  @override
+  String get feedbackHintIdea => 'What would make YumSum better for you?';
+
+  @override
+  String get feedbackHintOther => 'Anything at all';
+
+  @override
+  String feedbackRepliesTo(String email) {
+    return 'Replies go to $email.';
+  }
+
+  @override
+  String feedbackLimitReached(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'You\'ve sent $count today. You can send more tomorrow.',
+      one: 'You\'ve sent 1 today. You can send more tomorrow.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get feedbackErrorSend => 'Could not send. Try again.';
+
+  @override
+  String get feedbackSending => 'Sending…';
+
+  @override
+  String get feedbackSend => 'Send';
+
+  @override
+  String get splashTagline => 'Stay consistent. Stay lean.';
+
+  @override
+  String get startupErrorTitle => 'YumSum could not start';
+
+  @override
+  String get startupErrorBody =>
+      'Refresh the page. If it keeps happening, send the message below to the developer.';
+
+  @override
+  String get shortcutLogVoice => 'Log by voice';
 }

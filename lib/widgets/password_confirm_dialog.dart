@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 
 /// Asks for the password before [confirmLabel]. Without [askPassword]
 /// (a Google account, which confirms with Google next) it's a plain
@@ -79,7 +80,7 @@ class _PasswordConfirmDialogState extends State<_PasswordConfirmDialog> {
               obscureText: _obscure,
               onChanged: (_) => setState(() {}),
               decoration: InputDecoration(
-                labelText: 'Password',
+                labelText: context.l10n.commonPassword,
                 prefixIcon: Icon(Icons.lock_outline_rounded),
                 suffixIcon: IconButton(
                   onPressed: () => setState(() => _obscure = !_obscure),
@@ -97,7 +98,7 @@ class _PasswordConfirmDialogState extends State<_PasswordConfirmDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text('Cancel'),
+          child: Text(context.l10n.commonCancel),
         ),
         FilledButton(
           onPressed: canConfirm

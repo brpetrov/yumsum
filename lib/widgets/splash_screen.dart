@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'app_logo_mark.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -61,7 +62,7 @@ class _Logo extends StatelessWidget {
         ),
         SizedBox(height: 6),
         Text(
-          'Stay consistent. Stay lean.',
+          context.l10n.splashTagline,
           style: TextStyle(
             color: AppColors.textSecondary,
             fontSize: 15,

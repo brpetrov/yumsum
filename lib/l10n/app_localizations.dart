@@ -2707,6 +2707,906 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Google Play is waiting for your payment. YumSum Star switches on once it goes through.'**
   String get starPaymentPending;
+
+  /// Shared: the email field's label.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get commonEmail;
+
+  /// Shared: the password field's label.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get commonPassword;
+
+  /// Shared: the Log out button while signing out.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing out...'**
+  String get commonSigningOut;
+
+  /// Shared: the password field is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password.'**
+  String get commonEnterPassword;
+
+  /// Shared: an email field's text isn't an email address.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email.'**
+  String get commonEnterValidEmail;
+
+  /// Shared: the server says the email address isn't valid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get commonEnterValidEmailAddress;
+
+  /// Shared: sign-in or a password check tried too often.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Try again later.'**
+  String get commonErrorTooManyAttempts;
+
+  /// Sign-in page: the tab for signing in.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get authSignInTab;
+
+  /// Sign-in page: the tab for making an account.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up'**
+  String get authSignUpTab;
+
+  /// Sign-in page: the main button on the Sign in tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get authSignInButton;
+
+  /// Sign-in page: the main button on the Sign up tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get authCreateAccountButton;
+
+  /// Sign-in page: the email field is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email.'**
+  String get authEnterEmail;
+
+  /// Sign-in page: the new password is too short.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters.'**
+  String get authPasswordTooShort;
+
+  /// Sign-in page: the link that emails a new-password link.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get authForgotPassword;
+
+  /// Sign-in page: Forgot password tapped with no email typed.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email above first, then tap Forgot password.'**
+  String get authForgotPasswordNeedsEmail;
+
+  /// Sign-in page: between the email form and Google.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get authOr;
+
+  /// Sign-in page: the Google sign-in button.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get authContinueWithGoogle;
+
+  /// Sign-in page: banner title after signing up.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification email sent'**
+  String get authVerificationSentTitle;
+
+  /// Sign-in page: banner text after signing up.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a link to {email}. Open it to verify your account, then sign in.'**
+  String authVerificationSentBody(String email);
+
+  /// Sign-in page: banner title after Forgot password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset email sent.'**
+  String get authResetSentTitle;
+
+  /// Sign-in page: banner text after Forgot password.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a link to {email}. Open it to choose a new password, then sign in.'**
+  String authResetSentBody(String email);
+
+  /// Sign-in page: signing in before confirming the email.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your email first. Check your inbox for the link.'**
+  String get authErrorVerifyEmail;
+
+  /// Sign-in page: Google sign-in failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in didn\'t work. Try again.'**
+  String get authErrorGoogle;
+
+  /// Sign-in page: Google sign-in for an email that has a password account.
+  ///
+  /// In en, this message translates to:
+  /// **'This email already has a password. Sign in with it instead.'**
+  String get authErrorUsePassword;
+
+  /// Sign-in page: wrong email or password.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect email or password.'**
+  String get authErrorWrongCredentials;
+
+  /// Sign-in page: signing up with an email that has an account.
+  ///
+  /// In en, this message translates to:
+  /// **'An account with this email already exists. Sign in instead.'**
+  String get authErrorEmailInUse;
+
+  /// Sign-in page: no connection.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Try again.'**
+  String get authErrorNoInternet;
+
+  /// Sign-in page: any other failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Try again.'**
+  String get authErrorGeneric;
+
+  /// Sign-in page footer; {terms} and {privacy} are the links legalTermsOfUse and legalPrivacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing you agree to the {terms} and {privacy}.'**
+  String legalAgreement(String terms, String privacy);
+
+  /// Sign-in page footer: the link to YumSum's terms, inside legalAgreement.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Use'**
+  String get legalTermsOfUse;
+
+  /// Sign-in page footer: the link to YumSum's privacy policy, inside legalAgreement.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get legalPrivacyPolicy;
+
+  /// Sign-in page footer on the web; {privacy} and {terms} are the links legalGooglePrivacy and legalGoogleTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'Protected by reCAPTCHA Enterprise. Google\'s {privacy} and {terms} apply.'**
+  String legalRecaptcha(String privacy, String terms);
+
+  /// Sign-in page footer on the web: the link to Google's privacy policy, inside legalRecaptcha.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get legalGooglePrivacy;
+
+  /// Sign-in page footer on the web: the link to Google's terms, inside legalRecaptcha.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get legalGoogleTerms;
+
+  /// Onboarding and Plan Settings: the health disclaimer under the calorie target.
+  ///
+  /// In en, this message translates to:
+  /// **'YumSum gives general estimates, not medical advice. Talk to a doctor or dietitian before changing your diet, especially if you have a health condition.'**
+  String get legalMedicalNote;
+
+  /// Daily movement card: title.
+  ///
+  /// In en, this message translates to:
+  /// **'Mostly sitting'**
+  String get planActivitySedentary;
+
+  /// Daily movement card: text under Mostly sitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Desk day, low steps, little standing.'**
+  String get planActivitySedentaryHint;
+
+  /// Daily movement card: title.
+  ///
+  /// In en, this message translates to:
+  /// **'Light daily movement'**
+  String get planActivityLight;
+
+  /// Daily movement card: text under Light daily movement.
+  ///
+  /// In en, this message translates to:
+  /// **'Some walking, errands, or light chores.'**
+  String get planActivityLightHint;
+
+  /// Daily movement card: title.
+  ///
+  /// In en, this message translates to:
+  /// **'On feet often'**
+  String get planActivityModerate;
+
+  /// Daily movement card: text under On feet often.
+  ///
+  /// In en, this message translates to:
+  /// **'Standing or walking for much of the day.'**
+  String get planActivityModerateHint;
+
+  /// Daily movement card: title.
+  ///
+  /// In en, this message translates to:
+  /// **'Physical job or high movement'**
+  String get planActivityHigh;
+
+  /// Daily movement card: text under Physical job or high movement.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual work, high steps, or very active days.'**
+  String get planActivityHighHint;
+
+  /// Training card: title.
+  ///
+  /// In en, this message translates to:
+  /// **'No regular training'**
+  String get planTrainingNone;
+
+  /// Training card: text under No regular training.
+  ///
+  /// In en, this message translates to:
+  /// **'No planned workouts most weeks.'**
+  String get planTrainingNoneHint;
+
+  /// Training card: title.
+  ///
+  /// In en, this message translates to:
+  /// **'1 to 2 sessions/week'**
+  String get planTrainingOneToTwo;
+
+  /// Training card: text under 1 to 2 sessions.
+  ///
+  /// In en, this message translates to:
+  /// **'A couple of lifting, cardio, or sport days.'**
+  String get planTrainingOneToTwoHint;
+
+  /// Training card: title.
+  ///
+  /// In en, this message translates to:
+  /// **'3 to 4 sessions/week'**
+  String get planTrainingThreeToFour;
+
+  /// Training card: text under 3 to 4 sessions.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular training most weeks.'**
+  String get planTrainingThreeToFourHint;
+
+  /// Training card: title.
+  ///
+  /// In en, this message translates to:
+  /// **'5+ sessions/week'**
+  String get planTrainingFivePlus;
+
+  /// Training card: text under 5+ sessions.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequent structured workouts.'**
+  String get planTrainingFivePlusHint;
+
+  /// Pace card: title; {amount} is 0.25 kg in the user's unit, e.g. "0.25 kg" or "0.55 lb".
+  ///
+  /// In en, this message translates to:
+  /// **'Slow - {amount}/week'**
+  String planPaceSlow(String amount);
+
+  /// Pace card: text under Slow.
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle and easier to maintain over a longer period.'**
+  String get planPaceSlowHint;
+
+  /// Pace card: title; {amount} is 0.5 kg in the user's unit, e.g. "0.5 kg" or "1.1 lb".
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate - {amount}/week'**
+  String planPaceModerate(String amount);
+
+  /// Pace card: text under Moderate.
+  ///
+  /// In en, this message translates to:
+  /// **'Steady progress with a moderate calorie deficit.'**
+  String get planPaceModerateHint;
+
+  /// Pace card: title; {amount} is 0.75 kg in the user's unit, e.g. "0.75 kg" or "1.65 lb".
+  ///
+  /// In en, this message translates to:
+  /// **'Fast - {amount}/week'**
+  String planPaceFast(String amount);
+
+  /// Pace card: text under Fast.
+  ///
+  /// In en, this message translates to:
+  /// **'Faster results, but more restrictive for most people.'**
+  String get planPaceFastHint;
+
+  /// Pace card: title.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintain weight'**
+  String get planPaceMaintain;
+
+  /// Pace card: text under Maintain weight.
+  ///
+  /// In en, this message translates to:
+  /// **'Keeps your calories around maintenance instead of creating a deficit.'**
+  String get planPaceMaintainHint;
+
+  /// Page shown when the profile doesn't load after sign-in: heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your profile'**
+  String get profileErrorLoadTitle;
+
+  /// Page shown when the profile doesn't load after sign-in: text.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your connection and try again.'**
+  String get profileErrorLoadBody;
+
+  /// Page shown when the profile doesn't load: signs out.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to sign in'**
+  String get profileBackToSignIn;
+
+  /// Account Settings: the page title.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Settings'**
+  String get accountTitle;
+
+  /// Account Settings: a confirmation's text for a Google account; {description} is the text before it.
+  ///
+  /// In en, this message translates to:
+  /// **'{description} You\'ll confirm with Google next.'**
+  String accountConfirmWithGoogle(String description);
+
+  /// Account Settings: snackbar after saving the name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name saved.'**
+  String get accountNameSaved;
+
+  /// Account Settings: saving the name failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save your name. Try again.'**
+  String get accountErrorSaveName;
+
+  /// Account Settings: snackbar after sending the new-password email.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset email sent.'**
+  String get accountResetEmailSent;
+
+  /// Account Settings: the new-password email failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send reset email.'**
+  String get accountErrorSendReset;
+
+  /// Account Settings: snackbar after asking to change the email.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your new email to confirm the change.'**
+  String get accountCheckNewEmail;
+
+  /// Account Settings: changing the email failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not change your email. Try again.'**
+  String get accountErrorChangeEmail;
+
+  /// Account Settings: the reset dialog's title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset all data?'**
+  String get accountResetTitle;
+
+  /// Account Settings: the reset dialog's text.
+  ///
+  /// In en, this message translates to:
+  /// **'This deletes all your meals, weigh-ins and days off. Your account, profile and plan stay.'**
+  String get accountResetBody;
+
+  /// Account Settings: the reset button and the dialog's confirm button.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset all data'**
+  String get accountResetButton;
+
+  /// Account Settings: snackbar after a reset.
+  ///
+  /// In en, this message translates to:
+  /// **'All logged data deleted.'**
+  String get accountResetDone;
+
+  /// Account Settings: the reset failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reset your data.'**
+  String get accountErrorReset;
+
+  /// Account Settings: the delete dialog's title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account?'**
+  String get accountDeleteTitle;
+
+  /// Account Settings: the delete dialog's text.
+  ///
+  /// In en, this message translates to:
+  /// **'This deletes your account and everything in it. It can\'t be undone.'**
+  String get accountDeleteBody;
+
+  /// Account Settings: the delete dialog's text while YumSum Star renews in Google Play.
+  ///
+  /// In en, this message translates to:
+  /// **'This deletes your account and everything in it. It can\'t be undone. Deleting your account doesn\'t cancel YumSum Star. Cancel it in Google Play first, or it keeps renewing.'**
+  String get accountDeleteBodyStar;
+
+  /// Account Settings: the delete button and the dialog's confirm button.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get accountDeleteButton;
+
+  /// Account Settings: deleting the account failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete your account.'**
+  String get accountErrorDelete;
+
+  /// Account Settings: the profile didn't load.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your account.'**
+  String get accountErrorLoad;
+
+  /// Account Settings: the heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your account'**
+  String get accountHeading;
+
+  /// Account Settings: under the heading, for a password account.
+  ///
+  /// In en, this message translates to:
+  /// **'Change your name, email or password.'**
+  String get accountSubtitle;
+
+  /// Account Settings: under the heading, for a Google account.
+  ///
+  /// In en, this message translates to:
+  /// **'Change your name. Google looks after your email and password.'**
+  String get accountSubtitleGoogle;
+
+  /// Account Settings: section label, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'ACCOUNT'**
+  String get accountSectionAccount;
+
+  /// Account Settings: the name field's label.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get accountName;
+
+  /// Account Settings: the name is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your name.'**
+  String get accountEnterName;
+
+  /// Account Settings: the button that opens the change-email dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Change email'**
+  String get accountChangeEmail;
+
+  /// Account Settings: saves the name.
+  ///
+  /// In en, this message translates to:
+  /// **'Save name'**
+  String get accountSaveName;
+
+  /// Account Settings: section label, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'PASSWORD'**
+  String get accountSectionPassword;
+
+  /// Account Settings: emails a new-password link.
+  ///
+  /// In en, this message translates to:
+  /// **'Send password reset email'**
+  String get accountSendReset;
+
+  /// Account Settings: section label, in capitals; a name.
+  ///
+  /// In en, this message translates to:
+  /// **'YUMSUM STAR'**
+  String get accountSectionStar;
+
+  /// Account Settings: section label, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'HELP & LEGAL'**
+  String get accountSectionHelp;
+
+  /// Account Settings: opens the feedback dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Send feedback'**
+  String get accountSendFeedback;
+
+  /// Account Settings: under Send feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Write to the developer'**
+  String get accountSendFeedbackHint;
+
+  /// Account Settings: opens the privacy policy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy'**
+  String get accountPrivacyPolicy;
+
+  /// Account Settings: opens the terms of use.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of use'**
+  String get accountTerms;
+
+  /// Account Settings: opens Open Food Facts.
+  ///
+  /// In en, this message translates to:
+  /// **'Food data from Open Food Facts'**
+  String get accountOpenFoodFacts;
+
+  /// Account Settings: under Food data from Open Food Facts.
+  ///
+  /// In en, this message translates to:
+  /// **'A free database built by volunteers, under the Open Database License'**
+  String get accountOpenFoodFactsHint;
+
+  /// Account Settings: section label over reset and delete, in capitals.
+  ///
+  /// In en, this message translates to:
+  /// **'DANGER ZONE'**
+  String get accountSectionDanger;
+
+  /// Change-email dialog: title.
+  ///
+  /// In en, this message translates to:
+  /// **'Change email'**
+  String get accountChangeEmailTitle;
+
+  /// Change-email dialog: text.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll email a link to your new address. Your email changes once you open it.'**
+  String get accountChangeEmailBody;
+
+  /// Change-email dialog: the new email's label.
+  ///
+  /// In en, this message translates to:
+  /// **'New email'**
+  String get accountNewEmail;
+
+  /// Change-email dialog: the new email is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your new email.'**
+  String get accountEnterNewEmail;
+
+  /// Change-email dialog: the password's label.
+  ///
+  /// In en, this message translates to:
+  /// **'Current password'**
+  String get accountCurrentPassword;
+
+  /// Change-email dialog: the eye button's tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get accountShowPassword;
+
+  /// Change-email dialog: the eye button's tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get accountHidePassword;
+
+  /// Change-email dialog: the password is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your current password.'**
+  String get accountEnterCurrentPassword;
+
+  /// Change-email dialog: the confirm button.
+  ///
+  /// In en, this message translates to:
+  /// **'Send link'**
+  String get accountSendLink;
+
+  /// Account Settings: an action with no one signed in.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not signed in.'**
+  String get accountErrorSignedOut;
+
+  /// Account Settings: new-password email for an account without an email.
+  ///
+  /// In en, this message translates to:
+  /// **'This account does not have an email address.'**
+  String get accountErrorNoEmail;
+
+  /// Account Settings: the new email is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a new email address.'**
+  String get accountErrorEnterNewEmail;
+
+  /// Account Settings: the new email is the current one.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s already your email.'**
+  String get accountErrorSameEmail;
+
+  /// Account Settings: confirmed with a different Google account.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the Google account you signed in with.'**
+  String get accountErrorWrongGoogle;
+
+  /// Account Settings: a password check for an account without an email.
+  ///
+  /// In en, this message translates to:
+  /// **'This account cannot confirm with a password.'**
+  String get accountErrorNoPassword;
+
+  /// Account Settings: the password is wrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password.'**
+  String get accountErrorWrongPassword;
+
+  /// Account Settings: no connection.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not connect. Check your internet and try again.'**
+  String get accountErrorNoConnection;
+
+  /// Account Settings: the new email belongs to another account.
+  ///
+  /// In en, this message translates to:
+  /// **'An account already uses that email address.'**
+  String get accountErrorEmailInUse;
+
+  /// Account Settings: Firebase wants a fresh sign-in.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your password and try again.'**
+  String get accountErrorConfirmPassword;
+
+  /// Account Settings: any other failure checking the password.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not verify your password.'**
+  String get accountErrorVerifyPassword;
+
+  /// Menu: Home.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get menuHome;
+
+  /// Menu: History.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get menuHistory;
+
+  /// Menu: AI Coach.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Coach'**
+  String get menuCoach;
+
+  /// Menu: Recipes.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipes'**
+  String get menuRecipes;
+
+  /// Menu: Weight & Progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight & Progress'**
+  String get menuProgress;
+
+  /// Menu: Plan Settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan Settings'**
+  String get menuPlanSettings;
+
+  /// Menu: Notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get menuNotifications;
+
+  /// Menu: Account Settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Settings'**
+  String get menuAccountSettings;
+
+  /// Menu: the heading over the System / Light / Dark switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get menuAppearance;
+
+  /// Menu: follow the device's light or dark mode.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get menuThemeSystem;
+
+  /// Menu: light mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get menuThemeLight;
+
+  /// Menu: dark mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get menuThemeDark;
+
+  /// Menu: signs out.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out'**
+  String get menuLogOut;
+
+  /// Feedback dialog: title.
+  ///
+  /// In en, this message translates to:
+  /// **'Send feedback'**
+  String get feedbackTitle;
+
+  /// Snackbar after feedback is sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Feedback sent. Thank you.'**
+  String get feedbackSent;
+
+  /// Feedback dialog: kind of message.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem'**
+  String get feedbackKindProblem;
+
+  /// Feedback dialog: kind of message.
+  ///
+  /// In en, this message translates to:
+  /// **'Idea'**
+  String get feedbackKindIdea;
+
+  /// Feedback dialog: kind of message.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get feedbackKindOther;
+
+  /// Feedback dialog: the text field's hint for a problem.
+  ///
+  /// In en, this message translates to:
+  /// **'What happened, and what did you expect?'**
+  String get feedbackHintProblem;
+
+  /// Feedback dialog: the text field's hint for an idea.
+  ///
+  /// In en, this message translates to:
+  /// **'What would make YumSum better for you?'**
+  String get feedbackHintIdea;
+
+  /// Feedback dialog: the text field's hint for anything else.
+  ///
+  /// In en, this message translates to:
+  /// **'Anything at all'**
+  String get feedbackHintOther;
+
+  /// Feedback dialog: where replies are sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Replies go to {email}.'**
+  String feedbackRepliesTo(String email);
+
+  /// Feedback dialog: the day's limit is used up.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{You\'ve sent 1 today. You can send more tomorrow.} other{You\'ve sent {count} today. You can send more tomorrow.}}'**
+  String feedbackLimitReached(int count);
+
+  /// Feedback dialog: sending failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send. Try again.'**
+  String get feedbackErrorSend;
+
+  /// Feedback dialog: the Send button while sending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending…'**
+  String get feedbackSending;
+
+  /// Feedback dialog: sends the message.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get feedbackSend;
+
+  /// Splash screen: the line under YumSum. Also the confirmation email's footer.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay consistent. Stay lean.'**
+  String get splashTagline;
+
+  /// Shown when the app fails to start: heading.
+  ///
+  /// In en, this message translates to:
+  /// **'YumSum could not start'**
+  String get startupErrorTitle;
+
+  /// Shown when the app fails to start: text over the error message.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh the page. If it keeps happening, send the message below to the developer.'**
+  String get startupErrorBody;
+
+  /// The app icon's long-press shortcut that starts a voice log.
+  ///
+  /// In en, this message translates to:
+  /// **'Log by voice'**
+  String get shortcutLogVoice;
 }
 
 class _AppLocalizationsDelegate

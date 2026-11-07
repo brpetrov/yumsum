@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/feedback_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
@@ -20,7 +21,7 @@ Future<void> showFeedbackDialog(BuildContext context) async {
   if (sent == true && context.mounted) {
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text('Feedback sent. Thank you.')));
+    ).showSnackBar(SnackBar(content: Text(context.l10n.feedbackSent)));
   }
 }
 
@@ -32,13 +33,26 @@ const _sentDayKey = 'feedback.sent_day';
 const _sentCountKey = 'feedback.sent_count';
 
 enum _Kind {
-  problem('Problem', 'What happened, and what did you expect?'),
-  idea('Idea', 'What would make YumSum better for you?'),
-  other('Other', 'Anything at all');
+  problem('Problem'),
+  idea('Idea'),
+  other('Other');
 
-  const _Kind(this.label, this.hint);
-  final String label;
-  final String hint;
+  const _Kind(this.sent);
+
+  /// What the message is sent as: English, for the developer's inbox.
+  final String sent;
+
+  String label(AppLocalizations l10n) => switch (this) {
+    problem => l10n.feedbackKindProblem,
+    idea => l10n.feedbackKindIdea,
+    other => l10n.feedbackKindOther,
+  };
+
+  String hint(AppLocalizations l10n) => switch (this) {
+    problem => l10n.feedbackHintProblem,
+    idea => l10n.feedbackHintIdea,
+    other => l10n.feedbackHintOther,
+  };
 }
 
 class _FeedbackDialog extends ConsumerStatefulWidget {
@@ -76,7 +90,7 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
     try {
       await ref
           .read(feedbackRepositoryProvider)
-          .send(kind: _kind.label, text: _textCtrl.text.trim());
+          .send(kind: _kind.sent, text: _textCtrl.text.trim());
       final sent = _sentToday();
       final prefs = ref.read(sharedPreferencesProvider);
       await prefs.setString(_sentDayKey, _today);
@@ -101,19 +115,22 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final email = ref.watch(authStateProvider).valueOrNull?.email;
     final limitReached = _sentToday() >= _dailyLimit;
     final canSend =
         !limitReached && !_sending && _textCtrl.text.trim().isNotEmpty;
 
     return AlertDialog(
-      title: Text('Send feedback'),
+      title: Text(l10n.feedbackTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           PillToggle<_Kind>(
-            options: [for (final kind in _Kind.values) (kind, kind.label)],
+            options: [
+              for (final kind in _Kind.values) (kind, kind.label(l10n)),
+            ],
             selected: _kind,
             onChanged: (kind) => setState(() => _kind = kind),
           ),
@@ -127,26 +144,26 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
             inputFormatters: [LengthLimitingTextInputFormatter(4000)],
             textCapitalization: TextCapitalization.sentences,
             onChanged: (_) => setState(() {}),
-            decoration: InputDecoration(hintText: _kind.hint),
+            decoration: InputDecoration(hintText: _kind.hint(l10n)),
           ),
           if (email != null) ...[
             SizedBox(height: 12),
             Text(
-              'Replies go to $email.',
+              l10n.feedbackRepliesTo(email),
               style: TextStyle(color: AppColors.textSecondary, height: 1.4),
             ),
           ],
           if (limitReached) ...[
             SizedBox(height: 12),
             Text(
-              "You've sent $_dailyLimit today. You can send more tomorrow.",
+              l10n.feedbackLimitReached(_dailyLimit),
               style: TextStyle(color: AppColors.textSecondary, height: 1.4),
             ),
           ],
           if (_failed) ...[
             SizedBox(height: 12),
             Text(
-              'Could not send. Try again.',
+              l10n.feedbackErrorSend,
               style: TextStyle(color: AppColors.error),
             ),
           ],
@@ -155,11 +172,11 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
       actions: [
         TextButton(
           onPressed: _sending ? null : () => Navigator.of(context).pop(),
-          child: Text('Cancel'),
+          child: Text(l10n.commonCancel),
         ),
         FilledButton(
           onPressed: canSend ? _send : null,
-          child: Text(_sending ? 'Sending…' : 'Send'),
+          child: Text(_sending ? l10n.feedbackSending : l10n.feedbackSend),
         ),
       ],
     );

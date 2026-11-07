@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
@@ -12,6 +13,7 @@ class ProfileLoadErrorScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final isSigningOut = ref.watch(authControllerProvider).isLoading;
 
     return Scaffold(
@@ -32,7 +34,7 @@ class ProfileLoadErrorScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  'Could not load your profile',
+                  l10n.profileErrorLoadTitle,
                   textAlign: TextAlign.center,
                   style: AppTheme.display.copyWith(
                     color: AppColors.textPrimary,
@@ -41,7 +43,7 @@ class ProfileLoadErrorScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Check your connection and try again.',
+                  l10n.profileErrorLoadBody,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: AppColors.textSecondary,
@@ -53,7 +55,7 @@ class ProfileLoadErrorScreen extends ConsumerWidget {
                 ElevatedButton.icon(
                   onPressed: () => ref.invalidate(userProfileProvider),
                   icon: const Icon(Icons.refresh_rounded),
-                  label: const Text('Try again'),
+                  label: Text(l10n.commonTryAgain),
                 ),
                 const SizedBox(height: 10),
                 TextButton.icon(
@@ -63,7 +65,9 @@ class ProfileLoadErrorScreen extends ConsumerWidget {
                             ref.read(authControllerProvider.notifier).signOut(),
                   icon: const Icon(Icons.arrow_back_rounded),
                   label: Text(
-                    isSigningOut ? 'Signing out...' : 'Back to sign in',
+                    isSigningOut
+                        ? l10n.commonSigningOut
+                        : l10n.profileBackToSignIn,
                   ),
                 ),
               ],

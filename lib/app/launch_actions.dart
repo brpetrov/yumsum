@@ -7,6 +7,8 @@ import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:lean_streak/app/router.dart';
+import 'package:lean_streak/l10n/l10n.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/services/notification_service.dart';
 
@@ -93,9 +95,16 @@ Future<void> bindLaunchActions(ProviderContainer container) async {
   await quickActions.initialize((type) {
     if (type == shortcutType) dispatch(LaunchAction.voiceLog);
   });
-  await quickActions.setShortcutItems([
-    ShortcutItem(type: shortcutType, localizedTitle: 'Log by voice'),
-  ]);
+  Future<void> setShortcut(AppLocalizations l10n) =>
+      quickActions.setShortcutItems([
+        ShortcutItem(type: shortcutType, localizedTitle: l10n.shortcutLogVoice),
+      ]);
+  await setShortcut(container.read(l10nProvider));
+  // Its title follows the app's language.
+  container.listen<AppLocalizations>(
+    l10nProvider,
+    (_, l10n) => setShortcut(l10n),
+  );
 
   // The Android home-screen widget opens the app with leanstreak://log/voice.
   // Taps while the app is running arrive on the stream, which must stay

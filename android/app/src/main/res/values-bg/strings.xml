@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The home-screen widget in Bulgarian: Android picks it by the phone's language. -->
+<resources>
+    <string name="log_widget_name">Бързо записване</string>
+    <string name="log_widget_description">Запиши хранене с текст или с глас направо от началния екран.</string>
+    <string name="log_widget_type">Запиши хранене с текст</string>
+    <string name="log_widget_mic">Запиши хранене с глас</string>
+</resources>

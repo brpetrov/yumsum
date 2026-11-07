@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/units.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/widgets/clickable.dart';
@@ -92,20 +93,21 @@ class ActivityCard extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  static String _title(ActivityLevel level) => switch (level) {
-    ActivityLevel.sedentary => 'Mostly sitting',
-    ActivityLevel.lightlyActive => 'Light daily movement',
-    ActivityLevel.moderatelyActive => 'On feet often',
-    ActivityLevel.veryActive => 'Physical job or high movement',
-  };
+  static String _title(AppLocalizations l10n, ActivityLevel level) =>
+      switch (level) {
+        ActivityLevel.sedentary => l10n.planActivitySedentary,
+        ActivityLevel.lightlyActive => l10n.planActivityLight,
+        ActivityLevel.moderatelyActive => l10n.planActivityModerate,
+        ActivityLevel.veryActive => l10n.planActivityHigh,
+      };
 
-  static String _description(ActivityLevel level) => switch (level) {
-    ActivityLevel.sedentary => 'Desk day, low steps, little standing.',
-    ActivityLevel.lightlyActive => 'Some walking, errands, or light chores.',
-    ActivityLevel.moderatelyActive =>
-      'Standing or walking for much of the day.',
-    ActivityLevel.veryActive => 'Manual work, high steps, or very active days.',
-  };
+  static String _description(AppLocalizations l10n, ActivityLevel level) =>
+      switch (level) {
+        ActivityLevel.sedentary => l10n.planActivitySedentaryHint,
+        ActivityLevel.lightlyActive => l10n.planActivityLightHint,
+        ActivityLevel.moderatelyActive => l10n.planActivityModerateHint,
+        ActivityLevel.veryActive => l10n.planActivityHighHint,
+      };
 
   static IconData _icon(ActivityLevel level) => switch (level) {
     ActivityLevel.sedentary => Icons.weekend_outlined,
@@ -117,8 +119,8 @@ class ActivityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SelectionCard(
-      title: _title(level),
-      description: _description(level),
+      title: _title(context.l10n, level),
+      description: _description(context.l10n, level),
       icon: _icon(level),
       selected: selected,
       onTap: onTap,
@@ -138,21 +140,23 @@ class TrainingCard extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  static String _title(TrainingFrequency frequency) => switch (frequency) {
-    TrainingFrequency.none => 'No regular training',
-    TrainingFrequency.oneToTwo => '1 to 2 sessions/week',
-    TrainingFrequency.threeToFour => '3 to 4 sessions/week',
-    TrainingFrequency.fivePlus => '5+ sessions/week',
-  };
-
-  static String _description(TrainingFrequency frequency) =>
+  static String _title(AppLocalizations l10n, TrainingFrequency frequency) =>
       switch (frequency) {
-        TrainingFrequency.none => 'No planned workouts most weeks.',
-        TrainingFrequency.oneToTwo =>
-          'A couple of lifting, cardio, or sport days.',
-        TrainingFrequency.threeToFour => 'Regular training most weeks.',
-        TrainingFrequency.fivePlus => 'Frequent structured workouts.',
+        TrainingFrequency.none => l10n.planTrainingNone,
+        TrainingFrequency.oneToTwo => l10n.planTrainingOneToTwo,
+        TrainingFrequency.threeToFour => l10n.planTrainingThreeToFour,
+        TrainingFrequency.fivePlus => l10n.planTrainingFivePlus,
       };
+
+  static String _description(
+    AppLocalizations l10n,
+    TrainingFrequency frequency,
+  ) => switch (frequency) {
+    TrainingFrequency.none => l10n.planTrainingNoneHint,
+    TrainingFrequency.oneToTwo => l10n.planTrainingOneToTwoHint,
+    TrainingFrequency.threeToFour => l10n.planTrainingThreeToFourHint,
+    TrainingFrequency.fivePlus => l10n.planTrainingFivePlusHint,
+  };
 
   static IconData _icon(TrainingFrequency frequency) => switch (frequency) {
     TrainingFrequency.none => Icons.block_rounded,
@@ -164,8 +168,8 @@ class TrainingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SelectionCard(
-      title: _title(frequency),
-      description: _description(frequency),
+      title: _title(context.l10n, frequency),
+      description: _description(context.l10n, frequency),
       icon: _icon(frequency),
       selected: selected,
       onTap: onTap,
@@ -187,26 +191,22 @@ class PaceCard extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  String _title(WeightLossPace pace) {
-    String perWeek(double kg) => '${formatPace(kg, weightUnit)}/week';
-    return switch (pace) {
-      WeightLossPace.slow => 'Slow - ${perWeek(0.25)}',
-      WeightLossPace.moderate => 'Moderate - ${perWeek(0.5)}',
-      WeightLossPace.fast => 'Fast - ${perWeek(0.75)}',
-      WeightLossPace.maintain => 'Maintain weight',
-    };
-  }
-
-  static String _description(WeightLossPace pace) => switch (pace) {
-    WeightLossPace.slow =>
-      'Gentle and easier to maintain over a longer period.',
-    WeightLossPace.moderate =>
-      'Steady progress with a moderate calorie deficit.',
-    WeightLossPace.fast =>
-      'Faster results, but more restrictive for most people.',
-    WeightLossPace.maintain =>
-      'Keeps your calories around maintenance instead of creating a deficit.',
+  String _title(AppLocalizations l10n, WeightLossPace pace) => switch (pace) {
+    WeightLossPace.slow => l10n.planPaceSlow(formatPace(0.25, weightUnit)),
+    WeightLossPace.moderate => l10n.planPaceModerate(
+      formatPace(0.5, weightUnit),
+    ),
+    WeightLossPace.fast => l10n.planPaceFast(formatPace(0.75, weightUnit)),
+    WeightLossPace.maintain => l10n.planPaceMaintain,
   };
+
+  static String _description(AppLocalizations l10n, WeightLossPace pace) =>
+      switch (pace) {
+        WeightLossPace.slow => l10n.planPaceSlowHint,
+        WeightLossPace.moderate => l10n.planPaceModerateHint,
+        WeightLossPace.fast => l10n.planPaceFastHint,
+        WeightLossPace.maintain => l10n.planPaceMaintainHint,
+      };
 
   static IconData _icon(WeightLossPace pace) => switch (pace) {
     WeightLossPace.slow => Icons.hourglass_bottom_rounded,
@@ -218,8 +218,8 @@ class PaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SelectionCard(
-      title: _title(pace),
-      description: _description(pace),
+      title: _title(context.l10n, pace),
+      description: _description(context.l10n, pace),
       icon: _icon(pace),
       selected: selected,
       onTap: onTap,

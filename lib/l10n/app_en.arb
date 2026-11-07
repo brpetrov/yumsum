@@ -2128,5 +2128,661 @@
   "starPaymentPending": "Google Play is waiting for your payment. YumSum Star switches on once it goes through.",
   "@starPaymentPending": {
     "description": "YumSum Star page: the payment is pending."
+  },
+  "commonEmail": "Email",
+  "@commonEmail": {
+    "description": "Shared: the email field's label."
+  },
+  "commonPassword": "Password",
+  "@commonPassword": {
+    "description": "Shared: the password field's label."
+  },
+  "commonSigningOut": "Signing out...",
+  "@commonSigningOut": {
+    "description": "Shared: the Log out button while signing out."
+  },
+  "commonEnterPassword": "Enter your password.",
+  "@commonEnterPassword": {
+    "description": "Shared: the password field is empty."
+  },
+  "commonEnterValidEmail": "Enter a valid email.",
+  "@commonEnterValidEmail": {
+    "description": "Shared: an email field's text isn't an email address."
+  },
+  "commonEnterValidEmailAddress": "Enter a valid email address.",
+  "@commonEnterValidEmailAddress": {
+    "description": "Shared: the server says the email address isn't valid."
+  },
+  "commonErrorTooManyAttempts": "Too many attempts. Try again later.",
+  "@commonErrorTooManyAttempts": {
+    "description": "Shared: sign-in or a password check tried too often."
+  },
+  "authSignInTab": "Sign in",
+  "@authSignInTab": {
+    "description": "Sign-in page: the tab for signing in."
+  },
+  "authSignUpTab": "Sign up",
+  "@authSignUpTab": {
+    "description": "Sign-in page: the tab for making an account."
+  },
+  "authSignInButton": "Sign in",
+  "@authSignInButton": {
+    "description": "Sign-in page: the main button on the Sign in tab."
+  },
+  "authCreateAccountButton": "Create account",
+  "@authCreateAccountButton": {
+    "description": "Sign-in page: the main button on the Sign up tab."
+  },
+  "authEnterEmail": "Enter your email.",
+  "@authEnterEmail": {
+    "description": "Sign-in page: the email field is empty."
+  },
+  "authPasswordTooShort": "Password must be at least 6 characters.",
+  "@authPasswordTooShort": {
+    "description": "Sign-in page: the new password is too short."
+  },
+  "authForgotPassword": "Forgot password?",
+  "@authForgotPassword": {
+    "description": "Sign-in page: the link that emails a new-password link."
+  },
+  "authForgotPasswordNeedsEmail": "Enter your email above first, then tap Forgot password.",
+  "@authForgotPasswordNeedsEmail": {
+    "description": "Sign-in page: Forgot password tapped with no email typed."
+  },
+  "authOr": "or",
+  "@authOr": {
+    "description": "Sign-in page: between the email form and Google."
+  },
+  "authContinueWithGoogle": "Continue with Google",
+  "@authContinueWithGoogle": {
+    "description": "Sign-in page: the Google sign-in button."
+  },
+  "authVerificationSentTitle": "Verification email sent",
+  "@authVerificationSentTitle": {
+    "description": "Sign-in page: banner title after signing up."
+  },
+  "authVerificationSentBody": "We sent a link to {email}. Open it to verify your account, then sign in.",
+  "@authVerificationSentBody": {
+    "description": "Sign-in page: banner text after signing up.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authResetSentTitle": "Password reset email sent.",
+  "@authResetSentTitle": {
+    "description": "Sign-in page: banner title after Forgot password."
+  },
+  "authResetSentBody": "We sent a link to {email}. Open it to choose a new password, then sign in.",
+  "@authResetSentBody": {
+    "description": "Sign-in page: banner text after Forgot password.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authErrorVerifyEmail": "Verify your email first. Check your inbox for the link.",
+  "@authErrorVerifyEmail": {
+    "description": "Sign-in page: signing in before confirming the email."
+  },
+  "authErrorGoogle": "Google sign-in didn't work. Try again.",
+  "@authErrorGoogle": {
+    "description": "Sign-in page: Google sign-in failed."
+  },
+  "authErrorUsePassword": "This email already has a password. Sign in with it instead.",
+  "@authErrorUsePassword": {
+    "description": "Sign-in page: Google sign-in for an email that has a password account."
+  },
+  "authErrorWrongCredentials": "Incorrect email or password.",
+  "@authErrorWrongCredentials": {
+    "description": "Sign-in page: wrong email or password."
+  },
+  "authErrorEmailInUse": "An account with this email already exists. Sign in instead.",
+  "@authErrorEmailInUse": {
+    "description": "Sign-in page: signing up with an email that has an account."
+  },
+  "authErrorNoInternet": "No internet connection. Try again.",
+  "@authErrorNoInternet": {
+    "description": "Sign-in page: no connection."
+  },
+  "authErrorGeneric": "Something went wrong. Try again.",
+  "@authErrorGeneric": {
+    "description": "Sign-in page: any other failure."
+  },
+  "legalAgreement": "By continuing you agree to the {terms} and {privacy}.",
+  "@legalAgreement": {
+    "description": "Sign-in page footer; {terms} and {privacy} are the links legalTermsOfUse and legalPrivacyPolicy.",
+    "placeholders": {
+      "terms": {
+        "type": "String"
+      },
+      "privacy": {
+        "type": "String"
+      }
+    }
+  },
+  "legalTermsOfUse": "Terms of Use",
+  "@legalTermsOfUse": {
+    "description": "Sign-in page footer: the link to YumSum's terms, inside legalAgreement."
+  },
+  "legalPrivacyPolicy": "Privacy Policy",
+  "@legalPrivacyPolicy": {
+    "description": "Sign-in page footer: the link to YumSum's privacy policy, inside legalAgreement."
+  },
+  "legalRecaptcha": "Protected by reCAPTCHA Enterprise. Google's {privacy} and {terms} apply.",
+  "@legalRecaptcha": {
+    "description": "Sign-in page footer on the web; {privacy} and {terms} are the links legalGooglePrivacy and legalGoogleTerms.",
+    "placeholders": {
+      "privacy": {
+        "type": "String"
+      },
+      "terms": {
+        "type": "String"
+      }
+    }
+  },
+  "legalGooglePrivacy": "Privacy Policy",
+  "@legalGooglePrivacy": {
+    "description": "Sign-in page footer on the web: the link to Google's privacy policy, inside legalRecaptcha."
+  },
+  "legalGoogleTerms": "Terms of Service",
+  "@legalGoogleTerms": {
+    "description": "Sign-in page footer on the web: the link to Google's terms, inside legalRecaptcha."
+  },
+  "legalMedicalNote": "YumSum gives general estimates, not medical advice. Talk to a doctor or dietitian before changing your diet, especially if you have a health condition.",
+  "@legalMedicalNote": {
+    "description": "Onboarding and Plan Settings: the health disclaimer under the calorie target."
+  },
+  "planActivitySedentary": "Mostly sitting",
+  "@planActivitySedentary": {
+    "description": "Daily movement card: title."
+  },
+  "planActivitySedentaryHint": "Desk day, low steps, little standing.",
+  "@planActivitySedentaryHint": {
+    "description": "Daily movement card: text under Mostly sitting."
+  },
+  "planActivityLight": "Light daily movement",
+  "@planActivityLight": {
+    "description": "Daily movement card: title."
+  },
+  "planActivityLightHint": "Some walking, errands, or light chores.",
+  "@planActivityLightHint": {
+    "description": "Daily movement card: text under Light daily movement."
+  },
+  "planActivityModerate": "On feet often",
+  "@planActivityModerate": {
+    "description": "Daily movement card: title."
+  },
+  "planActivityModerateHint": "Standing or walking for much of the day.",
+  "@planActivityModerateHint": {
+    "description": "Daily movement card: text under On feet often."
+  },
+  "planActivityHigh": "Physical job or high movement",
+  "@planActivityHigh": {
+    "description": "Daily movement card: title."
+  },
+  "planActivityHighHint": "Manual work, high steps, or very active days.",
+  "@planActivityHighHint": {
+    "description": "Daily movement card: text under Physical job or high movement."
+  },
+  "planTrainingNone": "No regular training",
+  "@planTrainingNone": {
+    "description": "Training card: title."
+  },
+  "planTrainingNoneHint": "No planned workouts most weeks.",
+  "@planTrainingNoneHint": {
+    "description": "Training card: text under No regular training."
+  },
+  "planTrainingOneToTwo": "1 to 2 sessions/week",
+  "@planTrainingOneToTwo": {
+    "description": "Training card: title."
+  },
+  "planTrainingOneToTwoHint": "A couple of lifting, cardio, or sport days.",
+  "@planTrainingOneToTwoHint": {
+    "description": "Training card: text under 1 to 2 sessions."
+  },
+  "planTrainingThreeToFour": "3 to 4 sessions/week",
+  "@planTrainingThreeToFour": {
+    "description": "Training card: title."
+  },
+  "planTrainingThreeToFourHint": "Regular training most weeks.",
+  "@planTrainingThreeToFourHint": {
+    "description": "Training card: text under 3 to 4 sessions."
+  },
+  "planTrainingFivePlus": "5+ sessions/week",
+  "@planTrainingFivePlus": {
+    "description": "Training card: title."
+  },
+  "planTrainingFivePlusHint": "Frequent structured workouts.",
+  "@planTrainingFivePlusHint": {
+    "description": "Training card: text under 5+ sessions."
+  },
+  "planPaceSlow": "Slow - {amount}/week",
+  "@planPaceSlow": {
+    "description": "Pace card: title; {amount} is 0.25 kg in the user's unit, e.g. \"0.25 kg\" or \"0.55 lb\".",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "planPaceSlowHint": "Gentle and easier to maintain over a longer period.",
+  "@planPaceSlowHint": {
+    "description": "Pace card: text under Slow."
+  },
+  "planPaceModerate": "Moderate - {amount}/week",
+  "@planPaceModerate": {
+    "description": "Pace card: title; {amount} is 0.5 kg in the user's unit, e.g. \"0.5 kg\" or \"1.1 lb\".",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "planPaceModerateHint": "Steady progress with a moderate calorie deficit.",
+  "@planPaceModerateHint": {
+    "description": "Pace card: text under Moderate."
+  },
+  "planPaceFast": "Fast - {amount}/week",
+  "@planPaceFast": {
+    "description": "Pace card: title; {amount} is 0.75 kg in the user's unit, e.g. \"0.75 kg\" or \"1.65 lb\".",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "planPaceFastHint": "Faster results, but more restrictive for most people.",
+  "@planPaceFastHint": {
+    "description": "Pace card: text under Fast."
+  },
+  "planPaceMaintain": "Maintain weight",
+  "@planPaceMaintain": {
+    "description": "Pace card: title."
+  },
+  "planPaceMaintainHint": "Keeps your calories around maintenance instead of creating a deficit.",
+  "@planPaceMaintainHint": {
+    "description": "Pace card: text under Maintain weight."
+  },
+  "profileErrorLoadTitle": "Could not load your profile",
+  "@profileErrorLoadTitle": {
+    "description": "Page shown when the profile doesn't load after sign-in: heading."
+  },
+  "profileErrorLoadBody": "Check your connection and try again.",
+  "@profileErrorLoadBody": {
+    "description": "Page shown when the profile doesn't load after sign-in: text."
+  },
+  "profileBackToSignIn": "Back to sign in",
+  "@profileBackToSignIn": {
+    "description": "Page shown when the profile doesn't load: signs out."
+  },
+  "accountTitle": "Account Settings",
+  "@accountTitle": {
+    "description": "Account Settings: the page title."
+  },
+  "accountConfirmWithGoogle": "{description} You'll confirm with Google next.",
+  "@accountConfirmWithGoogle": {
+    "description": "Account Settings: a confirmation's text for a Google account; {description} is the text before it.",
+    "placeholders": {
+      "description": {
+        "type": "String"
+      }
+    }
+  },
+  "accountNameSaved": "Name saved.",
+  "@accountNameSaved": {
+    "description": "Account Settings: snackbar after saving the name."
+  },
+  "accountErrorSaveName": "Could not save your name. Try again.",
+  "@accountErrorSaveName": {
+    "description": "Account Settings: saving the name failed."
+  },
+  "accountResetEmailSent": "Password reset email sent.",
+  "@accountResetEmailSent": {
+    "description": "Account Settings: snackbar after sending the new-password email."
+  },
+  "accountErrorSendReset": "Could not send reset email.",
+  "@accountErrorSendReset": {
+    "description": "Account Settings: the new-password email failed."
+  },
+  "accountCheckNewEmail": "Check your new email to confirm the change.",
+  "@accountCheckNewEmail": {
+    "description": "Account Settings: snackbar after asking to change the email."
+  },
+  "accountErrorChangeEmail": "Could not change your email. Try again.",
+  "@accountErrorChangeEmail": {
+    "description": "Account Settings: changing the email failed."
+  },
+  "accountResetTitle": "Reset all data?",
+  "@accountResetTitle": {
+    "description": "Account Settings: the reset dialog's title."
+  },
+  "accountResetBody": "This deletes all your meals, weigh-ins and days off. Your account, profile and plan stay.",
+  "@accountResetBody": {
+    "description": "Account Settings: the reset dialog's text."
+  },
+  "accountResetButton": "Reset all data",
+  "@accountResetButton": {
+    "description": "Account Settings: the reset button and the dialog's confirm button."
+  },
+  "accountResetDone": "All logged data deleted.",
+  "@accountResetDone": {
+    "description": "Account Settings: snackbar after a reset."
+  },
+  "accountErrorReset": "Could not reset your data.",
+  "@accountErrorReset": {
+    "description": "Account Settings: the reset failed."
+  },
+  "accountDeleteTitle": "Delete account?",
+  "@accountDeleteTitle": {
+    "description": "Account Settings: the delete dialog's title."
+  },
+  "accountDeleteBody": "This deletes your account and everything in it. It can't be undone.",
+  "@accountDeleteBody": {
+    "description": "Account Settings: the delete dialog's text."
+  },
+  "accountDeleteBodyStar": "This deletes your account and everything in it. It can't be undone. Deleting your account doesn't cancel YumSum Star. Cancel it in Google Play first, or it keeps renewing.",
+  "@accountDeleteBodyStar": {
+    "description": "Account Settings: the delete dialog's text while YumSum Star renews in Google Play."
+  },
+  "accountDeleteButton": "Delete account",
+  "@accountDeleteButton": {
+    "description": "Account Settings: the delete button and the dialog's confirm button."
+  },
+  "accountErrorDelete": "Could not delete your account.",
+  "@accountErrorDelete": {
+    "description": "Account Settings: deleting the account failed."
+  },
+  "accountErrorLoad": "Could not load your account.",
+  "@accountErrorLoad": {
+    "description": "Account Settings: the profile didn't load."
+  },
+  "accountHeading": "Manage your account",
+  "@accountHeading": {
+    "description": "Account Settings: the heading."
+  },
+  "accountSubtitle": "Change your name, email or password.",
+  "@accountSubtitle": {
+    "description": "Account Settings: under the heading, for a password account."
+  },
+  "accountSubtitleGoogle": "Change your name. Google looks after your email and password.",
+  "@accountSubtitleGoogle": {
+    "description": "Account Settings: under the heading, for a Google account."
+  },
+  "accountSectionAccount": "ACCOUNT",
+  "@accountSectionAccount": {
+    "description": "Account Settings: section label, in capitals."
+  },
+  "accountName": "Name",
+  "@accountName": {
+    "description": "Account Settings: the name field's label."
+  },
+  "accountEnterName": "Enter your name.",
+  "@accountEnterName": {
+    "description": "Account Settings: the name is empty."
+  },
+  "accountChangeEmail": "Change email",
+  "@accountChangeEmail": {
+    "description": "Account Settings: the button that opens the change-email dialog."
+  },
+  "accountSaveName": "Save name",
+  "@accountSaveName": {
+    "description": "Account Settings: saves the name."
+  },
+  "accountSectionPassword": "PASSWORD",
+  "@accountSectionPassword": {
+    "description": "Account Settings: section label, in capitals."
+  },
+  "accountSendReset": "Send password reset email",
+  "@accountSendReset": {
+    "description": "Account Settings: emails a new-password link."
+  },
+  "accountSectionStar": "YUMSUM STAR",
+  "@accountSectionStar": {
+    "description": "Account Settings: section label, in capitals; a name."
+  },
+  "accountSectionHelp": "HELP & LEGAL",
+  "@accountSectionHelp": {
+    "description": "Account Settings: section label, in capitals."
+  },
+  "accountSendFeedback": "Send feedback",
+  "@accountSendFeedback": {
+    "description": "Account Settings: opens the feedback dialog."
+  },
+  "accountSendFeedbackHint": "Write to the developer",
+  "@accountSendFeedbackHint": {
+    "description": "Account Settings: under Send feedback."
+  },
+  "accountPrivacyPolicy": "Privacy policy",
+  "@accountPrivacyPolicy": {
+    "description": "Account Settings: opens the privacy policy."
+  },
+  "accountTerms": "Terms of use",
+  "@accountTerms": {
+    "description": "Account Settings: opens the terms of use."
+  },
+  "accountOpenFoodFacts": "Food data from Open Food Facts",
+  "@accountOpenFoodFacts": {
+    "description": "Account Settings: opens Open Food Facts."
+  },
+  "accountOpenFoodFactsHint": "A free database built by volunteers, under the Open Database License",
+  "@accountOpenFoodFactsHint": {
+    "description": "Account Settings: under Food data from Open Food Facts."
+  },
+  "accountSectionDanger": "DANGER ZONE",
+  "@accountSectionDanger": {
+    "description": "Account Settings: section label over reset and delete, in capitals."
+  },
+  "accountChangeEmailTitle": "Change email",
+  "@accountChangeEmailTitle": {
+    "description": "Change-email dialog: title."
+  },
+  "accountChangeEmailBody": "We'll email a link to your new address. Your email changes once you open it.",
+  "@accountChangeEmailBody": {
+    "description": "Change-email dialog: text."
+  },
+  "accountNewEmail": "New email",
+  "@accountNewEmail": {
+    "description": "Change-email dialog: the new email's label."
+  },
+  "accountEnterNewEmail": "Enter your new email.",
+  "@accountEnterNewEmail": {
+    "description": "Change-email dialog: the new email is empty."
+  },
+  "accountCurrentPassword": "Current password",
+  "@accountCurrentPassword": {
+    "description": "Change-email dialog: the password's label."
+  },
+  "accountShowPassword": "Show password",
+  "@accountShowPassword": {
+    "description": "Change-email dialog: the eye button's tooltip."
+  },
+  "accountHidePassword": "Hide password",
+  "@accountHidePassword": {
+    "description": "Change-email dialog: the eye button's tooltip."
+  },
+  "accountEnterCurrentPassword": "Enter your current password.",
+  "@accountEnterCurrentPassword": {
+    "description": "Change-email dialog: the password is empty."
+  },
+  "accountSendLink": "Send link",
+  "@accountSendLink": {
+    "description": "Change-email dialog: the confirm button."
+  },
+  "accountErrorSignedOut": "You are not signed in.",
+  "@accountErrorSignedOut": {
+    "description": "Account Settings: an action with no one signed in."
+  },
+  "accountErrorNoEmail": "This account does not have an email address.",
+  "@accountErrorNoEmail": {
+    "description": "Account Settings: new-password email for an account without an email."
+  },
+  "accountErrorEnterNewEmail": "Enter a new email address.",
+  "@accountErrorEnterNewEmail": {
+    "description": "Account Settings: the new email is empty."
+  },
+  "accountErrorSameEmail": "That's already your email.",
+  "@accountErrorSameEmail": {
+    "description": "Account Settings: the new email is the current one."
+  },
+  "accountErrorWrongGoogle": "Choose the Google account you signed in with.",
+  "@accountErrorWrongGoogle": {
+    "description": "Account Settings: confirmed with a different Google account."
+  },
+  "accountErrorNoPassword": "This account cannot confirm with a password.",
+  "@accountErrorNoPassword": {
+    "description": "Account Settings: a password check for an account without an email."
+  },
+  "accountErrorWrongPassword": "Incorrect password.",
+  "@accountErrorWrongPassword": {
+    "description": "Account Settings: the password is wrong."
+  },
+  "accountErrorNoConnection": "Could not connect. Check your internet and try again.",
+  "@accountErrorNoConnection": {
+    "description": "Account Settings: no connection."
+  },
+  "accountErrorEmailInUse": "An account already uses that email address.",
+  "@accountErrorEmailInUse": {
+    "description": "Account Settings: the new email belongs to another account."
+  },
+  "accountErrorConfirmPassword": "Confirm your password and try again.",
+  "@accountErrorConfirmPassword": {
+    "description": "Account Settings: Firebase wants a fresh sign-in."
+  },
+  "accountErrorVerifyPassword": "Could not verify your password.",
+  "@accountErrorVerifyPassword": {
+    "description": "Account Settings: any other failure checking the password."
+  },
+  "menuHome": "Home",
+  "@menuHome": {
+    "description": "Menu: Home."
+  },
+  "menuHistory": "History",
+  "@menuHistory": {
+    "description": "Menu: History."
+  },
+  "menuCoach": "AI Coach",
+  "@menuCoach": {
+    "description": "Menu: AI Coach."
+  },
+  "menuRecipes": "Recipes",
+  "@menuRecipes": {
+    "description": "Menu: Recipes."
+  },
+  "menuProgress": "Weight & Progress",
+  "@menuProgress": {
+    "description": "Menu: Weight & Progress."
+  },
+  "menuPlanSettings": "Plan Settings",
+  "@menuPlanSettings": {
+    "description": "Menu: Plan Settings."
+  },
+  "menuNotifications": "Notifications",
+  "@menuNotifications": {
+    "description": "Menu: Notifications."
+  },
+  "menuAccountSettings": "Account Settings",
+  "@menuAccountSettings": {
+    "description": "Menu: Account Settings."
+  },
+  "menuAppearance": "Appearance",
+  "@menuAppearance": {
+    "description": "Menu: the heading over the System / Light / Dark switch."
+  },
+  "menuThemeSystem": "System",
+  "@menuThemeSystem": {
+    "description": "Menu: follow the device's light or dark mode."
+  },
+  "menuThemeLight": "Light",
+  "@menuThemeLight": {
+    "description": "Menu: light mode."
+  },
+  "menuThemeDark": "Dark",
+  "@menuThemeDark": {
+    "description": "Menu: dark mode."
+  },
+  "menuLogOut": "Log out",
+  "@menuLogOut": {
+    "description": "Menu: signs out."
+  },
+  "feedbackTitle": "Send feedback",
+  "@feedbackTitle": {
+    "description": "Feedback dialog: title."
+  },
+  "feedbackSent": "Feedback sent. Thank you.",
+  "@feedbackSent": {
+    "description": "Snackbar after feedback is sent."
+  },
+  "feedbackKindProblem": "Problem",
+  "@feedbackKindProblem": {
+    "description": "Feedback dialog: kind of message."
+  },
+  "feedbackKindIdea": "Idea",
+  "@feedbackKindIdea": {
+    "description": "Feedback dialog: kind of message."
+  },
+  "feedbackKindOther": "Other",
+  "@feedbackKindOther": {
+    "description": "Feedback dialog: kind of message."
+  },
+  "feedbackHintProblem": "What happened, and what did you expect?",
+  "@feedbackHintProblem": {
+    "description": "Feedback dialog: the text field's hint for a problem."
+  },
+  "feedbackHintIdea": "What would make YumSum better for you?",
+  "@feedbackHintIdea": {
+    "description": "Feedback dialog: the text field's hint for an idea."
+  },
+  "feedbackHintOther": "Anything at all",
+  "@feedbackHintOther": {
+    "description": "Feedback dialog: the text field's hint for anything else."
+  },
+  "feedbackRepliesTo": "Replies go to {email}.",
+  "@feedbackRepliesTo": {
+    "description": "Feedback dialog: where replies are sent.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "feedbackLimitReached": "{count, plural, one{You've sent 1 today. You can send more tomorrow.} other{You've sent {count} today. You can send more tomorrow.}}",
+  "@feedbackLimitReached": {
+    "description": "Feedback dialog: the day's limit is used up.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "feedbackErrorSend": "Could not send. Try again.",
+  "@feedbackErrorSend": {
+    "description": "Feedback dialog: sending failed."
+  },
+  "feedbackSending": "Sending…",
+  "@feedbackSending": {
+    "description": "Feedback dialog: the Send button while sending."
+  },
+  "feedbackSend": "Send",
+  "@feedbackSend": {
+    "description": "Feedback dialog: sends the message."
+  },
+  "splashTagline": "Stay consistent. Stay lean.",
+  "@splashTagline": {
+    "description": "Splash screen: the line under YumSum. Also the confirmation email's footer."
+  },
+  "startupErrorTitle": "YumSum could not start",
+  "@startupErrorTitle": {
+    "description": "Shown when the app fails to start: heading."
+  },
+  "startupErrorBody": "Refresh the page. If it keeps happening, send the message below to the developer.",
+  "@startupErrorBody": {
+    "description": "Shown when the app fails to start: text over the error message."
+  },
+  "shortcutLogVoice": "Log by voice",
+  "@shortcutLogVoice": {
+    "description": "The app icon's long-press shortcut that starts a voice log."
   }
 }

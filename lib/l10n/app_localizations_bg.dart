@@ -1654,4 +1654,511 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get starPaymentPending =>
       'Google Play чака плащането ти. YumSum Star ще се включи, щом то мине.';
+
+  @override
+  String get commonEmail => 'Имейл';
+
+  @override
+  String get commonPassword => 'Парола';
+
+  @override
+  String get commonSigningOut => 'Излизане…';
+
+  @override
+  String get commonEnterPassword => 'Въведи паролата си.';
+
+  @override
+  String get commonEnterValidEmail => 'Въведи валиден имейл.';
+
+  @override
+  String get commonEnterValidEmailAddress => 'Въведи валиден имейл адрес.';
+
+  @override
+  String get commonErrorTooManyAttempts =>
+      'Твърде много опити. Опитай пак по-късно.';
+
+  @override
+  String get authSignInTab => 'Вход';
+
+  @override
+  String get authSignUpTab => 'Регистрация';
+
+  @override
+  String get authSignInButton => 'Влез';
+
+  @override
+  String get authCreateAccountButton => 'Създай профил';
+
+  @override
+  String get authEnterEmail => 'Въведи имейла си.';
+
+  @override
+  String get authPasswordTooShort => 'Паролата трябва да е поне 6 знака.';
+
+  @override
+  String get authForgotPassword => 'Забравена парола?';
+
+  @override
+  String get authForgotPasswordNeedsEmail =>
+      'Въведи имейла си горе и тогава натисни „Забравена парола?“';
+
+  @override
+  String get authOr => 'или';
+
+  @override
+  String get authContinueWithGoogle => 'Продължи с Google';
+
+  @override
+  String get authVerificationSentTitle => 'Имейлът за потвърждение е изпратен';
+
+  @override
+  String authVerificationSentBody(String email) {
+    return 'Изпратихме линк на $email. Отвори го, за да потвърдиш профила си, и после влез.';
+  }
+
+  @override
+  String get authResetSentTitle => 'Имейлът за нова парола е изпратен.';
+
+  @override
+  String authResetSentBody(String email) {
+    return 'Изпратихме линк на $email. Отвори го, за да избереш нова парола, и после влез.';
+  }
+
+  @override
+  String get authErrorVerifyEmail =>
+      'Първо потвърди имейла си. Линкът е във входящата ти поща.';
+
+  @override
+  String get authErrorGoogle => 'Входът с Google не успя. Опитай отново.';
+
+  @override
+  String get authErrorUsePassword => 'Този имейл вече има парола. Влез с нея.';
+
+  @override
+  String get authErrorWrongCredentials => 'Грешен имейл или парола.';
+
+  @override
+  String get authErrorEmailInUse =>
+      'Вече има профил с този имейл. Влез в него.';
+
+  @override
+  String get authErrorNoInternet => 'Няма връзка с интернет. Опитай отново.';
+
+  @override
+  String get authErrorGeneric => 'Нещо се обърка. Опитай отново.';
+
+  @override
+  String legalAgreement(String terms, String privacy) {
+    return 'Като продължиш, приемаш $terms и $privacy.';
+  }
+
+  @override
+  String get legalTermsOfUse => 'Условията за ползване';
+
+  @override
+  String get legalPrivacyPolicy => 'Политиката за поверителност';
+
+  @override
+  String legalRecaptcha(String privacy, String terms) {
+    return 'Защитено с reCAPTCHA Enterprise. Важат $privacy и $terms на Google.';
+  }
+
+  @override
+  String get legalGooglePrivacy => 'Правилата за поверителност';
+
+  @override
+  String get legalGoogleTerms => 'Общите условия';
+
+  @override
+  String get legalMedicalNote =>
+      'YumSum дава общи ориентировъчни стойности, а не медицински съвет. Говори с лекар или диетолог, преди да промениш храненето си, особено ако имаш здравословен проблем.';
+
+  @override
+  String get planActivitySedentary => 'Предимно седене';
+
+  @override
+  String get planActivitySedentaryHint =>
+      'Работа на бюро, малко крачки, рядко на крак.';
+
+  @override
+  String get planActivityLight => 'Леко движение през деня';
+
+  @override
+  String get planActivityLightHint =>
+      'Малко ходене, задачи навън или лека домакинска работа.';
+
+  @override
+  String get planActivityModerate => 'Често на крак';
+
+  @override
+  String get planActivityModerateHint =>
+      'Стоиш или ходиш през голяма част от деня.';
+
+  @override
+  String get planActivityHigh => 'Физическа работа или много движение';
+
+  @override
+  String get planActivityHighHint =>
+      'Физически труд, много крачки или много активни дни.';
+
+  @override
+  String get planTrainingNone => 'Без редовни тренировки';
+
+  @override
+  String get planTrainingNoneHint =>
+      'През повечето седмици няма планирани тренировки.';
+
+  @override
+  String get planTrainingOneToTwo => '1–2 тренировки седмично';
+
+  @override
+  String get planTrainingOneToTwoHint =>
+      'Един-два дни с тежести, кардио или спорт.';
+
+  @override
+  String get planTrainingThreeToFour => '3–4 тренировки седмично';
+
+  @override
+  String get planTrainingThreeToFourHint =>
+      'Редовни тренировки през повечето седмици.';
+
+  @override
+  String get planTrainingFivePlus => '5+ тренировки седмично';
+
+  @override
+  String get planTrainingFivePlusHint => 'Чести тренировки по план.';
+
+  @override
+  String planPaceSlow(String amount) {
+    return 'Бавно – $amount седмично';
+  }
+
+  @override
+  String get planPaceSlowHint =>
+      'По-щадящо и по-лесно за спазване в дългосрочен план.';
+
+  @override
+  String planPaceModerate(String amount) {
+    return 'Умерено – $amount седмично';
+  }
+
+  @override
+  String get planPaceModerateHint =>
+      'Стабилен напредък с умерен калориен дефицит.';
+
+  @override
+  String planPaceFast(String amount) {
+    return 'Бързо – $amount седмично';
+  }
+
+  @override
+  String get planPaceFastHint =>
+      'По-бързи резултати, но по-трудно за повечето хора.';
+
+  @override
+  String get planPaceMaintain => 'Запазване на теглото';
+
+  @override
+  String get planPaceMaintainHint =>
+      'Калориите ти остават около поддържащите, без дефицит.';
+
+  @override
+  String get profileErrorLoadTitle => 'Не успяхме да заредим профила ти';
+
+  @override
+  String get profileErrorLoadBody => 'Провери връзката си и опитай отново.';
+
+  @override
+  String get profileBackToSignIn => 'Обратно към входа';
+
+  @override
+  String get accountTitle => 'Настройки на профила';
+
+  @override
+  String accountConfirmWithGoogle(String description) {
+    return '$description След това ще потвърдиш с Google.';
+  }
+
+  @override
+  String get accountNameSaved => 'Името е запазено.';
+
+  @override
+  String get accountErrorSaveName =>
+      'Не успяхме да запазим името ти. Опитай отново.';
+
+  @override
+  String get accountResetEmailSent => 'Изпратихме ти имейл за нова парола.';
+
+  @override
+  String get accountErrorSendReset =>
+      'Не успяхме да изпратим имейла за нова парола.';
+
+  @override
+  String get accountCheckNewEmail => 'Потвърди смяната от новия си имейл.';
+
+  @override
+  String get accountErrorChangeEmail =>
+      'Не успяхме да сменим имейла ти. Опитай отново.';
+
+  @override
+  String get accountResetTitle => 'Да нулираме ли всички данни?';
+
+  @override
+  String get accountResetBody =>
+      'Това изтрива всичките ти хранения, претегляния и почивни дни. Профилът, личните ти данни и планът остават.';
+
+  @override
+  String get accountResetButton => 'Нулирай всички данни';
+
+  @override
+  String get accountResetDone => 'Всички записани данни са изтрити.';
+
+  @override
+  String get accountErrorReset => 'Не успяхме да нулираме данните ти.';
+
+  @override
+  String get accountDeleteTitle => 'Да изтрием ли профила?';
+
+  @override
+  String get accountDeleteBody =>
+      'Това изтрива профила ти и всичко в него. Не може да се отмени.';
+
+  @override
+  String get accountDeleteBodyStar =>
+      'Това изтрива профила ти и всичко в него. Не може да се отмени. Изтриването на профила не спира YumSum Star. Първо откажи абонамента в Google Play, иначе ще продължи да се подновява.';
+
+  @override
+  String get accountDeleteButton => 'Изтрий профила';
+
+  @override
+  String get accountErrorDelete => 'Не успяхме да изтрием профила ти.';
+
+  @override
+  String get accountErrorLoad => 'Не успяхме да заредим профила ти.';
+
+  @override
+  String get accountHeading => 'Управлявай профила си';
+
+  @override
+  String get accountSubtitle => 'Смени името, имейла или паролата си.';
+
+  @override
+  String get accountSubtitleGoogle =>
+      'Смени името си. Имейлът и паролата ти се управляват от Google.';
+
+  @override
+  String get accountSectionAccount => 'ПРОФИЛ';
+
+  @override
+  String get accountName => 'Име';
+
+  @override
+  String get accountEnterName => 'Въведи името си.';
+
+  @override
+  String get accountChangeEmail => 'Смени имейла';
+
+  @override
+  String get accountSaveName => 'Запази името';
+
+  @override
+  String get accountSectionPassword => 'ПАРОЛА';
+
+  @override
+  String get accountSendReset => 'Изпрати имейл за нова парола';
+
+  @override
+  String get accountSectionStar => 'YUMSUM STAR';
+
+  @override
+  String get accountSectionHelp => 'ПОМОЩ И ПРАВНА ИНФОРМАЦИЯ';
+
+  @override
+  String get accountSendFeedback => 'Изпрати обратна връзка';
+
+  @override
+  String get accountSendFeedbackHint => 'Пиши на разработчика';
+
+  @override
+  String get accountPrivacyPolicy => 'Политика за поверителност';
+
+  @override
+  String get accountTerms => 'Условия за ползване';
+
+  @override
+  String get accountOpenFoodFacts => 'Данни за храните от Open Food Facts';
+
+  @override
+  String get accountOpenFoodFactsHint =>
+      'Свободна база данни, създадена от доброволци, под лиценза Open Database License';
+
+  @override
+  String get accountSectionDanger => 'ОПАСНА ЗОНА';
+
+  @override
+  String get accountChangeEmailTitle => 'Смяна на имейла';
+
+  @override
+  String get accountChangeEmailBody =>
+      'Ще изпратим линк на новия ти адрес. Имейлът ти се сменя, щом го отвориш.';
+
+  @override
+  String get accountNewEmail => 'Нов имейл';
+
+  @override
+  String get accountEnterNewEmail => 'Въведи новия си имейл.';
+
+  @override
+  String get accountCurrentPassword => 'Текуща парола';
+
+  @override
+  String get accountShowPassword => 'Покажи паролата';
+
+  @override
+  String get accountHidePassword => 'Скрий паролата';
+
+  @override
+  String get accountEnterCurrentPassword => 'Въведи текущата си парола.';
+
+  @override
+  String get accountSendLink => 'Изпрати линка';
+
+  @override
+  String get accountErrorSignedOut => 'Влез отново в профила си.';
+
+  @override
+  String get accountErrorNoEmail => 'Този профил няма имейл адрес.';
+
+  @override
+  String get accountErrorEnterNewEmail => 'Въведи нов имейл адрес.';
+
+  @override
+  String get accountErrorSameEmail => 'Това вече е твоят имейл.';
+
+  @override
+  String get accountErrorWrongGoogle =>
+      'Избери профила в Google, с който влезе.';
+
+  @override
+  String get accountErrorNoPassword =>
+      'Този профил не може да се потвърди с парола.';
+
+  @override
+  String get accountErrorWrongPassword => 'Грешна парола.';
+
+  @override
+  String get accountErrorNoConnection =>
+      'Няма връзка. Провери интернета си и опитай отново.';
+
+  @override
+  String get accountErrorEmailInUse => 'Вече има профил с този имейл адрес.';
+
+  @override
+  String get accountErrorConfirmPassword =>
+      'Потвърди паролата си и опитай отново.';
+
+  @override
+  String get accountErrorVerifyPassword =>
+      'Не успяхме да проверим паролата ти.';
+
+  @override
+  String get menuHome => 'Начало';
+
+  @override
+  String get menuHistory => 'История';
+
+  @override
+  String get menuCoach => 'AI треньор';
+
+  @override
+  String get menuRecipes => 'Рецепти';
+
+  @override
+  String get menuProgress => 'Тегло и напредък';
+
+  @override
+  String get menuPlanSettings => 'Настройки на плана';
+
+  @override
+  String get menuNotifications => 'Известия';
+
+  @override
+  String get menuAccountSettings => 'Настройки на профила';
+
+  @override
+  String get menuAppearance => 'Изглед';
+
+  @override
+  String get menuThemeSystem => 'Системен';
+
+  @override
+  String get menuThemeLight => 'Светъл';
+
+  @override
+  String get menuThemeDark => 'Тъмен';
+
+  @override
+  String get menuLogOut => 'Изход';
+
+  @override
+  String get feedbackTitle => 'Обратна връзка';
+
+  @override
+  String get feedbackSent => 'Изпратено. Благодарим ти.';
+
+  @override
+  String get feedbackKindProblem => 'Проблем';
+
+  @override
+  String get feedbackKindIdea => 'Идея';
+
+  @override
+  String get feedbackKindOther => 'Друго';
+
+  @override
+  String get feedbackHintProblem => 'Какво се случи и какво очакваше?';
+
+  @override
+  String get feedbackHintIdea => 'Какво би направило YumSum по-добро за теб?';
+
+  @override
+  String get feedbackHintOther => 'Каквото и да е';
+
+  @override
+  String feedbackRepliesTo(String email) {
+    return 'Ще ти отговорим на $email.';
+  }
+
+  @override
+  String feedbackLimitReached(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Днес вече изпрати $count съобщения. Утре можеш да пратиш още.',
+      one: 'Днес вече изпрати 1 съобщение. Утре можеш да пратиш още.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get feedbackErrorSend => 'Не успяхме да го изпратим. Опитай отново.';
+
+  @override
+  String get feedbackSending => 'Изпращане…';
+
+  @override
+  String get feedbackSend => 'Изпрати';
+
+  @override
+  String get splashTagline => 'Постоянство всеки ден. Винаги във форма.';
+
+  @override
+  String get startupErrorTitle => 'YumSum не успя да стартира';
+
+  @override
+  String get startupErrorBody =>
+      'Презареди страницата. Ако се повтаря, изпрати съобщението отдолу на разработчика.';
+
+  @override
+  String get shortcutLogVoice => 'Запиши с глас';
 }
