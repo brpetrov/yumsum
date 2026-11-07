@@ -39,8 +39,8 @@ enum _Step {
 /// First run: one question per card, then the plan. The pace is moderate
 /// until Plan Settings changes it; the country is stored from the phone's
 /// region, as `countryProvider`'s fallback. Height and weight are typed in
-/// the units for that region until a card's toggle changes them, and the
-/// units are stored too.
+/// kg and cm until a card's units toggle changes them, and the units are
+/// stored too.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -51,8 +51,8 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _nameCtrl = TextEditingController();
   final _ageCtrl = TextEditingController();
-  late HeightUnit _heightUnit;
-  late WeightUnit _weightUnit;
+  HeightUnit _heightUnit = HeightUnit.cm;
+  WeightUnit _weightUnit = WeightUnit.kg;
   late final HeightInput _height;
   late final WeightInput _currentWeight;
   late final WeightInput _targetWeight;
@@ -67,9 +67,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
-    final country = countryNameFor(ref.read(deviceRegionProvider));
-    _heightUnit = defaultHeightUnitFor(country);
-    _weightUnit = defaultWeightUnitFor(country);
     _height = HeightInput(_heightUnit);
     _currentWeight = WeightInput(_weightUnit);
     _targetWeight = WeightInput(_weightUnit);
@@ -260,17 +257,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
-  /// A height or weight: its unit toggle, then the boxes, as [_field].
+  /// A height or weight: the units toggle, then the boxes, as [_field].
   Widget _measure(
     MeasureInput input, {
     required String label,
     required String? Function() error,
-    required Widget toggle,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Align(alignment: Alignment.centerRight, child: toggle),
+        Align(alignment: Alignment.centerRight, child: _unitsToggle),
         const SizedBox(height: 16),
         MeasureField(
           input: input,
@@ -284,14 +280,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
-  Widget get _weightToggle => SizedBox(
-    width: 220,
-    child: WeightUnitToggle(
-      unit: _weightUnit,
-      onChanged: (unit) => setState(() {
-        _weightUnit = unit;
-        _currentWeight.switchTo(unit, context.l10n);
-        _targetWeight.switchTo(unit, context.l10n);
+  Widget get _unitsToggle => SizedBox(
+    width: 240,
+    child: UnitsToggle(
+      weightUnit: _weightUnit,
+      onChanged: (weight, height) => setState(() {
+        _weightUnit = weight;
+        _heightUnit = height;
+        _height.switchTo(height, context.l10n);
+        _currentWeight.switchTo(weight, context.l10n);
+        _targetWeight.switchTo(weight, context.l10n);
       }),
     ),
   );
@@ -345,21 +343,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     _Step.height => (
       _l10n.onboardingHeightTitle,
       null,
-      _measure(
-        _height,
-        label: _l10n.commonHeight,
-        error: _heightError,
-        toggle: SizedBox(
-          width: 160,
-          child: HeightUnitToggle(
-            unit: _heightUnit,
-            onChanged: (unit) => setState(() {
-              _heightUnit = unit;
-              _height.switchTo(unit, _l10n);
-            }),
-          ),
-        ),
-      ),
+      _measure(_height, label: _l10n.commonHeight, error: _heightError),
     ),
     _Step.weight => (
       _l10n.onboardingWeightTitle,
@@ -368,7 +352,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         _currentWeight,
         label: _l10n.commonCurrentWeight,
         error: () => _weightError(_currentWeight),
-        toggle: _weightToggle,
       ),
     ),
     _Step.goal => (
@@ -390,7 +373,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         _targetWeight,
         label: _l10n.commonTargetWeight,
         error: _targetError,
-        toggle: _weightToggle,
       ),
     ),
     _Step.activity => (

@@ -176,18 +176,25 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('in the UK: feet and inches, stones and pounds', (
-      tester,
-    ) async {
+    testWidgets('kg and cm by default, even in the UK', (tester) async {
+      await pump(tester, const Locale('en', 'GB'));
+      await toHeight(tester);
+      expect(_box(tester, 'Height').decoration!.suffixText, 'cm');
+      await _type(tester, 'Height', '170');
+      await next(tester);
+      expect(_box(tester, 'Current weight').decoration!.suffixText, 'kg');
+    });
+
+    testWidgets('stones and feet, chosen on the height card', (tester) async {
       await pump(tester, const Locale('en', 'GB'));
       await toHeight(tester);
 
-      expect(find.text('ft & in'), findsOneWidget);
+      await tester.tap(find.text('st, ft'));
+      await tester.pump();
       await _type(tester, 'Height', '5');
       await _type(tester, 'Inches', '7');
       await next(tester);
 
-      expect(find.text('st & lb'), findsOneWidget);
       await _type(tester, 'Current weight', '12');
       await _type(tester, 'Pounds', '8');
       await next(tester);
@@ -210,9 +217,11 @@ void main() {
       expect(body.heightUnit, HeightUnit.ftin);
     });
 
-    testWidgets('in the US: pounds, and the ranges in pounds', (tester) async {
+    testWidgets('pounds, and the ranges in pounds', (tester) async {
       await pump(tester, const Locale('en', 'US'));
       await toHeight(tester);
+      await tester.tap(find.text('lb, ft'));
+      await tester.pump();
       await _type(tester, 'Height', '9');
       expect(find.text('3 ft 4 in–8 ft 2 in'), findsOneWidget);
       await _type(tester, 'Height', '5');
@@ -235,19 +244,19 @@ void main() {
       expect(body.heightUnit, HeightUnit.ftin);
     });
 
-    testWidgets('a card\'s toggle switches the unit and keeps the number', (
+    testWidgets('a card\'s toggle switches the units and keeps the number', (
       tester,
     ) async {
       await pump(tester, const Locale('en', 'GB'));
       await toHeight(tester);
-      await tester.tap(find.text('cm'));
-      await tester.pump();
       await _type(tester, 'Height', '170');
       await next(tester);
 
+      await tester.tap(find.text('st, ft'));
+      await tester.pump();
       await _type(tester, 'Current weight', '12');
       await _type(tester, 'Pounds', '8');
-      await tester.tap(find.text('kg'));
+      await tester.tap(find.text('kg, cm'));
       await tester.pump();
       expect(find.widgetWithText(TextField, 'Pounds'), findsNothing);
       expect(_box(tester, 'Current weight').controller!.text, '79.8');
@@ -363,8 +372,7 @@ void main() {
       tester,
     ) async {
       await pump(tester, imperial);
-      await tester.tap(find.text('kg'));
-      await tester.tap(find.text('cm'));
+      await tester.tap(find.text('kg, cm'));
       await tester.pumpAndSettle();
       expect(find.widgetWithText(TextField, 'Pounds'), findsNothing);
       expect(_box(tester, 'Height').controller!.text, '170');

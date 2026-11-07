@@ -33,20 +33,6 @@ const cmPerInch = 2.54;
 double kgToLb(double kg) => kg / kgPerLb;
 double lbToKg(double lb) => lb * kgPerLb;
 
-/// The units for a profile that hasn't chosen, from its [country] (as
-/// `countryNameFor` names it): stones and feet in the UK, pounds and feet
-/// in the US, metric anywhere else.
-WeightUnit defaultWeightUnitFor(String country) => switch (country) {
-  'United Kingdom' => WeightUnit.st,
-  'United States' => WeightUnit.lb,
-  _ => WeightUnit.kg,
-};
-
-HeightUnit defaultHeightUnitFor(String country) => switch (country) {
-  'United Kingdom' || 'United States' => HeightUnit.ftin,
-  _ => HeightUnit.cm,
-};
-
 // Shown in [AppLocalizations]' language: "80.5 kg" and "180 cm" in English,
 // "80,5 кг" and "180 см" in Bulgarian. Imperial units keep their Latin
 // symbols in both.

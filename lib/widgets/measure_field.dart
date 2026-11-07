@@ -277,47 +277,30 @@ class MeasureField extends StatelessWidget {
   }
 }
 
-/// kg, lb, or stones and pounds.
-class WeightUnitToggle extends StatelessWidget {
-  const WeightUnitToggle({
+/// The units as one small choice: kg and cm, pounds and feet, or stones
+/// and feet. The height unit follows the weight's.
+class UnitsToggle extends StatelessWidget {
+  const UnitsToggle({
     super.key,
-    required this.unit,
+    required this.weightUnit,
     required this.onChanged,
   });
 
-  final WeightUnit unit;
-  final ValueChanged<WeightUnit> onChanged;
+  final WeightUnit weightUnit;
+  final void Function(WeightUnit weight, HeightUnit height) onChanged;
 
   @override
   Widget build(BuildContext context) => PillToggle<WeightUnit>(
+    dense: true,
     options: [
-      (WeightUnit.kg, context.l10n.unitsKgLabel),
-      (WeightUnit.lb, context.l10n.unitsLbLabel),
-      (WeightUnit.st, context.l10n.unitsStLbToggle),
+      (WeightUnit.kg, context.l10n.unitsMetricToggle),
+      (WeightUnit.lb, context.l10n.unitsLbFtToggle),
+      (WeightUnit.st, context.l10n.unitsStFtToggle),
     ],
-    selected: unit,
-    onChanged: onChanged,
-  );
-}
-
-/// cm, or feet and inches.
-class HeightUnitToggle extends StatelessWidget {
-  const HeightUnitToggle({
-    super.key,
-    required this.unit,
-    required this.onChanged,
-  });
-
-  final HeightUnit unit;
-  final ValueChanged<HeightUnit> onChanged;
-
-  @override
-  Widget build(BuildContext context) => PillToggle<HeightUnit>(
-    options: [
-      (HeightUnit.cm, context.l10n.unitsCmLabel),
-      (HeightUnit.ftin, context.l10n.unitsFtInToggle),
-    ],
-    selected: unit,
-    onChanged: onChanged,
+    selected: weightUnit,
+    onChanged: (unit) => onChanged(
+      unit,
+      unit == WeightUnit.kg ? HeightUnit.cm : HeightUnit.ftin,
+    ),
   );
 }

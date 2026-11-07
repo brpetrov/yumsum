@@ -2192,10 +2192,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unitsInLabel => 'in';
 
   @override
-  String get unitsStLbToggle => 'st & lb';
+  String get unitsMetricToggle => 'kg, cm';
 
   @override
-  String get unitsFtInToggle => 'ft & in';
+  String get unitsLbFtToggle => 'lb, ft';
+
+  @override
+  String get unitsStFtToggle => 'st, ft';
 
   @override
   String get unitsPounds => 'Pounds';
@@ -2450,9 +2453,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get planSectionUnits => 'UNITS';
-
-  @override
-  String get planWeightUnit => 'Weight';
 
   @override
   String get planSectionBody => 'YOUR BODY';

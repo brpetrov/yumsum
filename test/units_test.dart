@@ -74,16 +74,6 @@ void main() {
     expect(98 * cmPerInch, lessThanOrEqualTo(250));
   });
 
-  test('the default follows the country', () {
-    expect(defaultWeightUnitFor('United Kingdom'), WeightUnit.st);
-    expect(defaultHeightUnitFor('United Kingdom'), HeightUnit.ftin);
-    expect(defaultWeightUnitFor('United States'), WeightUnit.lb);
-    expect(defaultHeightUnitFor('United States'), HeightUnit.ftin);
-    expect(defaultWeightUnitFor('Bulgaria'), WeightUnit.kg);
-    expect(defaultHeightUnitFor('Bulgaria'), HeightUnit.cm);
-    expect(defaultWeightUnitFor('XX'), WeightUnit.kg);
-  });
-
   group('the boxes', () {
     test('a stored weight comes back exactly until a box changes', () {
       final input = WeightInput(WeightUnit.st)..show(79.8, en);
@@ -192,16 +182,16 @@ void main() {
       );
     }
 
-    test('unchosen, from the country', () async {
-      expect(await unitsFor('GB'), (WeightUnit.st, HeightUnit.ftin));
-      expect(await unitsFor('US'), (WeightUnit.lb, HeightUnit.ftin));
+    test('unchosen, kg and cm wherever the user is', () async {
+      expect(await unitsFor('GB'), (WeightUnit.kg, HeightUnit.cm));
+      expect(await unitsFor('US'), (WeightUnit.kg, HeightUnit.cm));
       expect(await unitsFor('BG'), (WeightUnit.kg, HeightUnit.cm));
     });
 
     test('chosen, whatever the country', () async {
       expect(
-        await unitsFor('GB', weight: WeightUnit.kg, height: HeightUnit.cm),
-        (WeightUnit.kg, HeightUnit.cm),
+        await unitsFor('BG', weight: WeightUnit.st, height: HeightUnit.ftin),
+        (WeightUnit.st, HeightUnit.ftin),
       );
     });
   });

@@ -208,7 +208,7 @@ void main() {
       await next(tester);
 
       expect(find.text('Какъв е ръстът ти?'), findsOneWidget);
-      expect(find.text('ft и in'), findsOneWidget);
+      expect(find.text('кг, см'), findsOneWidget);
       expect(find.text('см'), findsWidgets);
       await type(tester, 'Ръст', '90');
       expect(find.text('100–250 см'), findsOneWidget);
@@ -217,7 +217,7 @@ void main() {
       await next(tester);
 
       expect(find.text('Колко тежиш сега?'), findsOneWidget);
-      expect(find.text('st и lb'), findsOneWidget);
+      expect(find.text('st, ft'), findsOneWidget);
       await type(tester, 'Сегашно тегло', '20');
       expect(find.text('30–300 кг'), findsOneWidget);
       fits(tester);
@@ -276,7 +276,7 @@ void main() {
       fits(tester);
     });
 
-    testWidgets('stones and feet, from the UK', (tester) async {
+    testWidgets('stones and feet', (tester) async {
       await pump(tester, region: 'GB');
       await type(tester, 'Име', 'Иван');
       await next(tester);
@@ -286,6 +286,8 @@ void main() {
       await type(tester, 'Възраст', '40');
       await next(tester);
 
+      await tester.tap(find.text('st, ft'));
+      await tester.pump();
       expect(find.text('Инчове'), findsOneWidget);
       await type(tester, 'Ръст', '9');
       expect(find.text('3 ft 4 in–8 ft 2 in'), findsOneWidget);
@@ -299,7 +301,7 @@ void main() {
       await type(tester, 'Фунтове', '4,5');
       fits(tester);
       // The same weight in kg, with a decimal comma.
-      await tester.tap(find.text('кг'));
+      await tester.tap(find.text('кг, см'));
       await tester.pump();
       expect(find.widgetWithText(TextField, 'Фунтове'), findsNothing);
       expect(
@@ -380,8 +382,7 @@ void main() {
           heightUnit: HeightUnit.ftin,
         ),
       );
-      expect(find.text('st и lb'), findsOneWidget);
-      expect(find.text('ft и in'), findsOneWidget);
+      expect(find.text('st, ft'), findsOneWidget);
       expect(find.text('Фунтове', skipOffstage: false), findsNWidgets(2));
       expect(find.text('Инчове', skipOffstage: false), findsOneWidget);
       final boxes = [

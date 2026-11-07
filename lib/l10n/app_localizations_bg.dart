@@ -2220,10 +2220,13 @@ class AppLocalizationsBg extends AppLocalizations {
   String get unitsInLabel => 'in';
 
   @override
-  String get unitsStLbToggle => 'st и lb';
+  String get unitsMetricToggle => 'кг, см';
 
   @override
-  String get unitsFtInToggle => 'ft и in';
+  String get unitsLbFtToggle => 'lb, ft';
+
+  @override
+  String get unitsStFtToggle => 'st, ft';
 
   @override
   String get unitsPounds => 'Фунтове';
@@ -2477,9 +2480,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get planSectionUnits => 'МЕРНИ ЕДИНИЦИ';
-
-  @override
-  String get planWeightUnit => 'Тегло';
 
   @override
   String get planSectionBody => 'ТЯЛОТО ТИ';

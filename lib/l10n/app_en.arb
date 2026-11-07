@@ -2881,13 +2881,17 @@
   "@unitsInLabel": {
     "description": "The inch on its own: the inches box's suffix."
   },
-  "unitsStLbToggle": "st & lb",
-  "@unitsStLbToggle": {
-    "description": "Weight unit toggle: stones and pounds."
+  "unitsMetricToggle": "kg, cm",
+  "@unitsMetricToggle": {
+    "description": "Units toggle: kilograms and centimetres. Keep it as short as the symbols."
   },
-  "unitsFtInToggle": "ft & in",
-  "@unitsFtInToggle": {
-    "description": "Height unit toggle: feet and inches."
+  "unitsLbFtToggle": "lb, ft",
+  "@unitsLbFtToggle": {
+    "description": "Units toggle: pounds, and feet and inches."
+  },
+  "unitsStFtToggle": "st, ft",
+  "@unitsStFtToggle": {
+    "description": "Units toggle: stones and pounds, and feet and inches."
   },
   "unitsPounds": "Pounds",
   "@unitsPounds": {
@@ -3219,10 +3223,6 @@
   "planSectionUnits": "UNITS",
   "@planSectionUnits": {
     "description": "Plan Settings: section label, in capitals."
-  },
-  "planWeightUnit": "Weight",
-  "@planWeightUnit": {
-    "description": "Plan Settings: over the weight unit toggle."
   },
   "planSectionBody": "YOUR BODY",
   "@planSectionBody": {

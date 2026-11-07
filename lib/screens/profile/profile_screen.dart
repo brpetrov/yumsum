@@ -229,11 +229,6 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
             label: l10n.commonCurrentWeight,
             validator: () => _weightError(_currentWeight),
           );
-          final unitLabel = TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
-          );
 
           return SafeArea(
             child: SingleChildScrollView(
@@ -318,24 +313,14 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                       ),
                       SizedBox(height: 28),
                       SectionLabel(l10n.planSectionUnits),
-                      Text(l10n.planWeightUnit, style: unitLabel),
-                      SizedBox(height: 10),
-                      WeightUnitToggle(
-                        unit: _weightUnit,
-                        onChanged: (unit) => setState(() {
-                          _weightUnit = unit;
-                          _currentWeight.switchTo(unit, l10n);
-                          _targetWeight.switchTo(unit, l10n);
-                        }),
-                      ),
-                      SizedBox(height: 18),
-                      Text(l10n.commonHeight, style: unitLabel),
-                      SizedBox(height: 10),
-                      HeightUnitToggle(
-                        unit: _heightUnit,
-                        onChanged: (unit) => setState(() {
-                          _heightUnit = unit;
-                          _height.switchTo(unit, l10n);
+                      UnitsToggle(
+                        weightUnit: _weightUnit,
+                        onChanged: (weight, height) => setState(() {
+                          _weightUnit = weight;
+                          _heightUnit = height;
+                          _height.switchTo(height, l10n);
+                          _currentWeight.switchTo(weight, l10n);
+                          _targetWeight.switchTo(weight, l10n);
                         }),
                       ),
                       SizedBox(height: 28),

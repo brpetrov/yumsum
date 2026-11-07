@@ -299,14 +299,17 @@ void main() {
   testWidgets('in pounds: the numbers, the chart and the delete question', (
     tester,
   ) async {
-    await pumpScreen(tester, region: 'US');
+    await pumpScreen(
+      tester,
+      profile: planProfile().copyWith(weightUnit: WeightUnit.lb),
+    );
     expect(find.text('187.8 lb'), findsWidgets);
     expect(find.text('-1.8 lb'), findsOneWidget);
     final chart = tester.widget<LineChart>(find.byType(LineChart));
     final weighIns = chart.data.lineBarsData[1];
     expect(weighIns.spots.last.y, closeTo(kgToLb(85.2), 1e-9));
 
-    final delete = find.byTooltip('Delete weigh-in').first;
+    final delete = find.byTooltip('Delete weigh-in', skipOffstage: false).first;
     await tester.ensureVisible(delete);
     await tester.pumpAndSettle();
     await tester.tap(delete);

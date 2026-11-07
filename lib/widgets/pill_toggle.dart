@@ -12,11 +12,15 @@ class PillToggle<T> extends StatelessWidget {
     required this.options,
     required this.selected,
     required this.onChanged,
+    this.dense = false,
   });
 
   final List<(T, String)> options;
   final T selected;
   final ValueChanged<T> onChanged;
+
+  /// Lower and in smaller type, for a side setting like the units.
+  final bool dense;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +41,7 @@ class PillToggle<T> extends StatelessWidget {
                   onTap: value == selected ? null : () => onChanged(value),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(vertical: 11),
+                    padding: EdgeInsets.symmetric(vertical: dense ? 7 : 11),
                     decoration: BoxDecoration(
                       // Dark cards are darker than the track, so the chosen
                       // side is lifted with the outline colour there.
@@ -63,7 +67,7 @@ class PillToggle<T> extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       style: AppTheme.display.copyWith(
-                        fontSize: 15.5,
+                        fontSize: dense ? 14 : 15.5,
                         fontWeight: value == selected
                             ? FontWeight.w600
                             : FontWeight.w500,

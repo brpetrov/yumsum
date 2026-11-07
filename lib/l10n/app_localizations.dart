@@ -3686,17 +3686,23 @@ abstract class AppLocalizations {
   /// **'in'**
   String get unitsInLabel;
 
-  /// Weight unit toggle: stones and pounds.
+  /// Units toggle: kilograms and centimetres. Keep it as short as the symbols.
   ///
   /// In en, this message translates to:
-  /// **'st & lb'**
-  String get unitsStLbToggle;
+  /// **'kg, cm'**
+  String get unitsMetricToggle;
 
-  /// Height unit toggle: feet and inches.
+  /// Units toggle: pounds, and feet and inches.
   ///
   /// In en, this message translates to:
-  /// **'ft & in'**
-  String get unitsFtInToggle;
+  /// **'lb, ft'**
+  String get unitsLbFtToggle;
+
+  /// Units toggle: stones and pounds, and feet and inches.
+  ///
+  /// In en, this message translates to:
+  /// **'st, ft'**
+  String get unitsStFtToggle;
 
   /// Label of the second weight box when typing stones and pounds.
   ///
@@ -4171,12 +4177,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'UNITS'**
   String get planSectionUnits;
-
-  /// Plan Settings: over the weight unit toggle.
-  ///
-  /// In en, this message translates to:
-  /// **'Weight'**
-  String get planWeightUnit;
 
   /// Plan Settings: section label, in capitals.
   ///
