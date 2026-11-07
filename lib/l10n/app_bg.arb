@@ -1,0 +1,22 @@
+{
+  "@@locale": "bg",
+
+  "languageChoose": "Изберете език",
+  "languageEnglish": "English",
+  "languageBulgarian": "Български",
+  "languageSetting": "Език",
+
+  "reminderMealTitle": "Запишете днешните хранения",
+  "reminderMealBody": "Добавете какво сте яли, преди денят да свърши.",
+  "reminderMealChannel": "Дневно напомняне за храненията",
+  "reminderMealChannelDescription": "Напомня ви всяка вечер да запишете храненията си.",
+  "reminderWeightTitle": "Време е за претегляне",
+  "reminderWeightBodyDaily": "Запишете днешното си тегло, за да остане планът ви точен.",
+  "reminderWeightBodyWeekly": "Запишете теглото си за тази седмица, за да остане планът ви точен.",
+  "reminderWeightChannel": "Седмично напомняне за теглото",
+  "reminderWeightChannelDescription": "Напомня ви веднъж седмично да запишете теглото си.",
+  "reminderCreatineTitle": "Време за креатин",
+  "reminderCreatineBody": "Вземете днешния си креатин.",
+  "reminderCreatineChannel": "Напомняне за креатин",
+  "reminderCreatineChannelDescription": "Напомня ви веднъж дневно да вземете креатин."
+}

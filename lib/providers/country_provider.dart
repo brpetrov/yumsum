@@ -10,6 +10,12 @@ final deviceRegionProvider = Provider<String?>(
   (ref) => WidgetsBinding.instance.platformDispatcher.locale.countryCode,
 );
 
+/// The device's language code (e.g. en, bg): the phone's language in the
+/// app, the browser's first language on the web.
+final deviceLanguageProvider = Provider<String>(
+  (ref) => WidgetsBinding.instance.platformDispatcher.locale.languageCode,
+);
+
 /// Where the user lives, for the AI, food search and contributions: the
 /// device's region, else the country the profile stored at onboarding, else
 /// [defaultCountry]. Never written back to the profile.

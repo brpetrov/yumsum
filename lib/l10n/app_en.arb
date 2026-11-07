@@ -1,0 +1,73 @@
+{
+  "@@locale": "en",
+
+  "languageChoose": "Choose your language",
+  "@languageChoose": {
+    "description": "First-launch language screen: its heading, shown in English and in Bulgarian at once."
+  },
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "The English option, always written in English, in both files."
+  },
+  "languageBulgarian": "Български",
+  "@languageBulgarian": {
+    "description": "The Bulgarian option, always written in Bulgarian, in both files."
+  },
+  "languageSetting": "Language",
+  "@languageSetting": {
+    "description": "Menu: the heading over the English / Български switch."
+  },
+
+  "reminderMealTitle": "Log today's meals",
+  "@reminderMealTitle": {
+    "description": "Evening reminder notification: title."
+  },
+  "reminderMealBody": "Add what you ate before the day ends.",
+  "@reminderMealBody": {
+    "description": "Evening reminder notification: text."
+  },
+  "reminderMealChannel": "Daily Log Reminder",
+  "@reminderMealChannel": {
+    "description": "Android's notification settings: the evening reminder's name."
+  },
+  "reminderMealChannelDescription": "Reminds you each evening to log your meals.",
+  "@reminderMealChannelDescription": {
+    "description": "Android's notification settings: what the evening reminder is for."
+  },
+  "reminderWeightTitle": "Time to weigh in",
+  "@reminderWeightTitle": {
+    "description": "Weigh-in reminder notification: title."
+  },
+  "reminderWeightBodyDaily": "Log today's weight to keep your plan accurate.",
+  "@reminderWeightBodyDaily": {
+    "description": "Weigh-in reminder notification: text when it comes every day."
+  },
+  "reminderWeightBodyWeekly": "Log this week's weight to keep your plan accurate.",
+  "@reminderWeightBodyWeekly": {
+    "description": "Weigh-in reminder notification: text when it comes once a week."
+  },
+  "reminderWeightChannel": "Weekly Weight Reminder",
+  "@reminderWeightChannel": {
+    "description": "Android's notification settings: the weigh-in reminder's name."
+  },
+  "reminderWeightChannelDescription": "Reminds you once a week to log your weight.",
+  "@reminderWeightChannelDescription": {
+    "description": "Android's notification settings: what the weigh-in reminder is for."
+  },
+  "reminderCreatineTitle": "Creatine time",
+  "@reminderCreatineTitle": {
+    "description": "Creatine reminder notification: title."
+  },
+  "reminderCreatineBody": "Take today's creatine.",
+  "@reminderCreatineBody": {
+    "description": "Creatine reminder notification: text."
+  },
+  "reminderCreatineChannel": "Creatine Reminder",
+  "@reminderCreatineChannel": {
+    "description": "Android's notification settings: the creatine reminder's name."
+  },
+  "reminderCreatineChannelDescription": "Reminds you once a day to take creatine.",
+  "@reminderCreatineChannelDescription": {
+    "description": "Android's notification settings: what the creatine reminder is for."
+  }
+}

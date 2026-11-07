@@ -18,10 +18,11 @@ class AppTheme {
   static const sheetRadius = 32.0;
 
   /// Fredoka, for titles, headings and the big numbers. It has no Cyrillic,
-  /// so Nunito fills in for any Bulgarian, such as a product's name.
+  /// so Bulgarian falls back to NunitoDisplay, Nunito ExtraBold (pubspec):
+  /// as heavy as Fredoka SemiBold, where Nunito at 600 looks thin beside it.
   static const display = TextStyle(
     fontFamily: 'Fredoka',
-    fontFamilyFallback: [_font],
+    fontFamilyFallback: ['NunitoDisplay'],
     fontWeight: FontWeight.w600,
   );
 

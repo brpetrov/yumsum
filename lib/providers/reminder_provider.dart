@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/helpers/adaptive_formula.dart';
 import 'package:lean_streak/helpers/weight_reminder.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/services/notification_service.dart';
@@ -191,9 +192,11 @@ final reminderSettingsProvider =
     );
 
 /// Keeps the scheduled notifications in step with the settings. Re-runs
-/// whenever a switch flips or a time changes.
+/// whenever a switch flips, a time changes or the language changes (the
+/// texts are fixed when scheduled).
 final reminderSyncProvider = FutureProvider.autoDispose<void>((ref) async {
   final settings = ref.watch(reminderSettingsProvider);
+  final l10n = ref.watch(l10nProvider);
 
   final notifier = ref.read(reminderSettingsProvider.notifier);
   if (notifier.isFirstRun) {
@@ -203,13 +206,14 @@ final reminderSyncProvider = FutureProvider.autoDispose<void>((ref) async {
   if (!await NotificationService.hasPermission()) return;
 
   if (settings.dailyMeal) {
-    await NotificationService.scheduleDailyMealReminder();
+    await NotificationService.scheduleDailyMealReminder(l10n);
   } else {
     await NotificationService.cancelDailyMealReminder();
   }
 
   if (settings.creatine) {
     await NotificationService.scheduleCreatineReminder(
+      l10n,
       hour: settings.creatineTime.hour,
       minute: settings.creatineTime.minute,
     );
@@ -224,6 +228,7 @@ final reminderSyncProvider = FutureProvider.autoDispose<void>((ref) async {
   final daily = settings.weeklyDay == ReminderSettings.everyDay;
   final time = settings.weeklyTime;
   await NotificationService.scheduleWeeklyWeightReminder(
+    l10n,
     daily: daily,
     firstFireAt: daily
         ? nextDailyAt(hour: time.hour, minute: time.minute, now: DateTime.now())

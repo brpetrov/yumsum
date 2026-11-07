@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/auth_controller.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/theme_controller.dart';
 import 'package:lean_streak/widgets/app_logo_mark.dart';
@@ -98,7 +100,7 @@ void openPage(BuildContext context, String route) {
 }
 
 /// The menu, shown on every page: Home first, then the other pages,
-/// appearance and log out.
+/// appearance, language and log out.
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
@@ -238,6 +240,31 @@ class AppDrawer extends ConsumerWidget {
                       onChanged: (mode) => ref
                           .read(themeControllerProvider.notifier)
                           .setMode(mode),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 18, 20, 8),
+                    child: Text(
+                      context.l10n.languageSetting,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                    child: PillToggle<String>(
+                      options: [
+                        ('en', context.l10n.languageEnglish),
+                        ('bg', context.l10n.languageBulgarian),
+                      ],
+                      selected: ref.watch(languageCodeProvider),
+                      onChanged: (code) => ref
+                          .read(languageControllerProvider.notifier)
+                          .setLanguage(code),
                     ),
                   ),
                 ],

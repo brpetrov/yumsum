@@ -5,8 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/app_localizations.dart';
 import 'package:lean_streak/providers/activity_scale_migration_provider.dart';
 import 'package:lean_streak/providers/adaptive_formula_provider.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/plus_purchase_controller.dart';
 import 'package:lean_streak/providers/reminder_provider.dart';
 import 'package:lean_streak/providers/theme_controller.dart';
@@ -44,6 +46,9 @@ class LeanStreakApp extends ConsumerWidget {
       // Lerping the theme while the getters have already flipped would show
       // a frame of mismatched colours.
       themeAnimationDuration: Duration.zero,
+      locale: Locale(ref.watch(languageCodeProvider)),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
       builder: appShellBuilder,

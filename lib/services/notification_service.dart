@@ -4,9 +4,12 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_10y.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import 'package:lean_streak/l10n/app_localizations.dart';
+
 /// Local reminders on Android and iOS. Scheduling is driven by
 /// `reminderSyncProvider`; taps are reported through [initialize]'s callback
-/// (app running) or [launchPayload] (app started by the tap).
+/// (app running) or [launchPayload] (app started by the tap). The texts come
+/// in the app's language, and the sync schedules again when it changes.
 class NotificationService {
   NotificationService._();
 
@@ -105,7 +108,7 @@ class NotificationService {
     }
   }
 
-  static Future<void> scheduleDailyMealReminder() async {
+  static Future<void> scheduleDailyMealReminder(AppLocalizations l10n) async {
     if (!isSupported) return;
     await _ensureTimezones();
     await _notifications.cancel(id: _dailyReminderId);
@@ -125,14 +128,14 @@ class NotificationService {
 
     await _notifications.zonedSchedule(
       id: _dailyReminderId,
-      title: 'Log today\'s meals',
-      body: 'Add what you ate before the day ends.',
+      title: l10n.reminderMealTitle,
+      body: l10n.reminderMealBody,
       scheduledDate: scheduledTime,
-      notificationDetails: const NotificationDetails(
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           'daily_log_reminder',
-          'Daily Log Reminder',
-          channelDescription: 'Reminds you each evening to log your meals.',
+          l10n.reminderMealChannel,
+          channelDescription: l10n.reminderMealChannelDescription,
           importance: Importance.defaultImportance,
           priority: Priority.defaultPriority,
         ),
@@ -151,7 +154,8 @@ class NotificationService {
 
   /// Fires at [firstFireAt] and then weekly at the same weekday and time,
   /// or every day at that time when [daily].
-  static Future<void> scheduleWeeklyWeightReminder({
+  static Future<void> scheduleWeeklyWeightReminder(
+    AppLocalizations l10n, {
     required DateTime firstFireAt,
     bool daily = false,
   }) async {
@@ -161,16 +165,16 @@ class NotificationService {
 
     await _notifications.zonedSchedule(
       id: _weeklyWeightReminderId,
-      title: 'Time to weigh in',
+      title: l10n.reminderWeightTitle,
       body: daily
-          ? 'Log today\'s weight to keep your plan accurate.'
-          : 'Log this week\'s weight to keep your plan accurate.',
+          ? l10n.reminderWeightBodyDaily
+          : l10n.reminderWeightBodyWeekly,
       scheduledDate: tz.TZDateTime.from(firstFireAt, tz.local),
-      notificationDetails: const NotificationDetails(
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           'weekly_weight_reminder',
-          'Weekly Weight Reminder',
-          channelDescription: 'Reminds you once a week to log your weight.',
+          l10n.reminderWeightChannel,
+          channelDescription: l10n.reminderWeightChannelDescription,
           importance: Importance.defaultImportance,
           priority: Priority.defaultPriority,
         ),
@@ -190,7 +194,8 @@ class NotificationService {
   }
 
   /// Every day at [hour]:[minute].
-  static Future<void> scheduleCreatineReminder({
+  static Future<void> scheduleCreatineReminder(
+    AppLocalizations l10n, {
     required int hour,
     required int minute,
   }) async {
@@ -213,14 +218,14 @@ class NotificationService {
 
     await _notifications.zonedSchedule(
       id: _creatineReminderId,
-      title: 'Creatine time',
-      body: 'Take today\'s creatine.',
+      title: l10n.reminderCreatineTitle,
+      body: l10n.reminderCreatineBody,
       scheduledDate: scheduledTime,
-      notificationDetails: const NotificationDetails(
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           'creatine_reminder',
-          'Creatine Reminder',
-          channelDescription: 'Reminds you once a day to take creatine.',
+          l10n.reminderCreatineChannel,
+          channelDescription: l10n.reminderCreatineChannelDescription,
           importance: Importance.defaultImportance,
           priority: Priority.defaultPriority,
         ),

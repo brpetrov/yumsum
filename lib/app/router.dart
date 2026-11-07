@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/debug_provider.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/account/account_settings_screen.dart';
@@ -14,6 +15,7 @@ import 'package:lean_streak/screens/dashboard/dashboard_screen.dart';
 import 'package:lean_streak/screens/dashboard/helpers/meal_camera_page.dart';
 import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
 import 'package:lean_streak/screens/debug/debug_screen.dart';
+import 'package:lean_streak/screens/language/language_screen.dart';
 import 'package:lean_streak/screens/notifications/notifications_screen.dart';
 import 'package:lean_streak/screens/onboarding/onboarding_screen.dart';
 import 'package:lean_streak/screens/plus/plus_screen.dart';
@@ -32,6 +34,7 @@ import 'package:lean_streak/widgets/splash_screen.dart';
 class AppRoutes {
   AppRoutes._();
   static const splash = '/';
+  static const language = '/language';
   static const auth = '/auth';
   static const onboarding = '/onboarding';
   static const profileLoadError = '/profile-load-error';
@@ -84,6 +87,9 @@ class _RouterNotifier extends ChangeNotifier {
       }
     });
 
+    // The first-launch language question answered.
+    ref.listen<bool>(languagePromptProvider, (_, _) => notifyListeners());
+
     // Onboarding completion changes.
     ref.listen(userProfileProvider, (previous, next) {
       final prevDone = previous?.valueOrNull?.onboardingCompleted;
@@ -111,6 +117,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.splash,
         builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.language,
+        builder: (context, state) => const LanguageScreen(),
       ),
       GoRoute(
         path: AppRoutes.auth,
@@ -190,6 +200,12 @@ String? _redirect(Ref ref, GoRouterState state) {
   final authValue = ref.read(authStateProvider);
   final location = state.matchedLocation;
 
+  // 0. First launch in Bulgaria or Malta, or in Bulgarian: ask the language
+  // before anything else. Once chosen, the steps below move on from it.
+  if (ref.read(languagePromptProvider)) {
+    return location == AppRoutes.language ? null : AppRoutes.language;
+  }
+
   // 1. Firebase still initialising — hold on splash.
   if (authValue.isLoading) {
     return location == AppRoutes.splash ? null : AppRoutes.splash;
@@ -231,6 +247,7 @@ String? _redirect(Ref ref, GoRouterState state) {
 
   // 4. Fully set up — bounce off auth / splash / onboarding.
   if (location == AppRoutes.splash ||
+      location == AppRoutes.language ||
       location == AppRoutes.auth ||
       location == AppRoutes.profileLoadError ||
       location == AppRoutes.onboarding) {
