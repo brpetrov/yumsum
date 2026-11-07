@@ -1,3 +1,4 @@
+import 'package:lean_streak/helpers/tap_log.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -18,6 +19,7 @@ import 'package:lean_streak/widgets/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
+  logTap('start'); // reads ?debugtaps before the router changes the URL
   WidgetsFlutterBinding.ensureInitialized();
   // Logs carry food names, AI replies and token counts; keep them out of
   // release builds' logcat and browser console.
