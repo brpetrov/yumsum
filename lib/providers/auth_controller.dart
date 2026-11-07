@@ -1,5 +1,6 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -86,10 +87,23 @@ class AuthController extends AsyncNotifier<AuthStatus> {
             email: email.trim(),
             password: password,
           );
-      await credential.user?.sendEmailVerification();
+      await _sendVerification(credential.user);
       await FirebaseAuth.instance.signOut();
       return AuthStatus.verificationSent;
     });
+  }
+
+  /// Our own confirmation email ([verificationEmailProvider]), or
+  /// Firebase's plain one when ours can't be sent, so a new account always
+  /// gets a link.
+  Future<void> _sendVerification(User? user) async {
+    if (user == null) return;
+    try {
+      await ref.read(verificationEmailProvider)();
+    } catch (error) {
+      debugPrint("Sending Firebase's confirmation email instead: $error");
+      await user.sendEmailVerification();
+    }
   }
 
   /// Emails a link to choose a new password. An unknown address gets the
@@ -118,6 +132,16 @@ class AuthController extends AsyncNotifier<AuthStatus> {
     state = const AsyncData(AuthStatus.idle);
   }
 }
+
+/// Sends the signed-in user our confirmation email (sendVerificationEmail,
+/// functions/src/email.ts): styled as YumSum and from help.yumsum, where
+/// Firebase's own is plain text from lean-streak-project.firebaseapp.com.
+final verificationEmailProvider = Provider<Future<void> Function()>(
+  (ref) =>
+      () => FirebaseFunctions.instanceFor(
+        region: 'europe-west10',
+      ).httpsCallable('sendVerificationEmail').call<Object?>(),
+);
 
 final authControllerProvider =
     AsyncNotifierProvider<AuthController, AuthStatus>(AuthController.new);

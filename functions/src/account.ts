@@ -12,6 +12,7 @@ export const counters = [
   "day_edits",
   "contribution_usage",
   "feedback_usage",
+  "email_usage",
 ];
 
 /**

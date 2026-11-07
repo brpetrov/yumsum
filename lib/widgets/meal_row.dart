@@ -88,6 +88,8 @@ class _MealRowState extends State<MealRow> {
             ],
           ),
         ),
+        // A long name wraps before it reaches the calories.
+        const SizedBox(width: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [

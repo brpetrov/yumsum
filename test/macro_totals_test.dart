@@ -231,4 +231,23 @@ void main() {
     await pump(tester, const []);
     expect(find.byType(Text), findsNothing);
   });
+
+  testWidgets('a long meal name keeps clear of the calories', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await pumpWidget(
+      tester,
+      MealRow(
+        meal: _meal('2 slices whole wheat bread and butter', null),
+        onEdit: () {},
+        onDelete: () {},
+      ),
+    );
+    final name = tester.getRect(
+      find.text('2 slices whole wheat bread and butter'),
+    );
+    final kcal = tester.getRect(find.text('500 kcal'));
+    expect(kcal.left - name.right, greaterThanOrEqualTo(12));
+  });
 }

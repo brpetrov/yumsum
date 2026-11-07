@@ -303,6 +303,7 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
 ## Sign-in and account
 
 - **Email and password:** sign-up sends a verification email and signs out; unverified sign-ins fail with `EmailNotVerifiedException`.
+  - The confirmation email is ours (`sendVerificationEmail`, `functions/src/email.ts`, called through `verificationEmailProvider`): Firebase's own can't be restyled and comes from lean-streak-project.firebaseapp.com. The function takes the link from `generateEmailVerificationLink` and sends `verificationEmail(link)` (the logo from the website, "Confirm your email", one orange button, the link as text, tables and inline styles for mail apps) as "YumSum" <help.yumsum@gmail.com> through Gmail, with an app password in the `GMAIL_APP_PASSWORD` secret. Nothing is sent to a confirmed account, and 5 a day per account at most (`email_usage`). If it fails, the app sends Firebase's plain one, so a new account always gets a link. When the domain is bought (plan 02), only the sender changes.
 - **Google:**
   - The web uses Firebase's popup.
   - Phones use `google_sign_in` 7, which needs the web client ID that the google-services plugin reads from `google-services.json`. `googleSignIn()` in `auth_controller.dart` initialises the plugin once, as it requires.
