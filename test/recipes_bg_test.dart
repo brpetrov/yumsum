@@ -160,7 +160,7 @@ void main() {
     expect(find.text('500 г'), findsOneWidget);
     expect(find.text('1 с. л.'), findsOneWidget);
     expect(find.text('Постна телешка кайма, 5% мазнини'), findsOneWidget);
-    expect(find.text('Приготвяне'), findsOneWidget);
+    expect(find.text('Начин на приготвяне'), findsOneWidget);
 
     /// The bold parts of the step that starts with [start].
     List<String> boldIn(String start) {
