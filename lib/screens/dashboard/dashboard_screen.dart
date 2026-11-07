@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/app/router.dart';
+import 'package:lean_streak/core/config/app_check.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
@@ -64,6 +66,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     _activeDate = _normalizeDate(DateTime.now());
     WidgetsBinding.instance.addObserver(this);
     _scheduleMidnightRefresh();
+    // The web's App Check, once Home's own data is on its way, so the first
+    // AI estimate has its token ready.
+    if (kIsWeb) Future.delayed(const Duration(seconds: 3), ensureAppCheck);
     // fireImmediately catches an action set before Today mounted (cold start,
     // or while the user was still signing in).
     ref.listenManual(

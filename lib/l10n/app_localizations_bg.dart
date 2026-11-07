@@ -2151,6 +2151,13 @@ class AppLocalizationsBg extends AppLocalizations {
   String get feedbackSend => 'Изпрати';
 
   @override
+  String get splashSlow =>
+      'Отнема повече време от обикновено. Провери връзката си.';
+
+  @override
+  String get splashReload => 'Презареди';
+
+  @override
   String get splashTagline => 'Постоянство всеки ден. Винаги във форма.';
 
   @override

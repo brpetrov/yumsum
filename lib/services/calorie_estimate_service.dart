@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
+import 'package:lean_streak/core/config/app_check.dart';
+
 import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/repositories/ai_usage_repository.dart';
@@ -270,6 +272,7 @@ Future<Map<String, dynamic>> callAi(
   String name,
   Map<String, Object?> data,
 ) async {
+  await ensureAppCheck();
   final result = await functions.httpsCallable(name).call<Object?>({
     ...data,
     'dateKey': DateFormat('yyyy-MM-dd').format(DateTime.now()),

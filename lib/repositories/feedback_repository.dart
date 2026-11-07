@@ -1,6 +1,7 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 
+import 'package:lean_streak/core/config/app_check.dart';
 import 'package:lean_streak/core/constants/app_info.dart';
 
 /// The account has sent today's feedback, on this device or another.
@@ -20,6 +21,7 @@ class FeedbackRepository {
   /// [FeedbackLimitReached] once today's are sent.
   Future<void> send({required String kind, required String text}) async {
     final platform = kIsWeb ? 'web' : defaultTargetPlatform.name;
+    await ensureAppCheck();
     try {
       await _functions.httpsCallable('sendFeedback').call<Object?>({
         'kind': kind,

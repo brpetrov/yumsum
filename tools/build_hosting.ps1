@@ -15,6 +15,21 @@ function Reset-Directory($path) {
 
 Set-Location $root
 
+# web/index.html preloads Firebase's JS modules and adjusts two of them by
+# their internal names, all for the JS SDK version FlutterFire loads. When a
+# FlutterFire upgrade moves it on, stop: update the links and recheck the
+# names (docs/features.md, Start-up on the web).
+$packageConfig = Get-Content (Join-Path $root '.dart_tool\package_config.json') -Raw | ConvertFrom-Json
+$coreWeb = $packageConfig.packages | Where-Object { $_.name -eq 'firebase_core_web' }
+$coreWebDir = [System.Uri]::new($coreWeb.rootUri).LocalPath
+$sdkVersionFile = Get-Content (Join-Path $coreWebDir 'lib\src\firebase_sdk_version.dart') -Raw
+$flutterFireJs = [regex]::Match($sdkVersionFile, "supportedFirebaseJsSdkVersion = '([^']+)'").Groups[1].Value
+$indexHtml = Get-Content (Join-Path $root 'web\index.html') -Raw
+$preloadedJs = @([regex]::Matches($indexHtml, 'firebasejs/([0-9.]+)/') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+if (-not $flutterFireJs -or $preloadedJs.Count -ne 1 -or $preloadedJs[0] -ne $flutterFireJs) {
+  throw "web/index.html is written for Firebase JS $($preloadedJs -join ', '), but FlutterFire loads $flutterFireJs."
+}
+
 # Flutter keeps a web build cache per set of build options, with its own
 # copy of the plugin list, and doesn't always refresh that list when a
 # plugin is added: on 6 November the /app/ bundle was still built with an

@@ -82,12 +82,15 @@ void main() async {
         rethrow;
       }
     }
-    try {
-      await activateAppCheck();
-    } catch (error) {
-      // Without a token the AI call fails with a clear message; the rest of
-      // the app does not depend on App Check.
-      debugPrint('App Check setup failed: $error');
+    // On the web it starts later, off the start-up path (ensureAppCheck).
+    if (!kIsWeb) {
+      try {
+        await activateAppCheck();
+      } catch (error) {
+        // Without a token the AI call fails with a clear message; the rest
+        // of the app does not depend on App Check.
+        debugPrint('App Check setup failed: $error');
+      }
     }
     if (!kIsWeb) {
       // Crashlytics has no web build; the debugPrint handler above stays

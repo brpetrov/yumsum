@@ -36,6 +36,17 @@
   <link rel="manifest" href="manifest.json">
   <!-- The app's code is the big download; start it before the loader runs. -->
   <link rel="preload" href="main.dart.js" as="script">
+  <!-- Firebase's modules, which FlutterFire only starts fetching once
+       main.dart.js has run; the version must be FlutterFire's, which
+       tools/build_hosting.ps1 checks. Then the servers a signed-in start
+       talks to first. -->
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore-pipelines.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/13.1.0/firebase-functions.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/13.1.0/firebase-app-check.js">
+  <link rel="preconnect" href="https://securetoken.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
   <style>
     /* The same splash the app draws first (SplashScreen, AppLogoMark), so
        nothing changes when it takes over; the app's fonts, which it will
@@ -158,24 +169,34 @@
     }
   </script>
   <script>
-    // On phones and in Safari, Firebase Auth waits at start-up for Google's
-    // pop-up helper (a script from apis.google.com and a frame from
-    // firebaseapp.com) before it says who is signed in, with no time limit:
-    // when the helper is slow the app sits on its logo (7 November, iPhones).
-    // This lets Auth start without it and loads the helper straight after,
-    // so the Google sign-in pop-up is still ready by the time someone taps.
-    // FlutterFire puts the Auth module on window.firebase_auth; the names
-    // are Firebase's own, checked in JS SDK 13.1.0, and if they change,
-    // Firebase's usual behaviour is kept.
+    // FlutterFire puts each Firebase module on window (firebase_auth,
+    // firebase_app_check, ...) as it loads it; these hooks adjust two as
+    // they arrive. The names used are Firebase's own, checked in JS SDK
+    // 13.1.0 (tools/build_hosting.ps1 stops when FlutterFire moves on); if
+    // they change, Firebase's usual behaviour is kept.
     (function () {
-      let auth;
-      Object.defineProperty(window, 'firebase_auth', {
-        configurable: true,
-        get: () => auth,
-        set(module) {
-          auth = withHelperAfterStart(module);
-        },
-      });
+      function onModule(name, adjust) {
+        let module;
+        Object.defineProperty(window, name, {
+          configurable: true,
+          get: () => module,
+          set(value) {
+            try {
+              module = adjust(value) || value;
+            } catch (error) {
+              module = value;
+            }
+          },
+        });
+      }
+
+      // On phones and in Safari, Firebase Auth waits at start-up for
+      // Google's pop-up helper (a script from apis.google.com and a frame
+      // from firebaseapp.com) before it says who is signed in, with no time
+      // limit: when the helper is slow the app sits on its logo (7 November,
+      // iPhones). Auth starts without it here and loads it straight after,
+      // so the Google sign-in pop-up is still ready by the time someone taps.
+      onModule('firebase_auth', withHelperAfterStart);
 
       function withHelperAfterStart(module) {
         const resolver = module && module.browserPopupRedirectResolver;
@@ -207,6 +228,47 @@
         };
         return patched;
       }
+
+      // App Check's reCAPTCHA token gets 6 seconds. Firestore and Auth wait
+      // for it whenever App Check runs, though neither enforces it, so a
+      // stalled reCAPTCHA held up the database and sign-in for good
+      // (7 November). Past the limit Firebase carries on with no token, which
+      // only the Cloud Functions refuse; later asks fail at once until
+      // reCAPTCHA answers.
+      onModule('firebase_app_check', (module) => {
+        const provider = module && module.ReCaptchaEnterpriseProvider;
+        const proto = provider && provider.prototype;
+        if (!proto || typeof proto.getToken !== 'function') return module;
+        const getToken = proto.getToken;
+        let stalled = false;
+        proto.getToken = function () {
+          if (stalled) {
+            return Promise.reject(new Error('reCAPTCHA is not answering'));
+          }
+          const attempt = getToken.apply(this, arguments);
+          return new Promise((resolve, reject) => {
+            const timer = setTimeout(() => {
+              stalled = true;
+              const recover = () => {
+                stalled = false;
+              };
+              attempt.then(recover, recover);
+              reject(new Error('reCAPTCHA did not answer in 6 seconds'));
+            }, 6000);
+            attempt.then(
+              (token) => {
+                clearTimeout(timer);
+                resolve(token);
+              },
+              (error) => {
+                clearTimeout(timer);
+                reject(error);
+              },
+            );
+          });
+        };
+        return module;
+      });
     })();
   </script>
   <!-- The camera page's back camera and barcodes; the barcode reader itself

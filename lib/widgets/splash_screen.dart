@@ -1,11 +1,40 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import 'package:lean_streak/helpers/page_reload.dart';
 import 'package:lean_streak/l10n/l10n.dart';
 import 'app_logo_mark.dart';
 
-class SplashScreen extends StatelessWidget {
+/// The logo while the app starts. Still up after 15 seconds, it says so,
+/// with Reload on the web, the way out of a connection that stalled.
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  late final Timer _timer;
+  bool _slow = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer(
+      const Duration(seconds: 15),
+      () => setState(() => _slow = true),
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +54,28 @@ class SplashScreen extends StatelessWidget {
                 color: AppColors.primary,
               ),
             ),
+            if (_slow) ...[
+              SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Text(
+                  context.l10n.splashSlow,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 15,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+              if (kIsWeb) ...[
+                SizedBox(height: 8),
+                TextButton(
+                  onPressed: reloadPage,
+                  child: Text(context.l10n.splashReload),
+                ),
+              ],
+            ],
           ],
         ),
       ),

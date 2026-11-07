@@ -2123,6 +2123,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feedbackSend => 'Send';
 
   @override
+  String get splashSlow => 'Taking longer than usual. Check your connection.';
+
+  @override
+  String get splashReload => 'Reload';
+
+  @override
   String get splashTagline => 'Stay consistent. Stay lean.';
 
   @override

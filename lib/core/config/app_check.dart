@@ -13,6 +13,20 @@ bool get appCheckAvailable => !kIsWeb || recaptchaSiteKey.isNotEmpty;
 /// it uses a debug token on Android too.
 const _debugTokenOnAndroid = bool.fromEnvironment('APP_CHECK_DEBUG');
 
+Future<void>? _webAppCheck;
+
+/// Starts App Check on the web, once: before each Cloud Functions call and a
+/// few seconds after Home shows, rather than at start-up. Firestore and Auth
+/// don't enforce it but wait for its reCAPTCHA token once it runs, and
+/// reCAPTCHA's script (850 KB) slowed every start (7 November). The phone
+/// apps start it in main(), so this does nothing there.
+Future<void> ensureAppCheck() {
+  if (!kIsWeb) return Future.value();
+  return _webAppCheck ??= activateAppCheck().catchError((Object error) {
+    debugPrint('App Check setup failed: $error');
+  });
+}
+
 /// Debug builds prove themselves with a debug token registered in the
 /// Firebase console (printed in the log on first run); release builds use
 /// the platform attestation.

@@ -2765,6 +2765,14 @@
   "@feedbackSend": {
     "description": "Feedback dialog: sends the message."
   },
+  "splashSlow": "Taking longer than usual. Check your connection.",
+  "@splashSlow": {
+    "description": "Under the start-up logo when it has been up for 15 seconds."
+  },
+  "splashReload": "Reload",
+  "@splashReload": {
+    "description": "Website only, under splashSlow: reloads the page."
+  },
   "splashTagline": "Stay consistent. Stay lean.",
   "@splashTagline": {
     "description": "Splash screen: the line under YumSum. Also the confirmation email's footer."

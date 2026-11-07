@@ -5,6 +5,8 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
+import 'package:lean_streak/core/config/app_check.dart';
+
 import 'package:lean_streak/core/constants/app_info.dart';
 import 'package:lean_streak/l10n/l10n.dart';
 
@@ -113,6 +115,7 @@ class FoodContributionService {
       await Future<void>.delayed(const Duration(milliseconds: 600));
       return;
     }
+    await ensureAppCheck();
     try {
       await _functions
           .httpsCallable(

@@ -3578,6 +3578,18 @@ abstract class AppLocalizations {
   /// **'Send'**
   String get feedbackSend;
 
+  /// Under the start-up logo when it has been up for 15 seconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Taking longer than usual. Check your connection.'**
+  String get splashSlow;
+
+  /// Website only, under splashSlow: reloads the page.
+  ///
+  /// In en, this message translates to:
+  /// **'Reload'**
+  String get splashReload;
+
   /// Splash screen: the line under YumSum. Also the confirmation email's footer.
   ///
   /// In en, this message translates to:

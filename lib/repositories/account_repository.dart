@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
+import 'package:lean_streak/core/config/app_check.dart';
+
 class AccountRepository {
   AccountRepository(this._db, this._functions);
 
@@ -37,8 +39,10 @@ class AccountRepository {
 
   /// Has the server delete the counters, which the app can't, and then the
   /// signed-in account itself. Call it after [deleteAccountData].
-  Future<void> deleteAccount() =>
-      _functions.httpsCallable('deleteAccount').call<Object?>({});
+  Future<void> deleteAccount() async {
+    await ensureAppCheck();
+    await _functions.httpsCallable('deleteAccount').call<Object?>({});
+  }
 
   Future<void> _deleteCollection(
     CollectionReference<Map<String, dynamic>> collection,
