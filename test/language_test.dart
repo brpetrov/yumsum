@@ -179,6 +179,65 @@ void main() {
     expect(prefs.getString('language'), 'bg');
   });
 
+  testWidgets('Settings has no language choice outside Bulgaria, Malta and '
+      'the UK', (tester) async {
+    final router = GoRouter(
+      routes: [
+        GoRoute(path: '/', builder: (_, _) => const AccountSettingsScreen()),
+      ],
+    );
+    await pumpApp(tester, region: 'US', router: router, profile: planProfile());
+
+    expect(find.text('APPEARANCE', skipOffstage: false), findsOneWidget);
+    expect(find.text('LANGUAGE', skipOffstage: false), findsNothing);
+    expect(find.text('Български', skipOffstage: false), findsNothing);
+  });
+
+  group('the language choice in Settings', () {
+    Future<bool> offered({
+      String? region,
+      String language = 'en',
+      String? stored,
+    }) async {
+      SharedPreferences.setMockInitialValues({'language': ?stored});
+      final container = ProviderContainer(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(
+            await SharedPreferences.getInstance(),
+          ),
+          deviceRegionProvider.overrideWithValue(region),
+          deviceLanguageProvider.overrideWithValue(language),
+        ],
+      );
+      addTearDown(container.dispose);
+      return container.read(languageChoiceProvider);
+    }
+
+    test('is offered in Bulgaria, Malta and the UK', () async {
+      for (final region in ['BG', 'MT', 'GB', 'gb']) {
+        expect(await offered(region: region), isTrue, reason: region);
+      }
+    });
+
+    test('is not offered elsewhere in English', () async {
+      for (final region in ['US', 'DE', null]) {
+        expect(await offered(region: region), isFalse, reason: '$region');
+      }
+    });
+
+    test('is offered anywhere on a Bulgarian device', () async {
+      expect(await offered(region: 'DE', language: 'bg'), isTrue);
+    });
+
+    test(
+      'stays while Bulgarian is chosen, so it can be switched back',
+      () async {
+        expect(await offered(region: 'US', stored: 'bg'), isTrue);
+        expect(await offered(region: 'US', stored: 'en'), isFalse);
+      },
+    );
+  });
+
   test('l10nProvider and the server language follow the setting', () async {
     SharedPreferences.setMockInitialValues({});
     final container = ProviderContainer(

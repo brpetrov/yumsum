@@ -301,18 +301,21 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                             .read(themeControllerProvider.notifier)
                             .setMode(mode),
                       ),
-                      SizedBox(height: 28),
-                      _AccountSectionLabel(l10n.accountSectionLanguage),
-                      PillToggle<String>(
-                        options: [
-                          ('en', l10n.languageEnglish),
-                          ('bg', l10n.languageBulgarian),
-                        ],
-                        selected: ref.watch(languageCodeProvider),
-                        onChanged: (code) => ref
-                            .read(languageControllerProvider.notifier)
-                            .setLanguage(code),
-                      ),
+                      // Only where Bulgarian is wanted.
+                      if (ref.watch(languageChoiceProvider)) ...[
+                        SizedBox(height: 28),
+                        _AccountSectionLabel(l10n.accountSectionLanguage),
+                        PillToggle<String>(
+                          options: [
+                            ('en', l10n.languageEnglish),
+                            ('bg', l10n.languageBulgarian),
+                          ],
+                          selected: ref.watch(languageCodeProvider),
+                          onChanged: (code) => ref
+                              .read(languageControllerProvider.notifier)
+                              .setLanguage(code),
+                        ),
+                      ],
                       SizedBox(height: 28),
                       _AccountSectionLabel(l10n.accountSectionStar),
                       const _PlusTile(),

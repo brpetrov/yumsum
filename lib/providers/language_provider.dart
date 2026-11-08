@@ -47,6 +47,16 @@ final l10nProvider = Provider<AppLocalizations>(
   (ref) => lookupAppLocalizations(Locale(ref.watch(languageCodeProvider))),
 );
 
+/// Whether Settings offers Bulgarian: the device is set to Bulgaria, Malta
+/// or the UK, or to Bulgarian, or Bulgarian is already chosen (so it can be
+/// switched back). Everyone else has English and no choice.
+final languageChoiceProvider = Provider<bool>((ref) {
+  if (ref.watch(languageCodeProvider) == 'bg') return true;
+  final region = ref.watch(deviceRegionProvider)?.toUpperCase();
+  return const {'BG', 'MT', 'GB'}.contains(region) ||
+      ref.watch(deviceLanguageProvider) == 'bg';
+});
+
 /// Ask the language before sign-in: none chosen yet, and the device is set
 /// to Bulgaria or Malta or to Bulgarian. Everyone else gets English unasked.
 final languagePromptProvider = Provider<bool>((ref) {
