@@ -4,8 +4,8 @@ import { HttpsError, onCall } from "firebase-functions/https";
 
 /**
  * The counters under `users/{uid}`: the app's AI allowance and past-day
- * edits, and the functions' own daily limits. The app can't delete any of
- * them, so only a new account starts them again.
+ * edits, and the functions' own daily limits, with AI Coach's kept replies.
+ * The app can't delete any of them, so only a new account starts them again.
  */
 export const counters = [
   "ai_usage",
@@ -13,6 +13,7 @@ export const counters = [
   "contribution_usage",
   "feedback_usage",
   "email_usage",
+  "coach_replies",
 ];
 
 /**

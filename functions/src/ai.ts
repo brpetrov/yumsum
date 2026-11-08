@@ -102,11 +102,41 @@ export const aiEstimate = onCall(options, (request) => {
  * anything else or none), which the notes are written in. Returns
  * `{points: [{text, good}]}`.
  */
-export const aiWeeklyReview = onCall(options, (request) => {
-  const uid = signedIn(request);
-  const ask = weeklyReviewAsk(request.data);
-  return respond(getFirestore(), gemini, uid, dataOf(request.data).dateKey, ask, new Date());
-});
+export const aiWeeklyReview = onCall(options, (request) =>
+  weeklyReview(getFirestore(), gemini, signedIn(request), request.data, new Date()),
+);
+
+/**
+ * Asks Gemini about the latest finished week once: the reply is kept in
+ * `users/{uid}/coach_replies/{Monday}` and every later call that week gets
+ * it back, without asking or counting, whatever the app sends. So an app
+ * that fails to save its notes, or asks again, costs nothing more.
+ */
+export async function weeklyReview(
+  db: Firestore,
+  generate: Generate,
+  uid: string,
+  raw: unknown,
+  now: Date,
+): Promise<Record<string, unknown>> {
+  const today = todayFrom(dataOf(raw).dateKey, now);
+  const kept = db.doc(`users/${uid}/coach_replies/${latestFinishedWeek(today)}`);
+  const saved = await kept.get();
+  if (saved.exists) return saved.get("reply") as Record<string, unknown>;
+  const reply = await respond(db, generate, uid, today, weeklyReviewAsk(raw), now);
+  await kept.set({ reply, createdAt: now });
+  return reply;
+}
+
+/**
+ * The Monday of the latest finished week on [today] (yyyy-MM-dd), the only
+ * week the app asks about (its `latestFinishedWeek`).
+ */
+export function latestFinishedWeek(today: string): string {
+  const date = new Date(`${today}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() - (date.getUTCDay() || 7) - 6);
+  return date.toISOString().slice(0, 10);
+}
 
 // Room for a 30-second voice note at 16 kHz and a phone photo.
 const maxAudioBytes = 2_000_000;

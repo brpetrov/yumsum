@@ -8,9 +8,11 @@ import {
   estimateAsk,
   type Generate,
   geminiError,
+  latestFinishedWeek,
   parseReply,
   respond,
   todayFrom,
+  weeklyReview,
   weeklyReviewAsk,
 } from "../src/ai";
 import {
@@ -41,7 +43,16 @@ class FakeDb {
   private queue: Promise<unknown> = Promise.resolve();
 
   doc(path: string) {
-    return { path };
+    return {
+      path,
+      get: async () => {
+        const data = this.docs.get(path);
+        return { exists: !!data, get: (field: string) => data?.[field] };
+      },
+      set: async (data: Data) => {
+        this.docs.set(path, data);
+      },
+    };
   }
 
   runTransaction<T>(update: (tx: unknown) => Promise<T>): Promise<T> {
@@ -83,6 +94,14 @@ function setUp(entitlement?: Data, usage?: Data) {
     usage: () => db.docs.get(usagePath),
     call: (ask: Ask, dateKey: unknown = today) =>
       respond(db as unknown as Firestore, gemini, "u1", dateKey, ask, now),
+    review: (dateKey = today, at = now) =>
+      weeklyReview(
+        db as unknown as Firestore,
+        gemini,
+        "u1",
+        { facts: "Week: Monday 26 October.", dateKey },
+        at,
+      ),
   };
 }
 
@@ -255,6 +274,41 @@ describe("the fill-in and AI Coach", () => {
     const { call } = setUp(undefined, { nutrients: 49 });
     await call(nutrients);
     await refused(call(nutrients), "resource-exhausted");
+  });
+});
+
+describe("AI Coach once a week", () => {
+  test("later calls that week get the kept reply, not asked or counted", async () => {
+    const { review, asked, usage, db } = setUp(star);
+    const first = await review();
+    const again = await review();
+    assert.deepEqual(again, first);
+    assert.equal(asked.length, 1);
+    assert.deepEqual(usage(), { coach: 1 });
+    assert.ok(db.docs.has("users/u1/coach_replies/2026-10-26"));
+  });
+
+  test("the next week asks again", async () => {
+    const { review, asked } = setUp(star);
+    await review();
+    await review("2026-11-09", new Date("2026-11-09T12:00:00.000Z"));
+    assert.equal(asked.length, 2);
+  });
+
+  test("a refused call keeps nothing, so the next one asks", async () => {
+    const { review, asked, db } = setUp(undefined);
+    await refused(review(), "permission-denied");
+    assert.equal(db.docs.has("users/u1/coach_replies/2026-10-26"), false);
+    db.docs.set("entitlements/u1", star);
+    await review();
+    assert.equal(asked.length, 1);
+  });
+
+  test("the latest finished week is the app's", () => {
+    assert.equal(latestFinishedWeek("2026-11-05"), "2026-10-26"); // Thursday
+    assert.equal(latestFinishedWeek("2026-11-08"), "2026-10-26"); // Sunday
+    assert.equal(latestFinishedWeek("2026-11-09"), "2026-11-02"); // Monday
+    assert.equal(latestFinishedWeek("2026-01-01"), "2025-12-22"); // across a year
   });
 });
 

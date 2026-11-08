@@ -71,19 +71,17 @@ final hasWeeklyReviewsProvider = FutureProvider.autoDispose<bool>((ref) async {
   return ref.watch(weeklyReviewRepositoryProvider).hasAny(uid);
 });
 
-/// The notes the AI is writing, by user, week and basis, so runs that
-/// overlap (the page rebuilt while the AI is still at it) share one call.
+/// The notes the AI is writing, by user and week, so runs that overlap (the
+/// page rebuilt while the AI is still at it) share one call.
 final _writingProvider = Provider<Map<String, Future<List<ReviewPoint>>>>(
   (ref) => {},
 );
 
 /// The AI Coach's notes on the week starting [monday] (plan 09): the saved
-/// ones, or null when there are none. The AI writes them only where
-/// [reviewWritable], and only when the saved notes don't match the facts,
-/// which are worked out afresh each time, or the app's language: notes
-/// saved in English are written again in Bulgarian after a switch, and
-/// back. Empty for a week still going or
-/// with fewer than 4 judged days.
+/// ones, or null when there are none. The AI writes them once, where
+/// [reviewWritable] and nothing is saved yet; saved notes are never written
+/// again, whatever changes. Empty for a week still going or with fewer than
+/// 4 judged days.
 final weeklyReviewProvider = FutureProvider.autoDispose
     .family<List<ReviewPoint>?, DateTime>((ref, monday) async {
       final uid = ref.watch(currentUidProvider);
@@ -96,7 +94,8 @@ final weeklyReviewProvider = FutureProvider.autoDispose
       final week = _dateKey.format(monday);
       final entitlement = await ref.watch(entitlementProvider.future);
       final saved = await repository.fetch(uid, week);
-      if (!reviewWritable(entitlement, monday: monday, now: now)) {
+      if (saved != null ||
+          !reviewWritable(entitlement, monday: monday, now: now)) {
         return saved?.points;
       }
 
@@ -138,14 +137,12 @@ final weeklyReviewProvider = FutureProvider.autoDispose
       );
       if (facts.judgedDays < 4) return const [];
 
-      // English keeps the basis it always had, so its saved notes stay.
       final language = ref.watch(languageCodeProvider);
       final basis =
           'Prompt version $weeklyReviewPromptVersion\n'
           '${language == 'en' ? '' : 'Language $language\n'}${facts.text}';
-      if (saved != null && saved.basis == basis) return saved.points;
 
-      final key = '$uid $week $basis';
+      final key = '$uid $week';
       final call = writing[key] ??= () async {
         final points = await service.write(facts.text);
         try {

@@ -76,38 +76,14 @@ service cloud.firestore {
     }
 
     // The AI Coach's notes on a week, with the facts they were written from.
-    function validReviewPoint(p) {
-      return p is map
-        && p.keys().hasOnly(['title', 'text', 'good', 'why', 'tips', 'recipes'])
-        && text(p.title, 80)
-        && text(p.text, 600)
-        && p.good is bool
-        && (!('why' in p) || (p.why is string && p.why.size() <= 300))
-        && (!('tips' in p) || shortStrings(p.tips, 200))
-        && (!('recipes' in p) || shortStrings(p.recipes, 80));
-    }
-
-    // At most three strings of at most [max] characters each.
-    function shortStrings(l, max) {
-      return l is list
-        && l.size() <= 3
-        && (l.size() < 1 || (l[0] is string && l[0].size() <= max))
-        && (l.size() < 2 || (l[1] is string && l[1].size() <= max))
-        && (l.size() < 3 || (l[2] is string && l[2].size() <= max));
-    }
-
+    // The notes themselves aren't checked: checking each field of 5 notes
+    // went past the rules' limit of 1000 checks a request and refused every
+    // save (found 8 November). They are the user's own, shown only to them,
+    // and the app keeps them in shape (parseReviewPoints).
     function validWeeklyReview(d) {
       return d.keys().hasOnly(['points', 'basis', 'createdAt'])
         && d.points is list
         && d.points.size() <= 8
-        && (d.points.size() < 1 || validReviewPoint(d.points[0]))
-        && (d.points.size() < 2 || validReviewPoint(d.points[1]))
-        && (d.points.size() < 3 || validReviewPoint(d.points[2]))
-        && (d.points.size() < 4 || validReviewPoint(d.points[3]))
-        && (d.points.size() < 5 || validReviewPoint(d.points[4]))
-        && (d.points.size() < 6 || validReviewPoint(d.points[5]))
-        && (d.points.size() < 7 || validReviewPoint(d.points[6]))
-        && (d.points.size() < 8 || validReviewPoint(d.points[7]))
         && text(d.basis, 12000)
         && d.createdAt is timestamp;
     }
@@ -216,8 +192,10 @@ service cloud.firestore {
 
       // contribution_usage/{yyyy-MM-dd}, feedback_usage/{yyyy-MM-dd} and
       // email_usage/{yyyy-MM-dd} ({count}): the contributeProduct,
-      // sendFeedback and sendVerificationEmail functions' daily limits.
-      // Only the functions read or write them, so there's no rule.
+      // sendFeedback and sendVerificationEmail functions' daily limits; and
+      // coach_replies/{Monday} ({reply, createdAt}): the aiWeeklyReview
+      // function's one reply a week. Only the functions read or write them,
+      // so there's no rule.
 
       // Legacy check-ins: no longer written, only deleted with the account.
       match /check_ins/{document=**} {

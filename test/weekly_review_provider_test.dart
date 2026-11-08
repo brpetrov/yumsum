@@ -192,49 +192,39 @@ void main() {
     expect(meals.ranges, [(fourWeeksAgo, sunday)]);
   });
 
-  test('the saved notes are shown while they match the facts', () async {
+  test('the notes are written once and saved with the facts', () async {
     container();
     await pumpEventQueue();
     coach.calls.single.complete(_points);
     await pumpEventQueue();
-    final basis = reviews.saved[week]!.basis;
+    expect(reviews.saved[week]!.points, _points);
+    expect(
+      reviews.saved[week]!.basis,
+      'Prompt version $weeklyReviewPromptVersion\n${coach.facts}',
+    );
 
     final again = container(saved: {week: reviews.saved[week]!});
     expect(await notesOn(again), _points);
     expect(coach.calls, isEmpty);
-    expect(basis, startsWith('Prompt version $weeklyReviewPromptVersion\n'));
   });
 
-  test('notes saved in one language are written again in the other', () async {
-    container();
-    await pumpEventQueue();
-    coach.calls.single.complete(_points);
-    await pumpEventQueue();
-    final english = reviews.saved[week]!;
-    // English keeps the basis it always had.
-    expect(
-      english.basis,
-      'Prompt version $weeklyReviewPromptVersion\n${coach.facts}',
-    );
+  test('saved notes are never written again, whatever changed', () async {
+    // Older facts, an older prompt version, and now another language.
+    final notes = container(language: 'bg', saved: {week: _oldNotes});
+    expect(await notesOn(notes), _points);
+    expect(coach.calls, isEmpty);
+    expect(meals.ranges, isEmpty);
+  });
 
-    container(language: 'bg', saved: {week: english});
+  test('notes in Bulgarian say so in the basis', () async {
+    container(language: 'bg');
     await pumpEventQueue();
-    expect(coach.calls, hasLength(1));
     coach.calls.single.complete(_points);
     await pumpEventQueue();
-    final bulgarian = reviews.saved[week]!;
     expect(
-      bulgarian.basis,
+      reviews.saved[week]!.basis,
       'Prompt version $weeklyReviewPromptVersion\nLanguage bg\n${coach.facts}',
     );
-
-    final again = container(language: 'bg', saved: {week: bulgarian});
-    expect(await notesOn(again), _points);
-    expect(coach.calls, isEmpty);
-
-    container(saved: {week: bulgarian});
-    await pumpEventQueue();
-    expect(coach.calls, hasLength(1));
   });
 
   test(
