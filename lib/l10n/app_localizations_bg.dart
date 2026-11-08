@@ -229,7 +229,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get homeStarPitch =>
-      'Smart Snap, адаптивна формула, AI треньор и подробни макроси.';
+      'Запис със снимка, адаптивна формула, AI треньор и подробни макроси.';
 
   @override
   String get homeStarHide => 'Скрий засега';
@@ -605,7 +605,7 @@ class AppLocalizationsBg extends AppLocalizations {
       'Снимай таблицата отблизо и на фокус. Дръж опаковката изправена, за да се четат всички числа.';
 
   @override
-  String get cameraSmartSnap => 'Smart Snap';
+  String get cameraSmartSnap => 'Запис със снимка';
 
   @override
   String get cameraSmartSnapSubtitle =>
@@ -1451,7 +1451,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get starHeaderMember => 'Всички тези функции са достъпни за теб.';
 
   @override
-  String get starFeatureSnapTitle => 'Smart Snap';
+  String get starFeatureSnapTitle => 'Запис със снимка';
 
   @override
   String get starFeatureSnapBody => 'Снимай храната си. AI прави останалото.';
@@ -1598,7 +1598,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get starClose => 'Затвори';
 
   @override
-  String get starStatusPitch => 'Smart Snap, 30 AI оценки на ден и още';
+  String get starStatusPitch => 'Запис със снимка, 30 AI оценки на ден и още';
 
   @override
   String get starStatusHold =>

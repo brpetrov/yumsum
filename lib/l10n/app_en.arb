@@ -287,7 +287,7 @@
   },
   "homeStarPitch": "Smart Snap, the Adaptive Formula, an AI Assisted Coach and Detailed Macros.",
   "@homeStarPitch": {
-    "description": "Home: the YumSum Star card for free accounts, under the YumSum Star logo: what it adds. Smart Snap is a name; AI Coach is AI треньор in Bulgarian."
+    "description": "Home: the YumSum Star card for free accounts, under the YumSum Star logo: what it adds. Smart Snap is Запис със снимка and AI Coach is AI треньор in Bulgarian."
   },
   "homeStarHide": "Hide for now",
   "@homeStarHide": {
@@ -765,7 +765,7 @@
   },
   "cameraSmartSnap": "Smart Snap",
   "@cameraSmartSnap": {
-    "description": "Smart Snap's name, the YumSum Star photo logging; a name, kept in Latin letters."
+    "description": "The YumSum Star photo logging feature's name: Smart Snap in English, Запис със снимка in Bulgarian."
   },
   "cameraSmartSnapSubtitle": "Make food logging as easy as taking a photo.",
   "@cameraSmartSnapSubtitle": {
@@ -1861,7 +1861,7 @@
   },
   "starFeatureSnapTitle": "Smart Snap",
   "@starFeatureSnapTitle": {
-    "description": "YumSum Star page: a feature's name (a name, the same in every language)."
+    "description": "YumSum Star page: the photo logging feature's name, Запис със снимка in Bulgarian."
   },
   "starFeatureSnapBody": "Capture your meal. The AI does the rest.",
   "@starFeatureSnapBody": {

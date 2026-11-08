@@ -452,7 +452,7 @@ abstract class AppLocalizations {
   /// **'Log'**
   String get homeWeightLog;
 
-  /// Home: the YumSum Star card for free accounts, under the YumSum Star logo: what it adds. Smart Snap is a name; AI Coach is AI треньор in Bulgarian.
+  /// Home: the YumSum Star card for free accounts, under the YumSum Star logo: what it adds. Smart Snap is Запис със снимка and AI Coach is AI треньор in Bulgarian.
   ///
   /// In en, this message translates to:
   /// **'Smart Snap, the Adaptive Formula, an AI Assisted Coach and Detailed Macros.'**
@@ -1088,7 +1088,7 @@ abstract class AppLocalizations {
   /// **'Fill the frame with the table, flat and sharp, so every number can be read.'**
   String get cameraTableTip;
 
-  /// Smart Snap's name, the YumSum Star photo logging; a name, kept in Latin letters.
+  /// The YumSum Star photo logging feature's name: Smart Snap in English, Запис със снимка in Bulgarian.
   ///
   /// In en, this message translates to:
   /// **'Smart Snap'**
@@ -2402,7 +2402,7 @@ abstract class AppLocalizations {
   /// **'Everything here is yours.'**
   String get starHeaderMember;
 
-  /// YumSum Star page: a feature's name (a name, the same in every language).
+  /// YumSum Star page: the photo logging feature's name, Запис със снимка in Bulgarian.
   ///
   /// In en, this message translates to:
   /// **'Smart Snap'**

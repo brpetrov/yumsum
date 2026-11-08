@@ -87,7 +87,7 @@ The paid tier (plan 06; the code says `plus`).
   - `dev` true is admin plus Debug tools in every build.
 - **Providers** (`lib/providers/plus_provider.dart`): `entitlementProvider` (with Debug tools' pretend account applied), `plusProvider`, `adminProvider`, and `realEntitlementProvider` / `debugToolsProvider`, which read the real record so pretending never hides Debug tools. Tests override `entitlementProvider`.
 - **The page:** gates call `showPlusPaywall`, which opens `PlusScreen` (`/plus`), a one-screen promo (a smaller bowl on screens under 800 px tall).
-  - It names Smart Snap (photo logging), Triple the AI estimates, Adaptive Formula, AI Coach (the weekly review) and Detailed Macros.
+  - It names Smart Snap (photo logging, „Запис със снимка“ in Bulgarian), Triple the AI estimates, Adaptive Formula, AI Coach (the weekly review) and Detailed Macros.
   - On Android the yearly and monthly tiles show Play's own prices (`starPlansProvider`), with the yearly price as the big number, its monthly cost and saving worked out from Play's figures. "Start 7 days free" and the trial wording only when Play offers this Google account the trial; otherwise "Subscribe".
   - Restore purchase, and "Could not reach Google Play…" with Try again when the plans don't load.
   - Once YumSum Star switches on after a purchase or restore started there, it closes with "YumSum Star is on." (and the trial's end date).

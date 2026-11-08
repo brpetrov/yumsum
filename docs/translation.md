@@ -97,7 +97,7 @@ Weights and heights go through `lib/models/units.dart`, which takes the `AppLoca
 
 - Address the user informally, with "ти" ("Запиши", "твоят", "планът ти"), as a friendly app would; never "Вие". Write it as a good Bulgarian app would say it, not word for word from the English. Keep `CLAUDE.md`'s copy rules: sentence case, no exclamation marks (but "Благодарим ти!" and "Планът ти е готов!"), errors as "Не успяхме да … Опитай отново.", short enough for a 360dp phone.
 - Bulgarian past forms and adjectives about the user carry gender ("ял/яла", "готов/готова"). Phrase around them so every line suits anyone: "Добави храненията си", not "Добави какво си ял".
-- YumSum, YumSum Star and Smart Snap are names: keep them in Latin letters. AI Coach is "AI треньор". Units: kcal → ккал, g → г, kg → кг, cm → см; lb, st, ft and in stay as they are (see the glossary).
+- YumSum and YumSum Star are names: keep them in Latin letters. Smart Snap is "Запис със снимка" in Bulgarian, including feature headings and promotional text. AI Coach is "AI треньор". Units: kcal → ккал, g → г, kg → кг, cm → см; lb, st, ft and in stay as they are (see the glossary).
 - Menu and page names (Plan Settings, Weight & Progress) are titles in English; in Bulgarian, write them as ordinary sentence-case phrases ("Настройки на плана").
 - Translate the meaning in context. Use „съвети“ for AI Coach's notes and „обобщение“ for a period's review. Name what is being compared: „калориите за деня са в рамките на целта“, rather than making a day itself meet a calorie target. Avoid literal English metaphors such as „яж по-уверено“ and „започни седмицата с посока“.
 - Static lists of labels (`const _pages = [...]` in `AppDrawer`, enums with labels such as `DayStatus` in `lib/models/daily_summary.dart` and `MealType` in `lib/models/recipe.dart`) can't call `context.l10n`: turn the label into a getter or a function that takes the `AppLocalizations`.
@@ -141,7 +141,8 @@ The Bulgarian the app uses for its own words. Keep to it in new text.
 | AI Coach notes / weekly review | съвети / седмично обобщение |
 | yoghurt / Greek yoghurt | кисело мляко / цедено кисело мляко (only when Greek or strained is specified) |
 | Adaptive formula | адаптивна формула („Адаптивна формула“ as a heading) |
-| YumSum, YumSum Star, Smart Snap | as they are, in Latin letters |
+| Smart Snap | Запис със снимка |
+| YumSum, YumSum Star | as they are, in Latin letters |
 | kcal, g, kg, cm | ккал, г, кг, см |
 | lb, st, ft, in | lb, st, ft, in: kept, as imperial units are rare in Bulgaria and the Bulgarian words (фунт, стоун, фут, инч) have no short forms; the toggles read „st и lb“, „ft и in“ and the second boxes „Фунтове“, „Инчове“ |
 | decimals | with a comma: 80,5 кг, 0,25 кг |
