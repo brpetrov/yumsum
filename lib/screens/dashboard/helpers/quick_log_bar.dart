@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:record/record.dart';
+import 'package:speech_to_text/speech_recognition_error.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
@@ -18,7 +21,9 @@ import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/country_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
@@ -47,20 +52,28 @@ final audioRecorderProvider = Provider<AudioRecorder>((ref) {
   return recorder;
 });
 
+/// The phone's or browser's speech recogniser behind the mic, which shows
+/// the words as they're said and stops by itself after a pause; overridable
+/// in tests. Null once it has failed this session (none there, no such
+/// language, as on iPhones in Bulgarian, or no permission), so the mic
+/// records a note for the AI to listen to instead.
+final speechProvider = StateProvider<SpeechToText?>((ref) => SpeechToText());
+
 typedef _Entry = ({String? name, int? kcal, int? protein});
 
 /// The log composer pinned to the bottom of Today, under the thumb: a name
 /// box, with calorie and protein boxes under it once the bar is in use.
 /// Beside the idle box sit the other ways in, one round button each: a
 /// photo of the plate for the AI, a packet's barcode (phones only) and the
-/// mic, which records a short note that the AI listens to itself, in
-/// English, Bulgarian or a mix. Once the bar is in use (text, or the
-/// keyboard up for it) they slide away for one round button, so the box
-/// has the room: a sparkle to estimate a named meal, a tick to save one
-/// with calories. While the box is focused, meals are offered as chips for
-/// one-tap re-logging: the usual ones for this time of day, then recent
-/// ones matching what is typed, along with a search of packaged foods
-/// while [showFoodSearchChip] is on.
+/// mic, which writes the words into the box as they're said, in the app's
+/// language, and estimates them as if typed; where the device can't, it
+/// records a short note that the AI listens to itself. Once the bar is in
+/// use (text, or the keyboard up for it) they slide away for one round
+/// button, so the box has the room: a sparkle to estimate a named meal, a
+/// tick to save one with calories. While the box is focused, meals are
+/// offered as chips for one-tap re-logging: the usual ones for this time of
+/// day, then recent ones matching what is typed, along with a search of
+/// packaged foods while [showFoodSearchChip] is on.
 enum _Offer { declined, abandoned, contributed }
 
 class QuickLogBar extends ConsumerStatefulWidget {
@@ -79,6 +92,14 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   static const _silenceAfterSpeech = Duration(milliseconds: 2500);
   static const _speechDbfs = -30.0;
   static const _silenceDbfs = -45.0;
+  // The recogniser stops after this long without new words.
+  static const _speechPause = Duration(seconds: 3);
+  // Errors that mean nothing was said, rather than that it can't listen.
+  static const _nothingSaid = {
+    'error_no_match',
+    'error_speech_timeout',
+    'no-speech',
+  };
   static const _switchDuration = Duration(milliseconds: 220);
 
   String get _limitMessage =>
@@ -107,6 +128,8 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   AppLifecycleListener? _resumeListener;
 
   bool _listening = false;
+  // The recogniser while it, rather than the recorder, is listening.
+  SpeechToText? _speech;
   bool _working = false;
   // As of the last metrics change, so only the keyboard coming or going
   // rebuilds, not each frame of its slide.
@@ -226,7 +249,10 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     _stopTimer?.cancel();
     _levelSub?.cancel();
     _audioSub?.cancel();
-    if (_listening) ref.read(audioRecorderProvider).cancel();
+    _speech?.cancel();
+    if (_listening && _speech == null) {
+      ref.read(audioRecorderProvider).cancel();
+    }
     for (final focus in [_focusNode, _kcalFocus, _proteinFocus]) {
       focus.dispose();
     }
@@ -379,7 +405,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
 
   Future<void> _toggleListening() async {
     if (_listening) {
-      await _finishListening();
+      await (_speech != null ? _stopSpeech() : _finishListening());
       return;
     }
     // Said before recording, not after the user has spoken the whole meal.
@@ -387,6 +413,11 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       setState(() => _error = _limitMessage);
       return;
     }
+    // The words as they're said where the device can; a note for the AI
+    // otherwise.
+    final speech = ref.read(speechProvider);
+    if (speech != null && await _startSpeech(speech)) return;
+    if (!mounted) return;
 
     final recorder = ref.read(audioRecorderProvider);
     if (!await recorder.hasPermission()) {
@@ -428,6 +459,122 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
         .onAmplitudeChanged(const Duration(milliseconds: 250))
         .listen(_onLevel);
     _stopTimer = Timer(_maxRecording, _finishListening);
+  }
+
+  /// The language the recogniser listens for: the app's, with the device's
+  /// region when the device speaks it too (en-US), else en-GB or bg-BG.
+  String get _speechLocale {
+    final language = ref.read(languageCodeProvider);
+    final region = ref.read(deviceRegionProvider);
+    if (ref.read(deviceLanguageProvider) == language &&
+        region != null &&
+        region.isNotEmpty) {
+      return '$language-$region';
+    }
+    return language == 'bg' ? 'bg-BG' : 'en-GB';
+  }
+
+  /// Listens with the device's recogniser, the words filling the box as
+  /// they're said, until a pause, the stop button or the time cap. False
+  /// when it can't start, and then it isn't tried again this session.
+  Future<bool> _startSpeech(SpeechToText speech) async {
+    try {
+      // Set each time: initialize() takes its listeners only once.
+      speech
+        ..errorListener = _onSpeechError
+        ..statusListener = _onSpeechStatus;
+      if (await speech.initialize()) {
+        if (!mounted) return true;
+        _fill('', null, null);
+        setState(() {
+          _listening = true;
+          _speech = speech;
+          _aiItems = const [];
+          _error = null;
+        });
+        await speech.listen(
+          onResult: _onWords,
+          listenOptions: SpeechListenOptions(
+            localeId: _speechLocale,
+            listenFor: _maxRecording,
+            pauseFor: _speechPause,
+            listenMode: ListenMode.dictation,
+            cancelOnError: true,
+          ),
+        );
+        return true;
+      }
+    } catch (error) {
+      debugPrint('Speech recognition failed: $error');
+    }
+    _speechFailed();
+    return false;
+  }
+
+  /// The recogniser can't listen here: the mic records notes for the AI
+  /// for the rest of the session.
+  void _speechFailed() {
+    if (!mounted) return;
+    ref.read(speechProvider.notifier).state = null;
+    if (_speech != null) {
+      setState(() {
+        _speech = null;
+        _listening = false;
+      });
+    }
+  }
+
+  void _onWords(SpeechRecognitionResult result) {
+    if (!mounted || _speech == null) return;
+    final words = result.recognizedWords;
+    setState(() {
+      _name.value = TextEditingValue(
+        text: words,
+        selection: TextSelection.collapsed(offset: words.length),
+      );
+    });
+    if (result.finalResult) _finishSpeech();
+  }
+
+  /// The recogniser stopped by itself, after a pause or at the time cap.
+  void _onSpeechStatus(String status) {
+    if (status == SpeechToText.doneStatus) _finishSpeech();
+  }
+
+  /// Words heard before an error still count, and silence says so; with
+  /// nothing heard, a recogniser that can't listen (no such language, no
+  /// network, no permission) hands this note over to the recorder.
+  void _onSpeechError(SpeechRecognitionError error) {
+    final speech = _speech;
+    if (!mounted || speech == null) return;
+    if (_name.text.trim().isEmpty && !_nothingSaid.contains(error.errorMsg)) {
+      _speechFailed();
+      speech.cancel().whenComplete(() {
+        if (mounted) _toggleListening();
+      });
+      return;
+    }
+    speech.cancel();
+    _finishSpeech();
+  }
+
+  Future<void> _stopSpeech() async {
+    await _speech?.stop();
+    await _finishSpeech();
+  }
+
+  /// Ends listening and estimates what was said, as if typed.
+  Future<void> _finishSpeech() async {
+    if (!mounted || _speech == null) return;
+    setState(() {
+      _speech = null;
+      _listening = false;
+    });
+    if (_name.text.trim().isEmpty) {
+      setState(() => _error = context.l10n.quickLogMisTap);
+      return;
+    }
+    await _estimate();
   }
 
   /// Ends the recording by itself after a pause, once something was said.

@@ -56,6 +56,8 @@
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>YumSum uses the microphone so you can describe meals by voice for AI calorie estimates.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>YumSum uses speech recognition to show your words as you describe a meal.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>YumSum uses the camera so you can photograph a meal for an AI calorie estimate.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

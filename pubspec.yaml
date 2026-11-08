@@ -42,6 +42,7 @@ dependencies:
   in_app_purchase_android: ^0.5.5
   cloud_functions: ^7.0.1
   crypto: ^3.0.8
+  speech_to_text: ^7.5.0
 
 dev_dependencies:
   flutter_test:

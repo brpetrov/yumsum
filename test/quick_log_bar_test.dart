@@ -15,7 +15,9 @@ import 'package:lean_streak/models/recipe.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/ai_usage_provider.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
+import 'package:lean_streak/providers/country_provider.dart';
 import 'package:lean_streak/providers/food_lookup_provider.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/meal_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
@@ -30,6 +32,9 @@ import 'package:lean_streak/services/food_lookup_service.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:record/record.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:speech_to_text/speech_recognition_error.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 import 'recipe_fixtures.dart';
 
@@ -58,9 +63,12 @@ class _FakeEstimateService implements CalorieEstimateService {
     EstimateItem(name: 'Mayo', grams: 15, kcal: 120, protein: 2),
   ];
 
+  String? described;
+
   @override
   Future<CalorieEstimate> estimate(String uid, String description) async {
     estimateCalls++;
+    described = description;
     final total = totalOf(items);
     return (
       kcal: total.kcal,
@@ -187,15 +195,17 @@ class _FakeFoodLookup implements FoodLookupService {
 
 /// A microphone that plays back whatever the test feeds it.
 class _FakeRecorder extends Fake implements AudioRecorder {
-  final audio = StreamController<Uint8List>();
+  var audio = StreamController<Uint8List>();
   bool stopped = false;
 
   @override
   Future<bool> hasPermission({bool request = true}) async => true;
 
   @override
-  Future<Stream<Uint8List>> startStream(RecordConfig config) async =>
-      audio.stream;
+  Future<Stream<Uint8List>> startStream(RecordConfig config) async {
+    if (audio.isClosed) audio = StreamController<Uint8List>();
+    return audio.stream;
+  }
 
   @override
   Stream<Amplitude> onAmplitudeChanged(Duration interval) =>
@@ -207,6 +217,72 @@ class _FakeRecorder extends Fake implements AudioRecorder {
     await audio.close();
     return null;
   }
+}
+
+/// A speech recogniser the test speaks through; one that doesn't [work]
+/// can't start, as where the device has none.
+class _FakeSpeech extends Fake implements SpeechToText {
+  _FakeSpeech({this.works = true});
+
+  final bool works;
+  int starts = 0;
+  SpeechResultListener? _onResult;
+  SpeechListenOptions? options;
+  bool stopped = false;
+  bool cancelled = false;
+
+  @override
+  SpeechErrorListener? errorListener;
+
+  @override
+  SpeechStatusListener? statusListener;
+
+  @override
+  Future<bool> initialize({
+    SpeechErrorListener? onError,
+    SpeechStatusListener? onStatus,
+    debugLogging = false,
+    Duration finalTimeout = SpeechToText.defaultFinalTimeout,
+    List<SpeechConfigOption>? options,
+  }) async {
+    starts++;
+    return works;
+  }
+
+  @override
+  Future<void> listen({
+    SpeechResultListener? onResult,
+    Duration? listenFor,
+    Duration? pauseFor,
+    String? localeId,
+    SpeechSoundLevelChange? onSoundLevelChange,
+    cancelOnError = false,
+    partialResults = true,
+    onDevice = false,
+    ListenMode listenMode = ListenMode.confirmation,
+    sampleRate = 0,
+    SpeechListenOptions? listenOptions,
+  }) async {
+    _onResult = onResult;
+    options = listenOptions;
+  }
+
+  @override
+  Future<void> stop() async {
+    stopped = true;
+  }
+
+  @override
+  Future<void> cancel() async {
+    cancelled = true;
+  }
+
+  /// The words heard so far; [last] once the recogniser has finished.
+  void say(String words, {bool last = false}) => _onResult!(
+    SpeechRecognitionResult([
+      SpeechRecognitionWords(words, null, 1),
+    ], (last ? ResultType.finalResult : ResultType.partial).value),
+  );
 }
 
 /// A profile that has switched protein off.
@@ -280,6 +356,8 @@ void main() {
     int aiUsed = 0,
     bool trackProtein = true,
     bool plus = true,
+    _FakeSpeech? speech,
+    String language = 'en',
   }) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
@@ -299,6 +377,10 @@ void main() {
         recentMealsProvider.overrideWith((ref) => Stream.value(recents)),
         recipesProvider.overrideWith((ref) async => recipes),
         audioRecorderProvider.overrideWithValue(recorder),
+        speechProvider.overrideWith((ref) => speech),
+        languageCodeProvider.overrideWithValue(language),
+        deviceLanguageProvider.overrideWithValue('en'),
+        deviceRegionProvider.overrideWithValue('GB'),
         userProfileProvider.overrideWith(
           (ref) => Stream.value(trackProtein ? null : _noProteinProfile),
         ),
@@ -1161,6 +1243,116 @@ void main() {
     expect(recorder.stopped, isTrue);
     expect(estimateService.heard!.length, 44 + 32000);
     expect(boxes(tester), ['Lunch', '400', '']);
+  });
+
+  testWidgets('the mic writes the words as they are said and estimates them '
+      'once the speaker stops', (tester) async {
+    final speech = _FakeSpeech();
+    await pumpCard(tester, speech: speech);
+    await tester.tap(find.byTooltip('Speak'));
+    await tester.pump();
+    expect(find.text(listening), findsOneWidget);
+    expect(speech.options!.localeId, 'en-GB');
+    expect(speech.options!.pauseFor, const Duration(seconds: 3));
+
+    speech.say('two eggs');
+    await tester.pump();
+    expect(boxes(tester).first, 'two eggs');
+    expect(estimateService.estimateCalls, 0);
+
+    speech.say('two eggs on toast', last: true);
+    await tester.pumpAndSettle();
+    expect(find.text(listening), findsNothing);
+    expect(estimateService.described, 'two eggs on toast');
+    expect(boxes(tester).take(2), ['two eggs on toast', '520']);
+    expect(estimateService.heard, isNull);
+  });
+
+  testWidgets('in Bulgarian the recogniser listens for Bulgarian', (
+    tester,
+  ) async {
+    final speech = _FakeSpeech();
+    await pumpCard(tester, speech: speech, language: 'bg');
+    await tester.tap(find.byTooltip('Speak'));
+    await tester.pump();
+    expect(speech.options!.localeId, 'bg-BG');
+  });
+
+  testWidgets('stop estimates the words heard so far', (tester) async {
+    final speech = _FakeSpeech();
+    await pumpCard(tester, speech: speech);
+    await tester.tap(find.byTooltip('Speak'));
+    await tester.pump();
+    speech.say('a banana');
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Stop'));
+    await tester.pumpAndSettle();
+    expect(speech.stopped, isTrue);
+    expect(estimateService.described, 'a banana');
+  });
+
+  testWidgets('silence from the recogniser is not sent to the AI', (
+    tester,
+  ) async {
+    final speech = _FakeSpeech();
+    await pumpCard(tester, speech: speech);
+    for (final silence in [
+      () => speech.statusListener!(SpeechToText.doneStatus),
+      () => speech.errorListener!(SpeechRecognitionError('no-speech', true)),
+    ]) {
+      await tester.tap(find.byTooltip('Speak'));
+      await tester.pump();
+      silence();
+      await tester.pumpAndSettle();
+      expect(estimateService.estimateCalls, 0);
+      expect(
+        find.text('Didn\'t catch that. Tap the mic and try again.'),
+        findsOneWidget,
+      );
+    }
+    expect(recorder.stopped, isFalse);
+  });
+
+  testWidgets('without a recogniser the mic records a note for the AI, '
+      'and keeps to that', (tester) async {
+    final speech = _FakeSpeech(works: false);
+    await pumpCard(tester, speech: speech);
+    for (var note = 0; note < 2; note++) {
+      estimateService.heard = null;
+      await tester.tap(find.byTooltip('Speak'));
+      await tester.pump();
+      expect(find.text(listening), findsOneWidget);
+      recorder.audio.add(Uint8List(32000));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Stop'));
+      await tester.pumpAndSettle();
+      expect(estimateService.heard, isNotNull);
+      await tester.tap(find.byTooltip('Clear'));
+      await tester.pumpAndSettle();
+    }
+    expect(speech.starts, 1);
+  });
+
+  testWidgets('a recogniser that can\'t listen in the language hands the '
+      'note to the recorder', (tester) async {
+    final speech = _FakeSpeech();
+    await pumpCard(tester, speech: speech);
+    await tester.tap(find.byTooltip('Speak'));
+    await tester.pump();
+    speech.errorListener!(
+      SpeechRecognitionError('error_language_not_supported', true),
+    );
+    await tester.pumpAndSettle();
+
+    expect(speech.cancelled, isTrue);
+    expect(find.text(listening), findsOneWidget);
+    recorder.audio.add(Uint8List(32000));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Stop'));
+    await tester.pumpAndSettle();
+    expect(estimateService.heard, isNotNull);
+    expect(boxes(tester).take(2), ['Lunch', '400']);
   });
 
   testWidgets('the mic says so before recording once the AI is used up', (
