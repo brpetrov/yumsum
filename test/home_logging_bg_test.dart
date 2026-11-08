@@ -211,7 +211,7 @@ void main() {
 
     expect(find.text(capitalised(bg.weekdayDayMonth(now))), findsOneWidget);
     expect(find.textContaining('ккал остават', findRichText: true), findsOne);
-    expect(find.textContaining('Изядени 1090 от'), findsOneWidget);
+    expect(find.textContaining('Приети 1090 от'), findsOneWidget);
     expect(find.text('Днешни хранения'), findsOneWidget);
     expect(find.text('2 записани'), findsOneWidget);
     expect(find.text('Отключи макроси'), findsOneWidget);
@@ -288,7 +288,10 @@ void main() {
     await tester.tap(find.byTooltip('Вземи почивен ден'));
     await tester.pumpAndSettle();
     expect(find.text('Почивен ден днес?'), findsOneWidget);
-    expect(find.text('Не се брои в „История“.'), findsOneWidget);
+    expect(
+      find.text('Денят не влияе на резултатите в „История“.'),
+      findsOneWidget,
+    );
     await tester.tap(find.text('Отказ'));
     await tester.pumpAndSettle();
 
@@ -317,7 +320,7 @@ void main() {
     addTearDown(tester.view.resetViewInsets);
     await tester.tap(find.byKey(const ValueKey('quick-log-name')));
     await tester.pumpAndSettle();
-    expect(find.text('Добави хранене'), findsOneWidget);
+    expect(find.text('Опиши храната'), findsOneWidget);
     expect(find.text('ккал'), findsOneWidget);
     expect(find.text('протеин (г)'), findsOneWidget);
     expect(find.text('За днес остават 5 AI оценки'), findsOneWidget);
@@ -364,7 +367,7 @@ void main() {
     expect(find.text('Добави хранене'), findsOneWidget);
     expect(find.text(capitalised(bg.weekdayDayMonth(yesterday))), findsOne);
     expect(find.text('Калории'), findsOneWidget);
-    expect(find.text('Изчисли по името'), findsOneWidget);
+    expect(find.text('Изчисли по описанието'), findsOneWidget);
     expect(find.text('Запази храненето'), findsOneWidget);
 
     await tester.tap(find.text('Запази храненето'));

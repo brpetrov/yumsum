@@ -118,7 +118,7 @@ void main() {
       find.widgetWithText(ActionChip, 'Пилешко къри с ориз'),
       findsOneWidget,
     );
-    expect(find.text('Цедено кисело мляко с горски плодове'), findsOneWidget);
+    expect(find.text('Кисело мляко с горски плодове'), findsOneWidget);
     expect(find.text('Greek yoghurt berry bowl'), findsNothing);
     expect(tester.takeException(), isNull);
 
@@ -151,8 +151,8 @@ void main() {
     expect(find.text('Телешки бургери с картофи по селски'), findsOneWidget);
     expect(
       find.text(
-        'Американска кухня · Домашни бургери от постно телешко с картофи от '
-        'фурната.',
+        'Американска кухня · Домашни телешки бургери с малко мазнини и '
+        'картофи на фурна.',
       ),
       findsOneWidget,
     );

@@ -248,6 +248,40 @@ void main() {
       expect(recipe.isNamed('ПАСТА болонезе'), isTrue);
       expect(recipe.isNamed('Паста'), isFalse);
     });
+
+    test('a renamed Bulgarian recipe still recognises its former name', () {
+      final recipe = Recipe.fromJson(
+        _json(
+          change: {
+            'bg': {
+              ..._bg,
+              'previousNames': ['Спагети болонезе'],
+            },
+          },
+        ),
+      );
+      expect(recipe.isNamed(' СПАГЕТИ болонезе '), isTrue);
+      expect(recipe.isNamed('Спагети'), isFalse);
+      expect(recipe.mealName(1, _bulgarian), 'Паста болонезе');
+      expect(Recipe.fromJson(_json()).previousNames, isEmpty);
+
+      for (final invalid in <Object>[
+        'Спагети болонезе',
+        [' '],
+        [42],
+      ]) {
+        expect(
+          () => Recipe.fromJson(
+            _json(
+              change: {
+                'bg': {..._bg, 'previousNames': invalid},
+              },
+            ),
+          ),
+          throwsFormatException,
+        );
+      }
+    });
   });
 
   test('recipes match by name, any case', () {
@@ -445,4 +479,29 @@ void main() {
       ], reason: logged);
     }
   });
+
+  test(
+    'recently cooked recipes recognise a former Bulgarian name and portions',
+    () {
+      final now = DateTime(2026, 10, 31, 12);
+      final recipe = Recipe.fromJson(
+        _json(
+          change: {
+            'bg': {
+              ..._bg,
+              'previousNames': ['Спагети болонезе'],
+            },
+          },
+        ),
+      );
+      expect(
+        recentlyCookedRecipes(
+          [recipe],
+          [_meal('Спагети болонезе × 1,5', now)],
+          now,
+        ),
+        [recipe],
+      );
+    },
+  );
 }

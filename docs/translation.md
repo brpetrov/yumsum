@@ -99,6 +99,7 @@ Weights and heights go through `lib/models/units.dart`, which takes the `AppLoca
 - Bulgarian past forms and adjectives about the user carry gender ("ял/яла", "готов/готова"). Phrase around them so every line suits anyone: "Добави храненията си", not "Добави какво си ял".
 - YumSum, YumSum Star and Smart Snap are names: keep them in Latin letters. AI Coach is "AI треньор". Units: kcal → ккал, g → г, kg → кг, cm → см; lb, st, ft and in stay as they are (see the glossary).
 - Menu and page names (Plan Settings, Weight & Progress) are titles in English; in Bulgarian, write them as ordinary sentence-case phrases ("Настройки на плана").
+- Translate the meaning in context. Use „съвети“ for AI Coach's notes and „обобщение“ for a period's review. Name what is being compared: „калориите за деня са в рамките на целта“, rather than making a day itself meet a calorie target. Avoid literal English metaphors such as „яж по-уверено“ and „започни седмицата с посока“.
 - Static lists of labels (`const _pages = [...]` in `AppDrawer`, enums with labels such as `DayStatus` in `lib/models/daily_summary.dart` and `MealType` in `lib/models/recipe.dart`) can't call `context.l10n`: turn the label into a getter or a function that takes the `AppLocalizations`.
 - Exceptions thrown with English text (`Exception('Not authenticated')`) only need a key where the text reaches the screen; check how the screen shows the error first.
 - `main.dart`'s "YumSum could not start" screen runs before Riverpod and the app's localisations, so it reads the stored `language` from `SharedPreferences` and uses `lookupAppLocalizations`.
@@ -120,10 +121,10 @@ The Bulgarian the app uses for its own words. Keep to it in new text.
 | target weight | желано тегло |
 | current weight | сегашно тегло |
 | height | ръст |
-| On track / Close / Off track | В целта / Близо / Извън целта |
+| On track / Close / Off track | По план / Близо / Извън плана |
 | day off | почивен ден |
 | pace | темпо |
-| maintenance (calories) | поддържащи калории |
+| maintenance (calories) | калории за поддържане на теглото („За поддържане“ as a short label) |
 | BMI | ИТМ |
 | protein, fibre, carbs, fat, sugars, saturates, salt | протеин, фибри, въглехидрати, мазнини, захари, наситени мазнини, сол |
 | account | профил |
@@ -137,6 +138,8 @@ The Bulgarian the app uses for its own words. Keep to it in new text.
 | Recipes | Рецепти |
 | Notifications | Известия |
 | AI Coach | AI треньор |
+| AI Coach notes / weekly review | съвети / седмично обобщение |
+| yoghurt / Greek yoghurt | кисело мляко / цедено кисело мляко (only when Greek or strained is specified) |
 | Adaptive formula | адаптивна формула („Адаптивна формула“ as a heading) |
 | YumSum, YumSum Star, Smart Snap | as they are, in Latin letters |
 | kcal, g, kg, cm | ккал, г, кг, см |
@@ -150,11 +153,12 @@ Address the user as "ти" and keep lines free of the user's gender: „Колк
 The library's words are content, not ARB strings: each recipe in `assets/recipes/recipes.json` has a `bg` object with its `name`, `description`, `cuisine`, `ingredients` (`item` and `amount`, one for each English ingredient, in order) and `steps`. `Recipe.textIn(context.l10n.localeName)` picks the language; `test/recipes_asset_test.dart` fails a recipe without complete Bulgarian. A new recipe needs its `bg` too.
 
 - Steps say "ти" in the imperative („Нарежи“, „Загрей“, „Раздели в 2 чинии“), with no forms that show the reader's gender.
-- Ingredients by their shop names: кисело мляко, цедено кисело мляко (Greek yoghurt), извара (quark and cottage cheese), сирене (feta and sirene), пилешко филе, филе от пилешки бут, овесени ядки, гъби печурки, зелен фасул, риба тон в собствен сос, заквасена сметана (crème fraîche), прясно мляко 1,5%, „неварен“ for dried pasta and rice.
+- Ingredients by their shop names: кисело мляко (ordinary yoghurt), цедено кисело мляко (only Greek or explicitly strained yoghurt), извара (quark and cottage cheese), сирене (feta and sirene), пилешко филе, филе от пилешки бут, овесени ядки, гъби печурки, пресни картофи (new potatoes), див лук (chives), зелен фасул, риба тон в собствен сос, заквасена сметана (crème fraîche), прясно мляко 1,5%, „неварен“ for dried pasta and rice. Natural wording must preserve the actual ingredient, fat percentage and raw or cooked state, since the nutrition is shared with the English recipe.
 - Amounts in г, мл, л, с. л., ч. л., бр., глава, скилидки, филии; „на вкус“, „за сервиране“; decimal commas (1,5 л).
 - Times as the page bolds them: „5 минути“, „1 минута“, „10–12 минути“ (an en dash, no spaces), „6 часа“, „30 секунди“; ovens „220°C (200°C с вентилатор)“. Keep every number the English step has.
 - Dish names translated where Bulgarians would (Пилешко къри с ориз, Пълнени яйца), well-known foreign ones in Cyrillic (Менемен, Бьоф Строганов, Чили кон карне). Cuisines as „Гръцка кухня“.
 - Names must differ from every other recipe's name in either language: a logged meal is matched to its recipe by name.
+- When editing a Bulgarian recipe name, append the old name to its optional `bg.previousNames` list. `Recipe.isNamed` recognises those names too, keeping existing logged meals and saved AI Coach recipe links connected. Keep all earlier names when renaming it again; current and former names must be unique across the library.
 
 ## To translate
 

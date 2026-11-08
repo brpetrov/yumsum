@@ -84,6 +84,7 @@ class Recipe {
     required this.ingredients,
     required this.steps,
     this.bg,
+    this.previousNames = const [],
   });
 
   final String id;
@@ -110,6 +111,10 @@ class Recipe {
   /// The Bulgarian, shown when the app is in Bulgarian. Every library
   /// recipe has it; the fields above are the English.
   final RecipeText? bg;
+
+  /// Former Bulgarian names, so copy edits still match meals logged before
+  /// a recipe was renamed.
+  final List<String> previousNames;
 
   /// Reads one recipe strictly: anything missing or out of range throws a
   /// [FormatException] naming the recipe and the field, so a bad library
@@ -241,6 +246,11 @@ class Recipe {
       );
     }
 
+    final bg = bulgarian();
+    final rawBg = json['bg'];
+    final previousNames = rawBg is Map && rawBg['previousNames'] != null
+        ? lines(rawBg['previousNames'], 'bg.previousNames')
+        : const <String>[];
     final description = text('description', 140, optional: true);
     final minutes = number('minutes', 1, 600);
     final fat = grams('fatPerPortion', 150);
@@ -267,7 +277,8 @@ class Recipe {
       ),
       ingredients: ingredients,
       steps: steps,
-      bg: bulgarian(),
+      bg: bg,
+      previousNames: previousNames,
     );
   }
 
@@ -302,10 +313,12 @@ class Recipe {
 
   /// Whether [text] is its name in any language, whatever the case: a meal
   /// logged in English is still this recipe once the app is in Bulgarian,
-  /// and the other way round.
+  /// and the other way round. Former names still match after a copy edit.
   bool isNamed(String text) {
     final wanted = text.trim().toLowerCase();
-    return wanted == name.toLowerCase() || wanted == bg?.name.toLowerCase();
+    return wanted == name.toLowerCase() ||
+        wanted == bg?.name.toLowerCase() ||
+        previousNames.any((name) => wanted == name.toLowerCase());
   }
 
   /// What a logged meal of [portions] is called, in [l10n]'s language, so

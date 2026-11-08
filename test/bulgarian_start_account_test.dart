@@ -301,7 +301,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Предимно седене'), findsOneWidget);
+    expect(find.text('Предимно в седнало положение'), findsOneWidget);
     expect(find.text('Физическа работа или много движение'), findsOneWidget);
     expect(find.text('1–2 тренировки седмично'), findsOneWidget);
     await tester.scrollUntilVisible(find.byType(MedicalNote), 200);

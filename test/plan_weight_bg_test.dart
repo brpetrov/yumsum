@@ -202,7 +202,7 @@ void main() {
 
       expect(find.text('На колко години си?'), findsOneWidget);
       await type(tester, 'Възраст', '15');
-      expect(find.text('Въведи възраст от 18 до 120.'), findsOneWidget);
+      expect(find.text('Въведи възраст от 18 до 120 години.'), findsOneWidget);
       fits(tester);
       await type(tester, 'Възраст', '34');
       await next(tester);
@@ -225,9 +225,9 @@ void main() {
       await next(tester);
 
       expect(find.text('Каква е целта ти?'), findsOneWidget);
-      expect(find.text('Да отслабна'), findsOneWidget);
-      expect(find.text('Да запазя теглото'), findsOneWidget);
-      expect(find.textContaining('Калориите са енергията'), findsOneWidget);
+      expect(find.text('Отслабване'), findsOneWidget);
+      expect(find.text('Поддържане'), findsOneWidget);
+      expect(find.textContaining('Калориите измерват енергията'), findsOneWidget);
       fits(tester);
       await next(tester);
 
@@ -238,12 +238,12 @@ void main() {
       await type(tester, 'Желано тегло', '64');
       await next(tester);
 
-      expect(find.text('Колко се движиш в обикновен ден?'), findsOneWidget);
-      expect(find.text('Предимно седене'), findsOneWidget);
+      expect(find.text('Колко се движиш през деня?'), findsOneWidget);
+      expect(find.text('Предимно в седнало положение'), findsOneWidget);
       fits(tester);
       await next(tester);
 
-      expect(find.text('Тренираш ли освен това?'), findsOneWidget);
+      expect(find.text('Колко често тренираш?'), findsOneWidget);
       expect(find.text('Без редовни тренировки'), findsOneWidget);
       fits(tester);
       await next(tester);
@@ -258,7 +258,7 @@ void main() {
       expect(find.text('Твоят план'), findsOneWidget);
       expect(find.text('Дневна цел'), findsOneWidget);
       expect(find.text('Темпо'), findsOneWidget);
-      expect(find.text('Цел до'), findsOneWidget);
+      expect(find.text('Очаквана дата'), findsOneWidget);
       expect(find.text('0,5 кг/седм.'), findsOneWidget);
       expect(find.text('Устойчиво темпо'), findsOneWidget);
       expect(find.text('Започни'), findsOneWidget);
@@ -366,7 +366,7 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.textContaining(' по план − 80 адаптивно = ', skipOffstage: false),
+        find.textContaining(' по план − 80 корекция = ', skipOffstage: false),
         findsOneWidget,
       );
       expect(find.text('Обновен план', skipOffstage: false), findsOneWidget);
@@ -524,7 +524,7 @@ void main() {
         ],
       );
       expect(find.text('Адаптивна формула'), findsOneWidget);
-      expect(find.textContaining('специално за теб'), findsOneWidget);
+      expect(find.textContaining('съобразена с теб'), findsOneWidget);
       fits(tester);
     });
 
@@ -594,12 +594,13 @@ void main() {
 
     expect(
       line(AdaptiveNote.lowered.value),
-      'Настроено за теб: −80 ккал. Изгаряш малко по-малко, отколкото '
+      'Корекция на целта: −80 ккал. Изгаряш малко по-малко, отколкото '
       'предвиждаше планът.',
     );
     expect(
       line(AdaptiveNote.steady.value, kcal: 0),
-      'Без промяна тази седмица: теглото ти отговаря на това, което ядеш.',
+      'Целта остава същата тази седмица. Теглото ти се променя според '
+      'очакваното за приетите калории.',
     );
     expect(
       adaptiveTodayLine(

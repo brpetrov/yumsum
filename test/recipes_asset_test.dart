@@ -174,9 +174,13 @@ void main() {
     }
   });
 
-  test('Bulgarian names are unique and differ from the English ones', () {
+  test('current and former names are unique across both languages', () {
     final names = [
-      for (final recipe in recipes) ...[recipe.name, recipe.bg!.name],
+      for (final recipe in recipes) ...[
+        recipe.name,
+        recipe.bg!.name,
+        ...recipe.previousNames,
+      ],
     ].map((name) => name.toLowerCase()).toList();
     expect(names.toSet(), hasLength(names.length));
   });

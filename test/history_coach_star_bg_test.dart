@@ -124,8 +124,8 @@ void main() {
     expect(find.text('Днес'), findsOneWidget);
     expect(find.text('Записани 7 от 7 дни'), findsOneWidget);
     expect(find.text('Средно 1850 ккал на ден'), findsOneWidget);
-    expect(find.text('от записаните дни са в целта'), findsOneWidget);
-    expect(find.textContaining('в целта'), findsWidgets);
+    expect(find.text('от записаните дни са по план'), findsOneWidget);
+    expect(find.textContaining('по план'), findsWidgets);
     expect(find.textContaining(' – '), findsWidgets);
     expect(tester.takeException(), isNull);
   });
@@ -150,9 +150,9 @@ void main() {
 
     expect(find.text('Сряда, 11 март'), findsOneWidget);
     expect(find.text('1850 от 1900 ккал'), findsOneWidget);
-    expect(find.text('В целта'), findsOneWidget);
+    expect(find.text('По план'), findsOneWidget);
     expect(
-      find.text('Остава 1 от 10 промени по минали дни този месец'),
+      find.text('За този месец остава 1 от 10 промени за минали дни'),
       findsOneWidget,
     );
     expect(find.text('Няма записани хранения за този ден.'), findsOneWidget);
@@ -337,7 +337,10 @@ void main() {
       await pump(tester, _plus);
 
       expect(find.text('Вече имаш YumSum Star'), findsOneWidget);
-      expect(find.text('Всичко това е твое.'), findsOneWidget);
+      expect(
+        find.text('Всички тези функции са достъпни за теб.'),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     });
   });

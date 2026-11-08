@@ -37,6 +37,20 @@ export interface Profile {
   language?: Language;
 }
 
+// Use familiar food names without silently changing the kind of food.
+const bulgarianFoodNames =
+  `For translated names and generic food suggestions, ordinary yoghurt ` +
+  `is "кисело мляко", not "цедено кисело ` +
+  `мляко" or "йогурт". Use "цедено кисело мляко" only when Greek or ` +
+  `strained yoghurt is explicitly specified. Fruit yoghurt is "плодово ` +
+  `кисело мляко". Oats are "овесени ядки", chicken breast is "пилешко ` +
+  `филе", and low-fat milk is "нискомаслено прясно мляко". Preserve any ` +
+  "stated fat percentage, cooking method and raw or cooked weight; a " +
+  "natural name must not substitute a different food. Use familiar " +
+  "Bulgarian dish names and word order, not English words transliterated " +
+  "or translated one by one. User-provided Bulgarian meal names, brand " +
+  "names and library recipe names always keep their original wording.\n";
+
 // In Bulgarian the names are what the app shows, so they're Bulgarian
 // whatever the user typed, but what the user named in Bulgarian or by brand
 // keeps their words: the app keeps an option only when it has every word of
@@ -49,7 +63,8 @@ const bulgarianNames =
   `"Пилешко къри с ориз"), even when the user wrote in English. Where the ` +
   "user wrote in Bulgarian, keep their words. Keep brand, chain and " +
   `product names as the user wrote them ("Big Mac", "Coca-Cola Zero"). In ` +
-  `names, write "г" for grams, "мл" for millilitres and a decimal comma.\n`;
+  `names, write "г" for grams, "мл" for millilitres and a decimal comma.\n` +
+  bulgarianFoodNames;
 
 /**
  * The opening of every estimate prompt, so dish names and portions are read
@@ -317,8 +332,8 @@ export function nutrientsPrompt(
  * from the facts. In Bulgarian, how to write and the note lengths change
  * (Bulgarian runs about a fifth longer), and a last section covers
  * Bulgarian's words, numbers and gender. Raise weeklyReviewPromptVersion in
- * lib/services/weekly_review_service.dart whenever this changes, so saved
- * notes are written again; a change of language rewrites them anyway.
+ * lib/services/weekly_review_service.dart whenever this changes, to label
+ * new notes. Previously saved weeks keep their original notes.
  */
 export function coachInstruction(language: Language): string {
   return coachIntro +
@@ -349,7 +364,7 @@ const coachIntro =
 /** A note's parts, with lengths and example titles for [language]. */
 function noteShape(language: Language): string {
   const [title, text, why, tip, examples] = language === "bg"
-    ? [50, 260, 190, 140, `"Малко фибри трета седмица поред" or "Уикендите са над целта"`]
+    ? [50, 260, 190, 140, `"Малко фибри трета седмица поред" or "Повече калории през уикенда"`]
     : [40, 220, 160, 120, `"Fibre low for a third week" or "Weekends run high"`];
   return "Each note has a title, a text, a why, tips and recipes. The title is a " +
     `short plain heading of at most ${title} characters, such as ${examples}. ` +
@@ -391,7 +406,14 @@ const bulgarianWriting =
   `not even in the perfect tense ("си изял", "си записал"). Use the ` +
   "present or the simple past, which don't " +
   `("изяде", "прие", "записа", "стигна"), or make the food, the day or the ` +
-  `nutrient the subject ("Протеинът стигна целта през уикенда"). Tips ` +
+  `nutrient the subject ("През уикенда протеинът е в рамките на целта"). ` +
+  "Describe the meaning in a complete Bulgarian sentence: say " +
+  `"Приемът на протеин е под целта", not "Твоят протеин е нисък"; ` +
+  `"Добави храни с повече фибри", not "Работи върху фибрите". Avoid ` +
+  "English metaphors and motivational slogans translated literally. " +
+  "Name what changes or is being compared (calories, portions, food or " +
+  "weight); don't make a day or weekend itself go above a calorie target. " +
+  "Read each sentence as something a Bulgarian would actually say. Tips " +
   `start with a verb telling the user what to do ("Добави", "Сложи", ` +
   `"Избери"). The user's country is in the facts, so name foods people ` +
   "buy there, by their Bulgarian names. The app already shows the days on " +
@@ -435,14 +457,18 @@ const bulgarianWords =
   `case ("в понеделник", "през уикенда"); "ккал", "г" and "кг"; protein ` +
   `"протеин", fibre "фибри", salt "сол", sugars "захари", saturates ` +
   `"наситени мазнини"; the daily target "дневната цел", a day on track ` +
-  `"ден в целта", a day off "почивен ден", a weigh-in "претегляне", a ` +
+  `"ден по план", a day off "почивен ден", a weigh-in "претегляне", a ` +
   `logged meal "записано хранене", the Adaptive formula "адаптивната ` +
-  `формула". No word of blame either, such as "провал", "виновен", ` +
+  `формула". In sentences, explain a day on track as "калориите за деня ` +
+  `са в рамките на целта". No word of blame either, such as "провал", "виновен", ` +
   `"мързел" or "боклучава храна". Numbers stay the facts' own, written ` +
   `the Bulgarian way: a decimal comma where the facts have a point ("7,4 ` +
   `г" for 7.4 g) and no separator in thousands ("1850 ккал" for 1,850 ` +
   "kcal). Quotation marks are „…“. The user's own meal names and the " +
-  "recipe names stay exactly as the facts write them, even in English.\n\n";
+  "recipe names stay exactly as the facts write them, even in English. " +
+  "The following food-name guidance applies only to general food " +
+  "suggestions, never to renaming those meals or library recipes.\n" +
+  bulgarianFoodNames + "\n";
 
 const coachReply =
   `Reply in JSON: {"points": [{"title": "…", "text": "…", "why": "…", ` +

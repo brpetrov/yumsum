@@ -5,10 +5,10 @@ import 'package:lean_streak/models/weekly_review.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 
 /// Raise whenever the instruction or the facts change: it is the first line
-/// of each cached review's `basis`, so the notes are written again. The
+/// of each new review's `basis`. Saved weeks keep their original notes. The
 /// instruction (plan 09) is `weeklyReviewInstruction` in
 /// `functions/src/prompts.ts`, on the server with its response schema.
-const weeklyReviewPromptVersion = 9;
+const weeklyReviewPromptVersion = 10;
 
 /// The AI's answer had no note worth showing.
 class WeeklyReviewException implements Exception {
