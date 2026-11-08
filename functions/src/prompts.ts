@@ -54,7 +54,9 @@ const bulgarianFoodNames =
 // In Bulgarian the names are what the app shows, so they're Bulgarian
 // whatever the user typed, but what the user named in Bulgarian or by brand
 // keeps their words: the app keeps an option only when it has every word of
-// the item's name the user typed.
+// the item's name the user typed. The decimal comma is for names only: told
+// just "a decimal comma", the model wrote the salt as 1,2 in the JSON, which
+// broke every Bulgarian photo and voice estimate with macros (8 November).
 const bulgarianNames =
   "The app is in Bulgarian, and the user may write in Bulgarian or " +
   "English. Write the meal name and every item's and option's name in " +
@@ -63,7 +65,8 @@ const bulgarianNames =
   `"Пилешко къри с ориз"), even when the user wrote in English. Where the ` +
   "user wrote in Bulgarian, keep their words. Keep brand, chain and " +
   `product names as the user wrote them ("Big Mac", "Coca-Cola Zero"). In ` +
-  `names, write "г" for grams, "мл" for millilitres and a decimal comma.\n` +
+  `names, write "г" for grams, "мл" for millilitres and a decimal comma; ` +
+  `numbers in the JSON always use a decimal point ("salt": 1.2).\n` +
   bulgarianFoodNames;
 
 /**

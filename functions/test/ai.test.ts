@@ -515,6 +515,8 @@ describe("the app's language", () => {
       assert.ok(bg.includes(`"Пържени картофи"`), data.kind);
       assert.ok(bg.includes("Where the user wrote in Bulgarian, keep their words"));
       assert.ok(bg.includes("Keep brand, chain and product names as the user wrote them"));
+      // A decimal comma in the JSON's numbers broke every reply with salt.
+      assert.ok(bg.includes(`numbers in the JSON always use a decimal point ("salt": 1.2)`));
       assert.ok(!en.includes("Bulgarian, keep their words"), data.kind);
       assert.ok(en.includes("write the meal name and item names in the language they used"));
     }
