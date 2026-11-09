@@ -89,7 +89,9 @@ void main() {
     );
 
     expect(foods.map((food) => food.brand), ['Myprotein', 'Daily Delight']);
-    expect(foods.first.servingGrams, 175);
+    // A pack size isn't a serving.
+    expect(foods.first.servingGrams, isNull);
+    expect(foods.first.packGrams, 175);
     expect(foods.first.proteinPer100g, 12);
     expect(foods.first.macrosPer100g, isNull);
     expect(foods.first.imageUrl, 'https://images.openfoodfacts.org/w.200.jpg');
@@ -103,6 +105,7 @@ void main() {
         {"status": 1, "product": {
           "product_name": "Chicken Tikka Wrap", "brands": "Tesco, Tesco Finest",
           "serving_size": "1 wrap (220 g)", "quantity": "220 g",
+          "serving_quantity": "12.5", "product_quantity": 300,
           "nutriments": {"energy-kcal_100g": 215, "proteins_100g": 9.4}
         }}'''),
       );
@@ -112,7 +115,43 @@ void main() {
       expect(food.brand, 'Tesco');
       expect(food.kcalPer100g, 215);
       expect(food.proteinPer100g, 9);
-      expect(food.servingGrams, 220);
+      // The figures win over the labels' grams.
+      expect(food.servingGrams, 13);
+      expect(food.servingLabel, '1 wrap (220 g)');
+      expect(food.packGrams, 300);
+    });
+
+    test('reads the serving and the pack from their labels alone', () {
+      final food = parsePackagedFood(
+        _reply('''
+        {"product": {"product_name": "Cookies",
+          "serving_size": "30 g (3 cookies)", "quantity": "200 g",
+          "nutriments": {"energy-kcal_100g": 480}}}'''),
+      );
+      expect(food!.servingGrams, 30);
+      expect(food.servingLabel, '30 g (3 cookies)');
+      expect(food.packGrams, 200);
+    });
+
+    test('no serving without one, even with a pack size', () {
+      final none = parsePackagedFood(
+        _reply('''
+        {"product": {"product_name": "Rice",
+          "nutriments": {"energy-kcal_100g": 350}}}'''),
+      );
+      expect(
+        (none!.servingGrams, none.servingLabel, none.packGrams),
+        (null, null, null),
+      );
+      final jar = parsePackagedFood(
+        _reply(
+          '''
+        {"product": {"product_name": "Honey", "quantity": "400 g",
+          "serving_quantity": "0", "nutriments": {"energy-kcal_100g": 304}}}''',
+        ),
+      );
+      expect(jar!.servingGrams, isNull);
+      expect(jar.packGrams, 400);
     });
 
     test('prefers the English name and drops a brand already in it', () {
@@ -125,7 +164,8 @@ void main() {
 
       expect(food!.name, 'Nutella');
       expect(food.brand, isNull);
-      expect(food.servingGrams, 400);
+      expect(food.servingGrams, isNull);
+      expect(food.packGrams, 400);
     });
 
     test('converts kilojoules when no kcal figure is given', () {

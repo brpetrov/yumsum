@@ -84,7 +84,7 @@ The app is in English and Bulgarian (`docs/translation.md` has the how-to and wh
 | AI Coach (the weekly review) | `lib/helpers/week_facts.dart`, `lib/services/weekly_review_service.dart`, `lib/providers/weekly_review_provider.dart`, `lib/screens/coach/coach_screen.dart`, `lib/screens/review/weekly_notes.dart` | 09 |
 | Macros | `lib/models/nutrients.dart`, `lib/widgets/macro_rings.dart`, `macro_totals.dart`, `macro_guide.dart` | 10 |
 | Daily summaries, statuses, day off | `lib/services/daily_summary_service.dart`, `lib/widgets/day_status.dart` | |
-| Packaged foods and contributing | `lib/services/food_lookup_service.dart`, `food_contribution_service.dart`, `functions/src/off.ts` | 01 |
+| Packaged foods and contributing | `lib/services/food_lookup_service.dart`, `food_contribution_service.dart`, `functions/src/off.ts`, `lib/screens/dashboard/helpers/portion_sheet.dart` | 01, 13 |
 | Recipes | `assets/recipes/recipes.json`, `lib/models/recipe.dart`, `lib/screens/recipes/` | 05 |
 | YumSum Star, Debug tools | `lib/providers/plus_provider.dart`, `lib/screens/plus/`, `lib/widgets/plus_mark.dart`, `lib/screens/debug/` | 06, 07 |
 | Billing | `lib/services/billing_service.dart`, `lib/providers/plus_purchase_controller.dart`, `lib/repositories/billing_repository.dart`, `functions/` | 07 |
@@ -105,3 +105,4 @@ The app is in English and Bulgarian (`docs/translation.md` has the how-to and wh
 - 10 full macros
 - 11 pricing YumSum Star
 - 12 estimate choices: the amount and the kind
+- 13 servings on the scan sheet

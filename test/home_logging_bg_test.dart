@@ -402,6 +402,8 @@ void main() {
                       salt: 1.2,
                     ),
                     servingGrams: 260,
+                    servingLabel: null,
+                    packGrams: 260,
                     imageUrl: null,
                   ), showMacros: true),
                   child: const Text('portion'),

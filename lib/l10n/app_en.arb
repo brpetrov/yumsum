@@ -829,6 +829,28 @@
       }
     }
   },
+  "foodPortionServings": "{count, plural, one{1 serving} other{{count} servings}}",
+  "@foodPortionServings": {
+    "description": "Portion sheet: a chip that sets the grams to this many of the pack's servings.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "foodPortionWholePack": "Whole pack",
+  "@foodPortionWholePack": {
+    "description": "Portion sheet: a chip that sets the grams to the whole pack."
+  },
+  "foodPortionServingIs": "Serving: {label}",
+  "@foodPortionServingIs": {
+    "description": "Portion sheet: what the pack calls a serving, as printed, e.g. 1 biscuit (12.5 g).",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
   "foodPortionAmount": "Amount",
   "@foodPortionAmount": {
     "description": "Portion sheet: label of the grams box."

@@ -21,8 +21,9 @@ Portion portionFor(PackagedFood food, int grams) => (
   macros: food.macrosPer100g?.scaled(grams / 100),
 );
 
-/// Asks how much of [food] was eaten; resolves to the portion, or null if
-/// the sheet was dismissed.
+/// Asks how much of [food] was eaten, in grams, with chips for 1, 2 and 3
+/// of the pack's servings and the whole pack where the pack says them;
+/// resolves to the portion, or null if the sheet was dismissed.
 Future<Portion?> showPortionSheet(
   BuildContext context,
   PackagedFood food, {
@@ -72,6 +73,43 @@ class _PortionSheetState extends State<_PortionSheet> {
     Navigator.of(context).pop(portionFor(widget.food, _amount));
   }
 
+  void _setGrams(int grams) {
+    final text = '$grams';
+    setState(
+      () => _grams.value = TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(offset: text.length),
+      ),
+    );
+  }
+
+  /// 1, 2 and 3 of the pack's servings, and the whole pack unless it's one
+  /// of those, each with its grams.
+  List<(String, int)> get _chips {
+    final food = widget.food;
+    final l10n = context.l10n;
+    final servings = [
+      if (food.servingGrams case final serving?)
+        for (final count in [1, 2, 3])
+          (l10n.foodPortionServings(count), serving * count),
+    ];
+    return [
+      ...servings,
+      if (food.packGrams case final pack?
+          when !servings.any((chip) => chip.$2 == pack))
+        (l10n.foodPortionWholePack, pack),
+    ];
+  }
+
+  /// Whether the pack's words for a serving say more than its grams, as
+  /// "1 biscuit (12.5 g)" does and "30 g" doesn't.
+  static bool _saysMore(String label) => label
+      .replaceAll(
+        RegExp(r'\d+(?:[.,]\d+)?\s*(?:g|ml)\b', caseSensitive: false),
+        '',
+      )
+      .contains(RegExp(r'\p{L}', unicode: true));
+
   String _amounts(int kcal, int? protein) =>
       protein == null || !widget.showProtein
       ? context.l10n.commonKcal(kcal)
@@ -82,6 +120,7 @@ class _PortionSheetState extends State<_PortionSheet> {
     final food = widget.food;
     final portion = portionFor(food, _amount);
     final muted = TextStyle(fontSize: 14, color: AppColors.textSecondary);
+    final chips = _chips;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -130,6 +169,30 @@ class _PortionSheetState extends State<_PortionSheet> {
                 ),
               ],
             ),
+            if (chips.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final (label, grams) in chips)
+                    ChoiceChip(
+                      label: Text(label),
+                      selected: _amount == grams,
+                      showCheckmark: false,
+                      selectedColor: AppColors.primaryContainer,
+                      onSelected: (_) => _setGrams(grams),
+                    ),
+                ],
+              ),
+            ],
+            if (food.servingLabel case final label? when _saysMore(label)) ...[
+              const SizedBox(height: 8),
+              Text(
+                context.l10n.foodPortionServingIs(label),
+                style: muted.copyWith(fontSize: 13),
+              ),
+            ],
             const SizedBox(height: 20),
             Row(
               children: [

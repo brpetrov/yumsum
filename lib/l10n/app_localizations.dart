@@ -1172,6 +1172,24 @@ abstract class AppLocalizations {
   /// **'{amounts} per 100 g · Open Food Facts'**
   String foodPortionSource(String amounts);
 
+  /// Portion sheet: a chip that sets the grams to this many of the pack's servings.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 serving} other{{count} servings}}'**
+  String foodPortionServings(int count);
+
+  /// Portion sheet: a chip that sets the grams to the whole pack.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole pack'**
+  String get foodPortionWholePack;
+
+  /// Portion sheet: what the pack calls a serving, as printed, e.g. 1 biscuit (12.5 g).
+  ///
+  /// In en, this message translates to:
+  /// **'Serving: {label}'**
+  String foodPortionServingIs(String label);
+
   /// Portion sheet: label of the grams box.
   ///
   /// In en, this message translates to:

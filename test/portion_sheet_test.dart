@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/screens/dashboard/helpers/portion_sheet.dart';
+import 'package:lean_streak/services/food_lookup_service.dart';
 import 'package:lean_streak/widgets/pack_photo.dart';
 
 /// A macros line as the app shows it, each figure held together.
@@ -18,8 +19,46 @@ const _wrap = (
   proteinPer100g: 9,
   macrosPer100g: Nutrients(fat: 8, carbs: 24, salt: 0.9),
   servingGrams: 220,
+  servingLabel: '1 wrap (220 g)',
+  packGrams: 220,
   imageUrl: null,
 );
+
+const _cookies = (
+  name: 'Digestives',
+  brand: null,
+  kcalPer100g: 450,
+  proteinPer100g: null,
+  macrosPer100g: null,
+  servingGrams: 13,
+  servingLabel: '1 biscuit (12.5 g)',
+  packGrams: 300,
+  imageUrl: null,
+);
+
+/// Opens the portion sheet for [food], closing any open one first.
+Future<void> _open(WidgetTester tester, PackagedFood food) async {
+  await tester.pumpWidget(const SizedBox());
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: AppTheme.light,
+      home: Scaffold(
+        body: Builder(
+          builder: (context) => TextButton(
+            onPressed: () => showPortionSheet(context, food),
+            child: const Text('open'),
+          ),
+        ),
+      ),
+    ),
+  );
+  await tester.tap(find.text('open'));
+  await tester.pumpAndSettle();
+}
+
+/// The chip labelled [label].
+ChoiceChip _chip(WidgetTester tester, String label) =>
+    tester.widget(find.widgetWithText(ChoiceChip, label));
 
 void main() {
   test('portionFor scales per-100 g figures and rounds', () {
@@ -41,6 +80,8 @@ void main() {
       proteinPer100g: null,
       macrosPer100g: null,
       servingGrams: 330,
+      servingLabel: null,
+      packGrams: 330,
       imageUrl: null,
     );
     expect(portionFor(noProtein, 330), (
@@ -49,6 +90,96 @@ void main() {
       protein: null,
       macros: null,
     ));
+  });
+
+  testWidgets('serving chips set the grams; the whole pack shows only when '
+      'it differs', (tester) async {
+    await _open(tester, _wrap);
+    for (final label in ['1 serving', '2 servings', '3 servings']) {
+      expect(find.widgetWithText(ChoiceChip, label), findsOneWidget);
+    }
+    expect(find.text('Whole pack'), findsNothing);
+    expect(_chip(tester, '1 serving').selected, isTrue);
+    // "1 wrap (220 g)" says more than its grams.
+    expect(find.text('Serving: 1 wrap (220 g)'), findsOneWidget);
+
+    await tester.tap(find.text('2 servings'));
+    await tester.pump();
+    expect(find.widgetWithText(TextField, '440'), findsOneWidget);
+    expect(find.text('946 kcal · 40 g protein'), findsOneWidget);
+    expect(_chip(tester, '2 servings').selected, isTrue);
+    expect(_chip(tester, '1 serving').selected, isFalse);
+
+    await _open(tester, _cookies);
+    expect(find.text('Serving: 1 biscuit (12.5 g)'), findsOneWidget);
+    await tester.tap(find.text('Whole pack'));
+    await tester.pump();
+    expect(find.widgetWithText(TextField, '300'), findsOneWidget);
+    expect(find.text('1350 kcal'), findsOneWidget);
+  });
+
+  testWidgets('no chips without a serving; the whole pack alone with only a '
+      'pack size', (tester) async {
+    await _open(tester, (
+      name: 'Honey',
+      brand: null,
+      kcalPer100g: 304,
+      proteinPer100g: null,
+      macrosPer100g: null,
+      servingGrams: null,
+      servingLabel: null,
+      packGrams: null,
+      imageUrl: null,
+    ));
+    expect(find.byType(ChoiceChip), findsNothing);
+    expect(find.widgetWithText(TextField, '100'), findsOneWidget);
+
+    await _open(tester, (
+      name: 'Honey',
+      brand: null,
+      kcalPer100g: 304,
+      proteinPer100g: null,
+      macrosPer100g: null,
+      servingGrams: null,
+      servingLabel: null,
+      packGrams: 400,
+      imageUrl: null,
+    ));
+    expect(find.byType(ChoiceChip), findsOneWidget);
+    expect(find.text('Whole pack'), findsOneWidget);
+  });
+
+  testWidgets('typing in the box deselects the chips', (tester) async {
+    await _open(tester, _cookies);
+    expect(_chip(tester, '1 serving').selected, isTrue);
+    await tester.enterText(find.byType(TextField), '50');
+    await tester.pump();
+    for (final label in [
+      '1 serving',
+      '2 servings',
+      '3 servings',
+      'Whole pack',
+    ]) {
+      expect(_chip(tester, label).selected, isFalse, reason: label);
+    }
+  });
+
+  testWidgets('the serving line is left out when the label is only grams', (
+    tester,
+  ) async {
+    await _open(tester, (
+      name: 'Oats',
+      brand: null,
+      kcalPer100g: 370,
+      proteinPer100g: 13,
+      macrosPer100g: null,
+      servingGrams: 40,
+      servingLabel: '40 g',
+      packGrams: 1000,
+      imageUrl: null,
+    ));
+    expect(find.textContaining('Serving:'), findsNothing);
+    expect(find.text('1 serving'), findsOneWidget);
   });
 
   testWidgets('the sheet starts at the serving, recalculates and returns', (
@@ -145,6 +276,8 @@ void main() {
       proteinPer100g: 9,
       macrosPer100g: null,
       servingGrams: 220,
+      servingLabel: '1 wrap (220 g)',
+      packGrams: 220,
       imageUrl: 'https://images.openfoodfacts.org/w.200.jpg',
     );
     await tester.pumpWidget(

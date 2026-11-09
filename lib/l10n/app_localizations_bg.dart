@@ -655,6 +655,25 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String foodPortionServings(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count порции',
+      one: '1 порция',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get foodPortionWholePack => 'Цялата опаковка';
+
+  @override
+  String foodPortionServingIs(String label) {
+    return 'Порция: $label';
+  }
+
+  @override
   String get foodPortionAmount => 'Количество';
 
   @override

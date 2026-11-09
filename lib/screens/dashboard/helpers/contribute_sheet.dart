@@ -323,7 +323,9 @@ class _ContributeSheetState extends ConsumerState<_ContributeSheet> {
       macrosPer100g: nutrientsFromOff({
         for (final id in labelNutrientIds) id: _figure(id),
       }),
-      servingGrams: gramsIn(_servingSize) ?? gramsIn(_packSize),
+      servingGrams: gramsIn(_servingSize),
+      servingLabel: _servingSize,
+      packGrams: gramsIn(_packSize),
       imageUrl: _listed?.imageUrl,
     );
   }

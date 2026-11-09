@@ -19,6 +19,12 @@ typedef PackagedFood = ({
   Nutrients? macrosPer100g,
   int? servingGrams,
 
+  /// The serving as the pack states it ("1 biscuit (12.5 g)"), when known.
+  String? servingLabel,
+
+  /// The whole pack in grams (ml for drinks), when known.
+  int? packGrams,
+
   /// A small photo of the front of the pack, when one has been uploaded.
   String? imageUrl,
 });
@@ -74,7 +80,7 @@ class FoodLookupService {
       '/api/v2/product/$barcode.json',
       {
         'fields':
-            'product_name,product_name_en,brands,nutriments,serving_size,quantity,image_front_small_url,lang,image_nutrition_small_url',
+            'product_name,product_name_en,brands,nutriments,serving_size,serving_quantity,quantity,product_quantity,image_front_small_url,lang,image_nutrition_small_url',
         'app_name': 'YumSum',
       },
     );
@@ -102,7 +108,8 @@ class FoodLookupService {
       'page_size': '30',
       'fields':
           'product_name,product_name_en,brands,nutriments,serving_size,'
-          'quantity,countries_tags,image_front_small_url',
+          'serving_quantity,quantity,product_quantity,countries_tags,'
+          'image_front_small_url',
     });
     final response = await _get(uri);
     if (response.statusCode != 200) {
@@ -179,8 +186,13 @@ PackagedFood? parsePackagedFood(Map<String, dynamic> json) {
     kcalPer100g: kcal.round(),
     proteinPer100g: _number(n['proteins_100g'])?.round(),
     macrosPer100g: nutrientsFromOff(n, suffix: '_100g'),
+    // The serving never falls back to the pack: a 400 g jar isn't a serving.
     servingGrams:
-        gramsIn(_text(product['serving_size'])) ??
+        _wholeGrams(product['serving_quantity']) ??
+        gramsIn(_text(product['serving_size'])),
+    servingLabel: _text(product['serving_size']),
+    packGrams:
+        _wholeGrams(product['product_quantity']) ??
         gramsIn(_text(product['quantity'])),
     imageUrl: _text(product['image_front_small_url']),
   );
@@ -233,6 +245,13 @@ String? _text(Object? value) {
 double? _number(Object? value) => switch (value) {
   num n => n.toDouble(),
   String s => double.tryParse(s),
+  _ => null,
+};
+
+/// Open Food Facts' figure in grams (a number, or a number as text),
+/// rounded; null unless positive.
+int? _wholeGrams(Object? value) => switch (_number(value)?.round()) {
+  final grams? when grams > 0 => grams,
   _ => null,
 };
 

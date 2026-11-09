@@ -80,7 +80,7 @@ The old `config/off_account.json` is no longer read by anything; it stays gitign
 
 - [ ] Unknown barcode → invitation → Contribute → both camera steps → form prefilled
 - [ ] The AI's figures match the packet; a missing figure stays blank (not guessed)
-- [ ] Contribute → thank-you → Log it → amount sheet starts at the pack or serving size
+- [ ] Contribute → thank-you → Log it → amount sheet starts at the serving size, with the whole pack as a chip
 - [ ] The product page has both photos, the right language and the figures
 - [ ] Not now, closing the camera, and closing the form each leave the bar as before
 - [ ] Offline: a clear message; Contribute works once the connection is back

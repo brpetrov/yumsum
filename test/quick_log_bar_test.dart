@@ -164,6 +164,8 @@ class _FakeFoodLookup implements FoodLookupService {
     proteinPer100g: 9,
     macrosPer100g: const Nutrients(fat: 8, carbs: 24, salt: 0.9),
     servingGrams: 220,
+    servingLabel: '1 wrap (220 g)',
+    packGrams: 220,
     imageUrl: null,
   );
   String? lastBarcode;
@@ -815,7 +817,10 @@ void main() {
 
     await tester.tap(find.text('Log it'));
     await tester.pumpAndSettle();
-    // The pack size (260 g) is the starting amount.
+    // With no serving it starts at 100 g; the whole pack (260 g) is a chip.
+    expect(find.text('Whole pack'), findsOneWidget);
+    await tester.tap(find.text('Whole pack'));
+    await tester.pump();
     await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
     expect(boxes(tester), ['Лютеница', '247', '5']);
@@ -875,7 +880,9 @@ void main() {
 
     await tester.tap(find.text('Log it'));
     await tester.pumpAndSettle();
-    // Open Food Facts' pack size (260 g) is the starting amount.
+    // Open Food Facts' pack size (260 g) is a chip.
+    await tester.tap(find.text('Whole pack'));
+    await tester.pump();
     await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
     expect(boxes(tester), ['Лютеница', '247', '5']);
