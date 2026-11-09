@@ -104,7 +104,7 @@
   "quickLogProteinHint": "протеин (г)",
   "quickLogProteinUnit": "г протеин",
   "quickLogSearchFoods": "Търси храни",
-  "quickLogChip": "{name} · {kcal} ккал",
+  "quickLogChipKcal": "· {kcal} ккал",
   "quickLogStop": "Спри",
   "quickLogPhoto": "Снимай",
   "quickLogBarcode": "Сканирай баркод",

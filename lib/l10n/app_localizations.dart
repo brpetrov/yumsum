@@ -722,11 +722,11 @@ abstract class AppLocalizations {
   /// **'Search foods'**
   String get quickLogSearchFoods;
 
-  /// Quick-log bar: a chip offering a recent meal or a recipe portion.
+  /// Quick-log bar: the calories after a chip's meal or recipe name, which is cut short when long.
   ///
   /// In en, this message translates to:
-  /// **'{name} · {kcal} kcal'**
-  String quickLogChip(String name, int kcal);
+  /// **'· {kcal} kcal'**
+  String quickLogChipKcal(int kcal);
 
   /// Quick-log bar: tooltip of the button that stops the recording.
   ///

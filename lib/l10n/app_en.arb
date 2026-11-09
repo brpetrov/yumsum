@@ -490,13 +490,10 @@
   "@quickLogSearchFoods": {
     "description": "Quick-log bar: chip that searches packaged foods for what's typed."
   },
-  "quickLogChip": "{name} · {kcal} kcal",
-  "@quickLogChip": {
-    "description": "Quick-log bar: a chip offering a recent meal or a recipe portion.",
+  "quickLogChipKcal": "· {kcal} kcal",
+  "@quickLogChipKcal": {
+    "description": "Quick-log bar: the calories after a chip's meal or recipe name, which is cut short when long.",
     "placeholders": {
-      "name": {
-        "type": "String"
-      },
       "kcal": {
         "type": "int"
       }

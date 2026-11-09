@@ -14,11 +14,15 @@ typedef MealSuggestion = ({
   bool fromRecipe,
 });
 
+/// The most chips offered while typing, in a row that scrolls sideways.
+const searchChips = 10;
+
 /// What the bar offers for [query]. With nothing typed, the meals usually
 /// had around [now] (never recipes, which would only be noise). Once typing,
-/// up to three matches: the user's own meals first, with a matching recipe
-/// always given one place, and a recipe that's already among the user's
-/// meals (in either language) left out, since their own latest figures win.
+/// up to [searchChips] matches: the user's own meals first, with a matching
+/// recipe always given one place, and a recipe that's already among the
+/// user's meals (in either language) left out, since their own latest
+/// figures win.
 /// A recipe is found by its name in either language and offered in
 /// [language].
 List<MealSuggestion> suggestionsFor({
@@ -49,10 +53,13 @@ List<MealSuggestion> suggestionsFor({
     for (final recipe in matchingRecipes(recipes, q))
       if (!own.any((meal) => recipe.isNamed(meal.name!))) recipe,
   ];
-  final mine = own.take(fromLibrary.isEmpty ? 3 : 2).map(fromMeal).toList();
+  final mine = own
+      .take(fromLibrary.isEmpty ? searchChips : searchChips - 1)
+      .map(fromMeal)
+      .toList();
   return [
     ...mine,
-    for (final recipe in fromLibrary.take(3 - mine.length))
+    for (final recipe in fromLibrary.take(searchChips - mine.length))
       (
         name: recipe.nameIn(language),
         kcal: recipe.kcalPerPortion,

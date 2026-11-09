@@ -71,11 +71,14 @@ void main() {
     expect(_names(found), [
       'Pasta salad',
       'Pasta bake',
+      'Pasta al forno',
       'Pasta bolognese (recipe)',
+      'Pasta primavera (recipe)',
     ]);
-    expect(found.last.kcal, 560);
-    expect(found.last.protein, 42);
-    expect(found.last.macros?.fat, 14);
+    final bolognese = found[3];
+    expect(bolognese.kcal, 560);
+    expect(bolognese.protein, 42);
+    expect(bolognese.macros?.fat, 14);
   });
 
   test('a chip carries its meal\'s macros', () {
@@ -93,17 +96,17 @@ void main() {
     expect(found.last.macros, isNull);
   });
 
-  test('without a matching recipe, up to three own meals', () {
-    final recents = [_meal('Soup'), _meal('Soup bowl'), _meal('Soup cup')];
-    expect(
-      suggestionsFor(
-        recents: recents,
-        recipes: recipes,
-        query: 'soup ',
-        now: _now,
-      ).where((s) => !s.fromRecipe),
-      hasLength(2),
+  test('up to $searchChips chips: own meals, with one place kept for a '
+      'matching recipe', () {
+    final recents = [for (var i = 1; i <= 12; i++) _meal('Soup $i')];
+    final withRecipe = suggestionsFor(
+      recents: recents,
+      recipes: recipes,
+      query: 'soup ',
+      now: _now,
     );
+    expect(withRecipe, hasLength(searchChips));
+    expect(withRecipe.where((s) => !s.fromRecipe), hasLength(searchChips - 1));
     expect(
       _names(
         suggestionsFor(
@@ -113,7 +116,7 @@ void main() {
           now: _now,
         ),
       ),
-      ['Soup', 'Soup bowl', 'Soup cup'],
+      [for (var i = 1; i <= 10; i++) 'Soup $i'],
     );
   });
 

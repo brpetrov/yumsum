@@ -101,6 +101,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     'no-speech',
   };
   static const _switchDuration = Duration(milliseconds: 220);
+  // A chip's name is cut short past this, so a long one doesn't fill the
+  // row: about half a 360 px phone.
+  static const _chipNameWidth = 200.0;
 
   String get _limitMessage =>
       context.l10n.quickLogLimit(AiUsageRepository.dailyLimit);
@@ -1082,26 +1085,58 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
 
   /// One scrolling row of chips: a search for [search] when given, then
   /// meals and recipe portions ([suggestionsFor]), which fill the boxes
-  /// ready to save when tapped.
+  /// ready to save when tapped. A long name is cut short with its calories
+  /// kept; holding the chip (or hovering, on a computer) shows it whole with
+  /// its calories, and protein where it's tracked.
   Widget _buildChips(List<MealSuggestion> suggestions, String? search) {
-    ActionChip chip(String label, VoidCallback onPressed, {Widget? avatar}) =>
+    final l10n = context.l10n;
+    final trackProtein = ref.read(trackProteinProvider);
+    final labelStyle = TextStyle(
+      fontSize: 13.5,
+      fontWeight: FontWeight.w700,
+      color: AppColors.onPrimaryContainer,
+    );
+    ActionChip chip(Widget label, VoidCallback onPressed, {Widget? avatar}) =>
         ActionChip(
           avatar: avatar,
-          label: Text(label),
-          labelStyle: TextStyle(
-            fontSize: 13.5,
-            fontWeight: FontWeight.w700,
-            color: AppColors.onPrimaryContainer,
-          ),
+          label: label,
+          labelStyle: labelStyle,
           backgroundColor: AppColors.primaryContainer,
           side: BorderSide.none,
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           onPressed: onPressed,
         );
+    Widget withWholeName(MealSuggestion meal, Widget chip) => Tooltip(
+      preferBelow: false,
+      triggerMode: TooltipTriggerMode.longPress,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.textPrimary,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      richMessage: TextSpan(
+        children: [
+          TextSpan(
+            text: meal.name,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: AppColors.surface,
+            ),
+          ),
+          TextSpan(
+            text:
+                '\n${trackProtein && meal.protein != null ? l10n.commonKcalProtein(meal.kcal, meal.protein!) : l10n.commonKcal(meal.kcal)}',
+            style: TextStyle(fontSize: 13, color: AppColors.surface),
+          ),
+        ],
+      ),
+      child: chip,
+    );
     final chips = [
       if (search != null)
         chip(
-          context.l10n.quickLogSearchFoods,
+          Text(l10n.quickLogSearchFoods),
           () => _search(search),
           avatar: Icon(
             Icons.search_rounded,
@@ -1110,24 +1145,41 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
           ),
         ),
       for (final meal in suggestions)
-        chip(
-          context.l10n.quickLogChip(meal.name, meal.kcal),
-          () {
-            logTap('chip tapped');
-            _fill(meal.name, meal.kcal, meal.protein, macros: meal.macros);
-            _focusNode.requestFocus();
-            setState(() {
-              _aiItems = const [];
-              _error = null;
-            });
-          },
-          avatar: meal.fromRecipe
-              ? Icon(
-                  Icons.menu_book_outlined,
-                  size: 18,
-                  color: AppColors.onPrimaryContainer,
-                )
-              : null,
+        withWholeName(
+          meal,
+          chip(
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: _chipNameWidth),
+                  child: Text(
+                    meal.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(l10n.quickLogChipKcal(meal.kcal)),
+              ],
+            ),
+            () {
+              logTap('chip tapped');
+              _fill(meal.name, meal.kcal, meal.protein, macros: meal.macros);
+              _focusNode.requestFocus();
+              setState(() {
+                _aiItems = const [];
+                _error = null;
+              });
+            },
+            avatar: meal.fromRecipe
+                ? Icon(
+                    Icons.menu_book_outlined,
+                    size: 18,
+                    color: AppColors.onPrimaryContainer,
+                  )
+                : null,
+          ),
         ),
     ];
     return SizedBox(

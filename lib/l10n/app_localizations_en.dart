@@ -386,8 +386,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickLogSearchFoods => 'Search foods';
 
   @override
-  String quickLogChip(String name, int kcal) {
-    return '$name · $kcal kcal';
+  String quickLogChipKcal(int kcal) {
+    return '· $kcal kcal';
   }
 
   @override

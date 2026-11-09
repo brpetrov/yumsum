@@ -450,6 +450,9 @@ void main() {
     find.descendant(of: nameBox, matching: find.byType(EditableText)),
   );
 
+  /// The quick-log chip for the meal or recipe called [name].
+  Finder chipNamed(String name) => find.widgetWithText(ActionChip, name);
+
   /// The round button with [tooltip].
   IconButton button(WidgetTester tester, String tooltip) => tester.widget(
     find.ancestor(
@@ -1125,7 +1128,14 @@ void main() {
     await tester.tap(nameBox);
     await tester.pump();
     expect(find.byType(ActionChip, skipOffstage: false), findsOneWidget);
-    expect(find.text('Ham sandwich · 500 kcal'), findsOneWidget);
+    expect(chipNamed('Ham sandwich'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: chipNamed('Ham sandwich'),
+        matching: find.text('· 500 kcal'),
+      ),
+      findsOneWidget,
+    );
 
     await tester.enterText(nameBox, 'wrap');
     await tester.pump();
@@ -1133,9 +1143,9 @@ void main() {
       find.text('Search foods'),
       showFoodSearchChip ? findsOneWidget : findsNothing,
     );
-    expect(find.text('Ham sandwich · 500 kcal'), findsNothing);
+    expect(chipNamed('Ham sandwich'), findsNothing);
 
-    await tester.tap(find.text('Chicken wrap · 450 kcal'));
+    await tester.tap(chipNamed('Chicken wrap'));
     await tester.pumpAndSettle();
     expect(boxes(tester), ['Chicken wrap', '450', '30']);
     expect(find.byType(ActionChip), findsNothing);
@@ -1147,6 +1157,62 @@ void main() {
     ]);
     expect(controller.savedMacros.single?.fat, 15);
     expect(controller.savedMacros.single?.salt, 1.8);
+  });
+
+  testWidgets('typing offers up to 10 chips; a long name is cut short '
+      'and shown whole with its calories when held', (tester) async {
+    const long =
+        'Chicken, avocado and sweetcorn wrap with extra garlic mayonnaise';
+    await pumpCard(
+      tester,
+      recents: [
+        _recent(long, 620, 31),
+        for (var i = 1; i <= 11; i++) _recent('Wrap $i', 400.0 + i, 20),
+      ],
+    );
+    await tester.pump();
+    await tester.tap(nameBox);
+    await tester.pump();
+    await tester.enterText(nameBox, 'wrap');
+    await tester.pump();
+
+    // The row builds what's on screen: scroll it to the end.
+    final row = find
+        .descendant(
+          of: find.byWidgetPredicate(
+            (widget) =>
+                widget is ListView && widget.scrollDirection == Axis.horizontal,
+          ),
+          matching: find.byType(Scrollable),
+        )
+        .first;
+    await tester.scrollUntilVisible(chipNamed('Wrap 9'), 200, scrollable: row);
+    await tester.drag(row, const Offset(-600, 0));
+    await tester.pumpAndSettle();
+    expect(chipNamed('Wrap 9'), findsOneWidget);
+    expect(chipNamed('Wrap 10'), findsNothing);
+    await tester.drag(row, const Offset(3000, 0));
+    await tester.pumpAndSettle();
+
+    final name = find.descendant(
+      of: chipNamed(long),
+      matching: find.text(long),
+    );
+    expect(tester.getSize(name).width, lessThanOrEqualTo(200));
+    expect(
+      find.descendant(of: chipNamed(long), matching: find.text('· 620 kcal')),
+      findsOneWidget,
+    );
+
+    await tester.longPress(chipNamed(long));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(
+      find.text('$long\n620 kcal · 31 g protein', findRichText: true),
+      findsOneWidget,
+    );
+    // Holding doesn't log it.
+    expect(boxes(tester).first, 'wrap');
+    await tester.pumpAndSettle(const Duration(seconds: 2));
   });
 
   testWidgets('a chip can be tapped as a browser taps, where pressing '
@@ -1165,7 +1231,7 @@ void main() {
     // A browser (and a mouse anywhere) lets go of a box when the pointer
     // goes down outside it; an empty bar would fold before the tap ends.
     final press = await tester.startGesture(
-      tester.getCenter(find.text('Ham sandwich · 500 kcal')),
+      tester.getCenter(chipNamed('Ham sandwich')),
       kind: PointerDeviceKind.mouse,
     );
     await tester.pump(const Duration(milliseconds: 100));
@@ -1192,7 +1258,7 @@ void main() {
     // The browser lets go of the box, and the keyboard goes, as soon as the
     // finger touches the chip, before the tap ends.
     final press = await tester.startGesture(
-      tester.getCenter(find.text('Ham sandwich · 500 kcal')),
+      tester.getCenter(chipNamed('Ham sandwich')),
     );
     FocusManager.instance.primaryFocus?.unfocus();
     tester.view.viewInsets = FakeViewPadding.zero;
@@ -1214,7 +1280,7 @@ void main() {
 
     await tester.enterText(nameBox, 'bolo');
     await tester.pump();
-    final chip = find.widgetWithText(ActionChip, 'Pasta bolognese · 560 kcal');
+    final chip = chipNamed('Pasta bolognese');
     expect(chip, findsOneWidget);
     expect(
       find.descendant(
@@ -1500,7 +1566,7 @@ void main() {
     await tester.enterText(nameBox, 'c');
     await tester.pump();
 
-    expect(find.text('Chicken wrap · 450 kcal'), findsOneWidget);
+    expect(chipNamed('Chicken wrap'), findsOneWidget);
     expect(nameField(tester), same(before));
   });
 
