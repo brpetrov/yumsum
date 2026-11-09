@@ -102,6 +102,10 @@ The app sends feedback to a Formspree form (formspree.io, signed up with help.yu
 - [ ] After 14 days with 12 testers: Play Console → Dashboard → **Apply for production**.
 - [ ] Once App Check metrics show nearly all requests verified: enforce App Check for **Cloud Firestore** and **Authentication**, not just AI Logic
 
+## Later
+
+- [ ] **Our own page for account email links** (asked 9 November 2026, parked): the reset and confirmation emails' links open Firebase's plain grey page at lean-streak-project.firebaseapp.com/__/auth/action. Claude can build a YumSum page at yumsum.web.app/account (plain HTML, English and Bulgarian: choose a new password, email confirmed, link expired, a button back to YumSum), test it with the test account, then point Firebase at it (Authentication → Templates → Customize action URL). A few hours, website only. Switching the setting back restores Firebase's page.
+
 ## Known and accepted for now
 
 - Email verification is only checked inside the app; an unverified account could still use the database through Google's API directly. Low risk.
