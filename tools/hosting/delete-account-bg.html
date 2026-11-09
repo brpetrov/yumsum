@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#FAF2E7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1A1512" media="(prefers-color-scheme: dark)">
+  <title>Изтриване на профила в YumSum</title>
+  <style>
+    :root { --bg: #FAF2E7; --surface: #FFFBF5; --text: #2B1F18; --muted: #76665A; --accent: #C94D1A; --line: #EFE3D2; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #1A1512; --surface: #241D19; --text: #F6EDE3; --muted: #BCAD9F; --accent: #F58A5A; --line: #382E28; }
+    }
+    html, body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    main { max-width: 720px; margin: 0 auto; padding: 32px 20px 64px; }
+    h1 { font-size: 28px; letter-spacing: -0.5px; margin: 0 0 4px; }
+    h2 { font-size: 18px; margin: 28px 0 8px; }
+    p, li { color: var(--text); }
+    .meta { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+    a { color: var(--accent); }
+    .box { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+    nav { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+<main>
+  <nav><a href="/">YumSum</a> · <a href="/privacy-bg">Политика за поверителност</a> · <a href="/delete-account" lang="en" hreflang="en">English</a></nav>
+  <h1>Изтриване на профила в YumSum</h1>
+  <p class="meta">YumSum, от Боян Петров · обновено на 9 ноември 2026 г.<br>При разминаване между версиите предимство има <a href="/delete-account">английската версия</a>.</p>
+
+  <h2>В приложението</h2>
+  <div class="box">
+    <ol>
+      <li>Отвори менюто (горе вляво) и избери <strong>Настройки</strong>.</li>
+      <li>Превърти до края и натисни <strong>Изтрий профила</strong>.</li>
+      <li>Потвърди с паролата си или с Google, ако влизаш с Google.</li>
+    </ol>
+    <p>Профилът и данните ти се изтриват веднага и излизаш от приложението.</p>
+  </div>
+
+  <h2>Без приложението</h2>
+  <p>Пиши на <a href="mailto:help.yumsum@gmail.com?subject=Delete%20my%20YumSum%20account">help.yumsum@gmail.com</a> от адреса, с който влизаш, с тема „Изтриване на профила в YumSum“. Ще изтрием профила и данните му до един месец и ще ти отговорим, когато е готово.</p>
+
+  <h2>Какво се изтрива</h2>
+  <ul>
+    <li>Данните за вход и профилът: име, имейл, възраст, пол, ръст, тегло и план.</li>
+    <li>Всичко записано: хранения, дневни обобщения, претегляния и почивни дни.</li>
+    <li>Съветите от AI треньора, дневните броячи за AI оценките и промените за минали дни, и записът за YumSum Star с връзките му към покупките в Google Play.</li>
+  </ul>
+
+  <h2>Какво не се изтрива</h2>
+  <ul>
+    <li><strong>Абонаментът за YumSum Star:</strong> изтриването на профила не го прекратява. Прекрати го в Google Play → Плащания и абонаменти.</li>
+    <li><strong>Изпратената обратна връзка:</strong> пази се като имейл, докато вече не ни е необходима. Пиши ни на адреса по-горе, за да я изтрием.</li>
+    <li><strong>Продуктите, добавени в Open Food Facts:</strong> снимките и данните им са публикувани там с отворени лицензи и не съдържат нищо за теб.</li>
+    <li><strong>Докладите за сривове:</strong> Firebase Crashlytics ги пази до 90 дни, след което ги изтрива.</li>
+  </ul>
+
+  <h2>Само данните, без профила</h2>
+  <p>Настройки → <strong>Нулирай всички данни</strong> изтрива всички хранения, обобщения, претегляния, почивни дни и съвети от AI треньора, а профилът и планът ти остават.</p>
+</main>
+</body>
+</html>
