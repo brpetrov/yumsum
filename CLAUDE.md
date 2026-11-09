@@ -17,6 +17,7 @@ firebase deploy --only hosting:app      # The website
 firebase deploy --only firestore:rules  # Firestore rules
 firebase deploy --only functions        # The Cloud Functions (functions/; their tests: npm test there)
 npm run eval                   # In functions/: the typed-estimate test set, before and after a prompt change
+node run.js webkit "iPhone 13" # In tools/e2e/: the website in a browser, signed in as the test account (its README)
 ```
 
 Run the deploys a change needs yourself, straight after it: rules, then the website. The VS Code configs in `.vscode/launch.json` add `--web-port 5000` for Edge, and a contribute dry run (`OFF_DRY_RUN`) for Android.
