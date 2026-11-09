@@ -94,14 +94,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   bool _isValidEmail(String email) => _emailRe.hasMatch(email);
 
   Future<void> _forgotPassword() async {
-    final email = _emailController.text.trim();
-    if (!_isValidEmail(email)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.authForgotPasswordNeedsEmail)),
-      );
-      return;
-    }
-    await ref.read(authControllerProvider.notifier).sendPasswordReset(email);
+    await showDialog<void>(
+      context: context,
+      builder: (_) => _ResetPasswordDialog(email: _emailController.text.trim()),
+    );
   }
 
   void _switchMode() {
@@ -128,10 +124,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       AuthStatus.verificationSent => (
         l10n.authVerificationSentTitle,
         l10n.authVerificationSentBody(email),
-      ),
-      AuthStatus.resetSent => (
-        l10n.authResetSentTitle,
-        l10n.authResetSentBody(email),
       ),
       _ => (null, null),
     };
@@ -504,6 +496,121 @@ class _TabButton extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Forgot password: asks for the email to send the link to (the sign-in
+/// box's to start with), then says a link went if an account uses it. The
+/// answer is the same either way, so it never tells who has an account.
+class _ResetPasswordDialog extends ConsumerStatefulWidget {
+  const _ResetPasswordDialog({required this.email});
+
+  final String email;
+
+  @override
+  ConsumerState<_ResetPasswordDialog> createState() =>
+      _ResetPasswordDialogState();
+}
+
+class _ResetPasswordDialogState extends ConsumerState<_ResetPasswordDialog> {
+  late final _email = TextEditingController(text: widget.email);
+  final _formKey = GlobalKey<FormState>();
+  bool _sending = false;
+  String? _sentTo;
+  String? _error;
+
+  @override
+  void dispose() {
+    _email.dispose();
+    super.dispose();
+  }
+
+  Future<void> _send() async {
+    if (_sending || !_formKey.currentState!.validate()) return;
+    final email = _email.text.trim();
+    setState(() {
+      _sending = true;
+      _error = null;
+    });
+    await ref.read(authControllerProvider.notifier).sendPasswordReset(email);
+    if (!mounted) return;
+    final failed = ref.read(authControllerProvider).hasError;
+    setState(() {
+      _sending = false;
+      if (failed) {
+        _error = context.l10n.authResetError;
+      } else {
+        _sentTo = email;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final body = TextStyle(fontSize: 14.5, color: AppColors.textSecondary);
+    if (_sentTo case final email?) {
+      return AlertDialog(
+        title: Text(l10n.authResetSentTitle),
+        content: Text(l10n.authResetSentBody(email), style: body),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.commonOk),
+          ),
+        ],
+      );
+    }
+    return AlertDialog(
+      title: Text(l10n.authResetTitle),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.authResetIntro, style: body),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _email,
+              autofocus: true,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.send,
+              autocorrect: false,
+              enableSuggestions: false,
+              onFieldSubmitted: (_) => _send(),
+              decoration: InputDecoration(
+                labelText: l10n.commonEmail,
+                prefixIcon: const Icon(Icons.email_outlined),
+              ),
+              validator: (v) =>
+                  _AuthScreenState._emailRe.hasMatch(v?.trim() ?? '')
+                  ? null
+                  : l10n.commonEnterValidEmail,
+            ),
+            if (_error case final error?) ...[
+              const SizedBox(height: 12),
+              Text(error, style: TextStyle(color: AppColors.error)),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _sending ? null : () => Navigator.of(context).pop(),
+          child: Text(l10n.commonCancel),
+        ),
+        FilledButton(
+          onPressed: _sending ? null : _send,
+          child: _sending
+              ? const SizedBox.square(
+                  dimension: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(l10n.authResetSend),
+        ),
+      ],
     );
   }
 }

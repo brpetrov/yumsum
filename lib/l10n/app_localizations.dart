@@ -2876,12 +2876,6 @@ abstract class AppLocalizations {
   /// **'Forgot password?'**
   String get authForgotPassword;
 
-  /// Sign-in page: Forgot password tapped with no email typed.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter your email above first, then tap Forgot password.'**
-  String get authForgotPasswordNeedsEmail;
-
   /// Sign-in page: between the email form and Google.
   ///
   /// In en, this message translates to:
@@ -2906,16 +2900,40 @@ abstract class AppLocalizations {
   /// **'We sent a link to {email}. Open it to verify your account, then sign in.'**
   String authVerificationSentBody(String email);
 
-  /// Sign-in page: banner title after Forgot password.
+  /// Forgot password dialog: title.
   ///
   /// In en, this message translates to:
-  /// **'Password reset email sent.'**
+  /// **'Reset your password'**
+  String get authResetTitle;
+
+  /// Forgot password dialog: above the email box.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the email you sign in with. We\'ll send a link to choose a new password.'**
+  String get authResetIntro;
+
+  /// Forgot password dialog: button that sends the reset link.
+  ///
+  /// In en, this message translates to:
+  /// **'Send link'**
+  String get authResetSend;
+
+  /// Forgot password dialog: the email could not be sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send the email. Try again.'**
+  String get authResetError;
+
+  /// Forgot password dialog: title once the link is asked for.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email'**
   String get authResetSentTitle;
 
-  /// Sign-in page: banner text after Forgot password.
+  /// Forgot password dialog: the same whether or not an account uses the email, so it never tells who has one.
   ///
   /// In en, this message translates to:
-  /// **'We sent a link to {email}. Open it to choose a new password, then sign in.'**
+  /// **'If an account uses {email}, we\'ve sent it a link to choose a new password. It can take a few minutes, so check your spam too.'**
   String authResetSentBody(String email);
 
   /// Sign-in page: signing in before confirming the email.

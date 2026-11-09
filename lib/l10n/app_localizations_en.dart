@@ -1741,10 +1741,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authForgotPassword => 'Forgot password?';
 
   @override
-  String get authForgotPasswordNeedsEmail =>
-      'Enter your email above first, then tap Forgot password.';
-
-  @override
   String get authOr => 'or';
 
   @override
@@ -1759,11 +1755,24 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get authResetSentTitle => 'Password reset email sent.';
+  String get authResetTitle => 'Reset your password';
+
+  @override
+  String get authResetIntro =>
+      'Enter the email you sign in with. We\'ll send a link to choose a new password.';
+
+  @override
+  String get authResetSend => 'Send link';
+
+  @override
+  String get authResetError => 'Could not send the email. Try again.';
+
+  @override
+  String get authResetSentTitle => 'Check your email';
 
   @override
   String authResetSentBody(String email) {
-    return 'We sent a link to $email. Open it to choose a new password, then sign in.';
+    return 'If an account uses $email, we\'ve sent it a link to choose a new password. It can take a few minutes, so check your spam too.';
   }
 
   @override

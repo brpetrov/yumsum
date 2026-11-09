@@ -24,9 +24,8 @@ class _FakeAuthController extends AuthController {
 }
 
 void main() {
-  testWidgets('Forgot password needs an email, then sends the reset link', (
-    tester,
-  ) async {
+  testWidgets('Forgot password asks for the email, then says a link went '
+      'if an account uses it', (tester) async {
     final controller = _FakeAuthController();
     await tester.pumpWidget(
       ProviderScope(
@@ -39,18 +38,39 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    final dialogBox = find.descendant(
+      of: find.byType(AlertDialog),
+      matching: find.byType(TextFormField),
+    );
     await tester.ensureVisible(find.text('Forgot password?'));
     await tester.tap(find.text('Forgot password?'));
+    await tester.pumpAndSettle();
+    expect(find.text('Reset your password'), findsOneWidget);
+    await tester.tap(find.text('Send link'));
     await tester.pump();
-    expect(find.textContaining('Enter your email above first'), findsOneWidget);
+    expect(find.text('Enter a valid email.'), findsOneWidget);
     expect(controller.resets, isEmpty);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
 
+    // It starts with what's in the sign-in box.
     await tester.enterText(find.byType(TextFormField).first, 'me@example.com');
     await tester.tap(find.text('Forgot password?'));
     await tester.pumpAndSettle();
+    expect(
+      tester.widget<TextFormField>(dialogBox).controller!.text,
+      'me@example.com',
+    );
+    await tester.tap(find.text('Send link'));
+    await tester.pumpAndSettle();
 
     expect(controller.resets, ['me@example.com']);
-    expect(find.text('Password reset email sent.'), findsOneWidget);
+    expect(find.text('Check your email'), findsOneWidget);
+    expect(find.textContaining('If an account uses me@example.com'), findsOne);
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text('Check your email'), findsNothing);
   });
 
   testWidgets('the sign-in screen links to the terms and privacy policy', (

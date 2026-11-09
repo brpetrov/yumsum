@@ -1768,10 +1768,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get authForgotPassword => 'Забравена парола?';
 
   @override
-  String get authForgotPasswordNeedsEmail =>
-      'Първо въведи имейла си горе, после натисни „Забравена парола?“';
-
-  @override
   String get authOr => 'или';
 
   @override
@@ -1786,11 +1782,24 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
-  String get authResetSentTitle => 'Имейлът за нова парола е изпратен.';
+  String get authResetTitle => 'Смени паролата си';
+
+  @override
+  String get authResetIntro =>
+      'Въведи имейла, с който влизаш. Ще изпратим линк, за да избереш нова парола.';
+
+  @override
+  String get authResetSend => 'Изпрати линк';
+
+  @override
+  String get authResetError => 'Не успяхме да изпратим имейла. Опитай отново.';
+
+  @override
+  String get authResetSentTitle => 'Провери пощата си';
 
   @override
   String authResetSentBody(String email) {
-    return 'Изпратихме линк на $email. Отвори го, за да избереш нова парола, и после влез.';
+    return 'Ако има профил с $email, изпратихме му линк за нова парола. Може да отнеме няколко минути, затова провери и папката за спам.';
   }
 
   @override
