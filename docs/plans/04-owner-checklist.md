@@ -82,7 +82,8 @@ The app sends feedback to a Formspree form (formspree.io, signed up with help.yu
   - [x] Claude built the app bundle: signed by `CN=Boyan Petrov`, upload key SHA-1 `A9:1D:7C:AF:C3:2E:51:1B:E8:31:5D:44:03:0F:76:B9:96:95:6D:4F`, SHA-256 `CA:F6:11:56:58:AD:A4:AA:D8:28:7C:16:6A:73:95:85:82:11:75:CC:76:F5:C6:8E:90:A9:D2:15:E6:EC:54:1F` (Play shows the same under App integrity → Upload key).
   - The bundle to upload: `flutter build appbundle` (the Open Food Facts account is on the server, not in the app), file `build\app\outputs\bundle\release\app-release.aab`. Raise the `+1` in `version: 0.1.0+1` (pubspec.yaml) for every upload after the first.
 - [x] **Play developer account**: personal, developer name YumSum, set up 29 October 2026.
-  - [ ] Google checks your ID (a few days, they email you), then verify the contact phone number from the Play Console home page.
+  - [x] Google checks your ID: verified 30 October 2026.
+  - [ ] Declare your trader status (Play Console home, by February 2027, or the profile and apps are removed). Selling YumSum Star makes you a trader under EU rules, so Play shows your contact details (address, phone, email) to EU users; a non-trader can't sell. Decide which address and phone to show before you declare.
 
 ### While Google checks your ID
 
@@ -94,7 +95,7 @@ The app sends feedback to a Formspree form (formspree.io, signed up with help.yu
 
 ### Once Google has approved you
 
-- [ ] **Create the app**: Play Console → Create app → YumSum, App, Free.
+- [x] **Create the app**: YumSum, `com.bpetrov.yumsum`, a draft since 4 November 2026.
 - [ ] **App content** forms (Claude can draft the answers): privacy policy https://yumsum.web.app/privacy, ads (none), app access (sign-in needed, so give Google a test email account with a password), content rating, target audience (18+), data safety, health apps, account deletion link.
 - [ ] **First closed test**: Claude builds the bundle; upload it under Test and release → Testing → Closed testing, accept Play App Signing, add the 12 testers, and send them the opt-in link. Add the same 12 to Settings → License testing too, and give each a YumSum Star manual grant so they can try it (`docs/plans/07-billing.md`).
 - [ ] Add the Play signing SHA-1 and SHA-256 (Test and release → App integrity → App signing) to **YumSum Android** in Firebase → Project settings (Google sign-in and App Check need them)
