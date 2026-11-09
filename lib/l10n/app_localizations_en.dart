@@ -509,6 +509,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get mealLogAgain => 'Log again';
+
+  @override
+  String get mealLoggedAgain => 'Added to today.';
+
+  @override
   String get mealOptions => 'Meal options';
 
   @override
@@ -986,6 +992,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get macroGuideSaltTarget => 'Under 6 g a day, about a teaspoon.';
+
+  @override
+  String get macroGuideColours => 'Colours: ';
+
+  @override
+  String macroGuideUnder(int grams) {
+    return 'under $grams g';
+  }
+
+  @override
+  String macroGuideRange(int from, int to) {
+    return '$from–$to g';
+  }
+
+  @override
+  String macroGuideOverUpTo(int percent) {
+    return 'up to $percent% over';
+  }
+
+  @override
+  String macroGuideOverRange(int from, int to) {
+    return '$from–$to% over';
+  }
+
+  @override
+  String macroGuideOverMore(int percent) {
+    return 'more than $percent% over';
+  }
+
+  @override
+  String get macroGuideWithinLimit => 'within the limit';
 
   @override
   String get macroGuideTarget => 'Target: ';

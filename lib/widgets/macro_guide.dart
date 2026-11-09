@@ -3,29 +3,56 @@ import 'package:flutter/material.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/l10n/l10n.dart';
+import 'package:lean_streak/widgets/macro_rings.dart';
 
-/// What each macro does for you and how its target is set, in three groups
-/// that match how the rings are judged: aim for, keep in balance and keep
-/// under. No figures: the rings have those. [withProtein] leaves protein
-/// out where it isn't shown; [withCalories] starts with the calorie target,
-/// for Today's card.
+/// A ring's colours as coloured dots, each with when it shows.
+typedef _Bands = List<(Color, String)>;
+
+/// What each macro does for you, how its target is set and when its ring
+/// changes colour, in three groups that match how the rings are judged: aim
+/// for, keep in balance and keep under. [withProtein] leaves protein out
+/// where it isn't shown, and [goalWeightKg] gives its colours in grams;
+/// [withCalories] starts with the calorie target, for Today's card.
 Future<void> showMacroGuide(
   BuildContext context, {
   bool withProtein = true,
   bool withCalories = false,
+  double? goalWeightKg,
 }) {
   final l10n = context.l10n;
   final calories = (
     l10n.macroGuideCalories,
     l10n.macroGuideCaloriesWhy,
     l10n.macroGuideCaloriesTarget,
+    null,
   );
+  final _Bands? proteinBands = switch (goalWeightKg) {
+    null => null,
+    final kg => () {
+      int at(double perKg) => (kg * perKg).round();
+      final (red, green, gold) = (
+        at(proteinBandsPerKg.redBelow),
+        at(proteinBandsPerKg.greenFrom),
+        at(proteinBandsPerKg.goldFrom),
+      );
+      return [
+        (AppColors.veryBad, l10n.macroGuideUnder(red)),
+        (AppColors.bad, l10n.macroGuideRange(red, green)),
+        (AppColors.veryGood, l10n.macroGuideRange(green, gold)),
+        (AppColors.gold, l10n.macroRingAtLeast(gold)),
+      ];
+    }(),
+  };
+  final fibreGreen = fibreBands.greenFrom.round();
+  final fibreGold = fibreBands.goldFrom.round();
   // Each group with its heading, its colour, a note under the heading (why,
-  // once for all of Keep under) and its macros.
+  // once for all of Keep under), the colours its rings share, and its
+  // macros, each with its own colours where they differ.
   final groups = [
     (
       l10n.macroGuideAimFor,
       AppColors.veryGood,
+      null,
       null,
       [
         if (withProtein)
@@ -33,35 +60,67 @@ Future<void> showMacroGuide(
             l10n.macroProtein,
             l10n.macroGuideProteinWhy,
             l10n.macroGuideProteinTarget,
+            proteinBands,
           ),
-        (l10n.macroFibre, l10n.macroGuideFibreWhy, l10n.macroGuideFibreTarget),
+        (
+          l10n.macroFibre,
+          l10n.macroGuideFibreWhy,
+          l10n.macroGuideFibreTarget,
+          <(Color, String)>[
+            (AppColors.bad, l10n.macroGuideUnder(fibreGreen)),
+            (AppColors.veryGood, l10n.macroGuideRange(fibreGreen, fibreGold)),
+            (AppColors.gold, l10n.macroRingAtLeast(fibreGold)),
+          ],
+        ),
       ],
     ),
     (
       l10n.macroGuideBalance,
       AppColors.primary,
       null,
+      <(Color, String)>[
+        (AppColors.veryGood, l10n.macroGuideOverUpTo(10)),
+        (AppColors.bad, l10n.macroGuideOverRange(10, 20)),
+        (AppColors.veryBad, l10n.macroGuideOverMore(20)),
+      ],
       [
-        (l10n.macroCarbs, l10n.macroGuideCarbsWhy, l10n.macroGuideCarbsTarget),
-        (l10n.macroFat, l10n.macroGuideFatWhy, l10n.macroGuideFatTarget),
+        (
+          l10n.macroCarbs,
+          l10n.macroGuideCarbsWhy,
+          l10n.macroGuideCarbsTarget,
+          null,
+        ),
+        (l10n.macroFat, l10n.macroGuideFatWhy, l10n.macroGuideFatTarget, null),
       ],
     ),
     (
       l10n.macroGuideKeepUnder,
       AppColors.bad,
       l10n.macroGuideKeepUnderNote,
+      <(Color, String)>[
+        (AppColors.veryGood, l10n.macroGuideWithinLimit),
+        (AppColors.bad, l10n.macroGuideOverUpTo(20)),
+        (AppColors.veryBad, l10n.macroGuideOverMore(20)),
+      ],
       [
         (
           l10n.macroSugars,
           l10n.macroGuideSugarsWhy,
           l10n.macroGuideSugarsTarget,
+          null,
         ),
         (
           l10n.macroSaturates,
           l10n.macroGuideSaturatesWhy,
           l10n.macroGuideSaturatesTarget,
+          null,
         ),
-        (l10n.macroSalt, l10n.macroGuideSaltWhy, l10n.macroGuideSaltTarget),
+        (
+          l10n.macroSalt,
+          l10n.macroGuideSaltWhy,
+          l10n.macroGuideSaltTarget,
+          null,
+        ),
       ],
     ),
   ];
@@ -70,8 +129,35 @@ Future<void> showMacroGuide(
     height: 1.35,
     color: AppColors.textSecondary,
   );
-  List<Widget> item((String, String, String) entry) {
-    final (name, why, target) = entry;
+  final bold = TextStyle(
+    fontWeight: FontWeight.w700,
+    color: AppColors.textPrimary,
+  );
+  Widget colours(_Bands bands) => Padding(
+    padding: const EdgeInsets.only(top: 2),
+    child: Wrap(
+      spacing: 10,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Text(l10n.macroGuideColours, style: body.merge(bold)),
+        for (final (color, label) in bands)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              ),
+              const SizedBox(width: 4),
+              Text(label, style: body),
+            ],
+          ),
+      ],
+    ),
+  );
+  List<Widget> item((String, String, String, _Bands?) entry) {
+    final (name, why, target, bands) = entry;
     return [
       const SizedBox(height: 10),
       Text(
@@ -86,18 +172,13 @@ Future<void> showMacroGuide(
       Text.rich(
         TextSpan(
           children: [
-            TextSpan(
-              text: l10n.macroGuideTarget,
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
+            TextSpan(text: l10n.macroGuideTarget, style: bold),
             TextSpan(text: target),
           ],
         ),
         style: body,
       ),
+      if (bands != null) colours(bands),
     ];
   }
 
@@ -116,7 +197,7 @@ Future<void> showMacroGuide(
           children: [
             Text(l10n.macroGuideIntro, style: body),
             if (withCalories) ...item(calories),
-            for (final (group, color, note, items) in groups) ...[
+            for (final (group, color, note, bands, items) in groups) ...[
               const SizedBox(height: 18),
               Row(
                 children: [
@@ -144,6 +225,7 @@ Future<void> showMacroGuide(
                 const SizedBox(height: 6),
                 Text(note, style: body),
               ],
+              if (bands != null) ...[const SizedBox(height: 4), colours(bands)],
               for (final entry in items) ...item(entry),
             ],
             const SizedBox(height: 18),

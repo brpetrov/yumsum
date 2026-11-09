@@ -259,9 +259,9 @@ void main() {
       );
     }
     expect(find.textContaining('макс.', skipOffstage: false), findsWidgets);
-    expect(find.text('Стойности'), findsOneWidget);
+    expect(find.byTooltip('Стойности'), findsOneWidget);
 
-    await tester.tap(find.text('Стойности'));
+    await tester.tap(find.byTooltip('Стойности'));
     await tester.pumpAndSettle();
     expect(
       macroLine(

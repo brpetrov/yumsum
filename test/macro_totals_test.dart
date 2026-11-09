@@ -5,15 +5,31 @@ import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/models/user_profile.dart';
+import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/widgets/macro_totals.dart';
 import 'package:lean_streak/widgets/meal_row.dart';
+import 'package:lean_streak/widgets/nutrition_icon.dart';
 
 /// A macros line as the app shows it, each figure held together.
 String _line(String text) => text.replaceAllMapped(
   RegExp(r'(\w+) ([\d.]+) g'),
   (m) => '${m[1]}\u00A0${m[2]}\u00A0g',
 );
+
+class _SavingController extends LogMealController {
+  final saved = <(String?, String?, double, Nutrients?)>[];
+
+  @override
+  Future<void> submit({
+    Meal? existingMeal,
+    String? date,
+    String? name,
+    required double calories,
+    double? proteinGrams,
+    Nutrients? macros,
+  }) async => saved.add((date, name, calories, macros));
+}
 
 Meal _meal(String name, Nutrients? macros) => Meal(
   id: name,
@@ -147,11 +163,74 @@ void main() {
         ],
       ),
     );
-    // Only the wrap has macros to show.
-    expect(find.text('Nutrition'), findsOneWidget);
+    // Only the wrap has macros to show: an apple, named when held.
+    expect(find.byType(NutritionIcon), findsOneWidget);
+    expect(find.byTooltip('Nutrition'), findsOneWidget);
     await tester.tap(find.text('Chicken wrap'));
     await tester.pump();
     expect(find.text(macrosLine(wrap.macros!)), findsOneWidget);
+  });
+
+  testWidgets('Log again saves the meal on today with its figures, and '
+      'says so', (tester) async {
+    final controller = _SavingController();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [logMealControllerProvider.overrideWith(() => controller)],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => MealRow(
+                meal: wrap,
+                onEdit: () {},
+                onDelete: () {},
+                onLogAgain: () => logMealAgain(context, wrap),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.byTooltip('Meal options'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Log again'));
+    await tester.pumpAndSettle();
+    expect(controller.saved, [(null, 'Chicken wrap', 500.0, wrap.macros)]);
+    expect(find.text('Added to today.'), findsOneWidget);
+  });
+
+  testWidgets('the menu offers Log again where it is given', (tester) async {
+    var again = 0;
+    await pumpWidget(
+      tester,
+      MealRow(
+        meal: wrap,
+        onEdit: () {},
+        onDelete: () {},
+        onLogAgain: () => again++,
+      ),
+    );
+    await tester.tap(find.byTooltip('Meal options'));
+    await tester.pumpAndSettle();
+    expect(find.text('Edit'), findsOneWidget);
+    await tester.tap(find.text('Log again'));
+    await tester.pumpAndSettle();
+    expect(again, 1);
+
+    await pumpWidget(
+      tester,
+      MealRow(
+        key: const ValueKey('without'),
+        meal: wrap,
+        onEdit: () {},
+        onDelete: () {},
+      ),
+    );
+    await tester.tap(find.byTooltip('Meal options'));
+    await tester.pumpAndSettle();
+    expect(find.text('Edit'), findsOneWidget);
+    expect(find.text('Log again'), findsNothing);
   });
 
   testWidgets('a meal\'s nutrition has its protein where a label has it, '
@@ -206,7 +285,7 @@ void main() {
       tester,
       MealRow(meal: wrap, onEdit: () {}, onDelete: () {}),
     );
-    expect(find.text('Nutrition'), findsNothing);
+    expect(find.byType(NutritionIcon), findsNothing);
   });
 
   testWidgets('every meal counted needs no note', (tester) async {

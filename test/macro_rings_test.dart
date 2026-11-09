@@ -217,6 +217,20 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Your macros'), findsOneWidget);
     expect(find.textContaining('About 30% of your calories'), findsOneWidget);
+    // Each ring's colours: protein's in grams for an 80 kg goal.
+    for (final label in [
+      'under 64 g',
+      '64–96 g',
+      '96–112 g',
+      '112+ g',
+      'under 20 g',
+      '20–30 g',
+      '30+ g',
+      'up to 10% over',
+      'within the limit',
+    ]) {
+      expect(find.text(label, skipOffstage: false), findsOneWidget);
+    }
   });
 
   testWidgets('without YumSum Star, protein alone is live', (tester) async {

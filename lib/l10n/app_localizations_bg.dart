@@ -522,6 +522,12 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String get mealLogAgain => 'Запиши отново';
+
+  @override
+  String get mealLoggedAgain => 'Добавено към днес.';
+
+  @override
   String get mealOptions => 'Опции за храненето';
 
   @override
@@ -1004,6 +1010,37 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get macroGuideSaltTarget =>
       'Под 6 г на ден – около една чаена лъжичка.';
+
+  @override
+  String get macroGuideColours => 'Цветове: ';
+
+  @override
+  String macroGuideUnder(int grams) {
+    return 'под $grams г';
+  }
+
+  @override
+  String macroGuideRange(int from, int to) {
+    return '$from–$to г';
+  }
+
+  @override
+  String macroGuideOverUpTo(int percent) {
+    return 'до $percent% отгоре';
+  }
+
+  @override
+  String macroGuideOverRange(int from, int to) {
+    return '$from–$to% отгоре';
+  }
+
+  @override
+  String macroGuideOverMore(int percent) {
+    return 'над $percent% отгоре';
+  }
+
+  @override
+  String get macroGuideWithinLimit => 'в рамките на лимита';
 
   @override
   String get macroGuideTarget => 'Цел: ';

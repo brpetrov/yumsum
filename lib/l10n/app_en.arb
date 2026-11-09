@@ -648,6 +648,14 @@
       }
     }
   },
+  "mealLogAgain": "Log again",
+  "@mealLogAgain": {
+    "description": "Meal row's menu: logs the same meal again for today, now."
+  },
+  "mealLoggedAgain": "Added to today.",
+  "@mealLoggedAgain": {
+    "description": "Note after Log again from the meal row's menu."
+  },
   "mealOptions": "Meal options",
   "@mealOptions": {
     "description": "Meal row: tooltip of the menu with Edit and Delete."
@@ -1246,6 +1254,65 @@
   "macroGuideSaltTarget": "Under 6 g a day, about a teaspoon.",
   "@macroGuideSaltTarget": {
     "description": "Macro guide dialog: salt's limit, after Target:."
+  },
+  "macroGuideColours": "Colours: ",
+  "@macroGuideColours": {
+    "description": "Macro guide dialog: bold, before the ring's colours as coloured dots; keep the space at the end."
+  },
+  "macroGuideUnder": "under {grams} g",
+  "@macroGuideUnder": {
+    "description": "Macro guide dialog: beside a coloured dot, the ring is this colour under so many grams.",
+    "placeholders": {
+      "grams": {
+        "type": "int"
+      }
+    }
+  },
+  "macroGuideRange": "{from}–{to} g",
+  "@macroGuideRange": {
+    "description": "Macro guide dialog: beside a coloured dot, the ring is this colour from one amount to the next.",
+    "placeholders": {
+      "from": {
+        "type": "int"
+      },
+      "to": {
+        "type": "int"
+      }
+    }
+  },
+  "macroGuideOverUpTo": "up to {percent}% over",
+  "@macroGuideOverUpTo": {
+    "description": "Macro guide dialog: beside a coloured dot, the ring is this colour up to so many percent over the target.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "macroGuideOverRange": "{from}–{to}% over",
+  "@macroGuideOverRange": {
+    "description": "Macro guide dialog: beside a coloured dot, the ring is this colour between these percentages over the target.",
+    "placeholders": {
+      "from": {
+        "type": "int"
+      },
+      "to": {
+        "type": "int"
+      }
+    }
+  },
+  "macroGuideOverMore": "more than {percent}% over",
+  "@macroGuideOverMore": {
+    "description": "Macro guide dialog: beside a coloured dot, the ring is this colour past so many percent over the target.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "macroGuideWithinLimit": "within the limit",
+  "@macroGuideWithinLimit": {
+    "description": "Macro guide dialog: beside a green dot, the ring is green while under the limit."
   },
   "macroGuideTarget": "Target: ",
   "@macroGuideTarget": {

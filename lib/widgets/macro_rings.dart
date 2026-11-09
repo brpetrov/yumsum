@@ -31,8 +31,14 @@ typedef _Ring = ({
   double? goldFrom,
 });
 
-/// Fibre past the UK's 30 g, beyond the 25 g target, is done really well.
-const _fibreGold = 30.0;
+/// Where protein's ring changes colour, in g per kg of goal weight: red
+/// under 0.8 (the minimum adults need), amber to 1.2, green, then gold from
+/// 1.4. The macro guide lists them in grams.
+const proteinBandsPerKg = (redBelow: 0.8, greenFrom: 1.2, goldFrom: 1.4);
+
+/// Fibre's: amber under 20 g (80% of the 25 g target), green, then gold
+/// from the UK's 30 g.
+const fibreBands = (greenFrom: 20.0, goldFrom: 30.0);
 
 /// Today's protein and macros as rings in the bars' green, protein first,
 /// then carbs, fat and fibre, then the limits: sugars, saturates and salt,
@@ -86,9 +92,9 @@ class MacroRings extends StatelessWidget {
       target: proteinTarget,
       kind: _Kind.aim,
       decimal: false,
-      redBelow: goalWeightKg * 0.8,
-      greenFrom: goalWeightKg * 1.2,
-      goldFrom: goalWeightKg * 1.4,
+      redBelow: goalWeightKg * proteinBandsPerKg.redBelow,
+      greenFrom: goalWeightKg * proteinBandsPerKg.greenFrom,
+      goldFrom: goalWeightKg * proteinBandsPerKg.goldFrom,
     );
     final List<_Ring> macros = [
       (
@@ -118,8 +124,8 @@ class MacroRings extends StatelessWidget {
         kind: _Kind.aim,
         decimal: false,
         redBelow: null,
-        greenFrom: targets.fibre * 0.8,
-        goldFrom: _fibreGold,
+        greenFrom: fibreBands.greenFrom,
+        goldFrom: fibreBands.goldFrom,
       ),
       (
         name: l10n.macroSugars,
@@ -153,7 +159,11 @@ class MacroRings extends StatelessWidget {
       ),
     ];
 
-    void explain() => showMacroGuide(context, withProtein: trackProtein);
+    void explain() => showMacroGuide(
+      context,
+      withProtein: trackProtein,
+      goalWeightKg: goalWeightKg,
+    );
     Widget row(List<_Ring> rings, {bool preview = false}) => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

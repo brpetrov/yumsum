@@ -1,21 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/meal.dart';
+import 'package:lean_streak/providers/log_meal_controller.dart';
 import 'package:lean_streak/widgets/macro_totals.dart';
+import 'package:lean_streak/widgets/nutrition_icon.dart';
+
+/// Logs [meal] again for today, now, with its figures, and says so. It
+/// reads all it needs before saving, so a sheet can close straight after.
+Future<void> logMealAgain(BuildContext context, Meal meal) async {
+  final container = ProviderScope.containerOf(context, listen: false);
+  final messenger = ScaffoldMessenger.of(context);
+  final l10n = context.l10n;
+  await container
+      .read(logMealControllerProvider.notifier)
+      .submit(
+        name: meal.name,
+        calories: meal.calories,
+        proteinGrams: meal.proteinGrams,
+        macros: meal.macros,
+      );
+  final failed = container.read(logMealControllerProvider).hasError;
+  messenger.showSnackBar(
+    SnackBar(
+      content: Text(failed ? l10n.quickLogErrorSave : l10n.mealLoggedAgain),
+    ),
+  );
+}
 
 /// One meal as a plain row: name and time, calories and protein, and a menu
-/// with Edit and Delete. With [showMacros] (YumSum Star), a meal that has
-/// macros says so beside its time, and a tap on the row shows them under it,
-/// with the protein when it's shown.
+/// with Log again (when given), Edit and Delete. With [showMacros] (YumSum
+/// Star), a meal that has macros shows an apple beside its time, and a tap
+/// on the row shows them under it, with the protein when it's shown.
 class MealRow extends StatefulWidget {
   const MealRow({
     super.key,
     required this.meal,
     required this.onEdit,
     required this.onDelete,
+    this.onLogAgain,
     this.showProtein = true,
     this.showMacros = false,
   });
@@ -23,6 +49,7 @@ class MealRow extends StatefulWidget {
   final Meal meal;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback? onLogAgain;
   final bool showProtein;
   final bool showMacros;
 
@@ -64,25 +91,27 @@ class _MealRowState extends State<MealRow> {
               if (macros == null)
                 time
               else
-                // Says the row opens, like a link.
+                // Says the row opens, like a link; held, it says what for.
                 Row(
                   children: [
                     time,
                     const SizedBox(width: 10),
-                    Text(
-                      l10n.mealNutrition,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
+                    Tooltip(
+                      message: l10n.mealNutrition,
+                      triggerMode: TooltipTriggerMode.longPress,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          NutritionIcon(size: 16, color: AppColors.primary),
+                          Icon(
+                            _open
+                                ? Icons.expand_less_rounded
+                                : Icons.expand_more_rounded,
+                            size: 16,
+                            color: AppColors.primary,
+                          ),
+                        ],
                       ),
-                    ),
-                    Icon(
-                      _open
-                          ? Icons.expand_less_rounded
-                          : Icons.expand_more_rounded,
-                      size: 16,
-                      color: AppColors.primary,
                     ),
                   ],
                 ),
@@ -113,10 +142,16 @@ class _MealRowState extends State<MealRow> {
         PopupMenuButton<_MealAction>(
           tooltip: l10n.mealOptions,
           onSelected: (action) => switch (action) {
+            _MealAction.logAgain => widget.onLogAgain?.call(),
             _MealAction.edit => widget.onEdit(),
             _MealAction.delete => widget.onDelete(),
           },
           itemBuilder: (context) => [
+            if (widget.onLogAgain != null)
+              PopupMenuItem(
+                value: _MealAction.logAgain,
+                child: Text(l10n.mealLogAgain),
+              ),
             PopupMenuItem(
               value: _MealAction.edit,
               child: Text(l10n.commonEdit),
@@ -168,4 +203,4 @@ class _MealRowState extends State<MealRow> {
   }
 }
 
-enum _MealAction { edit, delete }
+enum _MealAction { logAgain, edit, delete }

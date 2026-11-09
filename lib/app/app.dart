@@ -1,4 +1,3 @@
-import 'package:lean_streak/helpers/tap_log.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -66,10 +65,7 @@ Widget appShellBuilder(BuildContext context, Widget? child) {
   // keyboard, which also folds the quick-log bar away.
   final page = GestureDetector(
     behavior: HitTestBehavior.opaque,
-    onTap: () {
-      logTap('page tap: unfocus');
-      FocusManager.instance.primaryFocus?.unfocus();
-    },
+    onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
     child: child,
   );
   final mediaQuery = MediaQuery.of(context);

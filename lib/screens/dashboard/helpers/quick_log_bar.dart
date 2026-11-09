@@ -13,7 +13,6 @@ import 'package:speech_to_text/speech_to_text.dart';
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/helpers/meal_suggestions.dart';
-import 'package:lean_streak/helpers/tap_log.dart';
 import 'package:lean_streak/helpers/wav.dart';
 import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/meal.dart';
@@ -180,13 +179,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     for (final focus in [_focusNode, _kcalFocus, _proteinFocus]) {
-      focus.addListener(() {
-        logTap(
-          'focus name ${_focusNode.hasFocus} kcal ${_kcalFocus.hasFocus} '
-          'protein ${_proteinFocus.hasFocus}',
-        );
-        setState(() {});
-      });
+      focus.addListener(() => setState(() {}));
     }
     ref.listenManual(
       launchActionProvider,
@@ -841,20 +834,11 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
         }
       },
       child: Listener(
-        onPointerDown: (event) {
-          logTap(
-            'down ${event.kind.name} focused $focused keyboard $keyboardUp',
-          );
+        onPointerDown: (_) {
           if (focused) setState(() => _heldKeyboardUp = keyboardUp);
         },
-        onPointerUp: (_) {
-          logTap('up');
-          _letGo();
-        },
-        onPointerCancel: (_) {
-          logTap('cancel');
-          _letGo();
-        },
+        onPointerUp: (_) => _letGo(),
+        onPointerCancel: (_) => _letGo(),
         child: TextFieldTapRegion(
           child: DecoratedBox(
             decoration: BoxDecoration(
@@ -885,14 +869,6 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                         children: [
                           // The drag handle a sheet has, while there is
                           // something to swipe down.
-                          if (tapLog case final log?)
-                            ValueListenableBuilder<List<String>>(
-                              valueListenable: log,
-                              builder: (_, lines, _) => Text(
-                                lines.join(String.fromCharCode(10)),
-                                style: const TextStyle(fontSize: 10),
-                              ),
-                            ),
                           if (open) ...[
                             Center(
                               child: Container(
@@ -1164,7 +1140,6 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
               ],
             ),
             () {
-              logTap('chip tapped');
               _fill(meal.name, meal.kcal, meal.protein, macros: meal.macros);
               _focusNode.requestFocus();
               setState(() {

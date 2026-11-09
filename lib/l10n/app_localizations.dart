@@ -944,6 +944,18 @@ abstract class AppLocalizations {
   /// **'{grams} g protein'**
   String mealProteinGrams(int grams);
 
+  /// Meal row's menu: logs the same meal again for today, now.
+  ///
+  /// In en, this message translates to:
+  /// **'Log again'**
+  String get mealLogAgain;
+
+  /// Note after Log again from the meal row's menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to today.'**
+  String get mealLoggedAgain;
+
   /// Meal row: tooltip of the menu with Edit and Delete.
   ///
   /// In en, this message translates to:
@@ -1705,6 +1717,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Under 6 g a day, about a teaspoon.'**
   String get macroGuideSaltTarget;
+
+  /// Macro guide dialog: bold, before the ring's colours as coloured dots; keep the space at the end.
+  ///
+  /// In en, this message translates to:
+  /// **'Colours: '**
+  String get macroGuideColours;
+
+  /// Macro guide dialog: beside a coloured dot, the ring is this colour under so many grams.
+  ///
+  /// In en, this message translates to:
+  /// **'under {grams} g'**
+  String macroGuideUnder(int grams);
+
+  /// Macro guide dialog: beside a coloured dot, the ring is this colour from one amount to the next.
+  ///
+  /// In en, this message translates to:
+  /// **'{from}–{to} g'**
+  String macroGuideRange(int from, int to);
+
+  /// Macro guide dialog: beside a coloured dot, the ring is this colour up to so many percent over the target.
+  ///
+  /// In en, this message translates to:
+  /// **'up to {percent}% over'**
+  String macroGuideOverUpTo(int percent);
+
+  /// Macro guide dialog: beside a coloured dot, the ring is this colour between these percentages over the target.
+  ///
+  /// In en, this message translates to:
+  /// **'{from}–{to}% over'**
+  String macroGuideOverRange(int from, int to);
+
+  /// Macro guide dialog: beside a coloured dot, the ring is this colour past so many percent over the target.
+  ///
+  /// In en, this message translates to:
+  /// **'more than {percent}% over'**
+  String macroGuideOverMore(int percent);
+
+  /// Macro guide dialog: beside a green dot, the ring is green while under the limit.
+  ///
+  /// In en, this message translates to:
+  /// **'within the limit'**
+  String get macroGuideWithinLimit;
 
   /// Macro guide dialog: bold, before each target; keep the space at the end.
   ///

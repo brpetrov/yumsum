@@ -225,6 +225,12 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
                               () => _error = l10n.historyNoChangesLeft,
                             ),
                       onDelete: () => _delete(meal),
+                      // It goes on today, so the sheet makes way for the
+                      // note saying so.
+                      onLogAgain: () {
+                        logMealAgain(context, meal);
+                        Navigator.of(context).pop();
+                      },
                     );
                   },
                 ),
