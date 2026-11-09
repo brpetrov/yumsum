@@ -8,6 +8,7 @@ import {
   estimateAsk,
   type Generate,
   geminiError,
+  hourOf,
   latestFinishedWeek,
   parseReply,
   respond,
@@ -456,6 +457,17 @@ describe("the prompts", () => {
     ));
     assert.ok(!context.includes("UK"));
     assert.ok(!context.includes("often eats"));
+    assert.ok(!context.includes("It is about"));
+  });
+
+  test("the hour the app sends goes in the context; anything odd is left out", () => {
+    assert.ok(nutritionContext({ country: "Bulgaria", hour: 8 }).includes("It is about 8:00 for the user."));
+    for (const [sent, kept] of [[8, 8], [0, 0], [23, 23], [24, undefined], [-1, undefined], [8.5, undefined], ["8", undefined], [undefined, undefined]] as const) {
+      assert.equal(hourOf(sent), kept, String(sent));
+    }
+    const prompt = estimateAsk({ kind: "meal", text: "eggs", hour: 8 }).contents as string;
+    assert.ok(prompt.includes("It is about 8:00 for the user."));
+    assert.ok(!(estimateAsk({ kind: "meal", text: "eggs" }).contents as string).includes("It is about"));
   });
 
   test("AI Coach thinks only a little, so it answers in seconds", () => {

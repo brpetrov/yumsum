@@ -1,3 +1,5 @@
 node_modules/
 lib/
 eval/last-run.txt
+eval/results-*.json
+eval/report-*.md

@@ -35,6 +35,8 @@ export function languageOf(value: unknown): Language {
 export interface Profile {
   country: string;
   language?: Language;
+  /** The hour where the user is, 0 to 23, when the app sent it. */
+  hour?: number;
 }
 
 // Use familiar food names without silently changing the kind of food.
@@ -49,7 +51,10 @@ const bulgarianFoodNames =
   "natural name must not substitute a different food. Use familiar " +
   "Bulgarian dish names and word order, not English words transliterated " +
   "or translated one by one. User-provided Bulgarian meal names, brand " +
-  "names and library recipe names always keep their original wording.\n";
+  "names and library recipe names always keep their original wording. " +
+  `Write "сурово тегло" or "сготвено" only for plain ` +
+  "meat, fish, rice or pasta given by weight, never on a dish, soup, salad " +
+  "or pastry.\n";
 
 // In Bulgarian the names are what the app shows, so they're Bulgarian
 // whatever the user typed, but what the user named in Bulgarian or by brand
@@ -75,10 +80,13 @@ const bulgarianNames =
  * The opening of every estimate prompt, so dish names and portions are read
  * the way the user means them, and named in the app's language.
  */
-export function nutritionContext({ country, language }: Profile): string {
+export function nutritionContext({ country, language, hour }: Profile): string {
   return `You are a nutrition assistant. The user lives in ${country}. Read ` +
     "dish names the way they are used there: the same name can mean a " +
     "different dish in different cuisines. " +
+    // The time of day helps read the meal ("eggs" at 8, "toast" at 23)
+    // and its size, found to cut the error in a 2025 study of 806 photos.
+    (hour === undefined ? "" : `It is about ${hour}:00 for the user. `) +
     (language === "bg"
       ? bulgarianNames
       : "The user may write in English or " +

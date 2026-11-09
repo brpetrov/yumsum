@@ -165,7 +165,7 @@ List<EstimateItem> parseEstimateItems(Object? raw, {String said = ''}) {
       if (_itemFrom(entry) case final item?)
         _fewerChips(
           _withOptions(
-            _withAmounts(item, entry as Map, heard),
+            _withAmounts(item, entry as Map, said, heard),
             entry['options'],
             saidWords,
           ),
@@ -178,10 +178,23 @@ List<EstimateItem> parseEstimateItems(Object? raw, {String said = ''}) {
 /// food's name ("5 сърми" for "сърми") or a vague measure ("a bowl").
 const _sizeWords = {
   'small', 'medium', 'regular', 'large', 'big', 'half', 'quarter', 'whole',
-  'double', 'single', 'pint', 'pints', //
+  'double', 'single', 'pint', 'pints', 'short', 'tall', 'grande', 'venti', //
   'малка', 'малък', 'средна', 'среден', 'средно', 'голяма', 'голям', 'голямо',
   'половин', 'половинка', 'цяла', 'цял', 'цяло', 'двойна', 'двоен', 'двойно',
 };
+
+/// "a fried egg" is one egg: the user's "a" or "an" (Bulgarian "един",
+/// "една", "едно") before a food, where the AI assumed one of it. Not where
+/// the AI's amount is a vague measure ("1 bowl" for "a bowl of soup"),
+/// which is still asked.
+final _oneArticle = RegExp(
+  r'(^|\s)(a|an|един|една|едно)\s',
+  caseSensitive: false,
+);
+final _oneAssumed = RegExp(
+  r'^(1|one|един|една|едно)\b(?!\s*(bowl|plate|handful|portion|serving|cup|glass|купа|купичка|чиния|шепа|порция|чаша))',
+  caseSensitive: false,
+);
 
 /// The numbers of any length in [text], and its words of three letters or
 /// more when [sizesOnly] is false, else only its [_sizeWords], in lower case.
@@ -213,7 +226,12 @@ EstimateItem _asking(
 
 /// The other amounts the AI offers, by grams, which need the item's own
 /// weight to scale from.
-EstimateItem _withAmounts(EstimateItem item, Map entry, Set<String> heard) {
+EstimateItem _withAmounts(
+  EstimateItem item,
+  Map entry,
+  String said,
+  Set<String> heard,
+) {
   final from = item.grams;
   final amount = switch (entry['amount']) {
     final String words => words.trim(),
@@ -229,6 +247,7 @@ EstimateItem _withAmounts(EstimateItem item, Map entry, Set<String> heard) {
   if (_tokens(theirs.join(' '), sizesOnly: true).any(heard.contains)) {
     return item;
   }
+  if (_oneArticle.hasMatch(said) && _oneAssumed.hasMatch(amount)) return item;
   final labels = {amount.toLowerCase()};
   final calories = [item.kcal];
   final amounts = <EstimateAmount>[];
@@ -491,13 +510,15 @@ class CalorieEstimateService {
   final AppLocalizations _l10n;
 
   /// Asks `aiEstimate` for [kind] with the country, which the server's
-  /// prompts open with.
+  /// prompts open with, and the hour where the user is: "eggs" at 8 is a
+  /// breakfast, "toast" at 23 a slice.
   Future<Map<String, dynamic>> _ask(String kind, Map<String, Object?> data) =>
       callAi(_functions, 'aiEstimate', {
         'kind': kind,
         'country': _country,
         'language': _language,
         'macros': _plus,
+        'hour': DateTime.now().hour,
         ...data,
       });
 

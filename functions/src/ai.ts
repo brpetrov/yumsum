@@ -148,6 +148,7 @@ export function estimateAsk(raw: unknown): Ask {
   const profile: Profile = {
     country: text(data.country, 100) || "United Kingdom",
     language: languageOf(data.language),
+    hour: hourOf(data.hour),
   };
   const macros = data.macros === true;
   const estimate = (contents: ContentListUnion): Ask => ({
@@ -386,6 +387,13 @@ const gemini: Generate = async ({ use, contents, config }) => {
 function signedIn(request: CallableRequest): string {
   if (!request.auth) throw new HttpsError("unauthenticated", "Sign in first.");
   return request.auth.uid;
+}
+
+/** The hour the app sent, 0 to 23; undefined for anything else, as from an older app. */
+export function hourOf(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 23
+    ? value
+    : undefined;
 }
 
 function dataOf(raw: unknown): Record<string, unknown> {

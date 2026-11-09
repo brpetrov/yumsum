@@ -60,6 +60,7 @@ void main() {
           'country': 'Bulgaria',
           'language': 'en',
           'macros': true,
+          'hour': DateTime.now().hour,
           'text': 'Musaka',
           'dateKey': today,
         });
@@ -542,6 +543,29 @@ void main() {
         ], said: 'a large tomato soup').single.amounts,
         isEmpty,
       );
+    });
+
+    test('"a fried egg" is one egg; "a bowl" is still asked; chain sizes '
+        'count as sizes', () {
+      List<EstimateAmount> amounts(String said, String amount, String other) =>
+          parseEstimateItems([
+            {
+              'item': said,
+              'grams': 100,
+              'kcal': 200,
+              'amount': amount,
+              'amounts': [
+                {'amount': other, 'grams': 200},
+              ],
+            },
+          ], said: said).single.amounts;
+      expect(amounts('a fried egg', '1 piece', '2 pieces'), isEmpty);
+      expect(amounts('a kiwi', '1', '2'), isEmpty);
+      expect(amounts('една ябълка', '1 брой', '2 броя'), isEmpty);
+      expect(amounts('fried eggs', '1 piece', '2 pieces'), hasLength(1));
+      expect(amounts('a bowl of soup', '1 bowl', 'large bowl'), hasLength(1));
+      expect(amounts('tall cappuccino', 'tall', 'grande'), isEmpty);
+      expect(amounts('cappuccino', 'tall', 'grande'), hasLength(1));
     });
 
     test('at most 6 chips: options give way to amounts', () {
