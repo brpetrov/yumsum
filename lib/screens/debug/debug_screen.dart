@@ -1,3 +1,5 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -126,6 +128,33 @@ class DebugScreen extends ConsumerWidget {
                   icon: const Icon(Icons.replay_rounded),
                   label: const Text('Show the YumSum Star card again'),
                 ),
+                if (!kIsWeb) ...[
+                  const SizedBox(height: 24),
+                  const _Label('CRASH REPORTS'),
+                  Text(
+                    'Sends a test report to Firebase → Crashlytics, under '
+                    'Non-fatals. It arrives when the app next starts. Debug '
+                    "builds don't send reports; this turns them on for this "
+                    'run.',
+                    style: muted,
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      final crashlytics = FirebaseCrashlytics.instance;
+                      await crashlytics.setCrashlyticsCollectionEnabled(true);
+                      await crashlytics.recordError(
+                        Exception('Test report from Debug tools'),
+                        StackTrace.current,
+                        reason: 'Debug tools test',
+                      );
+                      await crashlytics.sendUnsentReports();
+                      say('Test report sent.');
+                    },
+                    icon: const Icon(Icons.bug_report_outlined),
+                    label: const Text('Send a test crash report'),
+                  ),
+                ],
               ],
             ),
           ),

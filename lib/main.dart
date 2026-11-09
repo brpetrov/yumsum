@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lean_streak/app/app.dart';
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/core/config/app_check.dart';
+import 'package:lean_streak/core/config/crash_reports.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/firebase_options.dart';
@@ -51,6 +52,7 @@ void main() async {
   language = LanguageController.storedIn(prefs) ?? 'en';
   final container = ProviderContainer(
     overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+    observers: [if (!kIsWeb) CrashReportObserver()],
   );
   // The phone's launch screen stays up until the first frame, so draw the
   // splash now; the app replaces it once Firebase is ready.
@@ -102,6 +104,7 @@ void main() async {
         FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
         return true;
       };
+      await setUpCrashReports();
     }
   } catch (error, stackTrace) {
     debugPrint('LeanStreak startup failed: $error');

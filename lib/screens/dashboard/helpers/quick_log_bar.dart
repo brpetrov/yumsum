@@ -11,6 +11,7 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 import 'package:lean_streak/app/launch_actions.dart';
+import 'package:lean_streak/core/config/crash_reports.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/helpers/meal_suggestions.dart';
 import 'package:lean_streak/helpers/wav.dart';
@@ -392,7 +393,8 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       if (mounted) _error = _limitMessage;
     } on CalorieEstimateException catch (error) {
       _error = error.message;
-    } catch (_) {
+    } catch (error, stack) {
+      reportError(error, stack, 'AI estimate');
       if (mounted) _error = context.l10n.mealErrorAi;
     }
 
