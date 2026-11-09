@@ -10,20 +10,29 @@ import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/widgets/macro_guide.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
+import 'package:lean_streak/widgets/shine.dart';
 
 /// How a ring reads its target: one to reach (protein, fibre), where more
 /// is fine; a guide from the calories (carbs, fat), judged like the calorie
 /// bar; or a most (sugars, saturates, salt).
 enum _Kind { aim, guide, limit }
 
-/// [decimal] for salt, whose grams get one decimal.
+/// [decimal] for salt, whose grams get one decimal. A target to reach is
+/// green from [greenFrom] grams, gold from [goldFrom], and red under
+/// [redBelow] when it has one (else amber).
 typedef _Ring = ({
   String name,
   double? grams,
   int target,
   _Kind kind,
   bool decimal,
+  double? redBelow,
+  double? greenFrom,
+  double? goldFrom,
 });
+
+/// Fibre past the UK's 30 g, beyond the 25 g target, is done really well.
+const _fibreGold = 30.0;
 
 /// Today's protein and macros as rings in the bars' green, protein first,
 /// then carbs, fat and fibre, then the limits: sugars, saturates and salt,
@@ -37,6 +46,7 @@ class MacroRings extends StatelessWidget {
     required this.meals,
     required this.calorieTarget,
     required this.proteinTarget,
+    required this.goalWeightKg,
     required this.trackProtein,
     required this.full,
     required this.onUnlock,
@@ -45,6 +55,10 @@ class MacroRings extends StatelessWidget {
   final List<Meal> meals;
   final int calorieTarget;
   final int proteinTarget;
+
+  /// Protein's colours follow grams per kg of goal weight: red under 0.8
+  /// (the minimum adults need), amber to 1.2, green, then gold from 1.4.
+  final double goalWeightKg;
   final bool trackProtein;
   final bool full;
   final VoidCallback onUnlock;
@@ -72,6 +86,9 @@ class MacroRings extends StatelessWidget {
       target: proteinTarget,
       kind: _Kind.aim,
       decimal: false,
+      redBelow: goalWeightKg * 0.8,
+      greenFrom: goalWeightKg * 1.2,
+      goldFrom: goalWeightKg * 1.4,
     );
     final List<_Ring> macros = [
       (
@@ -80,6 +97,9 @@ class MacroRings extends StatelessWidget {
         target: targets.carbs,
         kind: _Kind.guide,
         decimal: false,
+        redBelow: null,
+        greenFrom: null,
+        goldFrom: null,
       ),
       (
         name: l10n.macroFat,
@@ -87,6 +107,9 @@ class MacroRings extends StatelessWidget {
         target: targets.fat,
         kind: _Kind.guide,
         decimal: false,
+        redBelow: null,
+        greenFrom: null,
+        goldFrom: null,
       ),
       (
         name: l10n.macroFibre,
@@ -94,6 +117,9 @@ class MacroRings extends StatelessWidget {
         target: targets.fibre,
         kind: _Kind.aim,
         decimal: false,
+        redBelow: null,
+        greenFrom: targets.fibre * 0.8,
+        goldFrom: _fibreGold,
       ),
       (
         name: l10n.macroSugars,
@@ -101,6 +127,9 @@ class MacroRings extends StatelessWidget {
         target: targets.sugars,
         kind: _Kind.limit,
         decimal: false,
+        redBelow: null,
+        greenFrom: null,
+        goldFrom: null,
       ),
       (
         name: l10n.macroRingSaturates,
@@ -108,6 +137,9 @@ class MacroRings extends StatelessWidget {
         target: targets.saturates,
         kind: _Kind.limit,
         decimal: false,
+        redBelow: null,
+        greenFrom: null,
+        goldFrom: null,
       ),
       (
         name: l10n.macroSalt,
@@ -115,6 +147,9 @@ class MacroRings extends StatelessWidget {
         target: targets.salt,
         kind: _Kind.limit,
         decimal: true,
+        redBelow: null,
+        greenFrom: null,
+        goldFrom: null,
       ),
     ];
 
@@ -260,16 +295,34 @@ class _RingTile extends StatelessWidget {
   /// A made-up fill, shown without a figure.
   final double? preview;
 
+  /// Whether a target to reach is done really well: gold, with a glint.
+  bool get _gold => switch ((ring.grams, ring.goldFrom)) {
+    (final grams?, final from?) when preview == null => grams >= from,
+    _ => false,
+  };
+
+  /// A gold ring catches the eye once, with the YumSum Star's glint, when
+  /// it turns gold (and again on coming back to Home).
+  Widget _shineWhenGold(Widget ring) =>
+      _gold ? Shine(sweeps: 1, strength: 0.8, child: ring) : ring;
+
   /// Green while on course; amber, then red, past a most or well past a
   /// guide, the way the calorie bar turns. A target to reach (protein,
-  /// fibre) is amber until 80% of it, then green however far over: never
-  /// red, as every day starts at nothing.
+  /// fibre) is amber until [_Ring.greenFrom] (80% of it unless given), red
+  /// under [_Ring.redBelow] where it has one, then green, then gold.
   Color get _color {
     final grams = ring.grams;
     if (grams == null || ring.target <= 0) return AppColors.veryGood;
     final share = grams / ring.target;
     if (ring.kind == _Kind.aim) {
-      return share >= 0.8 ? AppColors.veryGood : AppColors.bad;
+      if (_gold) return AppColors.gold;
+      if (grams >= (ring.greenFrom ?? ring.target * 0.8)) {
+        return AppColors.veryGood;
+      }
+      final redBelow = ring.redBelow;
+      return redBelow != null && grams < redBelow
+          ? AppColors.veryBad
+          : AppColors.bad;
     }
     final greenUpTo = ring.kind == _Kind.limit ? 1.0 : 1.1;
     if (share <= greenUpTo) return AppColors.veryGood;
@@ -295,24 +348,26 @@ class _RingTile extends StatelessWidget {
           children: [
             SizedBox.square(
               dimension: 60,
-              child: CustomPaint(
-                painter: _RingPainter(
-                  value:
-                      preview ??
-                      (grams == null || ring.target <= 0
-                          ? 0
-                          : grams / ring.target),
-                  color: _color,
-                  track: AppColors.isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : Colors.white.withValues(alpha: 0.85),
-                ),
-                child: Center(
-                  child: Text(
-                    figure,
-                    style: AppTheme.display.copyWith(
-                      fontSize: 14,
-                      color: AppColors.textPrimary,
+              child: _shineWhenGold(
+                CustomPaint(
+                  painter: _RingPainter(
+                    value:
+                        preview ??
+                        (grams == null || ring.target <= 0
+                            ? 0
+                            : grams / ring.target),
+                    color: _color,
+                    track: AppColors.isDark
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.white.withValues(alpha: 0.85),
+                  ),
+                  child: Center(
+                    child: Text(
+                      figure,
+                      style: AppTheme.display.copyWith(
+                        fontSize: 14,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                   ),
                 ),

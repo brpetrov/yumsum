@@ -339,6 +339,7 @@ class _DashboardContent extends StatelessWidget {
                   targetWeightKg: profile.targetWeightKg,
                   trainingFrequency: profile.trainingFrequency,
                 ),
+                goalWeightKg: profile.targetWeightKg,
                 showMacros: showMacros,
                 adaptiveLine: adaptiveLine,
               ),
@@ -407,6 +408,7 @@ class _TodayCard extends StatelessWidget {
     required this.meals,
     required this.trackProtein,
     required this.proteinTarget,
+    required this.goalWeightKg,
     required this.showMacros,
     required this.adaptiveLine,
   });
@@ -415,6 +417,7 @@ class _TodayCard extends StatelessWidget {
   final List<Meal> meals;
   final bool trackProtein;
   final int proteinTarget;
+  final double goalWeightKg;
 
   /// YumSum Star: every ring. Otherwise protein, and the rest dimmed.
   final bool showMacros;
@@ -538,6 +541,7 @@ class _TodayCard extends StatelessWidget {
             meals: meals,
             calorieTarget: summary.targetCalories,
             proteinTarget: proteinTarget,
+            goalWeightKg: goalWeightKg,
             trackProtein: trackProtein,
             full: showMacros,
             onUnlock: () => showPlusPaywall(context),

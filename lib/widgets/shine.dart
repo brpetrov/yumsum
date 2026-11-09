@@ -7,9 +7,17 @@ import 'package:flutter/material.dart';
 /// child draws, so it follows a chip's or the star's own shape. None when
 /// the phone asks for less motion.
 class Shine extends StatefulWidget {
-  const Shine({super.key, required this.child, this.strength = 0.6});
+  const Shine({
+    super.key,
+    required this.child,
+    this.strength = 0.6,
+    this.sweeps = 3,
+  });
 
   final Widget child;
+
+  /// How many times the glint sweeps across each time it shines.
+  final int sweeps;
 
   /// How white the glint is at its brightest, from 0 to 1. Small, light
   /// things like the star need more to show.
@@ -35,7 +43,7 @@ class _ShineState extends State<Shine> with SingleTickerProviderStateMixin {
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1800),
-    )..repeat(count: 3);
+    )..repeat(count: widget.sweeps);
     // The sweep takes the first 60%; the rest is a pause before the next.
     _sweep = CurvedAnimation(
       parent: _controller,
@@ -57,7 +65,7 @@ class _ShineState extends State<Shine> with SingleTickerProviderStateMixin {
     if (status == AnimationStatus.dismissed) {
       _controller
         ..value = 0
-        ..repeat(count: 3);
+        ..repeat(count: widget.sweeps);
     }
   }
 

@@ -10,6 +10,7 @@ import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/widgets/macro_rings.dart';
+import 'package:lean_streak/widgets/shine.dart';
 
 Meal _meal(String name, double? protein, Nutrients? macros) => Meal(
   id: name,
@@ -66,6 +67,8 @@ void main() {
               meals: meals,
               calorieTarget: 1670,
               proteinTarget: 131,
+              // Protein: red under 64 g, amber to 96, green, gold from 112.
+              goalWeightKg: 80,
               trackProtein: trackProtein,
               full: full,
               onUnlock: () => unlocked++,
@@ -112,8 +115,10 @@ void main() {
     expect(find.text('max 6 g'), findsOneWidget);
   });
 
-  testWidgets('fibre and protein are amber until 80% of their target, then '
-      'green, never red', (tester) async {
+  testWidgets('protein goes red, amber, green and gold by grams per kg of '
+      'goal weight; fibre amber, green from 20 g, gold from 30 g', (
+    tester,
+  ) async {
     Meal withFibre(double fibre, double protein) => _meal(
       'Lentils',
       protein,
@@ -129,13 +134,19 @@ void main() {
     await pump(tester, [withFibre(6, 0)]);
     expect(find.text('25+ g', skipOffstage: false), findsOneWidget);
     expect(ringColor(tester, '6 g'), AppColors.bad);
-    expect(ringColor(tester, '0 g'), AppColors.bad);
+    expect(ringColor(tester, '0 g'), AppColors.veryBad);
+    await pump(tester, [withFibre(19, 70)]);
+    expect(ringColor(tester, '19 g'), AppColors.bad);
+    expect(ringColor(tester, '70 g'), AppColors.bad);
     await pump(tester, [withFibre(20, 105)]);
     expect(ringColor(tester, '20 g'), AppColors.veryGood);
     expect(ringColor(tester, '105 g'), AppColors.veryGood);
-    await pump(tester, [withFibre(60, 300)]);
-    expect(ringColor(tester, '60 g'), AppColors.veryGood);
-    expect(ringColor(tester, '300 g'), AppColors.veryGood);
+    expect(find.byType(Shine), findsNothing);
+    await pump(tester, [withFibre(30, 112)]);
+    expect(ringColor(tester, '30 g'), AppColors.gold);
+    expect(ringColor(tester, '112 g'), AppColors.gold);
+    expect(find.byType(Shine, skipOffstage: false), findsNWidgets(2));
+    await tester.pumpAndSettle();
   });
 
   testWidgets('carbs go amber past 10% over, red past 20%', (tester) async {
@@ -179,9 +190,12 @@ void main() {
     );
   });
 
-  testWidgets('more protein than the target stays green', (tester) async {
+  testWidgets('more protein than the target is gold, never a warning', (
+    tester,
+  ) async {
     await pump(tester, [_meal('Steak', 160, null)]);
-    expect(ringColor(tester, '160 g'), AppColors.veryGood);
+    expect(ringColor(tester, '160 g'), AppColors.gold);
+    await tester.pumpAndSettle();
   });
 
   testWidgets('without protein tracking, carbs come first', (tester) async {

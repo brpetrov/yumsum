@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 /// readable on dark surfaces. Green (the icon's arc) means on track, the yolk
 /// amber close, and a crimson, kept well apart from the orange, off track.
 /// The hero colours are the warm sweep behind Today's main card, from the
-/// tile's peach into the bowl's cream.
+/// tile's peach into the bowl's cream. Gold is a deep, metallic one for a
+/// target done really well, kept darker than the amber so they don't mix.
 class AppPalette {
   const AppPalette({
     required this.primary,
@@ -29,6 +30,7 @@ class AppPalette {
     required this.info,
     required this.heroStart,
     required this.heroEnd,
+    required this.gold,
   });
 
   final Color primary;
@@ -51,6 +53,7 @@ class AppPalette {
   final Color info;
   final Color heroStart;
   final Color heroEnd;
+  final Color gold;
 
   static const light = AppPalette(
     primary: Color(0xFFC94D1A),
@@ -73,6 +76,7 @@ class AppPalette {
     info: Color(0xFF3B82F6),
     heroStart: Color(0xFFFFDCC2),
     heroEnd: Color(0xFFFFF3E6),
+    gold: Color(0xFFA8760A),
   );
 
   static const dark = AppPalette(
@@ -96,6 +100,7 @@ class AppPalette {
     info: Color(0xFF6FA6F8),
     heroStart: Color(0xFF4A2818),
     heroEnd: Color(0xFF2B221D),
+    gold: Color(0xFFD9A62E),
   );
 }
 
@@ -132,6 +137,7 @@ class AppColors {
   static Color get info => palette.info;
   static Color get heroStart => palette.heroStart;
   static Color get heroEnd => palette.heroEnd;
+  static Color get gold => palette.gold;
 
   /// The icon tile's orange-to-red sweep around [primary], for the mic and
   /// other glossy bubbles.
