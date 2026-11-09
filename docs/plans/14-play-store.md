@@ -64,7 +64,7 @@ Available in English and Bulgarian.
 
 **Име** (30 max): `YumSum: Калории и протеин` (25)
 
-**Кратко описание** (80 max): `Записвай храната бързо с текст, глас, снимка или баркод. ИИ оценява калориите.` (78)
+**Кратко описание** (80 max): `Записвай храната бързо с текст, глас, снимка или баркод. AI оценява калориите.` (78)
 
 **Пълно описание** (4000 max, 2326 characters):
 
@@ -78,8 +78,8 @@ YumSum е бърз тракер за калории и протеин. Кажи 
 - Избери от последните си храни или запиши порция от рецепта.
 - Въведи калориите и протеина сам, когато поискаш.
 
-ОЦЕНКИ С ИИ
-Не си сигурен какво има в ястието? Поискай оценка. YumSum дава калории, протеин и разбивка по продукти, които можеш да поправиш. Когато трябва да налучка колко или какъв вид, те пита. Има дневен лимит на оценките с ИИ, а числата винаги можеш да въведеш сам. Оценките са само приблизителни и може да грешат.
+ОЦЕНКИ С AI
+Не си сигурен какво има в ястието? Поискай оценка. YumSum дава калории, протеин и разбивка по продукти, които можеш да поправиш. Когато трябва да налучка колко или какъв вид, те пита. Има дневен лимит на оценките с AI, а числата винаги можеш да въведеш сам. Оценките са само приблизителни и може да грешат.
 
 ТВОЯТ ПЛАН
 - Дневна цел за калории, изчислена от данните и целта ти.
@@ -101,7 +101,7 @@ YumSum е бърз тракер за калории и протеин. Кажи 
 YUMSUM STAR (ПО ИЗБОР, АБОНАМЕНТ)
 YumSum се ползва безплатно. YumSum Star добавя:
 - Smart Snap: запис на храна от снимка.
-- Три пъти повече оценки с ИИ на ден.
+- Три пъти повече оценки с AI на ден.
 - Адаптивна формула: калорийната ти цел се нагажда към това как наистина се променя теглото ти.
 - AI Coach: кратък седмичен преглед на приключилите ти седмици.
 - Подробни макроси: мазнини, въглехидрати, фибри, сол и други.
@@ -124,7 +124,7 @@ Check: prices are left out on purpose. Plan 11 sets £3.99 a month, £25.99 a ye
 
 | Form | Answer | Why |
 |---|---|---|
-| Privacy policy URL | `https://yumsum.web.app/privacy` | Served from `tools/hosting/privacy.html`, effective 5 November 2026. |
+| Privacy policy URL | `https://yumsum.web.app/privacy` | Served from `tools/hosting/privacy.html`, effective 9 November 2026. |
 | Ads | No, the app contains no ads | No ad SDK in `pubspec.yaml` or the Android build; the policy says no advertising or ad trackers. |
 | App access | All or some functionality is restricted, so add instructions (2.1) | Everything sits behind sign-in. |
 | Content rating | Category: Utility, Productivity, Communication or other (2.2) | A tracking tool, not a game. |
@@ -188,7 +188,7 @@ Global answers:
 | App activity: In-app search history | Collected and Shared | Optional | App functionality | Food search words and barcode numbers go to Open Food Facts with nothing about you. Check: Play may treat this as not collected because no identifier goes with it; declaring it is the cautious choice. |
 | App activity: App interactions | Collected | Required | App functionality | Meals, weigh-ins, days off, daily AI-use counts and AI Coach notes in your account. Check: these are your own records, and some owners file them only under Health info. |
 | Financial info: Purchase history | Collected | Optional (only if you subscribe) | App functionality | Subscription status, plan, trial, renewal and end dates and Google Play's purchase reference (`entitlements`, `playPurchases`). Card details are never seen. |
-| App info and performance: Crash logs | Collected | Required (no opt-out found in the app) | Analytics | Firebase Crashlytics, Android and iOS only: device model, OS and app version and the crash trace, under a random installation ID. |
+| App info and performance: Crash logs | Collected | Required (no opt-out found in the app) | Analytics | Firebase Crashlytics, Android and iOS only: device model, OS and app version and the trace of a crash or of an error the app showed, under a random installation ID and the account's uid; kept 90 days. |
 | App info and performance: Diagnostics | Collected | Required | Analytics, Fraud prevention, security and compliance | Crashlytics diagnostics and Firebase's basic technical data. Check: declare only if you count these as collected beyond crash logs. |
 | Device or other IDs | Collected | Required | Fraud prevention, security and compliance; App functionality | Firebase installation ID and Play Integrity / App Check tokens on AI and billing calls; a random installation ID also goes to Open Food Facts when you contribute a product. |
 | Location | Not collected | | | No location permission. The country comes from the device's region setting and goes to the AI and, on a contribution, to Open Food Facts. Check: I treat a region setting as not "location"; confirm you agree. |
@@ -205,12 +205,12 @@ Who receives data (from `functions/src`, `lib/services` and the privacy policy):
 
 ## 3. Account deletion
 
-Web link for Play: `https://yumsum.web.app/delete-account` (being built separately).
+Web link for Play: `https://yumsum.web.app/delete-account` (live since 9 November 2026, with `/delete-account-bg`): the steps in the app, deleting by email without it, and what is and isn't deleted.
 
 - In the app (Settings > Delete account, confirmed with the password or Google) it deletes the profile, every meal, daily summary, weigh-in, day off and AI Coach note, the YumSum Star record and its Play purchase links, then the daily-count records and the sign-in account itself (`deleteAccountData` in `account_repository.dart`, `deleteAccount` in `functions/src/account.ts`).
 - It does not cancel a Google Play subscription (cancel it in Play), a feedback email already sent stays in the developer's mailbox until asked to delete it, and photos contributed to Open Food Facts stay published there.
 
-Check: the web page should name the same exceptions as above (Play subscription, feedback emails, Open Food Facts contributions), as the privacy policy does for the first two.
+The page names the same exceptions, plus crash reports kept for 90 days.
 
 ## 4. Graphics checklist
 
@@ -224,7 +224,7 @@ Suggested six screenshots, in order (captions 30 characters max, counts in brack
 |---|---|---|---|
 | 1 | Home: calories, rings and meals | `Your day at a glance` (20) | `Денят ти накратко` (17) |
 | 2 | Quick-log bar mid-estimate | `Log a meal in seconds` (21) | `Запиши храна за секунди` (23) |
-| 3 | AI estimate with its breakdown | `AI estimates, you correct` (25) | `ИИ оценява, ти поправяш` (23) |
+| 3 | AI estimate with its breakdown | `AI estimates, you correct` (25) | `AI оценява, ти поправяш` (23) |
 | 4 | Barcode scan and portion sheet | `Scan packets, pick portion` (26) | `Сканирай и избери порция` (24) |
 | 5 | Weight and progress chart | `Weight trend, no guesswork` (26) | `Тенденция на теглото` (20) |
 | 6 | YumSum Star page | `Go further with YumSum Star` (27) | `Повече със YumSum Star` (22) |
