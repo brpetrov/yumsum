@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:lean_streak/models/user_profile.dart';
 
@@ -25,15 +26,25 @@ class UserProfileRepository {
     // metadata are dropped, so watchers don't run again for the same profile.
     var yielded = false;
     Map<String, dynamic>? last;
-    await for (final snap in _doc(
-      uid,
-    ).snapshots(includeMetadataChanges: true)) {
-      final data = snap.exists ? snap.data() : null;
-      if (data == null && snap.metadata.isFromCache) continue;
-      if (yielded && _sameData(data, last)) continue;
-      yielded = true;
-      last = data;
-      yield data == null ? null : UserProfile.fromFirestore(snap);
+    try {
+      await for (final snap in _doc(
+        uid,
+      ).snapshots(includeMetadataChanges: true)) {
+        final data = snap.exists ? snap.data() : null;
+        if (data == null && snap.metadata.isFromCache) continue;
+        if (yielded && _sameData(data, last)) continue;
+        yielded = true;
+        last = data;
+        yield data == null ? null : UserProfile.fromFirestore(snap);
+      }
+    } on FirebaseException catch (error) {
+      // Signing out has the server refuse the listener before the providers
+      // hear the user has gone; that refusal went uncaught (and would be a
+      // crash report on a phone). It just ends the stream then.
+      if (error.code != 'permission-denied' ||
+          FirebaseAuth.instance.currentUser?.uid == uid) {
+        rethrow;
+      }
     }
   }
 
