@@ -326,14 +326,18 @@ describe("estimateAsk", () => {
     assert.deepEqual(ask.config, mealConfig(false));
   });
 
-  test("a typed meal's schema has the macros only when asked, and options on each item", () => {
+  test("a typed meal's schema has the macros only when asked, and amounts and options on each item", () => {
     const schema = (ask: boolean) => mealConfig(ask).responseSchema as {
       properties: Record<string, { items?: { properties: Record<string, unknown> } }>;
       required: string[];
     };
     assert.deepEqual(schema(false).required, ["items", "kcal", "protein_g"]);
     assert.deepEqual(schema(true).required, ["items", "kcal", "protein_g", "macros"]);
-    assert.ok("options" in schema(false).properties.items.items!.properties);
+    const item = schema(false).properties.items.items!.properties;
+    assert.ok("options" in item);
+    assert.ok("amount" in item);
+    const amounts = item.amounts as { items: { required: string[] } };
+    assert.deepEqual(amounts.items.required, ["amount", "grams"]);
     const meal = estimateAsk({ kind: "meal", text: "Musaka", macros: true });
     assert.deepEqual(meal.config, mealConfig(true));
   });
@@ -433,12 +437,15 @@ describe("the prompts", () => {
     const [meal, voice, photo, nutrients] = prompts(false);
     for (const prompt of [meal, voice]) {
       assert.ok(prompt.includes("go with the most common choice in United Kingdom"));
-      assert.ok(prompt.includes("Most items have no options."));
+      assert.ok(prompt.includes("Most items need neither amounts nor options"));
+      assert.ok(prompt.includes("The amount, first and most important."));
       assert.ok(prompt.includes("Add nothing the user didn't name"));
     }
-    assert.ok(voice.includes(`An item with options has two more keys`));
+    assert.ok(voice.includes(`An item with an amount to ask about has two more keys`));
+    assert.ok(voice.includes(`An item with a kind to ask about has two more keys`));
     for (const prompt of [photo, nutrients]) {
       assert.ok(!prompt.includes("options"));
+      assert.ok(!prompt.includes("amounts"));
     }
   });
 

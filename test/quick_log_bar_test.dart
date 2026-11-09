@@ -635,17 +635,16 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
 
     // The boxes are filled with the version the AI went with, and the dialog
-    // asks: that version ticked, the others under it, each with its calories.
+    // asks: that version ticked, the others beside it, and its calories.
     expect(boxes(tester), ['cappuccino and a croissant', '380', '12']);
     final dialog = find.byType(AlertDialog);
     expect(dialog, findsOneWidget);
     for (final text in [
       'Which did you have?',
-      'We went with the first.',
+      'Which kind?',
       'Cappuccino with semi-skimmed milk',
       '110 kcal',
       'Cappuccino with whole milk',
-      '150 kcal',
       'Large cappuccino',
     ]) {
       expect(
@@ -655,6 +654,8 @@ void main() {
     }
 
     await tester.tap(find.text('Cappuccino with whole milk'));
+    await tester.pump();
+    await tester.tap(find.text('Done'));
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
     expect(dialog, findsNothing);

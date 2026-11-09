@@ -446,5 +446,157 @@ void main() {
         'Large oat latte with syrup',
       ]);
     });
+
+    Map<String, Object?> sarmi({
+      Object? grams = 300,
+      List<Object?> amounts = const [],
+      List<Object?> options = const [],
+    }) => {
+      'item': 'Sarmi with meat',
+      'grams': grams,
+      'kcal': 420,
+      'protein_g': 21,
+      'amount': '5 pieces',
+      'amounts': amounts,
+      'options': options,
+    };
+
+    test('keeps an item\'s amounts at least $optionGap kcal apart and drops '
+        'the assumed one', () {
+      final item = parseEstimateItems([
+        sarmi(
+          amounts: [
+            {'amount': '3 pieces', 'grams': 180},
+            // The assumed weight, and under 30 kcal from it.
+            {'amount': '5 pieces', 'grams': 300},
+            {'amount': '5 bigger pieces', 'grams': 310},
+            {'amount': '', 'grams': 400},
+            {'amount': 'a lot', 'grams': 0},
+            'not a map',
+            {'amount': '8 pieces', 'grams': 480},
+            {'amount': '10 pieces', 'grams': 600},
+            // A fourth.
+            {'amount': '12 pieces', 'grams': 700},
+          ],
+        ),
+      ]).single;
+      expect(item.amount, '5 pieces');
+      expect(item.amounts, [
+        (label: '3 pieces', grams: 180),
+        (label: '8 pieces', grams: 480),
+        (label: '10 pieces', grams: 600),
+      ]);
+      expect(item.settled.amounts, isEmpty);
+      expect(item.settled.amount, isNull);
+    });
+
+    test('no amounts without a weight to scale from, or with none kept', () {
+      for (final entry in [
+        sarmi(
+          grams: null,
+          amounts: [
+            {'amount': '3 pieces', 'grams': 180},
+          ],
+        ),
+        sarmi(
+          amounts: [
+            {'amount': '5 bigger pieces', 'grams': 310},
+          ],
+        ),
+      ]) {
+        final item = parseEstimateItems([entry]).single;
+        expect(item.amount, isNull);
+        expect(item.amounts, isEmpty);
+      }
+    });
+
+    test('no amounts when the user said the amount, but a vague one counts '
+        'as none', () {
+      final three = [
+        {'amount': '3 pieces', 'grams': 180},
+      ];
+      expect(
+        parseEstimateItems([
+          sarmi(amounts: three),
+        ], said: '5 sarmi').single.amounts,
+        isEmpty,
+      );
+      final soup = {
+        'item': 'Tomato soup',
+        'grams': 300,
+        'kcal': 150,
+        'amount': '1 bowl',
+        'amounts': [
+          {'amount': 'small bowl', 'grams': 200},
+        ],
+      };
+      expect(
+        parseEstimateItems([
+          soup,
+        ], said: 'a bowl of tomato soup').single.amounts,
+        [(label: 'small bowl', grams: 200)],
+      );
+      expect(
+        parseEstimateItems([
+          {...soup, 'amount': 'large'},
+        ], said: 'a large tomato soup').single.amounts,
+        isEmpty,
+      );
+    });
+
+    test('at most 6 chips: options give way to amounts', () {
+      final item = parseEstimateItems([
+        sarmi(
+          amounts: [
+            {'amount': '3 pieces', 'grams': 180},
+            {'amount': '8 pieces', 'grams': 480},
+            {'amount': '10 pieces', 'grams': 600},
+          ],
+          options: [
+            {'item': 'Sarmi without meat', 'grams': 300, 'kcal': 300},
+            {'item': 'Sarmi with pork', 'grams': 300, 'kcal': 480},
+            {'item': 'Sarmi with rice only', 'grams': 300, 'kcal': 250},
+          ],
+        ),
+      ]).single;
+      expect(item.amounts, hasLength(3));
+      expect(item.options.map((option) => option.name), ['Sarmi without meat']);
+    });
+
+    test('answered: the kind picked, at the amount picked', () {
+      const without = EstimateItem(
+        name: 'Sarmi without meat',
+        grams: 300,
+        kcal: 300,
+        protein: 9,
+      );
+      const item = EstimateItem(
+        name: 'Sarmi with meat',
+        grams: 300,
+        kcal: 420,
+        protein: 21,
+        amount: '5 pieces',
+        amounts: [(label: '3 pieces', grams: 180)],
+        options: [without],
+      );
+      expect(answered(item), item.settled);
+      expect(answered(item, kind: without), without);
+      expect(answered(item, grams: 180), resized(item, 180));
+      expect(
+        answered(item, kind: without, grams: 180),
+        const EstimateItem(
+          name: 'Sarmi without meat',
+          grams: 180,
+          kcal: 180,
+          protein: 5,
+        ),
+      );
+      // A kind at another weight keeps its own weight in the same ratio.
+      const large = EstimateItem(name: 'Large sarmi', grams: 400, kcal: 600);
+      expect(
+        answered(item, kind: large, grams: 150),
+        const EstimateItem(name: 'Large sarmi', grams: 200, kcal: 300),
+      );
+    });
   });
 }

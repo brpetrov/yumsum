@@ -980,11 +980,29 @@ abstract class AppLocalizations {
   /// **'Which did you have?'**
   String get mealChoiceTitle;
 
-  /// Which-did-you-have dialog: the first option, ticked, is the AI's guess.
+  /// Which-did-you-have dialog: label of the row of counts, e.g. 3, 5 or 8 pieces.
   ///
   /// In en, this message translates to:
-  /// **'We went with the first.'**
-  String get mealChoiceNote;
+  /// **'How many?'**
+  String get mealChoiceHowMany;
+
+  /// Which-did-you-have dialog: label of the row of amounts, e.g. small, regular or large.
+  ///
+  /// In en, this message translates to:
+  /// **'How much?'**
+  String get mealChoiceHowMuch;
+
+  /// Which-did-you-have dialog: the amount the AI went with, when it didn't name it; beside e.g. small and large.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular'**
+  String get mealChoiceRegular;
+
+  /// Which-did-you-have dialog: label of the row of kinds, e.g. with or without meat.
+  ///
+  /// In en, this message translates to:
+  /// **'Which kind?'**
+  String get mealChoiceWhichKind;
 
   /// Camera page: the device has no camera.
   ///

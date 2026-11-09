@@ -66,7 +66,9 @@ const bulgarianNames =
   "user wrote in Bulgarian, keep their words. Keep brand, chain and " +
   `product names as the user wrote them ("Big Mac", "Coca-Cola Zero"). In ` +
   `names, write "г" for grams, "мл" for millilitres and a decimal comma; ` +
-  `numbers in the JSON always use a decimal point ("salt": 1.2).\n` +
+  `numbers in the JSON always use a decimal point ("salt": 1.2). Write ` +
+  `sizes as "малка", "средна" and "голяма", agreeing with the food, never ` +
+  `"редовна".\n` +
   bulgarianFoodNames;
 
 /**
@@ -112,39 +114,84 @@ function itemRules(country: string): string {
     `For branded and chain products, use ${country} nutrition figures.\n`;
 }
 
-// What people leave out most (the size, the milk, takeaway or homemade)
-// swings the calories most. Naming what it assumed keeps the model's options
-// to versions of the same thing (asked only for "other versions", it offered
-// other foods: a satsuma for an apple), the examples keep it from asking
-// about what the user did say or about a named product, and the options'
-// shape stays out of the item template, which the model fills for every
+// What people leave out most swings the calories most, and the amount most
+// of all: asked one thing per item, the model asked "sarmi" with meat or
+// without (a fifth either way) and never how many (3 against 8 is two and a
+// half times), 8 November 2026. So the amount and the kind are asked
+// separately, the amount first: "amounts" give other amounts as grams of the
+// whole item, which the app scales the item by, and "options" are the other
+// kinds, complete items at the same grams. Naming what it assumed keeps the
+// kinds to versions of the same thing (asked only for "other versions", it
+// offered other foods: a satsuma for an apple), the examples keep it from
+// asking about what the user did say or about a named product, and the
+// shapes stay out of the item template, which the model fills for every
 // item when it's there. The app doesn't read "assumed": the item's own name
-// carries it.
-function choices(country: string): string {
+// carries it. The regular size is named in the app's language: told
+// "regular", the model wrote "редовна", which no Bulgarian says.
+function choices({ country, language }: Profile): string {
+  const regular = language === "bg" ? "средна" : "regular";
   return "When the user leaves out something that changes an item's " +
-    "calories a lot (its size, the milk or sugar in a drink, full-fat or " +
-    "diet, homemade or takeaway, fried or grilled), go with the most " +
-    `common choice in ${country}. In that item, give "assumed", the ` +
-    `choice in a few words, and "options", up to 3 other common choices ` +
-    "for the same food or drink, each a complete item named in full. When " +
-    "the size is what's missing, as with chips, a coffee or a glass of " +
-    "wine, assume the regular size, and the options are the small and the " +
-    `large one. So "cappuccino" is assumed regular with semi-skimmed milk, ` +
-    `with options for whole milk, oat milk and large, and "chicken curry" ` +
-    "is assumed homemade with rice, with options without rice and from a " +
-    "takeaway. No options when the user said what they had (a large oat " +
-    "latte, 200 g of chicken breast), for a size they gave (a pint, a " +
-    "bowl, two slices), for a branded or chain product (a Big Mac, a " +
-    "Greggs sausage roll), where the choices make little " +
-    "difference (a banana, a cup of tea), or for an item's parts (its " +
-    "bread, butter or sauce). An option is never a different food, a meal " +
-    "deal or a bigger dish. Most items have no options.\n";
+    "calories a lot, go with the most common choice in " +
+    `${country} and offer the other likely choices, so the app can ask. ` +
+    "There are two things to ask about, and an item may have both:\n" +
+    "The amount, first and most important. Ask only when the user gave no " +
+    `amount, or only a vague one ("a bowl", "a plate", "some", "a ` +
+    `handful", "a few"). A number ("5 meatballs", "2 slices"), a size ` +
+    `("large", "small", "a pint", "half"), a weight or a volume is an ` +
+    `amount the user gave, and so is "a" or "an" before a single food ("a ` +
+    `boiled egg", "an apple", "a pizza"): one of it. Then never ask the ` +
+    "amount. For food that comes in pieces (sarmi, meatballs, " +
+    "dumplings, eggs, pancakes, biscuits, slices of pizza or bread, " +
+    "nuggets, fruit), assume one standard serving, as nutrition guides " +
+    `give it, and give "amount" as a count ` +
+    `("5 pieces") and "amounts" as two or three other counts, the grams of ` +
+    "the whole item at each. For food served as a portion (rice, chips, " +
+    "soup, pasta, salad, porridge), assume one standard single portion, as " +
+    `nutrition guides give it, and give "amount" as "${regular}" and "amounts" ` +
+    "as small and large. Whenever you " +
+    `give "amounts", give "amount" too. For food that comes in one piece of ` +
+    "varying size (a pizza, a baked potato, a bag of nuts or crisps, a " +
+    "muffin), the amounts are the sizes or, where part of it may be left, " +
+    "half and whole. For a drink, the sizes it's sold in (\"330 ml\", " +
+    `"500 ml", "pint"). When the user gave a count but not the size ("2 ` +
+    `slices of pizza", "a beer"), the amount is known: ask the size as the ` +
+    `kind instead ("2 slices from a small pizza" against "from a large ` +
+    `pizza"). Never ask the amount of a branded single product (a Big Mac, ` +
+    "a Mars bar).\n" +
+    "The kind, where it changes the calories by about 15% or more: with or " +
+    "without meat, fried or grilled, homemade or takeaway (a restaurant " +
+    "portion is also bigger: fold that in), full-fat or diet, the milk or " +
+    "sugar in a drink. A part the dish is often had " +
+    "with that adds a quarter or more also counts as a kind: dressing on a " +
+    "salad, mayonnaise in a sandwich, butter on toast, sauce on pasta, " +
+    `"with dressing" against "without". Give "assumed", the kind assumed in ` +
+    `a few words, and "options", up to 2 other likely kinds, each a ` +
+    "complete item named in full at the same grams as the item. Never a " +
+    "different food, a meal deal or a bigger dish, and never a kind for a " +
+    "branded or chain product, for a small difference (a banana, a cup of " +
+    "tea), or for something the user said.\n" +
+    `So "sarmi" is assumed 5 pieces with meat, with amounts of 3 and 8 ` +
+    `pieces and an option without meat; "cappuccino" is assumed regular ` +
+    "with semi-skimmed milk, with amounts small and large and options for " +
+    `whole milk and oat milk; "chicken curry" is assumed a regular homemade ` +
+    "portion with rice, with amounts small and large and options without " +
+    `rice and from a takeaway; "2 slices of pizza" has no amounts and ` +
+    `options for a small and a large pizza; "200 g chicken breast" has ` +
+    "neither. " +
+    "Where three things are unknown, ask the two that move the calories " +
+    "most and fold the third into what's assumed. Most items need neither " +
+    "amounts nor options: ask only where the answer would change the " +
+    "calories by at least 30.\n";
 }
 
 const optionsJson =
-  `An item with options has two more keys: "assumed": "<the choice, a few ` +
-  `words>" and "options": [{"item": "<version in full>", "grams": ` +
-  `<integer>, "kcal": <integer>, "protein_g": <integer>}].\n`;
+  `An item with an amount to ask about has two more keys: "amount": "<the ` +
+  `amount assumed, a few words>" and "amounts": [{"amount": "<another ` +
+  `amount, a few words>", "grams": <integer, for the whole item at that ` +
+  `amount>}]. An item with a kind to ask about has two more keys: ` +
+  `"assumed": "<the kind assumed, a few words>" and "options": [{"item": ` +
+  `"<the item in full, that kind>", "grams": <integer>, "kcal": ` +
+  `<integer>, "protein_g": <integer>}].\n`;
 
 // Six totals for the meal rather than per item, which would add about 60% to
 // a call (plan 10).
@@ -173,7 +220,7 @@ export function mealPrompt(profile: Profile, ask: boolean, meal: string): string
     "The user will describe a meal. " +
     itemRules(profile.country) +
     "Give each item's calories and protein, then add them up.\n" +
-    choices(profile.country) +
+    choices(profile) +
     weights +
     macros(ask) +
     `\nMeal: ${meal}`;
@@ -191,15 +238,26 @@ const option: Schema = {
   required: Object.keys(figures),
   propertyOrdering: Object.keys(figures),
 };
+const amountOption: Schema = {
+  type: Type.OBJECT,
+  properties: { amount: { type: Type.STRING }, grams: { type: Type.INTEGER } },
+  required: ["amount", "grams"],
+  propertyOrdering: ["amount", "grams"],
+};
 const item: Schema = {
   type: Type.OBJECT,
   properties: {
     ...figures,
+    amount: {
+      type: Type.STRING,
+      description: 'The amount assumed, in a few words ("5 pieces", "regular"), whenever "amounts" are given.',
+    },
+    amounts: { type: Type.ARRAY, items: amountOption, maxItems: "3" },
     assumed: { type: Type.STRING },
     options: { type: Type.ARRAY, items: option, maxItems: "3" },
   },
   required: Object.keys(figures),
-  propertyOrdering: [...Object.keys(figures), "assumed", "options"],
+  propertyOrdering: [...Object.keys(figures), "amount", "amounts", "assumed", "options"],
 };
 const nutrients = ["fat", "saturates", "carbs", "sugars", "fibre", "salt"];
 
@@ -244,7 +302,7 @@ export function voicePrompt(profile: Profile, ask: boolean): string {
     "Give each item's calories and protein; if the user stated a calorie " +
     "or protein amount for something, use that exact number for it. Then " +
     "add them up.\n" +
-    choices(profile.country) +
+    choices(profile) +
     "If the user gave calories but no protein, still estimate the protein " +
     `${ask ? "and macros " : ""}from the food. Only if nothing in ` +
     `the note says what the food was (e.g. "400 calories for lunch"), set ` +

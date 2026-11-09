@@ -683,9 +683,21 @@
   "@mealChoiceTitle": {
     "description": "Dialog asking which version of an item the user had (size, milk, homemade or takeaway)."
   },
-  "mealChoiceNote": "We went with the first.",
-  "@mealChoiceNote": {
-    "description": "Which-did-you-have dialog: the first option, ticked, is the AI's guess."
+  "mealChoiceHowMany": "How many?",
+  "@mealChoiceHowMany": {
+    "description": "Which-did-you-have dialog: label of the row of counts, e.g. 3, 5 or 8 pieces."
+  },
+  "mealChoiceHowMuch": "How much?",
+  "@mealChoiceHowMuch": {
+    "description": "Which-did-you-have dialog: label of the row of amounts, e.g. small, regular or large."
+  },
+  "mealChoiceRegular": "Regular",
+  "@mealChoiceRegular": {
+    "description": "Which-did-you-have dialog: the amount the AI went with, when it didn't name it; beside e.g. small and large."
+  },
+  "mealChoiceWhichKind": "Which kind?",
+  "@mealChoiceWhichKind": {
+    "description": "Which-did-you-have dialog: label of the row of kinds, e.g. with or without meat."
   },
   "cameraNotFound": "No camera found.",
   "@cameraNotFound": {

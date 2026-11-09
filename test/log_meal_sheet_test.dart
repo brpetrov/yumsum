@@ -182,6 +182,8 @@ void main() {
     expect(find.text('Which did you have?'), findsOneWidget);
 
     await tester.tap(find.text('Takeaway chicken curry'));
+    await tester.pump();
+    await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
     expect(find.byType(AlertDialog), findsNothing);
     expect(find.text('850'), findsOneWidget);

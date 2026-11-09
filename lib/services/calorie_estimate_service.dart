@@ -13,15 +13,20 @@ import 'package:lean_streak/repositories/ai_usage_repository.dart';
 
 /// One component of an AI estimate; [grams] is the weight the AI assumed
 /// (ml for drinks), null when it gave none. Where the user left out what
-/// swings the calories (the size, the milk, takeaway or homemade), the AI
-/// went with the usual version and [options] are the other likely ones,
-/// complete, for `showEstimateChoice`; empty otherwise.
+/// swings the calories, the AI went with the usual version and offers the
+/// others for `showEstimateChoice`: [amounts], other amounts of it, with
+/// [amount] the one it went with ("5 pieces"; null when it didn't say,
+/// shown as Regular), and [options], the other
+/// likely kinds (the milk, takeaway or homemade), complete items at the
+/// same amount. Empty, and [amount] null, when there's nothing to ask.
 class EstimateItem {
   const EstimateItem({
     required this.name,
     this.grams,
     required this.kcal,
     this.protein,
+    this.amount,
+    this.amounts = const [],
     this.options = const [],
   });
 
@@ -29,6 +34,8 @@ class EstimateItem {
   final int? grams;
   final int kcal;
   final int? protein;
+  final String? amount;
+  final List<EstimateAmount> amounts;
   final List<EstimateItem> options;
 
   /// This item with nothing left to ask.
@@ -42,15 +49,28 @@ class EstimateItem {
       other.grams == grams &&
       other.kcal == kcal &&
       other.protein == protein &&
+      other.amount == amount &&
+      listEquals(other.amounts, amounts) &&
       listEquals(other.options, options);
 
   @override
-  int get hashCode =>
-      Object.hash(name, grams, kcal, protein, Object.hashAll(options));
+  int get hashCode => Object.hash(
+    name,
+    grams,
+    kcal,
+    protein,
+    amount,
+    Object.hashAll(amounts),
+    Object.hashAll(options),
+  );
 
   @override
   String toString() => 'EstimateItem($name, $kcal kcal)';
 }
+
+/// Another amount the AI offers for an item: a few words and the grams of
+/// the whole item at that amount, for `showEstimateChoice`.
+typedef EstimateAmount = ({String label, int grams});
 
 /// An option closer than this to the item's calories isn't worth asking
 /// about.
@@ -128,19 +148,131 @@ LabelReading parseLabelReading(Map<String, dynamic> map) {
 }
 
 /// Reads the model's `items` list, skipping anything malformed. An item's
-/// options are kept at most 3, each at least [optionGap] kcal from the item
-/// and from each other, not the item or an earlier option under the same
-/// name, and keeping every word of the item's name the user [said]: the AI
-/// is told to offer them rarely, and this catches it asking about nothing,
-/// or arguing with the user (a soy latte for a large oat latte).
+/// amounts and options are each kept at most 3, each at least [optionGap]
+/// kcal from the item and from each other, under new labels and names:
+/// the AI is told to offer them rarely, and this catches it asking about
+/// nothing, or arguing with the user. Options keep every word of the item's
+/// name the user [said] (no soy latte for a large oat latte), and there are
+/// no amounts when theirs repeat a number or size the user said ("5
+/// meatballs", "a pint", "large"). At most 6 chips across both rows,
+/// counting each row's ticked one: options give way first.
 List<EstimateItem> parseEstimateItems(Object? raw, {String said = ''}) {
   if (raw is! List) return const [];
   final saidWords = _words(said);
+  final heard = _tokens(said);
   return [
     for (final entry in raw)
       if (_itemFrom(entry) case final item?)
-        _withOptions(item, (entry as Map)['options'], saidWords),
+        _fewerChips(
+          _withOptions(
+            _withAmounts(item, entry as Map, heard),
+            entry['options'],
+            saidWords,
+          ),
+        ),
   ];
+}
+
+/// The words of an amount that say how much, beside its numbers: when the
+/// AI's amounts repeat one the user said, the user gave the amount. Not the
+/// food's name ("5 сърми" for "сърми") or a vague measure ("a bowl").
+const _sizeWords = {
+  'small', 'medium', 'regular', 'large', 'big', 'half', 'quarter', 'whole',
+  'double', 'single', 'pint', 'pints', //
+  'малка', 'малък', 'средна', 'среден', 'средно', 'голяма', 'голям', 'голямо',
+  'половин', 'половинка', 'цяла', 'цял', 'цяло', 'двойна', 'двоен', 'двойно',
+};
+
+/// The numbers of any length in [text], and its words of three letters or
+/// more when [sizesOnly] is false, else only its [_sizeWords], in lower case.
+
+Set<String> _tokens(String text, {bool sizesOnly = false}) => {
+  for (final token in text.toLowerCase().split(
+    RegExp(r'[^\p{L}\p{N}]+', unicode: true),
+  ))
+    if (RegExp(r'^\p{N}+$', unicode: true).hasMatch(token) ||
+        (sizesOnly ? _sizeWords.contains(token) : token.length > 2))
+      token,
+};
+
+/// [item] with what's left to ask in place of its own.
+EstimateItem _asking(
+  EstimateItem item, {
+  String? amount,
+  List<EstimateAmount> amounts = const [],
+  List<EstimateItem> options = const [],
+}) => EstimateItem(
+  name: item.name,
+  grams: item.grams,
+  kcal: item.kcal,
+  protein: item.protein,
+  amount: amount,
+  amounts: amounts,
+  options: options,
+);
+
+/// The other amounts the AI offers, by grams, which need the item's own
+/// weight to scale from.
+EstimateItem _withAmounts(EstimateItem item, Map entry, Set<String> heard) {
+  final from = item.grams;
+  final amount = switch (entry['amount']) {
+    final String words => words.trim(),
+    _ => '',
+  };
+  final raw = entry['amounts'];
+  if (from == null || raw is! List) return item;
+  final theirs = [
+    amount,
+    for (final other in raw)
+      if (other case {'amount': final String label}) label,
+  ];
+  if (_tokens(theirs.join(' '), sizesOnly: true).any(heard.contains)) {
+    return item;
+  }
+  final labels = {amount.toLowerCase()};
+  final calories = [item.kcal];
+  final amounts = <EstimateAmount>[];
+  for (final entry in raw) {
+    if (entry is! Map || entry['amount'] is! String || entry['grams'] is! num) {
+      continue;
+    }
+    final label = (entry['amount'] as String).trim();
+    final grams = (entry['grams'] as num).round();
+    final kcal = (item.kcal * grams / from).round();
+    if (label.isEmpty ||
+        grams <= 0 ||
+        grams == from ||
+        calories.any((other) => (kcal - other).abs() < optionGap) ||
+        !labels.add(label.toLowerCase())) {
+      continue;
+    }
+    amounts.add((label: label, grams: grams));
+    calories.add(kcal);
+    if (amounts.length == 3) break;
+  }
+  if (amounts.isEmpty) return item;
+  return _asking(
+    item,
+    amount: amount.isEmpty ? null : amount,
+    amounts: amounts,
+  );
+}
+
+/// At most 6 chips across the amount and kind rows, counting each row's
+/// ticked one; options give way, as the amount matters more.
+EstimateItem _fewerChips(EstimateItem item) {
+  final amountChips = item.amounts.isEmpty ? 0 : item.amounts.length + 1;
+  var options = item.options.length;
+  while (options > 0 && amountChips + options + 1 > 6) {
+    options--;
+  }
+  if (options == item.options.length) return item;
+  return _asking(
+    item,
+    amount: item.amount,
+    amounts: item.amounts,
+    options: item.options.take(options).toList(),
+  );
 }
 
 /// The words of [text] of three letters or more, in lower case.
@@ -189,11 +321,10 @@ EstimateItem _withOptions(EstimateItem item, Object? raw, Set<String> said) {
     if (options.length == 3) break;
   }
   if (options.isEmpty) return item;
-  return EstimateItem(
-    name: item.name,
-    grams: item.grams,
-    kcal: item.kcal,
-    protein: item.protein,
+  return _asking(
+    item,
+    amount: item.amount,
+    amounts: item.amounts,
     options: options,
   );
 }
@@ -238,6 +369,25 @@ EstimateItem resized(EstimateItem item, int grams) {
     grams: grams,
     kcal: scale(item.kcal),
     protein: item.protein == null ? null : scale(item.protein!),
+  );
+}
+
+/// [item] as the user answered: [kind] is one of its options (null keeps
+/// the item's own), [grams] one of its amounts' grams (null keeps the
+/// item's). A kind at a different weight is scaled in the same ratio.
+EstimateItem answered(EstimateItem item, {EstimateItem? kind, int? grams}) {
+  final base = (kind ?? item).settled;
+  final from = item.grams;
+  if (grams == null || from == null) return base;
+  final weight = base.grams ?? from;
+  return resized(
+    EstimateItem(
+      name: base.name,
+      grams: weight,
+      kcal: base.kcal,
+      protein: base.protein,
+    ),
+    (weight * grams / from).round(),
   );
 }
 

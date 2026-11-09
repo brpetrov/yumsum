@@ -1,5 +1,5 @@
 {
-  "about": "What a typed estimate should come to, for one standard UK portion: kcal ranges wide enough for honest disagreement, narrow enough to catch a doubled portion or an added side. specific: the user said what they had, so the app should never ask.",
+  "about": "What a typed estimate should come to, for one standard UK portion: kcal ranges wide enough for honest disagreement, narrow enough to catch a doubled portion or an added side. specific: the user said what they had, so the app should never ask. pieces: a food that comes in pieces with no count given, so the app should ask how many.",
   "meals": [
     { "meal": "200 g grilled chicken breast", "min": 280, "max": 360, "specific": true },
     { "meal": "diet coke", "min": 0, "max": 5, "specific": true },
@@ -33,6 +33,17 @@
     { "meal": "jacket potato with beans and cheese", "min": 400, "max": 750 },
     { "meal": "баница", "min": 250, "max": 550 },
     { "meal": "шопска салата", "min": 150, "max": 400 },
-    { "meal": "yoghurt", "min": 60, "max": 200 }
+    { "meal": "yoghurt", "min": 60, "max": 200 },
+    { "meal": "cabbage rolls", "min": 250, "max": 600, "pieces": true },
+    { "meal": "meatballs", "min": 200, "max": 500, "pieces": true },
+    { "meal": "pancakes", "min": 150, "max": 450, "pieces": true },
+    { "meal": "a handful of almonds", "min": 120, "max": 260 },
+    { "meal": "a bowl of tomato soup", "min": 100, "max": 300 },
+    { "meal": "2 slices of pizza", "min": 350, "max": 700 },
+    { "meal": "a beer", "min": 120, "max": 260 },
+    { "meal": "chicken salad", "min": 200, "max": 500 },
+    { "meal": "a pizza", "min": 600, "max": 1400 },
+    { "meal": "5 meatballs", "min": 250, "max": 450, "specific": true },
+    { "meal": "half a pizza", "min": 350, "max": 750, "specific": true }
   ]
 }
