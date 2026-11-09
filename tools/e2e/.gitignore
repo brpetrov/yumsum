@@ -1,3 +1,5 @@
 node_modules/
 shots/
 *.png
+!store/en-*.png
+!store/feature-graphic.png

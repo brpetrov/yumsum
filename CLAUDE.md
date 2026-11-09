@@ -107,3 +107,5 @@ The app is in English and Bulgarian (`docs/translation.md` has the how-to and wh
 - 11 pricing YumSum Star
 - 12 estimate choices: the amount and the kind
 - 13 servings on the scan sheet
+- 14 Play store listing and forms
+- 15 from draft to closed test in Play Console

@@ -215,8 +215,8 @@ The page names the same exceptions, plus crash reports kept for 90 days.
 ## 4. Graphics checklist
 
 - [x] App icon 512 x 512: `assets/android/play_store_512.png`
-- [ ] Feature graphic 1024 x 500 (being made separately)
-- [ ] 4 to 8 phone screenshots (being made separately)
+- [x] Feature graphic 1024 x 500: `tools/e2e/store/feature-graphic.png` (from `store/feature.html`, `node feature_shot.js`)
+- [x] Six phone screenshots, 1080 x 1920: `tools/e2e/store/en-1-home.png` to `en-6-history.png` (`node screenshots.js` in `tools/e2e`, signed in as the test account): Home, typing with chips, the targets dialog, Recipes, Weight & Progress, History. YumSum Star's page and an AI estimate are best taken on the phone (the website's Star page says to subscribe in the Android app, and robot browsers can't use the AI).
 
 Suggested six screenshots, in order (captions 30 characters max, counts in brackets):
 

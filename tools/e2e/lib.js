@@ -9,7 +9,7 @@ async function open(engine, device) {
   const browser = await pw[engine].launch();
   // UK English: Settings offers Bulgarian only to some regions, the UK one.
   const context = await browser.newContext({
-    ...(device ? pw.devices[device] : { viewport: { width: 1280, height: 800 } }),
+    ...(typeof device === "object" ? device : device ? pw.devices[device] : { viewport: { width: 1280, height: 800 } }),
     locale: process.env.LOCALE || "en-GB",
   });
   const page = await context.newPage();
