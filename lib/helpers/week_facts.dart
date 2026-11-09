@@ -337,7 +337,7 @@ WeekFacts buildWeekFacts({
   if (fibreAverage != null) {
     final reached = fibre.values.where((g) => g.round() >= guides.fibre);
     lines.add(
-      'Fibre: the UK guide is at least ${guides.fibre} g a day. Averaged '
+      'Fibre: the guide is at least ${guides.fibre} g a day. Averaged '
       '$fibreAverage g on the ${fibre.length} days with fibre for every '
       'meal; reached on ${_days(reached.length)}.',
     );

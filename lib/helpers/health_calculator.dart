@@ -86,7 +86,8 @@ class HealthCalculator {
   /// follow weight, height, age, gender and activity with it: fat about 30%
   /// of the calories, carbs the rest after protein and fat, saturates no
   /// more than 10% (the UK's advice) and all sugars no more than 18% (the
-  /// food-label guide, 90 g in 2,000 kcal). Fibre (at least 30 g) and salt
+  /// food-label guide, 90 g in 2,000 kcal). Fibre (at least 25 g, the WHO's
+  /// minimum: the UK's 30 g was out of reach on a low-calorie plan) and salt
   /// (no more than 6 g) are the same for every adult.
   static ({int fat, int carbs, int saturates, int sugars, int fibre, int salt})
   macroTargets({required int calories, required int proteinGrams}) {
@@ -96,7 +97,7 @@ class HealthCalculator {
       carbs: math.max(0, (calories - proteinGrams * 4 - fat * 9) / 4).round(),
       saturates: (calories * 0.10 / 9).round(),
       sugars: (calories * 0.18 / 4).round(),
-      fibre: 30,
+      fibre: 25,
       salt: 6,
     );
   }

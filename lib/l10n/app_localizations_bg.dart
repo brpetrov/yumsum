@@ -872,6 +872,11 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String macroRingAtLeast(int grams) {
+    return '$grams+ г';
+  }
+
+  @override
   String macroRingOf(int grams) {
     return 'от $grams г';
   }
@@ -961,7 +966,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get macroGuideFibreWhy => 'Засищат и поддържат червата здрави.';
 
   @override
-  String get macroGuideFibreTarget => 'Поне 30 г на ден.';
+  String get macroGuideFibreTarget => 'Поне 25 г на ден. Повече е по-добре.';
 
   @override
   String get macroGuideCarbsWhy =>

@@ -363,7 +363,7 @@ void main() {
       expect(t.carbs, 161); // (1670 - 131 × 4 - 501) / 4
       expect(t.saturates, 19); // 10% of the calories
       expect(t.sugars, 75); // 18%, the label guide's 90 g in 2,000 kcal
-      expect(t.fibre, 30);
+      expect(t.fibre, 25);
       expect(t.salt, 6);
     });
 

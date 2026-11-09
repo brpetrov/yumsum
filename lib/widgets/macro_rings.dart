@@ -261,13 +261,16 @@ class _RingTile extends StatelessWidget {
   final double? preview;
 
   /// Green while on course; amber, then red, past a most or well past a
-  /// guide, the way the calorie bar turns.
+  /// guide, the way the calorie bar turns. A target to reach (protein,
+  /// fibre) is amber until 80% of it, then green however far over: never
+  /// red, as every day starts at nothing.
   Color get _color {
     final grams = ring.grams;
-    if (grams == null || ring.target <= 0 || ring.kind == _Kind.aim) {
-      return AppColors.veryGood;
-    }
+    if (grams == null || ring.target <= 0) return AppColors.veryGood;
     final share = grams / ring.target;
+    if (ring.kind == _Kind.aim) {
+      return share >= 0.8 ? AppColors.veryGood : AppColors.bad;
+    }
     final greenUpTo = ring.kind == _Kind.limit ? 1.0 : 1.1;
     if (share <= greenUpTo) return AppColors.veryGood;
     return share <= 1.2 ? AppColors.bad : AppColors.veryBad;
@@ -326,9 +329,11 @@ class _RingTile extends StatelessWidget {
             ),
             if (preview == null && ring.target > 0)
               Text(
-                ring.kind == _Kind.limit
-                    ? l10n.macroRingMax(ring.target)
-                    : l10n.macroRingOf(ring.target),
+                switch (ring.kind) {
+                  _Kind.limit => l10n.macroRingMax(ring.target),
+                  _Kind.aim => l10n.macroRingAtLeast(ring.target),
+                  _Kind.guide => l10n.macroRingOf(ring.target),
+                },
                 style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
               ),
           ],

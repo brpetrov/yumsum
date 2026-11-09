@@ -459,7 +459,7 @@ void main() {
       'Recipes from the app\'s library: "Greek yoghurt berry bowl" (332 '
           'kcal, 30 g protein); "Lighter full English" (408 kcal, 36 g '
           'protein).',
-      'Fibre: the UK guide is at least 30 g a day. Averaged 17 g on the 6 '
+      'Fibre: the guide is at least 25 g a day. Averaged 17 g on the 6 '
           'days with fibre for every meal; reached on 0 days.',
       'Salt: the UK guide is at most 6 g a day. Averaged 7.4 g on the 6 days '
           'with salt for every meal; over on 4 days.',
@@ -544,7 +544,7 @@ void main() {
     ];
 
     test('off the guide for weeks running', () {
-      // This week: protein 88 of 112, fibre 17 of 30, salt 7.4 over 6;
+      // This week: protein 88 of 112, fibre 17 of 25, salt 7.4 over 6;
       // sugars and saturates within their guides.
       final lines = _facts(
         meals: [...earlier(fibre: 12, salt: 8), ..._meals],
@@ -671,8 +671,8 @@ void main() {
       'Every weekday logged was on track.',
       'Protein target: 112 g a day. Averaged 110 g on the 5 days with '
           'protein for every meal; reached on 3 days.',
-      'Fibre: the UK guide is at least 30 g a day. Averaged 30 g on the 5 '
-          'days with fibre for every meal; reached on 3 days.',
+      'Fibre: the guide is at least 25 g a day. Averaged 30 g on the 5 '
+          'days with fibre for every meal; reached on 5 days.',
       'Salt: the UK guide is at most 6 g a day. Averaged 5.4 g on the 5 days '
           'with salt for every meal; over on 1 day.',
       'Sugars: the guide is at most 86 g a day. Averaged 72 g on the 5 days '

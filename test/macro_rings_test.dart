@@ -96,7 +96,7 @@ void main() {
     ];
     expect(names, orderedEquals([...names]..sort()));
     expect(find.text('44 g'), findsOneWidget);
-    expect(find.text('of 131 g'), findsOneWidget);
+    expect(find.text('131+ g'), findsOneWidget);
     expect(find.text('of 161 g'), findsOneWidget);
     expect(find.text('of 56 g'), findsOneWidget);
     expect(find.text('Macros'), findsNothing);
@@ -110,6 +110,32 @@ void main() {
     );
     expect(find.text('2.1 g'), findsOneWidget);
     expect(find.text('max 6 g'), findsOneWidget);
+  });
+
+  testWidgets('fibre and protein are amber until 80% of their target, then '
+      'green, never red', (tester) async {
+    Meal withFibre(double fibre, double protein) => _meal(
+      'Lentils',
+      protein,
+      Nutrients(
+        fat: 5,
+        saturates: 1,
+        carbs: 40,
+        sugars: 3,
+        fibre: fibre,
+        salt: 1,
+      ),
+    );
+    await pump(tester, [withFibre(6, 0)]);
+    expect(find.text('25+ g', skipOffstage: false), findsOneWidget);
+    expect(ringColor(tester, '6 g'), AppColors.bad);
+    expect(ringColor(tester, '0 g'), AppColors.bad);
+    await pump(tester, [withFibre(20, 105)]);
+    expect(ringColor(tester, '20 g'), AppColors.veryGood);
+    expect(ringColor(tester, '105 g'), AppColors.veryGood);
+    await pump(tester, [withFibre(60, 300)]);
+    expect(ringColor(tester, '60 g'), AppColors.veryGood);
+    expect(ringColor(tester, '300 g'), AppColors.veryGood);
   });
 
   testWidgets('carbs go amber past 10% over, red past 20%', (tester) async {
@@ -182,7 +208,7 @@ void main() {
   testWidgets('without YumSum Star, protein alone is live', (tester) async {
     await pump(tester, [_wrap], full: false);
     expect(find.text('38 g'), findsOneWidget);
-    expect(find.text('of 131 g'), findsOneWidget);
+    expect(find.text('131+ g'), findsOneWidget);
     // The rest are there to see, with no figures, under the chip.
     expect(find.text('Carbs'), findsOneWidget);
     expect(find.text('52 g'), findsNothing);

@@ -1508,6 +1508,12 @@ abstract class AppLocalizations {
   /// **'max {grams} g'**
   String macroRingMax(int grams);
 
+  /// Under a macro ring with a target to reach (protein, fibre): at least this, and more is fine.
+  ///
+  /// In en, this message translates to:
+  /// **'{grams}+ g'**
+  String macroRingAtLeast(int grams);
+
   /// Under a macro ring with a target: the day's target.
   ///
   /// In en, this message translates to:
@@ -1637,7 +1643,7 @@ abstract class AppLocalizations {
   /// Macro guide dialog: fibre's target, after Target:.
   ///
   /// In en, this message translates to:
-  /// **'At least 30 g a day.'**
+  /// **'At least 25 g a day. More is better.'**
   String get macroGuideFibreTarget;
 
   /// Macro guide dialog: what carbs do.

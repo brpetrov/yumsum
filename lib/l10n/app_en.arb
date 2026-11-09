@@ -1090,6 +1090,15 @@
       }
     }
   },
+  "macroRingAtLeast": "{grams}+ g",
+  "@macroRingAtLeast": {
+    "description": "Under a macro ring with a target to reach (protein, fibre): at least this, and more is fine.",
+    "placeholders": {
+      "grams": {
+        "type": "int"
+      }
+    }
+  },
   "macroRingOf": "of {grams} g",
   "@macroRingOf": {
     "description": "Under a macro ring with a target: the day's target.",
@@ -1194,7 +1203,7 @@
   "@macroGuideFibreWhy": {
     "description": "Macro guide dialog: what fibre does."
   },
-  "macroGuideFibreTarget": "At least 30 g a day.",
+  "macroGuideFibreTarget": "At least 25 g a day. More is better.",
   "@macroGuideFibreTarget": {
     "description": "Macro guide dialog: fibre's target, after Target:."
   },

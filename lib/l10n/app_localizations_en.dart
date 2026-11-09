@@ -857,6 +857,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String macroRingAtLeast(int grams) {
+    return '$grams+ g';
+  }
+
+  @override
   String macroRingOf(int grams) {
     return 'of $grams g';
   }
@@ -946,7 +951,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get macroGuideFibreWhy => 'Keeps you full and your gut healthy.';
 
   @override
-  String get macroGuideFibreTarget => 'At least 30 g a day.';
+  String get macroGuideFibreTarget => 'At least 25 g a day. More is better.';
 
   @override
   String get macroGuideCarbsWhy =>
