@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { inLanguage, verificationEmail } from "../src/email";
+import { inLanguage, resetEmail, verificationEmail } from "../src/email";
 
 describe("verificationEmail", () => {
   const link =
@@ -55,6 +55,27 @@ describe("verificationEmail", () => {
     assert.deepEqual(tags(bulgarian.html), tags(english.html)?.map((tag) =>
       tag === '<html lang="en">' ? '<html lang="bg">' : tag));
     assert.ok(bulgarian.text.includes("&lang=bg"));
+  });
+
+  test("the reset email: the same design, its own words, both languages", () => {
+    const reset = "https://lean-streak-project.firebaseapp.com/__/auth/action?mode=resetPassword&oobCode=abc&lang=en";
+    const english = resetEmail(reset);
+    assert.equal(english.subject, "Reset your YumSum password");
+    assert.ok(english.html.includes(">Choose a new password</a>"));
+    assert.equal(english.html.split(`href="${reset.replace(/&/g, "&amp;")}"`).length - 1, 2);
+    const bulgarian = resetEmail(inLanguage(reset, "bg"), "bg");
+    assert.equal(bulgarian.subject, "Нова парола за YumSum");
+    assert.ok(bulgarian.html.includes(">Избери нова парола</a>"));
+    assert.ok(!/Confirm|password/.test(bulgarian.text));
+    const tags = (html: string) => html.match(/<[^>]*>/g)?.filter((tag) => !tag.startsWith("<a "));
+    assert.deepEqual(tags(english.html), tags(verificationEmail(link).html));
+    for (const { html, text, subject } of [english, bulgarian]) {
+      for (const words of [html.replace("<!DOCTYPE html>", ""), text, subject]) {
+        assert.ok(!words.includes("!"));
+        assert.ok(!/please|моля/i.test(words));
+        assert.ok(!/(^|[^а-я])(вие|вас|ваш[а-я]*|ви)(?![а-я])/i.test(words));
+      }
+    }
   });
 
   test("Firebase's page opens in the email's language", () => {

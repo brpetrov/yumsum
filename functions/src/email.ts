@@ -19,7 +19,10 @@ const sender = "help.yumsum@gmail.com";
 /** The logo at the top of the email, from the website. */
 const logoUrl = "https://yumsum.web.app/app/icons/Icon-192.png";
 
-/** Confirmation emails a day per account: room to ask again, not to spam. */
+/**
+ * Confirmation and password reset emails a day per account, together: room
+ * to ask again, not to spam.
+ */
 export const dailyLimit = 5;
 
 /**
@@ -57,8 +60,59 @@ export const sendVerificationEmail = onCall(
 );
 
 /**
- * [link] opening Firebase's confirmation page in [language]: the link comes
- * with `lang=en`.
+ * Emails the link to choose a new password to `email`, styled as YumSum,
+ * from help.yumsum@gmail.com, in the app's `language`: Firebase's own reset
+ * email is plain and comes from lean-streak-project.firebaseapp.com. Asked
+ * before signing in, so it answers the same whether or not there's an
+ * account, and once the day's emails are used up, so the form can't be used
+ * to probe addresses. The app falls back to Firebase's email when this fails.
+ */
+export const sendPasswordResetEmail = onCall(
+  { enforceAppCheck: true, secrets: [gmailAppPassword] },
+  async (request) => {
+    const data = (request.data ?? {}) as { email?: unknown; language?: unknown };
+    const language = languageOf(data.language);
+    const email = typeof data.email === "string" ? data.email.trim() : "";
+    if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new HttpsError("invalid-argument", "Not an email address.");
+    }
+    const same = { sent: true };
+    let uid: string;
+    try {
+      const user = await getAuth().getUserByEmail(email);
+      if (user.disabled) return same;
+      uid = user.uid;
+    } catch (error) {
+      if ((error as { code?: string }).code === "auth/user-not-found") return same;
+      throw error;
+    }
+
+    let counter;
+    try {
+      counter = await countToday(uid, "email_usage", dailyLimit);
+    } catch (error) {
+      if (error instanceof HttpsError && error.code === "resource-exhausted") return same;
+      throw error;
+    }
+    try {
+      const link = await getAuth().generatePasswordResetLink(email);
+      const message = resetEmail(inLanguage(link, language), language);
+      await createTransport({
+        service: "gmail",
+        auth: { user: sender, pass: gmailAppPassword.value() },
+      }).sendMail({ from: `"YumSum" <${sender}>`, to: email, ...message });
+    } catch (error) {
+      logger.warn("Could not send the password reset email", error);
+      await counter.update({ count: FieldValue.increment(-1) });
+      throw new HttpsError("unavailable", "Could not send the email.");
+    }
+    return same;
+  },
+);
+
+/**
+ * [link] opening Firebase's confirmation or reset page in [language]: the
+ * link comes with `lang=en`.
  */
 export function inLanguage(link: string, language: Language): string {
   if (language === "en") return link;
@@ -67,9 +121,9 @@ export function inLanguage(link: string, language: Language): string {
   return url.toString();
 }
 
-/** The email's words in each language. */
-const copy: Record<Language, Record<string, string>> = {
-  en: {
+/** Each email's words in each language. */
+const copy: Record<"verify" | "reset", Record<Language, Record<string, string>>> = {
+  verify: { en: {
     subject: "Confirm your email for YumSum",
     title: "Confirm your email",
     preheader: "One tap to confirm your email and start using YumSum.",
@@ -92,7 +146,32 @@ const copy: Record<Language, Record<string, string>> = {
     ignore: "Ако регистрацията в YumSum не е по твоя заявка, можеш да " +
       "пренебрегнеш този имейл.",
     tagline: "Постоянство всеки ден. Винаги във форма.",
+  } },
+  // Firebase's reset links work once, for an hour.
+  reset: { en: {
+    subject: "Reset your YumSum password",
+    title: "Reset your password",
+    preheader: "Choose a new password for your YumSum account.",
+    intro: "Tap the button to choose a new password for your YumSum " +
+      "account. The link works once, for an hour.",
+    button: "Choose a new password",
+    fallback: "The button not working? Copy this link into your browser:",
+    ignore: "If you didn't ask to reset your password, you can ignore this " +
+      "email. Your password stays as it is.",
+    tagline: "Stay consistent. Stay lean.",
   },
+  bg: {
+    subject: "Нова парола за YumSum",
+    title: "Смени паролата си",
+    preheader: "Избери нова парола за профила си в YumSum.",
+    intro: "Натисни бутона, за да избереш нова парола за профила си в " +
+      "YumSum. Линкът работи веднъж, до един час.",
+    button: "Избери нова парола",
+    fallback: "Бутонът не работи? Копирай този линк в браузъра си:",
+    ignore: "Ако смяната на паролата не е по твоя заявка, можеш да " +
+      "пренебрегнеш този имейл. Паролата ти остава същата.",
+    tagline: "Постоянство всеки ден. Винаги във форма.",
+  } },
 };
 
 /**
@@ -100,11 +179,19 @@ const copy: Record<Language, Record<string, string>> = {
  * plain text.
  */
 export function verificationEmail(link: string, language: Language = "en") {
+  return styledEmail(copy.verify[language], link, language);
+}
+
+/** The password reset email for [link] in [language], in the same design. */
+export function resetEmail(link: string, language: Language = "en") {
+  return styledEmail(copy.reset[language], link, language);
+}
+
+function styledEmail(words: Record<string, string>, link: string, language: Language) {
   const href = escapeHtml(link);
   const font =
     "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-  const { subject, title, preheader, intro, button, fallback, ignore, tagline } =
-    copy[language];
+  const { subject, title, preheader, intro, button, fallback, ignore, tagline } = words;
   // Tables and inline styles, as email clients need.
   const html = `<!DOCTYPE html>
 <html lang="${language}">

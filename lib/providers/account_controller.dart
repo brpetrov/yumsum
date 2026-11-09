@@ -83,7 +83,7 @@ class AccountController extends AsyncNotifier<void> {
         throw AccountActionException(_l10n.accountErrorNoEmail);
       }
 
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      await sendResetEmail(ref, email);
       state = const AsyncData(null);
     } on FirebaseAuthException catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);

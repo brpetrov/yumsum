@@ -110,16 +110,13 @@ class AuthController extends AsyncNotifier<AuthStatus> {
     }
   }
 
-  /// Emails a link to choose a new password. An unknown address gets the
-  /// same answer as a known one, so the form can't be used to probe emails.
+  /// Emails a link to choose a new password: ours, else Firebase's. An
+  /// unknown address gets the same answer as a known one, so the form can't
+  /// be used to probe emails.
   Future<void> sendPasswordReset(String email) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      try {
-        await FirebaseAuth.instance.sendPasswordResetEmail(email: email.trim());
-      } on FirebaseAuthException catch (error) {
-        if (error.code != 'user-not-found') rethrow;
-      }
+      await sendResetEmail(ref, email.trim());
       return AuthStatus.resetSent;
     });
   }
@@ -149,6 +146,37 @@ final verificationEmailProvider = Provider<Future<void> Function()>(
         .call<Object?>({'language': ref.read(languageCodeProvider)});
   },
 );
+
+/// Sends [email] our password reset email (sendPasswordResetEmail,
+/// functions/src/email.ts), styled as YumSum and from help.yumsum in the
+/// app's language, where Firebase's own is plain text from
+/// lean-streak-project.firebaseapp.com.
+final passwordResetEmailProvider = Provider<Future<void> Function(String)>(
+  (ref) => (email) async {
+    await ensureAppCheck();
+    await FirebaseFunctions.instanceFor(
+      region: 'europe-west10',
+    ).httpsCallable('sendPasswordResetEmail').call<Object?>({
+      'email': email,
+      'language': ref.read(languageCodeProvider),
+    });
+  },
+);
+
+/// Our password reset email to [email], or Firebase's when ours fails, so a
+/// link always goes. Firebase's says nothing of an unknown address either.
+Future<void> sendResetEmail(Ref ref, String email) async {
+  try {
+    await ref.read(passwordResetEmailProvider)(email);
+  } catch (error) {
+    debugPrint("Sending Firebase's password reset email instead: $error");
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (error) {
+      if (error.code != 'user-not-found') rethrow;
+    }
+  }
+}
 
 final authControllerProvider =
     AsyncNotifierProvider<AuthController, AuthStatus>(AuthController.new);
