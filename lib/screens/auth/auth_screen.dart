@@ -327,7 +327,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       controller: _passwordController,
                       obscureText: _obscurePassword,
                       textInputAction: TextInputAction.done,
-                      autofillHints: _isSignIn
+                      // No hint while the password is shown: on the web, a
+                      // shown password with one lost its input after a
+                      // failed sign-in, so typing went nowhere (Firefox,
+                      // 9 November 2026).
+                      autofillHints: !_obscurePassword
+                          ? null
+                          : _isSignIn
                           ? const [AutofillHints.password]
                           : const [AutofillHints.newPassword],
                       onFieldSubmitted: (_) {
