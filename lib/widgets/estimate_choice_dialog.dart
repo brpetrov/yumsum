@@ -11,11 +11,14 @@ import 'package:lean_streak/services/calorie_estimate_service.dart';
 /// ([showEstimateChoice]): at most [limit] of them, those whose answers
 /// move the calories most, in the meal's order. Returns the list with the
 /// answers in, every other item settled, as is one whose dialog was
-/// dismissed. Null when there was nothing to ask.
+/// dismissed. Null when there was nothing to ask. [said] is what the user
+/// typed or said, shown under the title; a meal of one item then needs no
+/// item name.
 Future<List<EstimateItem>?> offerEstimateChoices(
   BuildContext context,
   List<EstimateItem> items, {
   int limit = 2,
+  String? said,
 }) async {
   final open = [
     for (final (index, item) in items.indexed)
@@ -31,7 +34,12 @@ Future<List<EstimateItem>?> offerEstimateChoices(
   final result = [for (final item in items) item.settled];
   for (final index in open.where(asked.contains)) {
     if (!context.mounted) return null;
-    final chosen = await showEstimateChoice(context, items[index]);
+    final chosen = await showEstimateChoice(
+      context,
+      items[index],
+      said: said,
+      showName: said == null || items.length > 1,
+    );
     result[index] = chosen ?? items[index].settled;
   }
   return result;
@@ -50,19 +58,24 @@ int _spread(EstimateItem item) => [
 /// couldn't tell: a row of amounts and a row of kinds, each with the one
 /// the AI went with first and ticked, and the calories of what's picked.
 /// Done answers that, settled; Cancel or dismissing answers null, which
-/// keeps the AI's.
+/// keeps the AI's. [said], what the user typed or said, goes under the
+/// title; [showName] false leaves out the item's name (a one-item meal).
 Future<EstimateItem?> showEstimateChoice(
   BuildContext context,
-  EstimateItem item,
-) => showDialog<EstimateItem>(
+  EstimateItem item, {
+  String? said,
+  bool showName = true,
+}) => showDialog<EstimateItem>(
   context: context,
-  builder: (_) => _ChoiceDialog(item),
+  builder: (_) => _ChoiceDialog(item, said: said, showName: showName),
 );
 
 class _ChoiceDialog extends StatefulWidget {
-  const _ChoiceDialog(this.item);
+  const _ChoiceDialog(this.item, {this.said, this.showName = true});
 
   final EstimateItem item;
+  final String? said;
+  final bool showName;
 
   @override
   State<_ChoiceDialog> createState() => _ChoiceDialogState();
@@ -100,15 +113,35 @@ class _ChoiceDialogState extends State<_ChoiceDialog> {
     );
 
     return AlertDialog(
-      title: Text(l10n.mealChoiceTitle),
+      title: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.mealChoiceTitle),
+          // What the user typed or said, so they know what's being asked.
+          if (widget.said case final said?)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                _capitalised(said),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+        ],
+      ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // The kind row starts with the item's name; without one, the
-            // name says what the amounts are of.
-            if (item.options.isEmpty)
+            // name says what the amounts are of, unless the meal is just
+            // this item and the subtitle already says.
+            if (item.options.isEmpty && widget.showName)
               Text(
                 _capitalised(item.name),
                 style: TextStyle(fontSize: 15, color: AppColors.textPrimary),

@@ -369,14 +369,15 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       _fill(text, result.kcal, result.protein, macros: result.macros);
       _aiItems = result.items;
     });
-    await _offerChoices();
+    await _offerChoices(said: text);
   }
 
   /// Where the AI had to assume which version of an item the user had, it
-  /// asks (`offerEstimateChoices`); a pick swaps the item in and the boxes
-  /// follow, as for a corrected weight.
-  Future<void> _offerChoices() async {
-    final items = await offerEstimateChoices(context, _aiItems);
+  /// asks (`offerEstimateChoices`), showing [said], what they typed or
+  /// said; a pick swaps the item in and the boxes follow, as for a
+  /// corrected weight.
+  Future<void> _offerChoices({String? said}) async {
+    final items = await offerEstimateChoices(context, _aiItems, said: said);
     if (items != null && mounted) _itemsChanged(items);
   }
 
@@ -615,6 +616,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       return;
     }
 
+    String? said;
     await _runAi(() async {
       final result = await ref
           .read(calorieEstimateServiceProvider)
@@ -622,8 +624,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       if (!mounted) return;
       _fill(result.name, result.kcal, result.protein, macros: result.macros);
       _aiItems = result.items;
+      said = result.name;
     });
-    await _offerChoices();
+    await _offerChoices(said: said);
   }
 
   /// A barcode the camera read is looked up in Open Food Facts (label

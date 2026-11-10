@@ -138,6 +138,33 @@ void main() {
     expect(find.text('672 kcal'), findsOneWidget);
   });
 
+  testWidgets('what the user typed goes under the title, and a one-item meal '
+      'skips the item\'s name', (tester) async {
+    late Future<List<EstimateItem>?> offered;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: Builder(
+          builder: (context) => TextButton(
+            onPressed: () => offered = offerEstimateChoices(context, const [
+              _sarmi,
+            ], said: 'sarmi for lunch'),
+            child: const Text('Ask'),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Ask'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Quick question'), findsOneWidget);
+    expect(find.text('Sarmi for lunch'), findsOneWidget);
+    expect(find.text('Sarmi with meat'), findsNothing);
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+    expect((await offered)!.single, _sarmi.settled);
+  });
+
   testWidgets('asks the two items with the widest spread, settles the rest', (
     tester,
   ) async {

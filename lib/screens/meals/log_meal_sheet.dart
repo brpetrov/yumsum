@@ -135,7 +135,11 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
     if (!mounted) return;
     setState(() => _estimating = false);
     // Where the AI had to assume which version of an item it was, it asks.
-    final items = await offerEstimateChoices(context, _estimateItems);
+    final items = await offerEstimateChoices(
+      context,
+      _estimateItems,
+      said: name,
+    );
     if (items != null && mounted) _itemsChanged(items);
   }
 
