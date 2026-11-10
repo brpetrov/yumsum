@@ -1,6 +1,6 @@
 // Play Store screenshots from the website (YumSum Star's page says to subscribe
 // in the Android app there, so take that one on the phone), signed in as the test account:
-// logs a few meals and a weigh-in, captures the main screens at a 9:16
+// logs a few recipe portions and a weigh-in, captures the main screens at a 9:16
 // phone size (1080 × 1920), then clears the data with Reset all data.
 // Usage: YUMSUM_TEST_EMAIL=… YUMSUM_TEST_PASSWORD=… node screenshots.js [en|bg]
 const fs = require("fs");
@@ -14,11 +14,13 @@ const phone = {
   screen: { width: 412, height: 732 },
   deviceScaleFactor: 1080 / 412,
 };
-const meals = [
-  ["Greek yoghurt with berries and honey", "240", "18"],
-  ["Chicken and avocado wrap", "460", "34"],
-  ["Apple", "80", "0"],
-  ["Salmon, rice and green beans", "610", "42"],
+// Recipes carry full macros, so the rings on the home screen fill up
+// (a typed meal has calories and protein only).
+const recipes = [
+  "Greek yoghurt berry bowl",
+  "Chicken souvlaki wrap",
+  "Berry protein smoothie",
+  "Salmon with dill potatoes",
 ];
 
 (async () => {
@@ -49,16 +51,31 @@ const meals = [
   await tap(page, "Sign in", { last: true });
   await page.waitForURL(/#\/dashboard/, { timeout: 30000 });
   await page.waitForTimeout(3000);
+  // One-off offers on a fresh browser: the Adaptive formula's intro (an
+  // account new to YumSum Star) and the creatine reminder.
+  for (const later of ["Maybe later", "No thanks"]) {
+    if (await sees(page, later, 8000)) {
+      await tap(page, later);
+      await page.waitForTimeout(1500);
+    }
+  }
   // Start from an empty day, after a run that stopped early.
   if (await sees(page, "logged", 2000)) await reset();
 
-  for (const [name, kcal, protein] of meals) {
-    await type(page, "Type a meal", name);
-    await type(page, "kcal", kcal);
-    await type(page, "protein (g)", protein, { enter: true });
-    await page.waitForTimeout(3500);
+  for (const name of recipes) {
+    await menu("Recipes");
+    await type(page, "Search recipes or ingredients", name);
+    // The search leaves one card; its button opens the recipe, whose own
+    // Log a portion opens the "How many portions?" sheet.
+    await tap(page, "Log a portion");
+    await tap(page, "Log a portion");
+    await tap(page, "Log", { last: true });
+    await page.waitForTimeout(3000);
+    // The recipe stays open after logging, and the list keeps the search.
+    await tap(page, "Back");
+    await tap(page, "Clear");
   }
-  await page.keyboard.press("Escape");
+  await menu("Home");
   await shot("1-home");
 
   await type(page, "Type a meal", "Chick");

@@ -11,20 +11,20 @@
 
 ## A. Before you upload (about 20 minutes)
 
-- [ ] **Open Food Facts password**: change it on openfoodfacts.org (old test builds carried it), then in the VS Code terminal `firebase functions:secrets:set OFF_PASSWORD` (type it when asked) and `firebase deploy --only functions:contributeProduct`. Plan 04 has the background.
-- [ ] **Payments profile**: Play Console → Settings (the cog) → Payments profile → create it. Needed for the subscription later; it shows your address on the listing, so decide on the address first (plan 07 step 1).
-- [ ] **Your own phone's Gmail** is the first tester: note which Gmail your phone's Play Store uses.
+- [x] **Open Food Facts password** (skipped 9 November 2026: only the owner's old builds carried it): change it on openfoodfacts.org (old test builds carried it), then in the VS Code terminal `firebase functions:secrets:set OFF_PASSWORD` (type it when asked) and `firebase deploy --only functions:contributeProduct`. Plan 04 has the background.
+- [ ] **Payments profile** (moved to E, around day 2–5 of the test): Play Console → Settings (the cog) → Payments profile → create it. Needed for the subscription later; it shows your address on the listing, so decide on the address first (plan 07 step 1).
+- [x] **Your own phone's Gmail** (`broovenn@gmail.com`) is the first tester: note which Gmail your phone's Play Store uses.
 
 ## B. Internal test, just you (about 30 minutes, then a few hours' wait)
 
-- [ ] **Bundle**: Claude has built `build\app\outputs\bundle\release\app-release.aab` (version 0.1.0+1). If it's older than the latest change, ask for a new one.
-- [ ] Play Console → YumSum → **Test and release → Testing → Internal testing** → Create new release.
-  - [ ] "Play App Signing": accept (Google keeps the signing key; your upload key stays in `C:\Users\brpet\keys`).
-  - [ ] Upload the `.aab`. Release name: leave Play's (0.1.0). Release notes: `First test build.`
-  - [ ] Next → Save → Go to overview → Send for review / Start rollout (internal tests usually go live within minutes to hours).
-- [ ] **Testers** tab → Create email list "Me" → add your phone's Gmail → Save → tick it. Copy the **join on the web** link.
-- [ ] **Signing keys into Firebase**: Test and release → **App integrity** → App signing → copy the **App signing key** SHA-1 and SHA-256. Firebase console → Project settings → Your apps → **YumSum Android** → Add fingerprint → paste each. (Without them, Google sign-in fails in Play installs.)
-- [ ] **Play Integrity**: App integrity → Play Integrity API → **Link a Cloud project** → `lean-streak-project`. Then Firebase → App Check → Apps → YumSum Android → Play Integrity → add the same **App signing** SHA-256. (Without this, AI fails in Play installs.)
+- [x] **Bundle**: Claude has built `build\app\outputs\bundle\release\app-release.aab` (version 0.1.0+1). If it's older than the latest change, ask for a new one.
+- [x] Play Console → YumSum → **Test and release → Testing → Internal testing** → Create new release.
+  - [x] "Play App Signing": accept (Google keeps the signing key; your upload key stays in `C:\Users\brpet\keys`).
+  - [x] Upload the `.aab`. Release name: leave Play's (0.1.0). Release notes: `First test build.`
+  - [x] Next → Save → Go to overview → Send for review / Start rollout (internal tests usually go live within minutes to hours).
+- [x] **Testers** tab → Create email list "Me" → add your phone's Gmail → Save → tick it. Copy the **join on the web** link (https://play.google.com/apps/internaltest/4701065037597490716).
+- [x] **Signing keys into Firebase** (added by Claude 10 November 2026; SHA-1 36:F8:32:6E…, SHA-256 68:27:1B:D7…): Protected with Play → Play Store protection → App signing → copy the **App signing key** SHA-1 and SHA-256. Firebase console → Project settings → Your apps → **YumSum Android** → Add fingerprint → paste each. (Without them, Google sign-in fails in Play installs.)
+- [x] **Play Integrity** (linked to project 296684319013, App Check already registered, 10 November 2026): Protected with Play → Play Integrity API → **Link a Cloud project** → `lean-streak-project`. Then Firebase → App Check → Apps → YumSum Android → Play Integrity → add the same **App signing** SHA-256. (Without this, AI fails in Play installs.)
 - [ ] **Try it**: on your phone open the join link → Become a tester → Download it on Google Play. Uninstall the VS Code build first if Play says it can't install (different signatures). Then: sign in with Google and with email, log a meal with an AI estimate, scan a barcode, use the mic, open every menu page. Anything odd → tell Claude.
 - [ ] **Crash reports**: on that install, Settings → Debug tools (your owner account) → **Send a test crash report**, close the app fully, open it again; within a few minutes it shows in Firebase → Crashlytics → Non-fatals.
 
@@ -33,14 +33,14 @@
 - [ ] **Grow users → Store presence → Main store listing**: app name, short and full description from plan 14 section 1.
   - [ ] App icon: `assets/android/play_store_512.png`.
   - [ ] Feature graphic: `tools/e2e/store/feature-graphic.png` (1024 × 500).
-  - [ ] Phone screenshots, in this order: `tools/e2e/store/en-1-home.png`, `en-2-quick-log.png`, `en-3-targets.png`, `en-4-recipes.png`, `en-5-progress.png`, `en-6-history.png`. Add one of the YumSum Star page and one of an AI estimate taken on your phone later if you like.
+  - [ ] Phone screenshots, in this order: `tools/e2e/store/en-1-home.png`, `en-2-quick-log.png`, `en-3-targets.png`, `en-4-recipes.png`, `en-5-progress.png`, `en-6-history.png`. For production, the poster-style set from `tools/e2e/store/BRIEF.md` (`play-*.png`) replaces these.
   - [ ] Translations → Add → Bulgarian: the Bulgarian texts from plan 14 (screenshots can stay English).
   - [ ] Save.
 - [ ] **Store settings**: category **Health & Fitness**, contact email `help.yumsum@gmail.com`, website `https://yumsum.web.app`.
 - [ ] **Policy and programs → App content**, each form from plan 14 section 2:
   - [ ] Privacy policy: `https://yumsum.web.app/privacy`
   - [ ] Ads: no
-  - [ ] App access: restricted → add the instructions from plan 14 section 2.1, with the test account's email and password in the credential boxes. Give that account a YumSum Star manual grant first (plan 07, Manual grants), or delete step 3 of the instructions. The browser tests reset its meals, never its profile, so it stays ready.
+  - [ ] App access: restricted → add the instructions from plan 14 section 2.1, with the test account's email and password in the credential boxes. That account has a YumSum Star manual grant (Claude wrote it on 10 November 2026). The browser tests reset its meals, never its profile, so it stays ready.
   - [ ] Content rating: the questionnaire in 2.2
   - [ ] Target audience: 18 and over
   - [ ] News app: no; Government app: no; Financial features: none
@@ -66,7 +66,7 @@ Message for testers:
 - [ ] Play Console → Closed testing shows how many testers have opted in. The clock needs **12 or more every day for 14 days in a row**: aim for 14–15.
 - [ ] Send a short nudge around day 5 and day 10 asking people to open the app and log something.
 - [ ] Watch Firebase → Crashlytics and help.yumsum's inbox; Claude fixes, builds 0.1.0+2, and you upload it to the closed track (it keeps the clock running).
-- [ ] Optional during the test: YumSum Star's subscription (plan 07, steps 5–13), tried by you and two or three testers.
+- [ ] **YumSum Star's subscription, around day 2–5**: decide about the public address, create the payments profile (A), then the subscription with Claude (plan 07, steps 5–13). By day 10, two or three licence testers try buying it with test cards.
 
 ## F. Production
 

@@ -3,3 +3,4 @@ shots/
 *.png
 !store/en-*.png
 !store/feature-graphic.png
+store/reference/
