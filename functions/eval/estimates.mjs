@@ -56,6 +56,7 @@ const list = (name) => text(name, "").split(",").filter(Boolean);
 const runs = arg("runs", 3);
 const concurrency = arg("concurrency", 8);
 const temperature = arg("temperature", undefined);
+const seed = arg("seed", undefined);
 const file = text("file", "meals.json");
 const set = file.replace(/\.json$/, "");
 const tag = text("tag", "");
@@ -85,7 +86,11 @@ const profiles = {
   en: { country: "United Kingdom" },
   bg: { country: "Bulgaria", language: "bg" },
 };
-const config = { ...mealConfig(false), ...(temperature === undefined ? {} : { temperature }) };
+const config = {
+  ...mealConfig(false),
+  ...(temperature === undefined ? {} : { temperature }),
+  ...(seed === undefined ? {} : { seed }),
+};
 
 // The app's filter (parseEstimateItems): other amounts, by grams, and
 // other kinds, as complete items, each at least 30 kcal from the item and

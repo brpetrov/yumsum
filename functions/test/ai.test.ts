@@ -18,6 +18,8 @@ import {
 } from "../src/ai";
 import {
   coachInstruction,
+  estimateSeed,
+  jsonReply,
   languageOf,
   mealConfig,
   mealPrompt,
@@ -432,6 +434,12 @@ describe("the prompts", () => {
       assert.ok(!prompt.includes("macros"));
       assert.ok(!prompt.includes("saturates"));
     }
+  });
+
+  test("estimates use a fixed seed, so the same words give the same answer", () => {
+    assert.equal(mealConfig(false).seed, estimateSeed);
+    assert.equal(mealConfig(true).seed, estimateSeed);
+    assert.equal(jsonReply.seed, estimateSeed);
   });
 
   test("typed and spoken meals may come with options; photos and the fill-in don't", () => {

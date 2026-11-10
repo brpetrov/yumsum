@@ -16,9 +16,19 @@ export const aiModelId = "gemini-3.5-flash-lite";
  */
 export const coachModelId = "gemini-3.8-flash";
 
+/**
+ * A fixed seed, so the same words give the same estimate and the same
+ * choices every time, for everyone. Without it the model's choices came and
+ * went between runs of one meal (10 November 2026: 12 foods, 3 runs each,
+ * from up to 18% apart to identical). A wrong answer is then wrong every
+ * time, which the eval set catches and a prompt change fixes.
+ */
+export const estimateSeed = 1;
+
 /** Estimates reply in JSON whose shape their prompt spells out. */
 export const jsonReply: GenerateContentConfig = {
   responseMimeType: "application/json",
+  seed: estimateSeed,
 };
 
 /** The app's language, which names and AI Coach's notes are written in. */
@@ -168,7 +178,9 @@ function choices({ country, language }: Profile): string {
     `give "amounts", give "amount" too. For food that comes in one piece of ` +
     "varying size (a pizza, a baked potato, a bag of nuts or crisps, a " +
     "muffin), the amounts are the sizes or, where part of it may be left, " +
-    "half and whole. For a drink, the sizes it's sold in (\"330 ml\", " +
+    "half and whole. For a packet snack, the packets it's sold in, by " +
+    `name ("small bag", "grab bag", "sharing bag"; "1 bar", "king-size ` +
+    `bar"), never grams. For a drink, the sizes it's sold in ("330 ml", ` +
     `"500 ml", "pint"). When the user gave a count but not the size ("2 ` +
     `slices of pizza", "a beer"), the amount is known: ask the size as the ` +
     `kind instead ("2 slices from a small pizza" against "from a large ` +
@@ -185,7 +197,9 @@ function choices({ country, language }: Profile): string {
     "(dressing on a salad, mayonnaise in a sandwich, butter on toast, " +
     `sauce on pasta: "with dressing" against "without"). Never an extra ` +
     "the user didn't mention and the dish isn't usually had with (extra " +
-    `feta, added chicken, "with a side"). A generic name ` +
+    `feta, added chicken, protein powder, double cream, "with a side"), ` +
+    `and never a different recipe of the same name ("green smoothie" for ` +
+    `"smoothie", "protein smoothie"). A generic name ` +
     `that covers foods of very different calories ("cheese", "nuts", ` +
     `"yoghurt", "milk", "bread") is asked the kind: assume the most common ` +
     `one in ${country} and offer the three other most common (for cheese ` +
@@ -327,6 +341,7 @@ export function mealConfig(ask: boolean): GenerateContentConfig {
   }
   return {
     responseMimeType: "application/json",
+    seed: estimateSeed,
     responseSchema: {
       type: Type.OBJECT,
       properties,
