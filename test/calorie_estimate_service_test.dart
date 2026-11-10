@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/repositories/ai_usage_repository.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 
@@ -798,6 +799,62 @@ void main() {
         answered(item, kind: large, grams: 150),
         const EstimateItem(name: 'Large sarmi', grams: 200, kcal: 300),
       );
+    });
+
+    test('reads the kind the AI assumed, only beside the options kept', () {
+      EstimateItem parse(Object? assumed, int kcal) => parseEstimateItems([
+        {
+          ...sarmi(
+            options: [
+              {'item': 'Sarmi without meat', 'grams': 300, 'kcal': kcal},
+            ],
+          ),
+          'assumed': assumed,
+        },
+      ]).single;
+      final item = parse(' with meat ', 260);
+      expect(item.assumed, 'with meat');
+      expect(item.settled.assumed, isNull);
+      expect(parse('  ', 260).assumed, isNull);
+      expect(parse(3, 260).assumed, isNull);
+      // Too close to ask about: no options, so nothing assumed either.
+      expect(parse('with meat', 400).assumed, isNull);
+    });
+
+    test('a kind chip says only what the option changes', () {
+      String chip(String item, String option) => capitalised(
+        choiceLabel(
+          EstimateItem(name: item, kcal: 400),
+          EstimateItem(name: option, kcal: 600),
+        ),
+      );
+      for (final (item, option, label) in [
+        (
+          'chicken curry with rice',
+          'Takeaway chicken curry with rice',
+          'Takeaway',
+        ),
+        ('sarmi with meat', 'sarmi without meat', 'Without meat'),
+        (
+          'cappuccino with semi-skimmed milk',
+          'Cappuccino with whole milk',
+          'Whole milk',
+        ),
+        (
+          'Caesar salad with dressing',
+          'Caesar salad without dressing',
+          'Without dressing',
+        ),
+        ('Fried fish fillet', 'Baked fish fillet', 'Baked'),
+        ('Cappuccino', 'Cappuccino with oat milk', 'With oat milk'),
+        ('сърми с месо', 'сърми без месо', 'Без месо'),
+        // Only filler, or nothing, left: the option's whole name.
+        ('Sarmi with meat', 'Sarmi without', 'Sarmi without'),
+        ('Large cappuccino', 'large cappuccino.', 'Large cappuccino.'),
+        ('Cappuccino', 'Large latte', 'Large latte'),
+      ]) {
+        expect(chip(item, option), label, reason: '$option for $item');
+      }
     });
   });
 }

@@ -150,11 +150,12 @@ function itemRules(country: string): string {
 // offered other foods: a satsuma for an apple), the examples keep it from
 // asking about what the user did say or about a named product, and the
 // shapes stay out of the item template, which the model fills for every
-// item when it's there. The app doesn't read "assumed": the item's own name
-// carries it. The regular size is named in the app's language: told
-// "regular", the model wrote "редовна", which no Bulgarian says. Sushi and
-// banitsa were sized regular/small/large instead of counted; the smoothie
-// offered other recipes as kinds (10 November 2026).
+// item when it's there. Since 10 November 2026 the app shows "assumed" as
+// the ticked kind chip, beside each option's difference. The regular size
+// is named in the app's language: told "regular", the model wrote
+// "редовна", which no Bulgarian says. Sushi and banitsa were sized
+// regular/small/large instead of counted; the smoothie offered other
+// recipes as kinds (10 November 2026).
 function choices({ country, language }: Profile): string {
   const regular = language === "bg" ? "средна" : "regular";
   return "When the user leaves out something that changes an item's " +

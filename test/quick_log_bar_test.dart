@@ -650,7 +650,7 @@ void main() {
     final breakdown = find.byType(EstimateBreakdown);
     for (final text in [
       '110 kcal · 7 g',
-      'Cappuccino with whole milk',
+      'Whole milk',
       'Large cappuccino',
       'Croissant',
     ]) {
@@ -670,7 +670,7 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.tap(find.text('Cappuccino with whole milk'));
+    await tester.tap(find.text('Whole milk'));
     await tester.pump();
     expect(boxes(tester), ['cappuccino and a croissant', '420', '13']);
     expect(find.text('150 kcal · 8 g'), findsOneWidget);

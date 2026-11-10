@@ -19,7 +19,9 @@ import 'package:lean_streak/repositories/ai_usage_repository.dart';
 /// [amount] the one it went with ("5 pieces"; null when it didn't say,
 /// shown as Regular), and [options], the other
 /// likely kinds (the milk, takeaway or homemade), complete items at the
-/// same amount. Empty, and [amount] null, when there's nothing to ask.
+/// same amount, with [assumed] the kind it went with in a few words ("with
+/// meat", "homemade"; null when it didn't say, shown as the item's name).
+/// Empty, and [amount] and [assumed] null, when there's nothing to ask.
 class EstimateItem {
   const EstimateItem({
     required this.name,
@@ -28,6 +30,7 @@ class EstimateItem {
     this.protein,
     this.amount,
     this.amounts = const [],
+    this.assumed,
     this.options = const [],
   });
 
@@ -37,6 +40,7 @@ class EstimateItem {
   final int? protein;
   final String? amount;
   final List<EstimateAmount> amounts;
+  final String? assumed;
   final List<EstimateItem> options;
 
   /// This item with nothing left to ask.
@@ -52,6 +56,7 @@ class EstimateItem {
       other.protein == protein &&
       other.amount == amount &&
       listEquals(other.amounts, amounts) &&
+      other.assumed == assumed &&
       listEquals(other.options, options);
 
   @override
@@ -62,6 +67,7 @@ class EstimateItem {
     protein,
     amount,
     Object.hashAll(amounts),
+    assumed,
     Object.hashAll(options),
   );
 
@@ -174,7 +180,7 @@ List<EstimateItem> parseEstimateItems(Object? raw, {String said = ''}) {
       if (_itemFrom(entry) case final item?)
         _withOptions(
           _withAmounts(item, entry as Map, said, heard),
-          entry['options'],
+          entry,
           saidWords,
         ),
   ];
@@ -230,6 +236,7 @@ EstimateItem _asking(
   EstimateItem item, {
   String? amount,
   List<EstimateAmount> amounts = const [],
+  String? assumed,
   List<EstimateItem> options = const [],
 }) => EstimateItem(
   name: item.name,
@@ -238,6 +245,7 @@ EstimateItem _asking(
   protein: item.protein,
   amount: amount,
   amounts: amounts,
+  assumed: assumed,
   options: options,
 );
 
@@ -375,7 +383,8 @@ bool _anotherKind(EstimateItem item, EstimateItem option) =>
               !_amountWords.contains(word),
         );
 
-EstimateItem _withOptions(EstimateItem item, Object? raw, Set<String> said) {
+EstimateItem _withOptions(EstimateItem item, Map entry, Set<String> said) {
+  final raw = entry['options'];
   if (raw is! List) return item;
   final kept = _words(item.name).intersection(said);
   final names = {item.name.toLowerCase()};
@@ -399,6 +408,10 @@ EstimateItem _withOptions(EstimateItem item, Object? raw, Set<String> said) {
     item,
     amount: item.amount,
     amounts: item.amounts,
+    assumed: switch (entry['assumed']) {
+      final String words when words.trim().isNotEmpty => words.trim(),
+      _ => null,
+    },
     options: options,
   );
 }
@@ -463,6 +476,51 @@ EstimateItem answered(EstimateItem item, {EstimateItem? kind, int? grams}) {
     ),
     (weight * grams / from).round(),
   );
+}
+
+/// Words that say nothing on their own, so a chip of only these shows the
+/// option's whole name.
+const _filler = {
+  'with', 'without', 'and', 'or', 'of', 'in', 'on', 'a', 'an', 'the', //
+  'from', 'с', 'със', 'без', 'и', 'или', 'на', 'в', 'във', 'от', 'за',
+};
+
+/// What [option]'s chip says: only what sets it apart from [item], the
+/// words both names start and end with left out ("Takeaway" beside
+/// "chicken curry with rice"). Where it swaps words inside the name, the
+/// words after the swap stay, so it reads on its own ("whole milk" beside
+/// "cappuccino with semi-skimmed milk", "without meat" beside "sarmi with
+/// meat"). Case and punctuation don't count. The option's whole name when
+/// nothing but filler would be left.
+String choiceLabel(EstimateItem item, EstimateItem option) {
+  final word = RegExp(r'[\p{L}\p{N}]+', unicode: true);
+  final theirs = word.allMatches(option.name).toList();
+  final ours = [
+    for (final match in word.allMatches(item.name)) match[0]!.toLowerCase(),
+  ];
+  String theirWord(int index) => theirs[index][0]!.toLowerCase();
+  var start = 0;
+  while (start < theirs.length &&
+      start < ours.length &&
+      theirWord(start) == ours[start]) {
+    start++;
+  }
+  var end = theirs.length;
+  var ourEnd = ours.length;
+  while (end > start &&
+      ourEnd > start &&
+      theirWord(end - 1) == ours[ourEnd - 1]) {
+    end--;
+    ourEnd--;
+  }
+  // A swap inside the name keeps the words after it.
+  if (start > 0 && ourEnd > start) end = theirs.length;
+  final real = RegExp(r'\p{L}', unicode: true);
+  final says = [
+    for (var index = start; index < end; index++) theirWord(index),
+  ].any((word) => real.hasMatch(word) && !_filler.contains(word));
+  if (!says) return option.name;
+  return option.name.substring(theirs[start].start, theirs[end - 1].end);
 }
 
 /// The meal's figures from its items, for after a weight was changed.

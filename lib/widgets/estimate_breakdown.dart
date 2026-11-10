@@ -10,8 +10,9 @@ import 'package:lean_streak/services/calorie_estimate_service.dart';
 /// a weight can be tapped and corrected; the item is rescaled and the new
 /// list handed back, with no further AI call. Where the AI had to assume
 /// how much of an item or which kind, it starts open, with the item's
-/// other amounts and kinds as chips under it, the assumed ones ticked; a
-/// tap swaps that version in the same way. Ignored, the assumption stays.
+/// other amounts and kinds as chips under it (a kind by what it changes,
+/// [choiceLabel]), the assumed ones ticked; a tap swaps that version in
+/// the same way. Ignored, the assumption stays.
 class EstimateBreakdown extends StatefulWidget {
   const EstimateBreakdown({
     super.key,
@@ -103,13 +104,13 @@ class _EstimateBreakdownState extends State<EstimateBreakdown> {
     final l10n = context.l10n;
     final item = _asked[index];
     Widget row(List<Widget> chips) =>
-        Wrap(spacing: 6, runSpacing: 6, children: chips);
+        Wrap(spacing: 6, runSpacing: 4, children: chips);
     // A tap between the chips mustn't close the breakdown.
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {},
       child: Padding(
-        padding: const EdgeInsets.only(top: 4, bottom: 10),
+        padding: const EdgeInsets.only(left: 4, top: 6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -136,13 +137,13 @@ class _EstimateBreakdownState extends State<EstimateBreakdown> {
             if (item.options.isNotEmpty)
               row([
                 _Chip(
-                  item.name,
+                  item.assumed ?? item.name,
                   selected: _kinds[index] == null,
                   onTap: () => _answer(index, grams: _grams[index]),
                 ),
                 for (final option in item.options)
                   _Chip(
-                    option.name,
+                    choiceLabel(item, option),
                     selected: _kinds[index] == option,
                     onTap: () =>
                         _answer(index, grams: _grams[index], kind: option),
@@ -174,49 +175,60 @@ class _EstimateBreakdownState extends State<EstimateBreakdown> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   for (final (index, item) in widget.items.indexed) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 2),
-                      child: Row(
-                        children: [
-                          Expanded(child: Text(item.name, style: muted)),
-                          if (item.grams != null)
-                            editable
-                                ? InkWell(
-                                    onTap: () => _changeGrams(index),
-                                    borderRadius: BorderRadius.circular(6),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      child: Text(
-                                        l10n.commonGrams('${item.grams}'),
-                                        style: muted.copyWith(
-                                          color: AppColors.primary,
-                                          fontWeight: FontWeight.w600,
-                                          decoration: TextDecoration.underline,
-                                          decorationColor: AppColors.primary,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Padding(
+                    if (index > 0) const SizedBox(height: 10),
+                    // A long name wraps; its figures stay on its first line.
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            capitalised(item.name),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                        if (item.grams != null)
+                          editable
+                              ? InkWell(
+                                  onTap: () => _changeGrams(index),
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: Padding(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 8,
+                                      vertical: 4,
                                     ),
                                     child: Text(
                                       l10n.commonGrams('${item.grams}'),
-                                      style: muted,
+                                      style: muted.copyWith(
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.w600,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: AppColors.primary
+                                            .withValues(alpha: 0.4),
+                                      ),
                                     ),
                                   ),
-                          Text(
-                            item.protein == null || !widget.showProtein
-                                ? l10n.commonKcal(item.kcal)
-                                : l10n.mealKcalGrams(item.kcal, item.protein!),
-                            style: muted,
-                          ),
-                        ],
-                      ),
+                                )
+                              : Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                                  child: Text(
+                                    l10n.commonGrams('${item.grams}'),
+                                    style: muted,
+                                  ),
+                                ),
+                        Text(
+                          item.protein == null || !widget.showProtein
+                              ? l10n.commonKcal(item.kcal)
+                              : l10n.mealKcalGrams(item.kcal, item.protein!),
+                          style: muted,
+                        ),
+                      ],
                     ),
                     if (widget.onChanged != null && _hasChoices(_asked[index]))
                       _choices(index),
@@ -300,7 +312,8 @@ class _GramsDialogState extends State<_GramsDialog> {
   }
 }
 
-/// One amount or kind on a small soft pill, tinted and ticked when picked.
+/// One amount or kind on a small quiet tag: a hairline edge, filled and
+/// ticked when picked.
 class _Chip extends StatelessWidget {
   const _Chip(this.label, {required this.selected, required this.onTap});
 
@@ -310,34 +323,40 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(14);
+    final radius = BorderRadius.circular(12);
+    final color = selected
+        ? AppColors.onPrimaryContainer
+        : AppColors.textPrimary;
     return Material(
-      color: selected ? AppColors.primaryContainer : AppColors.surfaceVariant,
-      borderRadius: radius,
+      color: selected ? AppColors.primaryContainer : Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: radius,
+        side: BorderSide(
+          color: selected ? AppColors.primaryContainer : AppColors.outline,
+        ),
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: radius,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (selected) ...[
+                Icon(Icons.check_rounded, size: 13, color: color),
+                const SizedBox(width: 3),
+              ],
               Flexible(
                 child: Text(
                   capitalised(label),
                   style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: selected
-                        ? AppColors.onPrimaryContainer
-                        : AppColors.textPrimary,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
+                    color: color,
                   ),
                 ),
               ),
-              if (selected) ...[
-                const SizedBox(width: 4),
-                Icon(Icons.check_rounded, size: 14, color: AppColors.primary),
-              ],
             ],
           ),
         ),

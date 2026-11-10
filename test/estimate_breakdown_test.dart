@@ -18,6 +18,7 @@ const _cappuccino = EstimateItem(
   protein: 7,
   amount: 'regular',
   amounts: [(label: 'small', grams: 150), (label: 'large', grams: 350)],
+  assumed: 'semi-skimmed milk',
   options: [
     _whole,
     EstimateItem(name: 'cappuccino with syrup', grams: 250, kcal: 190),
@@ -82,20 +83,21 @@ void main() {
       'assumed ones ticked', (tester) async {
     await pump(tester, const [_cappuccino, _croissant]);
 
+    // Each item's name heads its block; the kind chips say only what the
+    // option changes.
     for (final text in [
-      'cappuccino with semi-skimmed milk',
-      'croissant',
+      'Cappuccino with semi-skimmed milk',
+      'Croissant',
       'Regular',
       'Small',
       'Large',
-      'Cappuccino with semi-skimmed milk',
-      'Cappuccino with whole milk',
-      'Cappuccino with syrup',
+      'Semi-skimmed milk',
+      'Whole milk',
+      'Syrup',
     ]) {
       expect(find.text(text), findsOneWidget, reason: text);
     }
     expect(ticks, findsNWidgets(2));
-    expect(find.text('Croissant'), findsNothing);
     expect(changes, isEmpty);
   });
 
@@ -122,12 +124,12 @@ void main() {
     expect(changes.last, [answered(_cappuccino, grams: 350), _croissant]);
     expect(find.text('154 kcal · 10 g'), findsOneWidget);
 
-    await tester.tap(find.text('Cappuccino with whole milk'));
+    await tester.tap(find.text('Whole milk'));
     await tester.pump();
     final both = answered(_cappuccino, kind: _whole, grams: 350);
     expect(changes.last, [both, _croissant]);
     expect(find.text('210 kcal · 11 g'), findsOneWidget);
-    expect(find.text('cappuccino with whole milk'), findsOneWidget);
+    expect(find.text('Cappuccino with whole milk'), findsOneWidget);
     // Still open, the picks ticked.
     expect(ticks, findsNWidgets(2));
 
@@ -141,12 +143,54 @@ void main() {
     for (final text in ['5 pieces', '3 pieces', '8 pieces']) {
       expect(find.text(text), findsOneWidget, reason: text);
     }
-    expect(find.text('Sarmi with meat'), findsNothing);
+    // Its name, and no kind row.
+    expect(find.text('Sarmi with meat'), findsOneWidget);
     expect(ticks, findsOneWidget);
 
     await tester.tap(find.text('8 pieces'));
     await tester.pump();
     expect(changes.last.single.kcal, 672);
+  });
+
+  testWidgets('a kind chip shows only what differs; without the AI\'s '
+      'assumed kind, the first is the item\'s name', (tester) async {
+    const takeaway = EstimateItem(
+      name: 'takeaway chicken curry with rice',
+      grams: 450,
+      kcal: 820,
+    );
+    const curry = EstimateItem(
+      name: 'chicken curry with rice',
+      grams: 450,
+      kcal: 550,
+      assumed: 'homemade',
+      options: [takeaway],
+    );
+    const withoutMeat = EstimateItem(
+      name: 'sarmi without meat',
+      grams: 300,
+      kcal: 260,
+    );
+    const sarmi = EstimateItem(
+      name: 'sarmi with meat',
+      grams: 300,
+      kcal: 420,
+      options: [withoutMeat],
+    );
+    await pump(tester, const [curry, sarmi]);
+
+    for (final text in ['Homemade', 'Takeaway', 'Without meat']) {
+      expect(find.text(text), findsOneWidget, reason: text);
+    }
+    // The heading and the ticked chip.
+    expect(find.text('Sarmi with meat'), findsNWidgets(2));
+
+    await tester.tap(find.text('Takeaway'));
+    await tester.pump();
+    expect(changes.last, [takeaway, sarmi]);
+    await tester.tap(find.text('Without meat'));
+    await tester.pump();
+    expect(changes.last, [takeaway, withoutMeat]);
   });
 
   testWidgets('a weight corrected by hand settles the item: its chips go', (
@@ -173,7 +217,7 @@ void main() {
     await tester.pump();
     expect(find.text('110 kcal · 7 g'), findsOneWidget);
     expect(ticks, findsNWidgets(2));
-    await tester.tap(find.text('Cappuccino with syrup'));
+    await tester.tap(find.text('Syrup'));
     await tester.pump();
     expect(
       changes.last.single,

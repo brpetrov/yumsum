@@ -184,7 +184,7 @@ void main() {
     expect(find.byType(AlertDialog), findsNothing);
     expect(find.text('500'), findsOneWidget);
 
-    await tester.tap(find.text('Takeaway chicken curry'));
+    await tester.tap(find.text('Takeaway'));
     await tester.pump();
     expect(find.text('850'), findsOneWidget);
     expect(find.text('32'), findsOneWidget);
