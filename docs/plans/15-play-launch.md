@@ -68,6 +68,23 @@ Message for testers:
 - [ ] Watch Firebase → Crashlytics and help.yumsum's inbox; Claude fixes, builds 0.1.0+2, and you upload it to the closed track (it keeps the clock running).
 - [ ] **YumSum Star's subscription, around day 2–5**: decide about the public address, create the payments profile (A), then the subscription with Claude (plan 07, steps 5–13). By day 10, two or three licence testers try buying it with test cards.
 
+## G. Found in the first install (10 November 2026), to come back to
+
+Where the internal test got to: the release is live, you're a tester, the signing keys are in Firebase, Play Integrity is linked. Open:
+
+- [ ] **Google sign-in failed in the Play build.** Play's signing SHA-1 (36:F8:32:6E…) went into Firebase at about 12:45 on 10 November; a try before that fails, and Google can take a few minutes after. Try again; if it still fails, note the exact message for Claude. Next check: Google Cloud console → APIs & Services → Credentials → an Android OAuth client with package `com.bpetrov.yumsum` and that SHA-1 (Firebase makes it when the fingerprint is added).
+- [ ] **About 15 AI requests in 15 seconds** at 13:43 in the function logs, from the debug build while its App Check token was unregistered. Find out whether that was repeated taps or the app retrying by itself; if the app, fix it (one call per tap, see `quick_log_bar.dart`'s `_runAi`).
+- [ ] **A debug build gets a new App Check debug token every time it's uninstalled** (it was, to install the Play version). The symptom is "Could not estimate calories" and "Decoding App Check token failed" in the logs. Fix: the token from `adb logcat` ("Failed to exchange debug token (…)") goes into Firebase → App Check → YumSum Android → ⋮ → Manage debug tokens. Registered 10 November: `25997abf-…`.
+- [ ] **Debug tools' pretend Star shows the badge but the server still gives no macros**, by design (`aiMacrosProvider` asks only when the real record has Star). For screenshots or testing macros, give the account a real manual grant (plan 07). The phone has two accounts: Boyan Petrov (brooventest, admin) and John Doe (Google sign-in as `broovenn@gmail.com`, created 6 November, no Star).
+
+### Screenshots and selling the app
+
+- [ ] The poster-style set is specified in `tools/e2e/store/BRIEF.md`: 8 slides, who each is aimed at, the headline and line for each, the look, Play's rules. Competitor references are in `tools/e2e/store/reference/` (not in git). The raw screens (`en-*.png`) were retaken with the test account on YumSum Star and recipe portions logged, so the rings are filled.
+- [ ] **Four screens from your phone**, on an account with a real Star grant, saved into `tools/e2e/store/` as `phone-ai-estimate.png` (a typed meal's AI result), `phone-choice.png` (the "Which did you have?" dialog; type something vague like "sarmi"), `phone-scan.png` (the barcode portion sheet with its serving chips), `phone-progress.png` (Weight & Progress with real history). Take them on a 9:16 phone with the status bar hidden or cropped.
+- [ ] Then tell Codex: "Read `tools/e2e/store/BRIEF.md` and make the screenshots it describes, using the raw screens and references in that folder." Check the result against the brief's rules before uploading.
+- [ ] **The selling point to lead with: 10 free AI estimates a day, typed or spoken, no ads.** Research on 10 November (ten rival apps, third-party sources) found almost all of them lock AI logging behind a subscription, one gives about 3 a day, and several free tiers show ads. Say it as our own fact in the listing and the screenshots, never as a comparison with named apps.
+- [ ] The full description's first paragraph in plan 14 was rewritten to sell the benefit (only the first lines show before "Read more").
+
 ## F. Production
 
 - [ ] After 14 days: Play Console → Dashboard → **Apply for production**. Google asks how you tested, what testers said and what changed; Claude can draft the answers from the feedback and the fixes.

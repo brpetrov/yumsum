@@ -13,7 +13,7 @@
 **Full description** (4000 max, 2169 characters):
 
 ```
-YumSum is a calorie and protein tracker built to be quick. Say or type what you ate, and it is logged in seconds.
+YumSum is the quick way to track calories and protein. Say or type what you ate and it's logged in seconds. Not sure of the numbers? AI estimates them for you, and asks when it has to guess.
 
 LOG A MEAL YOUR WAY
 - Type it, or tap the mic and say it.
