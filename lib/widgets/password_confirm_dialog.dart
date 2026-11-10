@@ -83,6 +83,9 @@ class _PasswordConfirmDialogState extends State<_PasswordConfirmDialog> {
                 labelText: context.l10n.commonPassword,
                 prefixIcon: Icon(Icons.lock_outline_rounded),
                 suffixIcon: IconButton(
+                  tooltip: _obscure
+                      ? context.l10n.accountShowPassword
+                      : context.l10n.accountHidePassword,
                   onPressed: () => setState(() => _obscure = !_obscure),
                   icon: Icon(
                     _obscure

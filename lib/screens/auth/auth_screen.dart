@@ -335,6 +335,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         labelText: l10n.commonPassword,
                         prefixIcon: Icon(Icons.lock_outline_rounded),
                         suffixIcon: IconButton(
+                          tooltip: _obscurePassword
+                              ? l10n.accountShowPassword
+                              : l10n.accountHidePassword,
                           icon: Icon(
                             _obscurePassword
                                 ? Icons.visibility_outlined

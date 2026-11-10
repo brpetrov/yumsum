@@ -24,6 +24,27 @@ class _FakeAuthController extends AuthController {
 }
 
 void main() {
+  testWidgets('The password eye says what it does in its current state', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authControllerProvider.overrideWith(() => _FakeAuthController()),
+          languageCodeProvider.overrideWithValue('en'),
+        ],
+        child: MaterialApp(theme: AppTheme.light, home: const AuthScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Show password'), findsOneWidget);
+    await tester.tap(find.byTooltip('Show password'));
+    await tester.pump();
+    expect(find.byTooltip('Hide password'), findsOneWidget);
+    expect(find.byTooltip('Show password'), findsNothing);
+  });
+
   testWidgets('Forgot password asks for the email, then says a link went '
       'if an account uses it', (tester) async {
     final controller = _FakeAuthController();

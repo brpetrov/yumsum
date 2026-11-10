@@ -16,3 +16,4 @@ node run.js chromium "Pixel 7"       # Chrome as an Android phone
 - Firebase allows only so many sign-ins an hour: after many runs it answers "Too many attempts". Wait, and run a few at a time.
 - AI estimates aren't tested: App Check's reCAPTCHA refuses robot browsers. Camera, barcode and voice need real devices.
 - A failed check saves a screenshot in `shots/`. `node steps.js chromium -- "tap:Recipes" dump` runs steps one by one and prints what's on screen, for writing new checks.
+- The first typed letter can drop right after a box is focused through the screen-reader tree ("2E toast" for "E2E toast"), on Android Chrome and iPhone WebKit. The app doesn't cause it: its boxes keep their controller, focus and `readOnly` through first input. It is Flutter web swapping its hidden input element on the first key when semantics is on, so it can't be fixed here. `type()` in `lib.js` checks what landed and types it again.
