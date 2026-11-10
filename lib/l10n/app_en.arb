@@ -660,10 +660,6 @@
   "@mealOptions": {
     "description": "Meal row: tooltip of the menu with Edit and Delete."
   },
-  "mealTapWeight": "Tap a weight to change it.",
-  "@mealTapWeight": {
-    "description": "AI breakdown: note under the items, whose weights can be tapped."
-  },
   "mealWeight": "Weight",
   "@mealWeight": {
     "description": "AI breakdown: label of the box for an item's weight in grams."

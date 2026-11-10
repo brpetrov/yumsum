@@ -962,12 +962,6 @@ abstract class AppLocalizations {
   /// **'Meal options'**
   String get mealOptions;
 
-  /// AI breakdown: note under the items, whose weights can be tapped.
-  ///
-  /// In en, this message translates to:
-  /// **'Tap a weight to change it.'**
-  String get mealTapWeight;
-
   /// AI breakdown: label of the box for an item's weight in grams.
   ///
   /// In en, this message translates to:

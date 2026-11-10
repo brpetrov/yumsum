@@ -531,9 +531,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get mealOptions => 'Опции за храненето';
 
   @override
-  String get mealTapWeight => 'Натисни грамажа, за да го промениш.';
-
-  @override
   String get mealWeight => 'Грамаж';
 
   @override

@@ -518,9 +518,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mealOptions => 'Meal options';
 
   @override
-  String get mealTapWeight => 'Tap a weight to change it.';
-
-  @override
   String get mealWeight => 'Weight';
 
   @override

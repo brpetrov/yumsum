@@ -221,11 +221,6 @@ class _EstimateBreakdownState extends State<EstimateBreakdown> {
                     if (widget.onChanged != null && _hasChoices(_asked[index]))
                       _choices(index),
                   ],
-                  if (editable)
-                    Text(
-                      l10n.mealTapWeight,
-                      style: muted.copyWith(fontSize: 12),
-                    ),
                 ],
               )
             : Row(
