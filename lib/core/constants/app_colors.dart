@@ -81,9 +81,9 @@ class AppPalette {
     info: Color(0xFF3B82F6),
     heroStart: Color(0xFFFFDCC2),
     heroEnd: Color(0xFFFFF3E6),
-    gold: Color(0xFFD9A230),
+    gold: Color(0xFFC9912A),
     goldLight: Color(0xFFF6D27A),
-    goldDeep: Color(0xFFB07A12),
+    goldDeep: Color(0xFF9A6A10),
   );
 
   static const dark = AppPalette(
@@ -107,7 +107,7 @@ class AppPalette {
     info: Color(0xFF6FA6F8),
     heroStart: Color(0xFF4A2818),
     heroEnd: Color(0xFF2B221D),
-    gold: Color(0xFFE2B24A),
+    gold: Color(0xFFD9A83E),
     goldLight: Color(0xFFFBE3A2),
     goldDeep: Color(0xFFB8862C),
   );
