@@ -87,6 +87,10 @@ Where the internal test got to: the release is live, you're a tester, the signin
 - [ ] **The selling point to lead with: 10 free AI estimates a day, typed or spoken, no ads.** Research on 10 November (ten rival apps, third-party sources) found almost all of them lock AI logging behind a subscription, one gives about 3 a day, and several free tiers show ads. Say it as our own fact in the listing and the screenshots, never as a comparison with named apps.
 - [ ] The full description's first paragraph in plan 14 was rewritten to sell the benefit (only the first lines show before "Read more").
 
+### Later, after the closed test
+
+- [ ] **Built-in Kotlin:** `flutter build` warns that `android/app/build.gradle.kts` applies the Kotlin Gradle Plugin, and so do cloud_functions, firebase_app_check, firebase_auth, firebase_core, firebase_crashlytics and home_widget; a future Flutter will refuse to build. Migrate the app file with https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-app-developers together with a plugin upgrade, once those plugins support it. Not before the closed test: it changes the Android build for no gain today (noted 10 November 2026).
+
 ## F. Production
 
 - [ ] After 14 days: Play Console → Dashboard → **Apply for production**. Google asks how you tested, what testers said and what changed; Claude can draft the answers from the feedback and the fixes.
