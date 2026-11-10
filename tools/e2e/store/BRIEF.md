@@ -29,6 +29,26 @@ Make 6 to 8 phone screenshots, 1080 × 1920 PNG, each under 8 MB, saved here as 
 
 If a phone screen isn't supplied, drop that slide rather than fake it.
 
+### The phone screens supplied (10 November 2026)
+
+All taken on a Samsung S24 at about 510 × 1100 (a mirrored window, half the phone's resolution): scale them up with care, or ask for native captures if they look soft. The status bar is at the top of each; crop it.
+
+| File | What it shows | Use |
+|---|---|---|
+| `phone-ai-estimate.png` | "Chicken curry with rice" estimated: 550 kcal · 30 g, with the chips Regular ✓ Small Large / Homemade ✓ Takeaway | slide 2 (AI counts the calories) |
+| `phone-choice.png`, `phone-choice-crop.png` | "Avocado toast" with chips 2 slices ✓ 1 slice 3 slices / With butter ✓ With egg With bacon | slide 3 (it asks when it's not sure); the crop is a close-up of the chips |
+| `phone-scan.png` | the portion sheet after a barcode scan: 1 serving · **2 servings** · 3 servings · Whole pack, 380 kcal | slide 5 (scan a packet) |
+| `phone-scanner-camera.png` | the camera scanning a yoghurt pot | **don't use the photo as is**: it shows a brand and a hand. For slide 5 use `phone-scan.png` as the screen, and if the slide wants a scanning motif, draw a plain generic barcode graphic, not this photo |
+| `phone-rings-crop.png` | the home card's rings close up: 1015 kcal left, protein 80 g amber, carbs 89 g, fat 28 g, fibre | slide 4 close-up, or a detail on slide 1 |
+| `phone-home-dark.png` | the home screen in dark mode | a **dark mode** slide ("Easy on the eyes at night"), or slide 4 in dark |
+| `phone-progress-dark.png` | Weight & Progress in dark mode with real history (80 → 79 kg, trend line, target 73, Adaptive formula On, "You burn 2300 kcal a day") | slide 7 |
+| `phone-recipes-dark.png` | Recipes in dark mode | slide 6 if you prefer dark; `en-4-recipes.png` is the light one |
+| `phone-history-dark.png`, `phone-history-stats-dark.png` | History: the month calendar with on-track days, and the "68% of logged days on track, 31 of 31 days logged" stats | an optional slide: "See your month at a glance" |
+
+Brands: blur or paint out any third-party brand name or logo that appears in a screen (the peanut butter in `phone-scan.png` shows a brand name and jar photo: soften or crop it so no brand is readable; Open Food Facts can stay).
+
+Mixing themes is fine, but make it deliberate: light for the first slides, then one or two dark slides presented as a feature, never alternating at random.
+
 ## The look
 
 - **Background**: the app's cream, `#FAF2E7`, flat or with a very soft warm gradient. A faded food photo behind the phone is fine on one or two slides (as in the references), but never behind the headline.
