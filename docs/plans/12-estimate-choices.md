@@ -50,3 +50,17 @@ Eleven meals were added for this (`pieces` marks the piece foods). Of the 16 nee
 ## The trim that didn't pass (10 November 2026)
 
 The choices prompt had grown to about 1,480 tokens (the whole typed prompt about 1,800), and much of it restated rules the app enforces itself (`askBarFor`, number words, a handful, a typed weight, sandwiches never sized, kinds that only add a size). A version trimmed to about 1,040 tokens was run against both sets before and after, and **lost**: on `meals.json` in range fell from 94% to 90% ("boiled egg" became 2 eggs, "баница" 2 pieces, "5 meatballs" over), the bacon roll got sized, and the pieces group fell from 51/72 to 42/72 because "a full adult portion" pushes piece foods up. A second version fixed those but lost the raw-against-cooked kind ("200 g grilled chicken breast" offered the same weight at the same calories) and renamed "100 g cooked basmati rice" without the user's word. So the long prompt stays: its length isn't what hurts, and each sentence that looked redundant was holding something. The one contradiction found (`choices` says never "cooked" or "raw" in a name; `weights` says say in the item whether the weight is cooked or raw) is real but fixing it alone cost the cooked-weight kind, so it stays until a fix is found that names the other-weight kind explicitly. Still open from the everyday set: sweet and sour chicken with rice (610, a takeaway is 800+), smoothie (130 for a bought one is low), sushi and баница as pieces rather than sizes. The revised prompt and its diff are in the owner's scratchpad of that day (`prompts.revised.ts`, `prompt-trim-revised.diff`).
+
+
+## Fixes from the everyday set (10 November 2026)
+
+Four edits in `functions/src/prompts.ts`:
+
+- `itemRules`: a dish nearly always bought as a takeaway (sweet and sour chicken, a kebab, fish and chips) is the takeaway's own portion; a jacket potato is a large baked potato with its filling; a bowl of soup is about 350 ml and "with bread" adds a slice or a roll.
+- `choices`: sushi and banitsa join the foods that come in pieces, so they are counted rather than sized.
+- `choices`: a smoothie example, assumed a 250 ml bought fruit smoothie with the bottle sizes as amounts and no options.
+- The comments above `itemRules` and `choices` say why.
+
+The smoothie range in `eval/everyday.json` is now 100 to 300 kcal. `eval/fixes.json` holds the changed foods and a few that must not move.
+
+These were committed without an eval run because the Gemini spend cap was reached. Check with `node eval/estimates.mjs --file fixes.json --runs 1` once the cap resets (1 December), then deploy `aiEstimate`.

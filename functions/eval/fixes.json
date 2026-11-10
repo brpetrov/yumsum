@@ -1,0 +1,20 @@
+{
+  "about": "The foods the 10 November 2026 prompt fixes touch (takeaway portions, jacket potato and soup sizes, sushi and banitsa counted in pieces, the smoothie example), with a few that must not move. Check with one run once the AI is back: node eval/estimates.mjs --file fixes.json --runs 1",
+  "foods": [
+    { "meal": "sweet and sour chicken with rice", "min": 700, "max": 1200 },
+    { "meal": "jacket potato with tuna mayo", "min": 400, "max": 750 },
+    { "meal": "tomato soup with bread", "min": 250, "max": 500 },
+    { "meal": "smoothie", "min": 100, "max": 300 },
+    { "meal": "sushi", "min": 250, "max": 600, "pieces": true },
+    { "meal": "баница", "min": 300, "max": 650, "lang": "bg" },
+    { "meal": "doner kebab", "min": 700, "max": 1300 },
+    { "meal": "fish and chips", "min": 700, "max": 1300 },
+    { "meal": "chicken curry", "min": 550, "max": 950 },
+    { "meal": "sarmi", "min": 250, "max": 600, "pieces": true },
+    { "meal": "cheese", "min": 80, "max": 250 },
+    { "meal": "pizza", "min": 500, "max": 1200 },
+    { "meal": "tuna sandwich", "min": 300, "max": 600, "single": true },
+    { "meal": "chicken with rice", "min": 400, "max": 750 },
+    { "meal": "200 g grilled chicken breast", "min": 280, "max": 360, "specific": true }
+  ]
+}

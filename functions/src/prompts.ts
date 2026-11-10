@@ -116,7 +116,9 @@ const weights =
 // the model split a dish into five parts one time and kept it whole the
 // next. Nothing unnamed is added: it gave a Big Mac fries and a Coke, and
 // fish and chips tartare sauce, mushy peas and its frying oil again
-// (eval/meals.json, 6 November 2026).
+// (eval/meals.json, 6 November 2026). Added 10 November 2026 after the
+// 50-food set put sweet and sour chicken at 610 kcal (a takeaway is 800+), a
+// jacket potato with tuna mayo at 380 and tomato soup with bread at 240.
 function itemRules(country: string): string {
   return "List each food or drink the user named as one item, the way " +
     "they would name it: a curry, a sandwich or a slice of pizza is one " +
@@ -129,6 +131,11 @@ function itemRules(country: string): string {
     `the same item, and its name says so ("chicken curry with rice"). Use ` +
     "any amount the user gives; otherwise " +
     `one standard single portion, as ${country} nutrition guides give it. ` +
+    `A dish nearly always bought as a takeaway in ${country} (Chinese ` +
+    "dishes such as sweet and sour chicken, a kebab, fish and chips) is the " +
+    "takeaway's own portion. A jacket potato is a large baked potato with " +
+    "its filling; a bowl of soup is about 350 ml, and \"with bread\" adds a " +
+    "slice or a roll. " +
     `For branded and chain products, use ${country} nutrition figures.\n`;
 }
 
@@ -145,7 +152,9 @@ function itemRules(country: string): string {
 // shapes stay out of the item template, which the model fills for every
 // item when it's there. The app doesn't read "assumed": the item's own name
 // carries it. The regular size is named in the app's language: told
-// "regular", the model wrote "редовна", which no Bulgarian says.
+// "regular", the model wrote "редовна", which no Bulgarian says. Sushi and
+// banitsa were sized regular/small/large instead of counted; the smoothie
+// offered other recipes as kinds (10 November 2026).
 function choices({ country, language }: Profile): string {
   const regular = language === "bg" ? "средна" : "regular";
   return "When the user leaves out something that changes an item's " +
@@ -168,7 +177,7 @@ function choices({ country, language }: Profile): string {
     `is in the same terms as the assumed one: never "a handful" beside ` +
     `"14 g". For food that comes in pieces (sarmi, meatballs, ` +
     "dumplings, eggs, pancakes, biscuits, slices of pizza or bread, " +
-    "nuggets, fruit), assume one standard serving, as nutrition guides " +
+    "nuggets, sushi, banitsa, fruit), assume one standard serving, as nutrition guides " +
     `give it, and give "amount" as a count ` +
     `("5 pieces") and "amounts" as two or three other counts, the grams of ` +
     "the whole item at each. For food served as a portion (rice, chips, " +
@@ -234,7 +243,8 @@ function choices({ country, language }: Profile): string {
     `salad" is assumed a regular portion with its usual feta and olive ` +
     `oil, with amounts small and large and no options; "pizza" is assumed ` +
     `4 slices of a medium pizza, with amounts of 2, 6 and 8 slices and no ` +
-    `options; "a handful of almonds" and "two scrambled eggs on toast" ` +
+    `options; "smoothie" is assumed a 250 ml bought fruit smoothie, with ` +
+    `amounts of the bottle sizes and no options; "a handful of almonds" and "two scrambled eggs on toast" ` +
     `have neither; "cappuccino" has neither, as the milk changes little; ` +
     `"2 slices of pizza" has no amounts and options for a small and a ` +
     `large pizza; "200 g chicken breast" has no amounts and the cooked ` +

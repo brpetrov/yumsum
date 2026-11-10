@@ -450,6 +450,8 @@ describe("the prompts", () => {
       assert.ok(prompt.includes("The amount, first and most important."));
       assert.ok(prompt.includes("Add nothing the user didn't name"));
     }
+    assert.ok(meal.includes("takeaway's own portion"));
+    assert.ok(meal.includes("sushi, banitsa"));
     assert.ok(voice.includes(`An item with an amount to ask about has two more keys`));
     assert.ok(voice.includes(`An item with a kind to ask about has two more keys`));
     for (const prompt of [photo, nutrients]) {

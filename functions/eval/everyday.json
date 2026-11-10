@@ -33,7 +33,7 @@
     { "meal": "protein shake", "min": 120, "max": 300 },
     { "meal": "a pint of lager", "min": 180, "max": 260, "specific": true },
     { "meal": "glass of orange juice", "min": 80, "max": 150, "specific": true },
-    { "meal": "smoothie", "min": 150, "max": 350 },
+    { "meal": "smoothie", "min": 100, "max": 300 },
     { "meal": "omelette", "min": 200, "max": 450 },
     { "meal": "avocado toast", "min": 250, "max": 500 },
     { "meal": "pasta pesto", "min": 450, "max": 800 },
