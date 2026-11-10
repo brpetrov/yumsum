@@ -67,6 +67,24 @@ Mixing themes is fine, but make it deliberate: light for the first slides, then 
 - Only real screens of the app. No invented UI, no mock data drawn by hand, no stock food in the phone frame.
 - Don't show the name "Tester" or the test account's details.
 
+## Where to be creative, and where not
+
+You're a capable model with image tools; use them. Go further than the table where it makes the set sell better, within the rules above.
+
+Welcome:
+- **Composition and motion in a still:** a tilted phone, a second phone peeking in behind, a zoomed "detail bubble" that enlarges the chips or a ring with a soft shadow, a finger-tap ripple on a chip, a hand-drawn arrow or circle on the one thing the headline is about.
+- **Generated backdrops:** a softly blurred, warm food photo you generate (a bowl, a plate, a coffee) behind the phone, in the app's cream and peach palette, never behind the headline and never inside the phone frame.
+- **Enhancing the raw screens:** upscale them cleanly (they are half resolution), crop the status bar, straighten, sharpen a little, fix the one blemish allowed below. Replace the account name in the header ("John") with a neutral first name such as "Sam" in the same font, or crop the header.
+- **Headline wording:** you may improve the headlines and sublines in the table if yours are shorter, plainer or more concrete. Keep the voice: British English, sentence case, no exclamation marks, "you", five words or fewer for a headline. Keep the fact lines exact ("10 free estimates a day. No ads.").
+- **Order and count:** 6 to 8 slides; you may reorder after slide 1 and merge or drop slides if the story reads better. Slide 1 stays the hook (log a meal in seconds) and slide 2 stays the free AI.
+- **A dark-mode slide:** make it a feature ("Easy on the eyes"), using the dark captures.
+- **The feature graphic:** refresh `feature-graphic.png` (1024 × 500) in the same style if the existing one no longer matches the set.
+
+Not welcome, whatever the tool can do:
+- No invented app UI, no mock numbers typed over a screen, no features the app doesn't have, no stock photos of people, no ratings, awards or review quotes, no competitor names.
+- No changes to what a screen says beyond the name swap and brand blur above: the numbers and chips in each capture are real and stay as they are.
+- No text inside the phone frame that isn't the app's own.
+
 ## Deliver
 
 `play-1.png` … `play-N.png` in this folder, plus a `play-contact.png` strip (all slides side by side, any size) for a quick look. Say which slides were skipped and why.
