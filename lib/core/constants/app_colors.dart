@@ -6,8 +6,9 @@ import 'package:flutter/material.dart';
 /// readable on dark surfaces. Green (the icon's arc) means on track, the yolk
 /// amber close, and a crimson, kept well apart from the orange, off track.
 /// The hero colours are the warm sweep behind Today's main card, from the
-/// tile's peach into the bowl's cream. Gold is a deep, metallic one for a
-/// target done really well, kept darker than the amber so they don't mix.
+/// tile's peach into the bowl's cream. Gold, for a target done really well,
+/// is polished metal: [gold] between a pale [goldLight] highlight and a
+/// [goldDeep] shade, so it reads as shaded metal rather than the flat amber.
 class AppPalette {
   const AppPalette({
     required this.primary,
@@ -31,6 +32,8 @@ class AppPalette {
     required this.heroStart,
     required this.heroEnd,
     required this.gold,
+    required this.goldLight,
+    required this.goldDeep,
   });
 
   final Color primary;
@@ -54,6 +57,8 @@ class AppPalette {
   final Color heroStart;
   final Color heroEnd;
   final Color gold;
+  final Color goldLight;
+  final Color goldDeep;
 
   static const light = AppPalette(
     primary: Color(0xFFC94D1A),
@@ -76,7 +81,9 @@ class AppPalette {
     info: Color(0xFF3B82F6),
     heroStart: Color(0xFFFFDCC2),
     heroEnd: Color(0xFFFFF3E6),
-    gold: Color(0xFFA8760A),
+    gold: Color(0xFFD9A230),
+    goldLight: Color(0xFFF6D27A),
+    goldDeep: Color(0xFFB07A12),
   );
 
   static const dark = AppPalette(
@@ -100,7 +107,9 @@ class AppPalette {
     info: Color(0xFF6FA6F8),
     heroStart: Color(0xFF4A2818),
     heroEnd: Color(0xFF2B221D),
-    gold: Color(0xFFD9A62E),
+    gold: Color(0xFFE2B24A),
+    goldLight: Color(0xFFFBE3A2),
+    goldDeep: Color(0xFFB8862C),
   );
 }
 
@@ -138,6 +147,8 @@ class AppColors {
   static Color get heroStart => palette.heroStart;
   static Color get heroEnd => palette.heroEnd;
   static Color get gold => palette.gold;
+  static Color get goldLight => palette.goldLight;
+  static Color get goldDeep => palette.goldDeep;
 
   /// The icon tile's orange-to-red sweep around [primary], for the mic and
   /// other glossy bubbles.

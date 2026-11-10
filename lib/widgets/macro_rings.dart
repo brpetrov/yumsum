@@ -367,9 +367,19 @@ class _RingTile extends StatelessWidget {
                             ? 0
                             : grams / ring.target),
                     color: _color,
-                    track: AppColors.isDark
-                        ? Colors.white.withValues(alpha: 0.08)
-                        : Colors.white.withValues(alpha: 0.85),
+                    gold: _gold,
+                    track: switch ((_gold, AppColors.isDark)) {
+                      (true, true) => AppColors.goldLight.withValues(
+                        alpha: 0.14,
+                      ),
+                      (true, false) => Color.lerp(
+                        Colors.white,
+                        AppColors.goldLight,
+                        0.3,
+                      )!.withValues(alpha: 0.9),
+                      (false, true) => Colors.white.withValues(alpha: 0.08),
+                      (false, false) => Colors.white.withValues(alpha: 0.85),
+                    },
                   ),
                   child: Center(
                     child: Text(
@@ -409,13 +419,21 @@ class _RingTile extends StatelessWidget {
 }
 
 /// A round track with the eaten share drawn over it from the top, a little
-/// lighter at the start, like the bars.
+/// lighter at the start, like the bars. A [gold] ring is shaded like
+/// polished metal lit from the top left instead: pale there, deep at the
+/// bottom right, whatever its share.
 class _RingPainter extends CustomPainter {
-  _RingPainter({required this.value, required this.color, required this.track});
+  _RingPainter({
+    required this.value,
+    required this.color,
+    required this.track,
+    this.gold = false,
+  });
 
   final double value;
   final Color color;
   final Color track;
+  final bool gold;
 
   static const _stroke = 7.0;
 
@@ -434,6 +452,36 @@ class _RingPainter extends CustomPainter {
     );
     final share = 2 * math.pi * value.clamp(0.0, 1.0);
     if (share <= 0) return;
+    final arc = Paint()
+      ..shader =
+          (gold
+                  ? SweepGradient(
+                      // Clockwise from the top, the same colour at both ends
+                      // so a full ring has no seam.
+                      colors: [
+                        color,
+                        AppColors.goldDeep,
+                        color,
+                        AppColors.goldLight,
+                        color,
+                      ],
+                      stops: const [0, 0.375, 0.65, 0.875, 1],
+                      transform: const GradientRotation(-math.pi / 2),
+                    )
+                  : SweepGradient(
+                      startAngle: 0,
+                      endAngle: share,
+                      colors: [Color.lerp(color, Colors.white, 0.3)!, color],
+                      transform: const GradientRotation(-math.pi / 2),
+                    ))
+              .createShader(rect)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = _stroke;
+    // A full gold ring is one unbroken band, like a real ring.
+    if (gold && value >= 1) {
+      canvas.drawArc(rect, 0, 2 * math.pi, false, arc);
+      return;
+    }
     // The round ends reach half the stroke past each end of the arc, so it
     // is drawn that much shorter at both: with its ends it covers the share
     // eaten, and a full ring's ends meet at the top rather than overlap.
@@ -443,20 +491,14 @@ class _RingPainter extends CustomPainter {
       -math.pi / 2 + cap,
       math.max(share - 2 * cap, 0.001),
       false,
-      Paint()
-        ..shader = SweepGradient(
-          startAngle: 0,
-          endAngle: share,
-          colors: [Color.lerp(color, Colors.white, 0.3)!, color],
-          transform: const GradientRotation(-math.pi / 2),
-        ).createShader(rect)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = _stroke
-        ..strokeCap = StrokeCap.round,
+      arc..strokeCap = StrokeCap.round,
     );
   }
 
   @override
   bool shouldRepaint(_RingPainter old) =>
-      old.value != value || old.color != color || old.track != track;
+      old.value != value ||
+      old.color != color ||
+      old.track != track ||
+      old.gold != gold;
 }

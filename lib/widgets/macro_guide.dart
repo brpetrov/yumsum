@@ -147,7 +147,17 @@ Future<void> showMacroGuide(
               Container(
                 width: 8,
                 height: 8,
-                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                // Gold shaded like its ring, so it stands apart from amber.
+                decoration: color == AppColors.gold
+                    ? BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [AppColors.goldLight, AppColors.goldDeep],
+                        ),
+                      )
+                    : BoxDecoration(color: color, shape: BoxShape.circle),
               ),
               const SizedBox(width: 4),
               Text(label, style: body),
