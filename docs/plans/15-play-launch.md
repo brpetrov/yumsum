@@ -70,6 +70,8 @@ Message for testers:
 
 ## G. Found in the first install (10 November 2026), to come back to
 
+**Where we stopped, 10 November 2026 evening:** 0.1.0+2 is built (`build/app/outputs/bundle/release/app-release.aab`, signed with the upload key) with today's fixes and an up-to-date `google-services.json` (Firebase has a Google sign-in client for Play's key). Next: upload it to Internal testing, uninstall the debug build, install from Play, and try Continue with Google with the phone plugged in so Claude can read the error if it fails. The Gemini spend cap is £10 a month (AI Studio → Spend; it was £5 and paused the AI on 10 November); about £2–3 is left until 1 December.
+
 Where the internal test got to: the release is live, you're a tester, the signing keys are in Firebase, Play Integrity is linked. Open:
 
 - [ ] **Google sign-in failed in the Play build.** Play's signing SHA-1 (36:F8:32:6E…) went into Firebase at about 12:45 on 10 November; a try before that fails, and Google can take a few minutes after. Try again; if it still fails, note the exact message for Claude. Next check: Google Cloud console → APIs & Services → Credentials → an Android OAuth client with package `com.bpetrov.yumsum` and that SHA-1 (Firebase makes it when the fingerprint is added).
