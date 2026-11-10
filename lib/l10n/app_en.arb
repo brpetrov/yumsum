@@ -692,7 +692,7 @@
   "@mealChoiceHowMany": {
     "description": "Which-did-you-have dialog: label of the row of counts, e.g. 3, 5 or 8 pieces."
   },
-  "mealChoiceHowMuch": "How much?",
+  "mealChoiceHowMuch": "How big a portion?",
   "@mealChoiceHowMuch": {
     "description": "Which-did-you-have dialog: label of the row of amounts, e.g. small, regular or large."
   },

@@ -137,8 +137,12 @@ function amountsOf(item, said) {
     amounts.push({ amount: label, grams: Math.round(other.grams), kcal });
     if (amounts.length === 3) break;
   }
-  return amounts;
+  return worthAsking(item.kcal, calories) ? amounts : [];
 }
+// The app's askBarFor: a row must be able to move the item by a third and
+// at least 80 kcal, or it isn't asked.
+const bar = (kcal) => Math.max(80, Math.round(kcal * 0.3));
+const worthAsking = (kcal, calories) => calories.some((other) => Math.abs(other - kcal) >= bar(kcal));
 function asked(item, meal) {
   const said = words(meal);
   const kept = [...words(item.item)].filter((word) => said.has(word));
@@ -155,6 +159,7 @@ function asked(item, meal) {
     options.push(option);
     if (options.length === 3) break;
   }
+  if (!worthAsking(item.kcal, calories)) options.length = 0;
   const amounts = amountsOf(item, meal);
   const chips = () =>
     (amounts.length ? amounts.length + 1 : 0) + (options.length ? options.length + 1 : 0);
@@ -442,11 +447,17 @@ let vagueAsked = 0;
 let vagueRuns = 0;
 let piecesAsked = 0;
 let piecesRuns = 0;
+let imperialRuns = 0;
 const spreads = [];
 for (const result of results) {
   const { meal, min, max, specific, pieces, tries, holdout } = result;
   const { good, kcals, hits, spread, asks, countAsks } = statsOf(result);
   inRange += hits;
+  // Ounces or cups in an amount: the user is in a metric country.
+  for (const t of good) {
+    const labels = t.items.flatMap((item) => [item.amount, ...(Array.isArray(item.amounts) ? item.amounts.map((a) => a?.amount) : [])]);
+    if (labels.some((label) => typeof label === "string" && /\b(oz|ounces?|cups?)\b/i.test(label))) imperialRuns++;
+  }
   total += tries.length;
   spreads.push(spread);
   if (specific) needless += asks;
@@ -492,6 +503,7 @@ const summary = [
   `Needless questions: ${needless}/${specificRuns} runs of specific meals`,
   `Vague meals asked:  ${vagueAsked}/${vagueRuns} runs`,
   `Piece foods asked the count: ${piecesAsked}/${piecesRuns} runs`,
+  `Imperial amounts (oz, cups): ${imperialRuns} runs`,
 ];
 writeFileSync(new URL("last-run.txt", here), [...summary, "", ...lines].join("\n"));
 console.log([...lines.filter((line) => !line.startsWith("   ")), "", ...summary].join("\n"));

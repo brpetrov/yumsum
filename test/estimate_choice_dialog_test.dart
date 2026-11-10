@@ -64,7 +64,7 @@ void main() {
     await open(tester);
     for (final text in [
       'Quick question',
-      'How much?',
+      'How big a portion?',
       'Regular',
       'Small',
       'Large',

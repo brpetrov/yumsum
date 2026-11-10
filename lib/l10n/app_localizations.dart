@@ -1001,7 +1001,7 @@ abstract class AppLocalizations {
   /// Which-did-you-have dialog: label of the row of amounts, e.g. small, regular or large.
   ///
   /// In en, this message translates to:
-  /// **'How much?'**
+  /// **'How big a portion?'**
   String get mealChoiceHowMuch;
 
   /// Which-did-you-have dialog: the amount the AI went with, when it didn't name it; beside e.g. small and large.

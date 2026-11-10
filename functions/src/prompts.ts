@@ -141,14 +141,19 @@ function choices({ country, language }: Profile): string {
   return "When the user leaves out something that changes an item's " +
     "calories a lot, go with the most common choice in " +
     `${country} and offer the other likely choices, so the app can ask. ` +
-    "There are two things to ask about, and an item may have both:\n" +
+    "There are two things to ask about, and an item may have both. Ask " +
+    "only where the answer would move the item's calories by about a " +
+    "third, and by at least 80. Most items need neither amounts nor " +
+    "options, and a needless question is worse than none.\n" +
     "The amount, first and most important. Ask only when the user gave no " +
     `amount, or only a vague one ("a bowl", "a plate", "some", "a ` +
     `handful", "a few"). A number ("5 meatballs", "2 slices"), a size ` +
     `("large", "small", "a pint", "half"), a weight or a volume is an ` +
     `amount the user gave, and so is "a" or "an" before a single food ("a ` +
     `boiled egg", "an apple", "a pizza"): one of it. Then never ask the ` +
-    "amount. For food that comes in pieces (sarmi, meatballs, " +
+    "amount. Amounts are counts of pieces, grams, millilitres or the sizes " +
+    "a thing is sold in; never ounces or cups. For food that comes in " +
+    "pieces (sarmi, meatballs, " +
     "dumplings, eggs, pancakes, biscuits, slices of pizza or bread, " +
     "nuggets, fruit), assume one standard serving, as nutrition guides " +
     `give it, and give "amount" as a count ` +
@@ -169,30 +174,44 @@ function choices({ country, language }: Profile): string {
     "single item: it is one, unless the user said more, and what matters " +
     "is what's in it, which is a kind (with mayonnaise or without, white " +
     "or wholemeal bread, with cheese or without).\n" +
-    "The kind, where it changes the calories by about 15% or more: with or " +
-    "without meat, fried or grilled, homemade or takeaway (a restaurant " +
-    "portion is also bigger: fold that in), full-fat or diet, the milk or " +
-    "sugar in a drink. A part the dish is often had " +
-    "with that adds a quarter or more also counts as a kind: dressing on a " +
-    "salad, mayonnaise in a sandwich, butter on toast, sauce on pasta, " +
-    `"with dressing" against "without". Give "assumed", the kind assumed in ` +
-    `a few words, and "options", up to 2 other likely kinds, each a ` +
-    "complete item named in full at the same grams as the item. Never a " +
-    "different food, a meal deal or a bigger dish, and never a kind for a " +
-    "branded or chain product, for a small difference (a banana, a cup of " +
-    "tea), or for something the user said.\n" +
+    "The kind, only where it is a real choice people in " +
+    `${country} commonly make with that food, and it moves the calories ` +
+    "by about a third: with or without meat, fried or grilled where both " +
+    "are usual (a chicken breast, a fish fillet), full-fat or diet, a " +
+    "part the dish is often had with that adds a quarter or more " +
+    "(dressing on a salad, mayonnaise in a sandwich, butter on toast, " +
+    `sauce on pasta: "with dressing" against "without"). A generic name ` +
+    `that covers foods of very different calories ("cheese", "nuts", ` +
+    `"yoghurt", "milk", "bread") is asked the kind: assume the most common ` +
+    "one (cheddar, mixed nuts, whole milk) and offer two others. Homemade " +
+    "against takeaway only for food usually bought as a takeaway (curry, " +
+    "Chinese, pizza, kebab, fish and chips), never for plain home cooking " +
+    "like chicken with rice. Assume the dish as it is usually served in " +
+    `${country}: fish and chips is battered and deep-fried, a full English ` +
+    "is fried; never offer a healthier way of cooking a dish that is " +
+    "nearly always made one way. Name items as a person would say them, " +
+    `never with "cooked" or "raw" added. Raw against cooked weight is a ` +
+    "kind only when the user typed a weight of meat, fish, rice or pasta " +
+    `("200 g chicken breast": the raw weight assumed, the cooked weight ` +
+    `offered). Give "assumed", the kind assumed in a few words, and ` +
+    `"options", up to 2 other likely kinds, each a complete item named in ` +
+    "full at the same grams as the item. Never a different food, a meal " +
+    "deal or a bigger dish, and never a kind for a branded or chain " +
+    "product, for a small difference (a banana, a cup of tea, the milk in " +
+    "a coffee), or for something the user said.\n" +
     `So "sarmi" is assumed 5 pieces with meat, with amounts of 3 and 8 ` +
-    `pieces and an option without meat; "cappuccino" is assumed regular ` +
-    "with semi-skimmed milk, with amounts small and large and options for " +
-    `whole milk and oat milk; "chicken curry" is assumed a regular homemade ` +
-    "portion with rice, with amounts small and large and options without " +
-    `rice and from a takeaway; "2 slices of pizza" has no amounts and ` +
-    `options for a small and a large pizza; "200 g chicken breast" has ` +
-    "neither. " +
+    `pieces and an option without meat; "cheese" is assumed 30 g of ` +
+    "cheddar, with amounts of 60 g and 90 g and options of cottage cheese " +
+    `and feta; "chicken curry" is assumed a regular homemade portion with ` +
+    "rice, with amounts small and large and an option from a takeaway; " +
+    `"fish and chips" is assumed a regular portion, battered and fried, ` +
+    `with amounts small and large and no options; "chicken with rice" is ` +
+    `assumed a regular portion with no options; "cappuccino" has neither, ` +
+    `as the milk changes little; "2 slices of pizza" has no amounts and ` +
+    `options for a small and a large pizza; "200 g chicken breast" has no ` +
+    "amounts and the cooked weight as an option. " +
     "Where three things are unknown, ask the two that move the calories " +
-    "most and fold the third into what's assumed. Most items need neither " +
-    "amounts nor options: ask only where the answer would change the " +
-    "calories by at least 30.\n";
+    "most and fold the third into what's assumed.\n";
 }
 
 const optionsJson =

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
@@ -75,6 +76,12 @@ typedef EstimateAmount = ({String label, int grams});
 /// An option closer than this to the item's calories isn't worth asking
 /// about.
 const optionGap = 30;
+
+/// The least an amount or kind row must be able to move an item's
+/// calories to be worth a question: a third of them, and at least 80 kcal.
+/// Below that the row is dropped, whatever the model offered (10 November
+/// 2026: a large cappuccino or sugar in tea isn't worth asking).
+int askBarFor(int kcal) => max(80, (kcal * 0.3).round());
 
 /// [macros] are for the whole meal, and only there when they were asked for.
 typedef CalorieEstimate = ({
@@ -228,8 +235,9 @@ EstimateItem _asking(
 /// large", whatever the model offers (the prompt says so too; it still did
 /// in 2 of 12 eval runs on 10 November 2026). What's in it is a kind.
 final _singleItem = RegExp(
-  r'\b(sandwich|toastie|panini|burger|wrap|bagel|сандвич|бургер|дюнер|тост)',
+  r'(^|[^\p{L}])(sandwich|toastie|panini|burger|wrap|bagel|сандвич|бургер|дюнер|тост)',
   caseSensitive: false,
+  unicode: true,
 );
 
 /// The other amounts the AI offers, by grams, which need the item's own
@@ -278,13 +286,18 @@ EstimateItem _withAmounts(
     calories.add(kcal);
     if (amounts.length == 3) break;
   }
-  if (amounts.isEmpty) return item;
+  if (amounts.isEmpty || !_worthAsking(item.kcal, calories)) return item;
   return _asking(
     item,
     amount: amount.isEmpty ? null : amount,
     amounts: amounts,
   );
 }
+
+/// Whether a row's [calories] (the item's own first) can move the item by
+/// [askBarFor].
+bool _worthAsking(int kcal, List<int> calories) =>
+    calories.any((other) => (other - kcal).abs() >= askBarFor(kcal));
 
 /// At most 6 chips across the amount and kind rows, counting each row's
 /// ticked one; options give way, as the amount matters more.
@@ -348,7 +361,7 @@ EstimateItem _withOptions(EstimateItem item, Object? raw, Set<String> said) {
     calories.add(option.kcal);
     if (options.length == 3) break;
   }
-  if (options.isEmpty) return item;
+  if (options.isEmpty || !_worthAsking(item.kcal, calories)) return item;
   return _asking(
     item,
     amount: item.amount,

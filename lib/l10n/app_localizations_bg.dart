@@ -551,7 +551,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get mealChoiceHowMany => 'Колко броя?';
 
   @override
-  String get mealChoiceHowMuch => 'Колко?';
+  String get mealChoiceHowMuch => 'Колко голяма порция?';
 
   @override
   String get mealChoiceRegular => 'Средно';

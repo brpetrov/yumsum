@@ -439,7 +439,7 @@ void main() {
               'kcal': 150,
               'protein_g': 9,
             },
-            {'item': 'Large oat latte with syrup', 'grams': 470, 'kcal': 260},
+            {'item': 'Large oat latte with syrup', 'grams': 470, 'kcal': 300},
           ],
         },
       ], said: 'a large OAT latte');
@@ -511,6 +511,45 @@ void main() {
       }
     });
 
+    test('a row that cannot move the item by askBarFor is dropped', () {
+      expect(askBarFor(110), 80);
+      expect(askBarFor(420), 126);
+      // A cappuccino: small, large and whole milk are all under 80 kcal away.
+      final cappuccino = parseEstimateItems([
+        {
+          'item': 'Cappuccino',
+          'grams': 250,
+          'kcal': 110,
+          'protein_g': 7,
+          'amount': 'regular',
+          'amounts': [
+            {'amount': 'small', 'grams': 180},
+            {'amount': 'large', 'grams': 350},
+          ],
+          'options': [
+            {'item': 'Cappuccino with whole milk', 'grams': 250, 'kcal': 150},
+          ],
+        },
+      ]).single;
+      expect(cappuccino.amount, isNull);
+      expect(cappuccino.amounts, isEmpty);
+      expect(cappuccino.options, isEmpty);
+      // Sarmi: 3 pieces is 168 kcal under, so the row stays.
+      final sarmiItem = parseEstimateItems([
+        sarmi(
+          amounts: [
+            {'amount': '3 pieces', 'grams': 180},
+          ],
+          options: [
+            // 100 kcal under: under a third of 420, so this row goes.
+            {'item': 'Sarmi without meat', 'grams': 300, 'kcal': 320},
+          ],
+        ),
+      ]).single;
+      expect(sarmiItem.amounts, [(label: '3 pieces', grams: 180)]);
+      expect(sarmiItem.options, isEmpty);
+    });
+
     test('a sandwich, wrap or burger is never asked how much', () {
       for (final name in [
         'Tuna sandwich',
@@ -548,7 +587,7 @@ void main() {
       final soup = {
         'item': 'Tomato soup',
         'grams': 300,
-        'kcal': 150,
+        'kcal': 300,
         'amount': '1 bowl',
         'amounts': [
           {'amount': 'small bowl', 'grams': 200},

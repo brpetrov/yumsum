@@ -150,7 +150,7 @@
   "mealKcalGrams": "{kcal} ккал · {grams} г",
   "mealChoiceTitle": "Бърз въпрос",
   "mealChoiceHowMany": "Колко броя?",
-  "mealChoiceHowMuch": "Колко?",
+  "mealChoiceHowMuch": "Колко голяма порция?",
   "mealChoiceRegular": "Средно",
   "mealChoiceWhichKind": "Какъв вид?",
   "cameraNotFound": "Не открихме камера.",

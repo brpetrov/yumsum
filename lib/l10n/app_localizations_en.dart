@@ -538,7 +538,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mealChoiceHowMany => 'How many?';
 
   @override
-  String get mealChoiceHowMuch => 'How much?';
+  String get mealChoiceHowMuch => 'How big a portion?';
 
   @override
   String get mealChoiceRegular => 'Regular';
