@@ -161,8 +161,8 @@ LabelReading parseLabelReading(Map<String, dynamic> map) {
 /// nothing, or arguing with the user. Options keep every word of the item's
 /// name the user [said] (no soy latte for a large oat latte), and there are
 /// no amounts when theirs repeat a number or size the user said ("5
-/// meatballs", "a pint", "large"). At most 6 chips across both rows,
-/// counting each row's ticked one: options give way first.
+/// meatballs", "two eggs", "a pint", "large", "a handful"). Each row has
+/// at most 3 besides the ticked one.
 List<EstimateItem> parseEstimateItems(Object? raw, {String said = ''}) {
   if (raw is! List) return const [];
   final saidWords = _words(said);
@@ -170,12 +170,10 @@ List<EstimateItem> parseEstimateItems(Object? raw, {String said = ''}) {
   return [
     for (final entry in raw)
       if (_itemFrom(entry) case final item?)
-        _fewerChips(
-          _withOptions(
-            _withAmounts(item, entry as Map, said, heard),
-            entry['options'],
-            saidWords,
-          ),
+        _withOptions(
+          _withAmounts(item, entry as Map, said, heard),
+          entry['options'],
+          saidWords,
         ),
   ];
 }
@@ -206,13 +204,23 @@ final _oneAssumed = RegExp(
 /// The numbers of any length in [text], and its words of three letters or
 /// more when [sizesOnly] is false, else only its [_sizeWords], in lower case.
 
+/// Number words read as their digits ("two eggs" is "2 eggs").
 Set<String> _tokens(String text, {bool sizesOnly = false}) => {
-  for (final token in text.toLowerCase().split(
+  for (final word in text.toLowerCase().split(
     RegExp(r'[^\p{L}\p{N}]+', unicode: true),
   ))
-    if (RegExp(r'^\p{N}+$', unicode: true).hasMatch(token) ||
-        (sizesOnly ? _sizeWords.contains(token) : token.length > 2))
+    if (_numberWords[word] ?? word case final token
+        when RegExp(r'^\p{N}+$', unicode: true).hasMatch(token) ||
+            (sizesOnly ? _sizeWords.contains(token) : token.length > 2))
       token,
+};
+
+const _numberWords = {
+  'one': '1', 'two': '2', 'three': '3', 'four': '4', 'five': '5', //
+  'six': '6', 'seven': '7', 'eight': '8', 'nine': '9', 'ten': '10',
+  'eleven': '11', 'twelve': '12', 'един': '1', 'една': '1', 'едно': '1',
+  'два': '2', 'две': '2', 'три': '3', 'четири': '4', 'пет': '5',
+  'шест': '6', 'седем': '7', 'осем': '8', 'девет': '9', 'десет': '10',
 };
 
 /// [item] with what's left to ask in place of its own.
@@ -236,6 +244,18 @@ EstimateItem _asking(
 /// in 2 of 12 eval runs on 10 November 2026). What's in it is a kind.
 final _singleItem = RegExp(
   r'(^|[^\p{L}])(sandwich|toastie|panini|burger|wrap|bagel|сандвич|бургер|дюнер|тост)',
+  caseSensitive: false,
+  unicode: true,
+);
+
+/// "A handful" is an amount the user gave: one usual handful. Offering
+/// "14 g" or "42 g" beside it means nothing to anyone (10 November 2026).
+final _handful = RegExp(r'handful|шепа', caseSensitive: false);
+
+/// A weight or volume the user typed ("100 g", "330ml", "200 гр"): the
+/// amount is given, whatever size words the AI offers.
+final _measure = RegExp(
+  r'\d\s*(g|kg|ml|l|гр|г|кг|мл|л)(?![\p{L}])',
   caseSensitive: false,
   unicode: true,
 );
@@ -264,7 +284,11 @@ EstimateItem _withAmounts(
     return item;
   }
   if (_oneArticle.hasMatch(said) && _oneAssumed.hasMatch(amount)) return item;
-  if (_singleItem.hasMatch(item.name)) return item;
+  if (_singleItem.hasMatch(item.name) ||
+      _handful.hasMatch(said) ||
+      _measure.hasMatch(said)) {
+    return item;
+  }
   final labels = {amount.toLowerCase()};
   final calories = [item.kcal];
   final amounts = <EstimateAmount>[];
@@ -294,27 +318,11 @@ EstimateItem _withAmounts(
   );
 }
 
-/// Whether a row's [calories] (the item's own first) can move the item by
-/// [askBarFor].
+/// Whether a row's [calories] (the item's own among them) span
+/// [askBarFor], lowest to highest: small to large, so a regular portion
+/// in the middle is asked every time, not only when large comes out big.
 bool _worthAsking(int kcal, List<int> calories) =>
-    calories.any((other) => (other - kcal).abs() >= askBarFor(kcal));
-
-/// At most 6 chips across the amount and kind rows, counting each row's
-/// ticked one; options give way, as the amount matters more.
-EstimateItem _fewerChips(EstimateItem item) {
-  final amountChips = item.amounts.isEmpty ? 0 : item.amounts.length + 1;
-  var options = item.options.length;
-  while (options > 0 && amountChips + options + 1 > 6) {
-    options--;
-  }
-  if (options == item.options.length) return item;
-  return _asking(
-    item,
-    amount: item.amount,
-    amounts: item.amounts,
-    options: item.options.take(options).toList(),
-  );
-}
+    calories.reduce(max) - calories.reduce(min) >= askBarFor(kcal);
 
 /// The words of [text] of three letters or more, in lower case.
 Set<String> _words(String text) => {

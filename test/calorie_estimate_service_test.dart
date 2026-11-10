@@ -630,7 +630,7 @@ void main() {
       expect(amounts('cappuccino', 'tall', 'grande'), hasLength(1));
     });
 
-    test('at most 6 chips: options give way to amounts', () {
+    test('both rows keep up to 3 besides the ticked one', () {
       final item = parseEstimateItems([
         sarmi(
           amounts: [
@@ -646,7 +646,91 @@ void main() {
         ),
       ]).single;
       expect(item.amounts, hasLength(3));
-      expect(item.options.map((option) => option.name), ['Sarmi without meat']);
+      expect(item.options, hasLength(3));
+    });
+
+    test('a portion row is asked when small to large spans the bar, though '
+        'neither alone does', () {
+      // 650 kcal: the bar is 195; small is 130 under, large 160 over.
+      final item = parseEstimateItems([
+        {
+          'item': 'Spaghetti bolognese',
+          'grams': 450,
+          'kcal': 650,
+          'amount': 'regular',
+          'amounts': [
+            {'amount': 'small', 'grams': 360},
+            {'amount': 'large', 'grams': 561},
+          ],
+        },
+      ]).single;
+      expect(item.amounts.map((amount) => amount.label), ['small', 'large']);
+    });
+
+    test('a typed weight or volume is an amount the user gave', () {
+      final rice = {
+        'item': 'Cooked basmati rice',
+        'grams': 100,
+        'kcal': 300,
+        'amount': 'regular',
+        'amounts': [
+          {'amount': 'small', 'grams': 60},
+          {'amount': 'large', 'grams': 150},
+        ],
+      };
+      for (final said in [
+        '100 g cooked basmati rice',
+        '100g rice',
+        '200 гр ориз',
+      ]) {
+        expect(
+          parseEstimateItems([rice], said: said).single.amounts,
+          isEmpty,
+          reason: said,
+        );
+      }
+      expect(
+        parseEstimateItems([rice], said: 'basmati rice').single.amounts,
+        hasLength(2),
+      );
+    });
+
+    test('"two eggs" and "a handful" are amounts the user gave', () {
+      final eggs = {
+        'item': 'Scrambled eggs on toast',
+        'grams': 200,
+        'kcal': 380,
+        'amount': '2 eggs',
+        'amounts': [
+          {'amount': '1 egg', 'grams': 140},
+          {'amount': '3 eggs', 'grams': 260},
+        ],
+      };
+      expect(
+        parseEstimateItems([
+          eggs,
+        ], said: 'two scrambled eggs on toast').single.amounts,
+        isEmpty,
+      );
+      expect(
+        parseEstimateItems([eggs], said: 'две бъркани яйца').single.amounts,
+        isEmpty,
+      );
+      expect(
+        parseEstimateItems([
+          {
+            'item': 'Almonds',
+            'grams': 28,
+            'kcal': 165,
+            'amount': 'a handful',
+            'amounts': [
+              {'amount': '14 g', 'grams': 14},
+              {'amount': '56 g', 'grams': 56},
+            ],
+          },
+        ], said: 'a handful of almonds').single.amounts,
+        isEmpty,
+      );
     });
 
     test('answered: the kind picked, at the amount picked', () {

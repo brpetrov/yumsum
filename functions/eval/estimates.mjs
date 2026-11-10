@@ -90,8 +90,8 @@ const config = { ...mealConfig(false), ...(temperature === undefined ? {} : { te
 // The app's filter (parseEstimateItems): other amounts, by grams, and
 // other kinds, as complete items, each at least 30 kcal from the item and
 // each other, at most 3 of each; kinds under new names that keep every
-// word of the item's name the user typed; at most 6 chips counting the
-// ticked one of each row, kinds dropped first; questions for at most 2
+// word of the item's name the user typed; a row only when it spans a
+// third of the item's calories and 80 kcal; questions for at most 2
 // items a meal, the widest spread first.
 const words = (text) =>
   new Set(text.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter((word) => word.length > 2));
@@ -103,10 +103,18 @@ const sizes = new Set([
   "малка", "малък", "средна", "среден", "средно", "голяма", "голям", "голямо",
   "половин", "половинка", "цяла", "цял", "цяло", "двойна", "двоен", "двойно",
 ]);
+// Number words read as digits (the app's _numberWords).
+const numberWords = {
+  one: "1", two: "2", three: "3", four: "4", five: "5", six: "6", seven: "7", eight: "8",
+  nine: "9", ten: "10", eleven: "11", twelve: "12", един: "1", една: "1", едно: "1",
+  два: "2", две: "2", три: "3", четири: "4", пет: "5", шест: "6", седем: "7", осем: "8",
+  девет: "9", десет: "10",
+};
 const tokens = (text, sizesOnly = false) =>
   text
     .toLowerCase()
     .split(/[^\p{L}\p{N}]+/u)
+    .map((t) => numberWords[t] ?? t)
     .filter((t) => /^\p{N}+$/u.test(t) || (sizesOnly ? sizes.has(t) : t.length > 2));
 function amountsOf(item, said) {
   const amount = typeof item.amount === "string" ? item.amount.trim() : "";
@@ -120,6 +128,14 @@ function amountsOf(item, said) {
   if (
     /(^|\s)(a|an|един|една|едно)\s/i.test(said) &&
     /^(1|one|един|една|едно)\b(?!\s*(bowl|plate|handful|portion|serving|cup|glass|купа|купичка|чиния|шепа|порция|чаша))/i.test(amount)
+  ) {
+    return [];
+  }
+  // The app's _singleItem and _handful: a sandwich is one, a handful is given.
+  if (
+    /(^|[^\p{L}])(sandwich|toastie|panini|burger|wrap|bagel|сандвич|бургер|дюнер|тост)/iu.test(item.item) ||
+    /handful|шепа/i.test(said) ||
+    /\d\s*(g|kg|ml|l|гр|г|кг|мл|л)(?![\p{L}])/iu.test(said)
   ) {
     return [];
   }
@@ -142,7 +158,8 @@ function amountsOf(item, said) {
 // The app's askBarFor: a row must be able to move the item by a third and
 // at least 80 kcal, or it isn't asked.
 const bar = (kcal) => Math.max(80, Math.round(kcal * 0.3));
-const worthAsking = (kcal, calories) => calories.some((other) => Math.abs(other - kcal) >= bar(kcal));
+// Lowest to highest across the row, the item's own among them.
+const worthAsking = (kcal, calories) => Math.max(...calories) - Math.min(...calories) >= bar(kcal);
 function asked(item, meal) {
   const said = words(meal);
   const kept = [...words(item.item)].filter((word) => said.has(word));
@@ -161,9 +178,6 @@ function asked(item, meal) {
   }
   if (!worthAsking(item.kcal, calories)) options.length = 0;
   const amounts = amountsOf(item, meal);
-  const chips = () =>
-    (amounts.length ? amounts.length + 1 : 0) + (options.length ? options.length + 1 : 0);
-  while (chips() > 6) options.pop();
   const spread = Math.max(
     0,
     ...[...amounts, ...options].map((other) => Math.abs(other.kcal - item.kcal)),

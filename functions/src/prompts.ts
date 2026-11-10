@@ -146,14 +146,17 @@ function choices({ country, language }: Profile): string {
     "third, and by at least 80. Most items need neither amounts nor " +
     "options, and a needless question is worse than none.\n" +
     "The amount, first and most important. Ask only when the user gave no " +
-    `amount, or only a vague one ("a bowl", "a plate", "some", "a ` +
-    `handful", "a few"). A number ("5 meatballs", "2 slices"), a size ` +
-    `("large", "small", "a pint", "half"), a weight or a volume is an ` +
-    `amount the user gave, and so is "a" or "an" before a single food ("a ` +
-    `boiled egg", "an apple", "a pizza"): one of it. Then never ask the ` +
-    "amount. Amounts are counts of pieces, grams, millilitres or the sizes " +
-    "a thing is sold in; never ounces or cups. For food that comes in " +
-    "pieces (sarmi, meatballs, " +
+    `amount, or only a vague one ("a bowl", "a plate", "some", "a few"). A ` +
+    `number in digits or words ("5 meatballs", "two eggs", "три сърми"), a ` +
+    `size ("large", "small", "a pint", "half"), "a handful", a weight or a ` +
+    `volume is an amount the user gave, and so is "a" or "an" before a ` +
+    `single food ("a boiled egg", "an apple"): one of it. Then never ask ` +
+    "the amount. Amounts are what a person can picture: counts of pieces " +
+    "or slices, small, regular and large portions, the sizes a thing is " +
+    "sold in, and grams only for food people weigh or buy by weight " +
+    `(cheese, meat, fish); never ounces or cups. Every amount in the row ` +
+    `is in the same terms as the assumed one: never "a handful" beside ` +
+    `"14 g". For food that comes in pieces (sarmi, meatballs, ` +
     "dumplings, eggs, pancakes, biscuits, slices of pizza or bread, " +
     "nuggets, fruit), assume one standard serving, as nutrition guides " +
     `give it, and give "amount" as a count ` +
@@ -180,13 +183,18 @@ function choices({ country, language }: Profile): string {
     "are usual (a chicken breast, a fish fillet), full-fat or diet, a " +
     "part the dish is often had with that adds a quarter or more " +
     "(dressing on a salad, mayonnaise in a sandwich, butter on toast, " +
-    `sauce on pasta: "with dressing" against "without"). A generic name ` +
+    `sauce on pasta: "with dressing" against "without"). Never an extra ` +
+    "the user didn't mention and the dish isn't usually had with (extra " +
+    `feta, added chicken, "with a side"). A generic name ` +
     `that covers foods of very different calories ("cheese", "nuts", ` +
     `"yoghurt", "milk", "bread") is asked the kind: assume the most common ` +
-    "one (cheddar, mixed nuts, whole milk) and offer two others. Homemade " +
-    "against takeaway only for food usually bought as a takeaway (curry, " +
-    "Chinese, pizza, kebab, fish and chips), never for plain home cooking " +
-    "like chicken with rice. Assume the dish as it is usually served in " +
+    `one in ${country} and offer the three other most common (for cheese ` +
+    "in the UK: cheddar, then mozzarella, feta and cottage cheese). " +
+    "Homemade against takeaway only for food usually bought as a takeaway " +
+    "(curry, Chinese, kebab, fish and chips), never for home cooking like " +
+    "chicken with rice or spaghetti bolognese, and never \"restaurant " +
+    "style\". A kind never changes the amount or the size: that is the " +
+    "amount's row. Assume the dish as it is usually served in " +
     `${country}: fish and chips is battered and deep-fried, a full English ` +
     "is fried; never offer a healthier way of cooking a dish that is " +
     "nearly always made one way. Name items as a person would say them, " +
@@ -194,22 +202,29 @@ function choices({ country, language }: Profile): string {
     "kind only when the user typed a weight of meat, fish, rice or pasta " +
     `("200 g chicken breast": the raw weight assumed, the cooked weight ` +
     `offered). Give "assumed", the kind assumed in a few words, and ` +
-    `"options", up to 2 other likely kinds, each a complete item named in ` +
-    "full at the same grams as the item. Never a different food, a meal " +
+    `"options", up to 2 other likely kinds (3 for a generic name), each a ` +
+    "complete item named in full at the same grams as the item. Never a " +
+    "different food, a meal " +
     "deal or a bigger dish, and never a kind for a branded or chain " +
     "product, for a small difference (a banana, a cup of tea, the milk in " +
     "a coffee), or for something the user said.\n" +
     `So "sarmi" is assumed 5 pieces with meat, with amounts of 3 and 8 ` +
     `pieces and an option without meat; "cheese" is assumed 30 g of ` +
-    "cheddar, with amounts of 60 g and 90 g and options of cottage cheese " +
-    `and feta; "chicken curry" is assumed a regular homemade portion with ` +
-    "rice, with amounts small and large and an option from a takeaway; " +
-    `"fish and chips" is assumed a regular portion, battered and fried, ` +
-    `with amounts small and large and no options; "chicken with rice" is ` +
-    `assumed a regular portion with no options; "cappuccino" has neither, ` +
-    `as the milk changes little; "2 slices of pizza" has no amounts and ` +
-    `options for a small and a large pizza; "200 g chicken breast" has no ` +
-    "amounts and the cooked weight as an option. " +
+    "cheddar, with amounts of 60 g and 90 g and options of mozzarella, " +
+    `feta and cottage cheese; "chicken curry" is assumed a regular ` +
+    "homemade portion with rice, with amounts small and large and an " +
+    `option from a takeaway; "fish and chips" is assumed a regular ` +
+    "portion, battered and fried, with amounts small and large and no " +
+    `options; "chicken with rice" and "spaghetti bolognese" are assumed a ` +
+    `regular portion, with amounts small and large and no options; "Greek ` +
+    `salad" is assumed a regular portion with its usual feta and olive ` +
+    `oil, with amounts small and large and no options; "pizza" is assumed ` +
+    `4 slices of a medium pizza, with amounts of 2, 6 and 8 slices and no ` +
+    `options; "a handful of almonds" and "two scrambled eggs on toast" ` +
+    `have neither; "cappuccino" has neither, as the milk changes little; ` +
+    `"2 slices of pizza" has no amounts and options for a small and a ` +
+    `large pizza; "200 g chicken breast" has no amounts and the cooked ` +
+    "weight as an option. " +
     "Where three things are unknown, ask the two that move the calories " +
     "most and fold the third into what's assumed.\n";
 }
