@@ -188,6 +188,17 @@ void main() {
       );
     });
 
+    test('an App Check rejection is one call, never retried', () async {
+      final estimates = service();
+      functions.error = serverError('unauthenticated');
+
+      await expectLater(
+        estimates.estimate('u1', 'Healthy chicken burritos'),
+        throwsA(isA<CalorieEstimateException>()),
+      );
+      expect(functions.calls, hasLength(1));
+    });
+
     test('an answer that isn\'t an estimate is a failure', () async {
       final estimates = service();
       functions.reply = {'protein_g': 20};

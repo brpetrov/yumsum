@@ -66,10 +66,14 @@ class _FakeEstimateService implements CalorieEstimateService {
 
   String? described;
 
+  /// Thrown by [estimate] when set.
+  Object? error;
+
   @override
   Future<CalorieEstimate> estimate(String uid, String description) async {
     estimateCalls++;
     described = description;
+    if (error case final error?) throw error;
     final total = totalOf(items);
     return (
       kcal: total.kcal,
@@ -605,6 +609,41 @@ void main() {
     expect(macros.carbs, closeTo(66.46, 0.01));
     expect(macros.salt, closeTo(3.6, 0.01));
     expect(macros.fibre, isNull);
+  });
+
+  testWidgets('a failed estimate is one call; taps straight after it ask '
+      'nothing, and the sparkle works again 2 seconds on', (tester) async {
+    await pumpCard(tester);
+    estimateService.error = const CalorieEstimateException(
+      'Could not estimate calories. Try again.',
+    );
+    await tester.enterText(nameBox, 'healthy chicken burritos');
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Estimate'));
+    await tester.pump();
+    expect(
+      find.text('Could not estimate calories. Try again.'),
+      findsOneWidget,
+    );
+    expect(estimateService.estimateCalls, 1);
+
+    for (var i = 0; i < 5; i++) {
+      await tester.tap(find.byTooltip('Estimate'));
+      await tester.pump(const Duration(milliseconds: 300));
+    }
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pump();
+    expect(estimateService.estimateCalls, 1);
+    expect(
+      find.text('Could not estimate calories. Try again.'),
+      findsOneWidget,
+    );
+
+    await tester.pump(const Duration(seconds: 1));
+    await tester.tap(find.byTooltip('Estimate'));
+    await tester.pump();
+    expect(estimateService.estimateCalls, 2);
   });
 
   testWidgets('where the AI had to assume the version of an item, the '

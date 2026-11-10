@@ -133,6 +133,11 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   // The recogniser while it, rather than the recorder, is listening.
   SpeechToText? _speech;
   bool _working = false;
+  // Runs for a moment after an AI call fails, while a tap on the sparkle or
+  // Done estimates nothing: the error stays up, and a failure such as an App
+  // Check rejection would only fail again (10 November: 15 calls in 15
+  // seconds, each a tap).
+  Timer? _afterFailure;
   // As of the last metrics change, so only the keyboard coming or going
   // rebuilds, not each frame of its slide.
   bool _keyboardUp = false;
@@ -243,6 +248,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     WidgetsBinding.instance.removeObserver(this);
     _resumeListener?.dispose();
     _stopTimer?.cancel();
+    _afterFailure?.cancel();
     _levelSub?.cancel();
     _audioSub?.cancel();
     _speech?.cancel();
@@ -328,7 +334,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     if (_working || _listening) return;
     if (_entry.kcal != null) {
       _save();
-    } else {
+    } else if (!(_afterFailure?.isActive ?? false)) {
       _estimate();
     }
   }
@@ -388,7 +394,11 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       if (mounted) _error = context.l10n.mealErrorAi;
     }
 
-    if (mounted) setState(() => _working = false);
+    if (!mounted) return;
+    if (_error != null) {
+      _afterFailure = Timer(const Duration(seconds: 2), () {});
+    }
+    setState(() => _working = false);
   }
 
   Future<void> _toggleListening() async {
