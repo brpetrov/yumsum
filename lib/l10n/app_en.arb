@@ -684,7 +684,7 @@
       }
     }
   },
-  "mealChoiceTitle": "Which did you have?",
+  "mealChoiceTitle": "Quick question",
   "@mealChoiceTitle": {
     "description": "Dialog asking which version of an item the user had (size, milk, homemade or takeaway)."
   },

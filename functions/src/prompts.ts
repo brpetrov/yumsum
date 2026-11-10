@@ -165,7 +165,10 @@ function choices({ country, language }: Profile): string {
     `slices of pizza", "a beer"), the amount is known: ask the size as the ` +
     `kind instead ("2 slices from a small pizza" against "from a large ` +
     `pizza"). Never ask the amount of a branded single product (a Big Mac, ` +
-    "a Mars bar).\n" +
+    "a Mars bar), or of a sandwich, wrap, burger, roll, toastie or similar " +
+    "single item: it is one, unless the user said more, and what matters " +
+    "is what's in it, which is a kind (with mayonnaise or without, white " +
+    "or wholemeal bread, with cheese or without).\n" +
     "The kind, where it changes the calories by about 15% or more: with or " +
     "without meat, fried or grilled, homemade or takeaway (a restaurant " +
     "portion is also bigger: fold that in), full-fat or diet, the milk or " +

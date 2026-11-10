@@ -63,7 +63,7 @@ void main() {
       'and the total', (tester) async {
     await open(tester);
     for (final text in [
-      'Which did you have?',
+      'Quick question',
       'How much?',
       'Regular',
       'Small',

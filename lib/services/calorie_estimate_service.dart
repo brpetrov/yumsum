@@ -224,6 +224,14 @@ EstimateItem _asking(
   options: options,
 );
 
+/// One item whose amount is one: a sandwich is never "regular, small or
+/// large", whatever the model offers (the prompt says so too; it still did
+/// in 2 of 12 eval runs on 10 November 2026). What's in it is a kind.
+final _singleItem = RegExp(
+  r'\b(sandwich|toastie|panini|burger|wrap|bagel|сандвич|бургер|дюнер|тост)',
+  caseSensitive: false,
+);
+
 /// The other amounts the AI offers, by grams, which need the item's own
 /// weight to scale from.
 EstimateItem _withAmounts(
@@ -248,6 +256,7 @@ EstimateItem _withAmounts(
     return item;
   }
   if (_oneArticle.hasMatch(said) && _oneAssumed.hasMatch(amount)) return item;
+  if (_singleItem.hasMatch(item.name)) return item;
   final labels = {amount.toLowerCase()};
   final calories = [item.kcal];
   final amounts = <EstimateAmount>[];

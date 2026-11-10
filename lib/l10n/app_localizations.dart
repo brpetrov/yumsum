@@ -989,7 +989,7 @@ abstract class AppLocalizations {
   /// Dialog asking which version of an item the user had (size, milk, homemade or takeaway).
   ///
   /// In en, this message translates to:
-  /// **'Which did you have?'**
+  /// **'Quick question'**
   String get mealChoiceTitle;
 
   /// Which-did-you-have dialog: label of the row of counts, e.g. 3, 5 or 8 pieces.

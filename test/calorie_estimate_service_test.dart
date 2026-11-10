@@ -511,6 +511,29 @@ void main() {
       }
     });
 
+    test('a sandwich, wrap or burger is never asked how much', () {
+      for (final name in [
+        'Tuna sandwich',
+        'chicken wrap',
+        'Сандвич с кашкавал',
+      ]) {
+        final item = parseEstimateItems([
+          {
+            ...sarmi(
+              amounts: [
+                {'amount': 'small', 'grams': 200},
+                {'amount': 'large', 'grams': 400},
+              ],
+            ),
+            'item': name,
+            'amount': 'regular',
+          },
+        ]).single;
+        expect(item.amount, isNull, reason: name);
+        expect(item.amounts, isEmpty, reason: name);
+      }
+    });
+
     test('no amounts when the user said the amount, but a vague one counts '
         'as none', () {
       final three = [

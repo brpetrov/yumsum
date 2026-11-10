@@ -246,13 +246,17 @@ async function runAll() {
 }
 
 // The numbers of one food: used by the console summary and the report.
-function statsOf({ min, max, specific, pieces, tries }) {
+function statsOf({ min, max, specific, pieces, single, tries }) {
   const good = tries.filter((t) => !t.error);
   const kcals = good.map((t) => t.kcal);
   const hits = kcals.filter((kcal) => kcal >= min && kcal <= max).length;
   const spread = kcals.length ? (Math.max(...kcals) - Math.min(...kcals)) / Math.max(median(kcals), 1) : 0;
   const asks = good.filter((t) => t.questions.length > 0).length;
   const countAsks = pieces
+    ? good.filter((t) => t.questions.some((q) => q.amounts.length > 0)).length
+    : 0;
+  // A single item (a sandwich) asked how much: the amount is one.
+  const sizeAsks = single
     ? good.filter((t) => t.questions.some((q) => q.amounts.length > 0)).length
     : 0;
   // Amounts given with no amount on the item: the app can't say what the
@@ -265,7 +269,7 @@ function statsOf({ min, max, specific, pieces, tries }) {
         !(typeof item.amount === "string" && item.amount.trim()),
     ),
   ).length;
-  return { good, kcals, hits, spread, asks, countAsks, noLabel };
+  return { good, kcals, hits, spread, asks, countAsks, sizeAsks, noLabel };
 }
 
 // The report, for a reviewing AI.
@@ -318,6 +322,8 @@ function report(results) {
     const vagueAsked = items.reduce((n, r, at) => n + (r.specific ? 0 : stats[at].asks), 0);
     const pieceItems = items.filter((r) => r.pieces);
     const pieceRuns = pieceItems.reduce((n, r) => n + r.tries.filter((t) => !t.error).length, 0);
+    const singleItems = items.filter((r) => r.single);
+    const singleRuns = singleItems.reduce((n, r) => n + r.tries.filter((t) => !t.error).length, 0);
     const pct = (a, b) => (b ? `${a}/${b} (${Math.round((100 * a) / b)}%)` : "-");
     const spreads = stats.filter((s) => s.good.length > 1).map((s) => s.spread);
     return (
@@ -325,14 +331,15 @@ function report(results) {
       `| ${spreads.length ? `${Math.round(median(spreads) * 100)}%` : "-"} ` +
       `| ${pct(needlessRuns, specificRuns)} | ${pct(vagueAsked, vagueRuns)} ` +
       `| ${pct(pieceItems.reduce((n, r) => n + statsOf(r).countAsks, 0), pieceRuns)} ` +
+      `| ${pct(singleItems.reduce((n, r) => n + statsOf(r).sizeAsks, 0), singleRuns)} ` +
       `| ${sum((s) => s.noLabel)} |`
     );
   };
   const table = (title, key) => {
     const names = [...new Set(shown.map((r) => r[key]))].sort();
     return [
-      `| ${title} | Foods | In range (runs) | Median spread | Needless questions (runs of specific foods) | Vague foods asked (runs) | Piece foods asked the count (runs) | Runs with amounts but no amount |`,
-      "|---|---|---|---|---|---|---|---|",
+      `| ${title} | Foods | In range (runs) | Median spread | Needless questions (runs of specific foods) | Vague foods asked (runs) | Piece foods asked the count (runs) | Single items asked how much (runs) | Runs with amounts but no amount |`,
+      "|---|---|---|---|---|---|---|---|---|",
       ...(key === "all" ? [rows("All", shown)] : names.map((n) => rows(n, shown.filter((r) => r[key] === n)))),
     ].join("\n");
   };

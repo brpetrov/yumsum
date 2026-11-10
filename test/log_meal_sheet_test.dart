@@ -179,7 +179,7 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('Estimate from name'));
     await tester.pumpAndSettle();
-    expect(find.text('Which did you have?'), findsOneWidget);
+    expect(find.text('Quick question'), findsOneWidget);
 
     await tester.tap(find.text('Takeaway chicken curry'));
     await tester.pump();

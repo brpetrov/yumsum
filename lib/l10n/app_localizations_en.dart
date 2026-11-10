@@ -532,7 +532,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get mealChoiceTitle => 'Which did you have?';
+  String get mealChoiceTitle => 'Quick question';
 
   @override
   String get mealChoiceHowMany => 'How many?';

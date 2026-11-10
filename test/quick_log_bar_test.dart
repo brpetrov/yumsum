@@ -645,7 +645,7 @@ void main() {
     final dialog = find.byType(AlertDialog);
     expect(dialog, findsOneWidget);
     for (final text in [
-      'Which did you have?',
+      'Quick question',
       'Which kind?',
       'Cappuccino with semi-skimmed milk',
       '110 kcal',
