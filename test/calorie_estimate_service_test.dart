@@ -337,8 +337,27 @@ void main() {
       expect(totalOf([oil]), (kcal: 120, protein: null));
     });
 
-    test('keeps an item\'s options at least $optionGap kcal from it and from '
-        'each other, under new names, at most 3, as plain items', () {
+    test('keeps options close to each other: cheese shows all three kinds', () {
+      final item = parseEstimateItems([
+        {
+          'item': 'Cheese',
+          'grams': 30,
+          'kcal': 124,
+          'options': [
+            {'item': 'Mozzarella', 'grams': 30, 'kcal': 85},
+            {'item': 'Feta', 'grams': 30, 'kcal': 80},
+            {'item': 'Cottage cheese', 'grams': 30, 'kcal': 30},
+          ],
+        },
+      ]).single;
+      expect(
+        [for (final option in item.options) option.name],
+        ['Mozzarella', 'Feta', 'Cottage cheese'],
+      );
+    });
+
+    test('keeps an item\'s options at least $optionGap kcal from it, under '
+        'new names, at most 3, as plain items', () {
       EstimateItem parse(List<Object?> options) => parseEstimateItems([
         {
           'item': 'Cappuccino',
@@ -355,7 +374,7 @@ void main() {
           'kcal': 150,
           'protein_g': 8,
         },
-        // Too close to the item, and to the whole milk one.
+        // Too close to the item.
         {
           'item': 'Cappuccino with skimmed milk',
           'grams': 250,
@@ -365,7 +384,7 @@ void main() {
         {
           'item': 'Cappuccino with oat milk',
           'grams': 250,
-          'kcal': 145,
+          'kcal': 125,
           'protein_g': 4,
         },
         {'item': '', 'kcal': 300},

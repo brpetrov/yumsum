@@ -161,8 +161,8 @@ LabelReading parseLabelReading(Map<String, dynamic> map) {
 }
 
 /// Reads the model's `items` list, skipping anything malformed. An item's
-/// amounts and options are each kept at most 3, each at least [optionGap]
-/// kcal from the item and from each other, under new labels and names:
+/// amounts and options are each kept at most 3, at least [optionGap]
+/// kcal from the item (amounts also from each other), under new labels and names:
 /// the AI is told to offer them rarely, and this catches it asking about
 /// nothing, or arguing with the user. Options keep every word of the item's
 /// name the user [said] (no soy latte for a large oat latte) and add a word
@@ -394,7 +394,7 @@ EstimateItem _withOptions(EstimateItem item, Map entry, Set<String> said) {
     final option = _itemFrom(entry);
     if (option == null ||
         !_anotherKind(item, option) ||
-        calories.any((kcal) => (option.kcal - kcal).abs() < optionGap) ||
+        (option.kcal - item.kcal).abs() < optionGap ||
         !names.add(option.name.toLowerCase()) ||
         !_words(option.name).containsAll(kept)) {
       continue;

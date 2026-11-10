@@ -93,8 +93,9 @@ const config = {
 };
 
 // The app's filter (parseEstimateItems): other amounts, by grams, and
-// other kinds, as complete items, each at least 30 kcal from the item and
-// each other, at most 3 of each; kinds under new names that keep every
+// other kinds, as complete items, amounts at least 30 kcal from the item and
+// each other, options at least 30 kcal from the item only (kinds are
+// different foods, so close ones are fine); at most 3 of each; kinds under new names that keep every
 // word of the item's name the user typed and add a word beside sizes and
 // numbers; a row only when it spans a third of the item's calories and
 // 80 kcal; chips for every item that has any, the widest spread first.
@@ -188,7 +189,7 @@ function asked(item, meal) {
   for (const option of Array.isArray(item.options) ? item.options : []) {
     if (typeof option?.item !== "string" || typeof option.kcal !== "number") continue;
     if (!anotherKind(item, option)) continue;
-    if (calories.some((kcal) => Math.abs(option.kcal - kcal) < 30)) continue;
+    if (Math.abs(option.kcal - item.kcal) < 30) continue;
     if (names.has(option.item.toLowerCase())) continue;
     if (!kept.every((word) => words(option.item).has(word))) continue;
     names.add(option.item.toLowerCase());
