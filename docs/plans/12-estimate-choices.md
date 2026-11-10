@@ -22,7 +22,11 @@ After a typed or spoken estimate the app asks "Which did you have?" where the AI
 ## How it's built
 
 - **The reply:** an item may carry `amount` (the one assumed, "5 pieces", "regular", "средна" in Bulgarian) and `amounts` (`{amount, grams}`, up to 3, the grams of the whole item), beside the old `assumed` and `options` (complete items at the same grams). The typed meal's schema (`mealConfig`) has them; the voice template spells them out (`optionsJson`).
-- **The app** (`parseEstimateItems`, `answered`, `lib/widgets/estimate_choice_dialog.dart`) filters them, caps the chips and works out any combination by scaling the kind picked by the amount's grams, as for a corrected weight.
+- **The app** (`parseEstimateItems`, `answered`, `lib/widgets/estimate_breakdown.dart`) filters them, caps the chips and works out any combination by scaling the kind picked by the amount's grams, as for a corrected weight.
+
+## 10 November 2026: chips in the breakdown instead of a dialog
+
+The owner tried the "Quick question" dialog and hated it: it interrupted every vague estimate, and an odd suggestion ("Pizza" for "Medium pizza") was annoying rather than helpful. Other calorie apps show what they assumed as a list to edit instead of asking. So the dialog is gone: the breakdown under the boxes opens by itself and shows each item's other amounts and kinds as small chips under it, the assumed ones ticked. A tap swaps that version in; ignored, the assumption is logged. Every item with choices shows them, so the two-items-a-meal limit went too. The app also drops a kind that adds nothing beyond the item's own words but a size, a count or a number (`_anotherKind`), and the eval's filter does the same.
 
 ## What the test set showed (`npm run eval`, 3 runs of 44 meals)
 

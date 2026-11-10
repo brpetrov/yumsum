@@ -15,7 +15,6 @@ import 'package:lean_streak/providers/past_day_edit_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/widgets/estimate_breakdown.dart';
-import 'package:lean_streak/widgets/estimate_choice_dialog.dart';
 
 /// Opens the meal form: edits [existingMeal], or adds a meal on [date]
 /// (yyyy-MM-dd, today by default). Resolves to true when the meal was saved.
@@ -134,13 +133,6 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
 
     if (!mounted) return;
     setState(() => _estimating = false);
-    // Where the AI had to assume which version of an item it was, it asks.
-    final items = await offerEstimateChoices(
-      context,
-      _estimateItems,
-      said: name,
-    );
-    if (items != null && mounted) _itemsChanged(items);
   }
 
   /// A weight corrected or a version picked: the boxes follow the items.

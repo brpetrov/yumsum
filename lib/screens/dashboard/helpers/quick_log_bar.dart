@@ -38,7 +38,6 @@ import 'package:lean_streak/screens/dashboard/helpers/smart_snap_dialog.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
 import 'package:lean_streak/widgets/estimate_breakdown.dart';
-import 'package:lean_streak/widgets/estimate_choice_dialog.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 
 /// Whether a typed name offers "Search foods" (Open Food Facts' search).
@@ -277,8 +276,8 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     if (_heldKeyboardUp != null) setState(() => _heldKeyboardUp = null);
   }
 
-  /// A weight corrected in the breakdown: the boxes follow the items, and
-  /// the macros scale with the calories.
+  /// A weight corrected or a version picked in the breakdown: the boxes
+  /// follow the items, and the macros scale with the calories.
   void _itemsChanged(List<EstimateItem> items) {
     final total = totalOf(items);
     _fill(
@@ -369,16 +368,6 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       _fill(text, result.kcal, result.protein, macros: result.macros);
       _aiItems = result.items;
     });
-    await _offerChoices(said: text);
-  }
-
-  /// Where the AI had to assume which version of an item the user had, it
-  /// asks (`offerEstimateChoices`), showing [said], what they typed or
-  /// said; a pick swaps the item in and the boxes follow, as for a
-  /// corrected weight.
-  Future<void> _offerChoices({String? said}) async {
-    final items = await offerEstimateChoices(context, _aiItems, said: said);
-    if (items != null && mounted) _itemsChanged(items);
   }
 
   /// Shared busy and error handling for the estimate and voice AI calls.
@@ -616,7 +605,6 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       return;
     }
 
-    String? said;
     await _runAi(() async {
       final result = await ref
           .read(calorieEstimateServiceProvider)
@@ -624,9 +612,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       if (!mounted) return;
       _fill(result.name, result.kcal, result.protein, macros: result.macros);
       _aiItems = result.items;
-      said = result.name;
     });
-    await _offerChoices(said: said);
   }
 
   /// A barcode the camera read is looked up in Open Food Facts (label

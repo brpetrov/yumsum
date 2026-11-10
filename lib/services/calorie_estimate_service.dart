@@ -15,7 +15,7 @@ import 'package:lean_streak/repositories/ai_usage_repository.dart';
 /// One component of an AI estimate; [grams] is the weight the AI assumed
 /// (ml for drinks), null when it gave none. Where the user left out what
 /// swings the calories, the AI went with the usual version and offers the
-/// others for `showEstimateChoice`: [amounts], other amounts of it, with
+/// others, as chips in `EstimateBreakdown`: [amounts], other amounts of it, with
 /// [amount] the one it went with ("5 pieces"; null when it didn't say,
 /// shown as Regular), and [options], the other
 /// likely kinds (the milk, takeaway or homemade), complete items at the
@@ -70,7 +70,7 @@ class EstimateItem {
 }
 
 /// Another amount the AI offers for an item: a few words and the grams of
-/// the whole item at that amount, for `showEstimateChoice`.
+/// the whole item at that amount, for `EstimateBreakdown`'s chips.
 typedef EstimateAmount = ({String label, int grams});
 
 /// An option closer than this to the item's calories isn't worth asking
@@ -159,7 +159,9 @@ LabelReading parseLabelReading(Map<String, dynamic> map) {
 /// kcal from the item and from each other, under new labels and names:
 /// the AI is told to offer them rarely, and this catches it asking about
 /// nothing, or arguing with the user. Options keep every word of the item's
-/// name the user [said] (no soy latte for a large oat latte), and there are
+/// name the user [said] (no soy latte for a large oat latte) and add a word
+/// of their own beside sizes and numbers (no "Pizza" for "Medium pizza"),
+/// and there are
 /// no amounts when theirs repeat a number or size the user said ("5
 /// meatballs", "two eggs", "a pint", "large", "a handful"). Each row has
 /// at most 3 besides the ticked one.
@@ -351,6 +353,28 @@ EstimateItem? _itemFrom(Object? entry) {
   );
 }
 
+/// The words that make an option only another amount, or filler, not
+/// another kind: "Pizza" for "Medium pizza", "2 slices from a small 10 inch
+/// pizza" for "Pizza" (10 November 2026). Not "whole", which is a milk.
+const _amountWords = {
+  'small', 'medium', 'regular', 'large', 'big', 'slice', 'slices', //
+  'piece', 'pieces', 'portion', 'portions', 'half', 'quarter', 'double',
+  'single', 'inch', 'inches', 'from', 'the', 'and', 'малка', 'малък',
+  'малко', 'средна', 'среден', 'средно', 'голяма', 'голям', 'голямо',
+  'парче', 'парчета', 'филия', 'филии', 'порция', 'порции', 'половин',
+};
+
+/// Whether [option] names a word that [item] doesn't, beside numbers and
+/// [_amountWords]: another kind, not the same food in other words.
+bool _anotherKind(EstimateItem item, EstimateItem option) =>
+    _tokens(option.name)
+        .difference(_tokens(item.name))
+        .any(
+          (word) =>
+              !RegExp(r'^\p{N}+$', unicode: true).hasMatch(word) &&
+              !_amountWords.contains(word),
+        );
+
 EstimateItem _withOptions(EstimateItem item, Object? raw, Set<String> said) {
   if (raw is! List) return item;
   final kept = _words(item.name).intersection(said);
@@ -360,6 +384,7 @@ EstimateItem _withOptions(EstimateItem item, Object? raw, Set<String> said) {
   for (final entry in raw) {
     final option = _itemFrom(entry);
     if (option == null ||
+        !_anotherKind(item, option) ||
         calories.any((kcal) => (option.kcal - kcal).abs() < optionGap) ||
         !names.add(option.name.toLowerCase()) ||
         !_words(option.name).containsAll(kept)) {

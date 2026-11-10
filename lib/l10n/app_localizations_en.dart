@@ -532,19 +532,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get mealChoiceTitle => 'Quick question';
-
-  @override
-  String get mealChoiceHowMany => 'How many?';
-
-  @override
-  String get mealChoiceHowMuch => 'How big a portion?';
-
-  @override
   String get mealChoiceRegular => 'Regular';
-
-  @override
-  String get mealChoiceWhichKind => 'Which kind?';
 
   @override
   String get cameraNotFound => 'No camera found.';

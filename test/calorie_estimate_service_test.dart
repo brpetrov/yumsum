@@ -372,10 +372,10 @@ void main() {
         {'item': 'cappuccino', 'grams': 250, 'kcal': 160, 'protein_g': 7},
         {'item': 'Cappuccino with whole milk', 'grams': 250, 'kcal': 200},
         {
-          'item': 'Large cappuccino',
-          'grams': 350,
+          'item': 'Cappuccino with caramel syrup',
+          'grams': 250,
           'kcal': 200,
-          'protein_g': 11,
+          'protein_g': 7,
         },
         {
           'item': 'Cappuccino with syrup',
@@ -401,10 +401,10 @@ void main() {
           protein: 8,
         ),
         EstimateItem(
-          name: 'Large cappuccino',
-          grams: 350,
+          name: 'Cappuccino with caramel syrup',
+          grams: 250,
           kcal: 200,
-          protein: 11,
+          protein: 7,
         ),
         EstimateItem(
           name: 'Cappuccino with syrup',
@@ -423,6 +423,37 @@ void main() {
       expect(resized(item, 250), plain);
       expect(parse([options[1]]), plain);
       expect(parse(['not a map']), plain);
+    });
+
+    test('an option that adds only a size, a count or a number is no kind', () {
+      List<String> kinds(String name, String option) => parseEstimateItems([
+        {
+          'item': name,
+          'grams': 300,
+          'kcal': 400,
+          'options': [
+            {'item': option, 'grams': 300, 'kcal': 700},
+          ],
+        },
+      ]).single.options.map((option) => option.name).toList();
+      for (final (name, option) in [
+        ('Medium pizza', 'Pizza'),
+        ('Pizza', '2 slices from a small 10 inch pizza'),
+        ('Pizza', 'Large pizza'),
+        ('Latte', 'Double latte'),
+        ('Баница', 'Голямо парче баница'),
+        ('Пица', '2 филии пица'),
+      ]) {
+        expect(kinds(name, option), isEmpty, reason: '$option for $name');
+      }
+      for (final (name, option) in [
+        ('Cappuccino with semi-skimmed milk', 'Cappuccino with whole milk'),
+        ('Sarmi with meat', 'Sarmi without meat'),
+        ('Fried fish fillet', 'Baked fish fillet'),
+        ('Pizza', 'Pepperoni pizza'),
+      ]) {
+        expect(kinds(name, option), [option], reason: '$option for $name');
+      }
     });
 
     test('an option that drops a word the user said is no option', () {

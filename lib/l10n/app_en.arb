@@ -684,25 +684,9 @@
       }
     }
   },
-  "mealChoiceTitle": "Quick question",
-  "@mealChoiceTitle": {
-    "description": "Dialog asking which version of an item the user had (size, milk, homemade or takeaway)."
-  },
-  "mealChoiceHowMany": "How many?",
-  "@mealChoiceHowMany": {
-    "description": "Which-did-you-have dialog: label of the row of counts, e.g. 3, 5 or 8 pieces."
-  },
-  "mealChoiceHowMuch": "How big a portion?",
-  "@mealChoiceHowMuch": {
-    "description": "Which-did-you-have dialog: label of the row of amounts, e.g. small, regular or large."
-  },
   "mealChoiceRegular": "Regular",
   "@mealChoiceRegular": {
-    "description": "Which-did-you-have dialog: the amount the AI went with, when it didn't name it; beside e.g. small and large."
-  },
-  "mealChoiceWhichKind": "Which kind?",
-  "@mealChoiceWhichKind": {
-    "description": "Which-did-you-have dialog: label of the row of kinds, e.g. with or without meat."
+    "description": "Estimate breakdown: the chip for the amount the AI went with, when it didn't name it; beside chips such as small and large."
   },
   "cameraNotFound": "No camera found.",
   "@cameraNotFound": {

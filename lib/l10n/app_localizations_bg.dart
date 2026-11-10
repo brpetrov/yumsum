@@ -545,19 +545,7 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
-  String get mealChoiceTitle => 'Бърз въпрос';
-
-  @override
-  String get mealChoiceHowMany => 'Колко броя?';
-
-  @override
-  String get mealChoiceHowMuch => 'Колко голяма порция?';
-
-  @override
   String get mealChoiceRegular => 'Средно';
-
-  @override
-  String get mealChoiceWhichKind => 'Какъв вид?';
 
   @override
   String get cameraNotFound => 'Не открихме камера.';

@@ -29,6 +29,7 @@ import 'package:lean_streak/screens/dashboard/helpers/quick_log_bar.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/services/food_contribution_service.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
+import 'package:lean_streak/widgets/estimate_breakdown.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:record/record.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -606,8 +607,10 @@ void main() {
     expect(macros.fibre, isNull);
   });
 
-  testWidgets('where the AI had to assume the version of an item, it asks; '
-      'a pick swaps the item in', (tester) async {
+  testWidgets('where the AI had to assume the version of an item, the '
+      'breakdown opens with chips and no dialog; a pick swaps the item in', (
+    tester,
+  ) async {
     await pumpCard(tester);
     estimateService.items = const [
       EstimateItem(
@@ -639,36 +642,38 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
 
-    // The boxes are filled with the version the AI went with, and the dialog
-    // asks: that version ticked, the others beside it, and its calories.
+    // The boxes are filled with the version the AI went with, and the
+    // breakdown is open with its chips: that version ticked, the others
+    // beside it.
     expect(boxes(tester), ['cappuccino and a croissant', '380', '12']);
-    final dialog = find.byType(AlertDialog);
-    expect(dialog, findsOneWidget);
+    expect(find.byType(AlertDialog), findsNothing);
+    final breakdown = find.byType(EstimateBreakdown);
     for (final text in [
-      'Quick question',
-      'Which kind?',
-      'Cappuccino with semi-skimmed milk',
-      '110 kcal',
+      '110 kcal · 7 g',
       'Cappuccino with whole milk',
       'Large cappuccino',
+      'Croissant',
     ]) {
       expect(
-        find.descendant(of: dialog, matching: find.text(text)),
+        find.descendant(of: breakdown, matching: find.text(text)),
         findsOneWidget,
+        reason: text,
       );
     }
+    // The item's row and its ticked chip.
+    expect(find.text('Cappuccino with semi-skimmed milk'), findsNWidgets(2));
+    expect(
+      find.descendant(
+        of: breakdown,
+        matching: find.byIcon(Icons.check_rounded),
+      ),
+      findsOneWidget,
+    );
 
     await tester.tap(find.text('Cappuccino with whole milk'));
     await tester.pump();
-    await tester.tap(find.text('Done'));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 1));
-    expect(dialog, findsNothing);
     expect(boxes(tester), ['cappuccino and a croissant', '420', '13']);
-    expect(
-      find.text('Cappuccino with whole milk 150 · Croissant 270'),
-      findsOneWidget,
-    );
+    expect(find.text('150 kcal · 8 g'), findsOneWidget);
     expect(estimateService.estimateCalls, 1);
   });
 

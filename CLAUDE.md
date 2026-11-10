@@ -81,7 +81,7 @@ The app is in English and Bulgarian (`docs/translation.md` has the how-to and wh
 | Weight trend | `lib/helpers/weight_trend.dart` | 08 |
 | Adaptive formula | `lib/helpers/adaptive_formula.dart`, `lib/providers/adaptive_formula_provider.dart` | 08 |
 | Quick-log bar | `lib/screens/dashboard/helpers/quick_log_bar.dart` | |
-| AI estimates and the allowance | `lib/services/calorie_estimate_service.dart`, `lib/repositories/ai_usage_repository.dart`, `functions/src/ai.ts`, `functions/src/prompts.ts`, `lib/widgets/estimate_choice_dialog.dart` | 03, 12 |
+| AI estimates and the allowance | `lib/services/calorie_estimate_service.dart`, `lib/repositories/ai_usage_repository.dart`, `functions/src/ai.ts`, `functions/src/prompts.ts`, `lib/widgets/estimate_breakdown.dart` | 03, 12 |
 | AI Coach (the weekly review) | `lib/helpers/week_facts.dart`, `lib/services/weekly_review_service.dart`, `lib/providers/weekly_review_provider.dart`, `lib/screens/coach/coach_screen.dart`, `lib/screens/review/weekly_notes.dart` | 09 |
 | Macros | `lib/models/nutrients.dart`, `lib/widgets/macro_rings.dart`, `macro_totals.dart`, `macro_guide.dart` | 10 |
 | Daily summaries, statuses, day off | `lib/services/daily_summary_service.dart`, `lib/widgets/day_status.dart` | |

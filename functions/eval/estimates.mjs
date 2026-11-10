@@ -1,8 +1,8 @@
 // The typed-estimate test set: runs each meal of a set through the real
 // meal prompt a few times and reports how often the total lands in range,
 // how far the same words move between runs, and how often the app would ask
-// (after the same option filter as parseEstimateItems and
-// offerEstimateChoices in the app). Run it before and after any prompt
+// (after the same option filter as parseEstimateItems in the app, which
+// shows what's left as chips in EstimateBreakdown). Run it before and after any prompt
 // change:
 //
 //   npm run eval                      meals.json, 3 runs a meal, the model's temperature
@@ -90,9 +90,9 @@ const config = { ...mealConfig(false), ...(temperature === undefined ? {} : { te
 // The app's filter (parseEstimateItems): other amounts, by grams, and
 // other kinds, as complete items, each at least 30 kcal from the item and
 // each other, at most 3 of each; kinds under new names that keep every
-// word of the item's name the user typed; a row only when it spans a
-// third of the item's calories and 80 kcal; questions for at most 2
-// items a meal, the widest spread first.
+// word of the item's name the user typed and add a word beside sizes and
+// numbers; a row only when it spans a third of the item's calories and
+// 80 kcal; chips for every item that has any, the widest spread first.
 const words = (text) =>
   new Set(text.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter((word) => word.length > 2));
 // The words of an amount that say how much, beside its numbers (the app's
@@ -160,6 +160,20 @@ function amountsOf(item, said) {
 const bar = (kcal) => Math.max(80, Math.round(kcal * 0.3));
 // Lowest to highest across the row, the item's own among them.
 const worthAsking = (kcal, calories) => Math.max(...calories) - Math.min(...calories) >= bar(kcal);
+// The app's _amountWords and _anotherKind: an option that adds only a size,
+// a count, a number or filler ("Pizza" for "Medium pizza") is no kind.
+// Not "whole", which is a milk.
+const amountWords = new Set([
+  "small", "medium", "regular", "large", "big", "slice", "slices", "piece", "pieces",
+  "portion", "portions", "half", "quarter", "double", "single", "inch", "inches",
+  "from", "the", "and", "малка", "малък", "малко", "средна", "среден", "средно",
+  "голяма", "голям", "голямо", "парче", "парчета", "филия", "филии", "порция",
+  "порции", "половин",
+]);
+const anotherKind = (item, option) => {
+  const own = new Set(tokens(item.item));
+  return tokens(option.item).some((t) => !own.has(t) && !/^\p{N}+$/u.test(t) && !amountWords.has(t));
+};
 function asked(item, meal) {
   const said = words(meal);
   const kept = [...words(item.item)].filter((word) => said.has(word));
@@ -168,6 +182,7 @@ function asked(item, meal) {
   const options = [];
   for (const option of Array.isArray(item.options) ? item.options : []) {
     if (typeof option?.item !== "string" || typeof option.kcal !== "number") continue;
+    if (!anotherKind(item, option)) continue;
     if (calories.some((kcal) => Math.abs(option.kcal - kcal) < 30)) continue;
     if (names.has(option.item.toLowerCase())) continue;
     if (!kept.every((word) => words(option.item).has(word))) continue;
@@ -206,8 +221,7 @@ async function estimate(meal, lang) {
   const questions = items
     .map((item) => ({ item, ...asked(item, meal) }))
     .filter(({ amounts, options }) => amounts.length + options.length > 0)
-    .sort((a, b) => b.spread - a.spread)
-    .slice(0, 2);
+    .sort((a, b) => b.spread - a.spread);
   return {
     kcal: items.reduce((sum, item) => sum + item.kcal, 0),
     items,

@@ -155,8 +155,10 @@ void main() {
     expect(macros.salt, closeTo(2.4, 1e-9));
   });
 
-  testWidgets('where the AI had to assume the version of an item, it asks; '
-      'a pick swaps the item in', (tester) async {
+  testWidgets('where the AI had to assume the version of an item, the '
+      'breakdown offers the others as chips; a pick swaps the item in', (
+    tester,
+  ) async {
     _estimateItems = const [
       EstimateItem(
         name: 'Homemade chicken curry',
@@ -179,16 +181,14 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('Estimate from name'));
     await tester.pumpAndSettle();
-    expect(find.text('Quick question'), findsOneWidget);
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text('500'), findsOneWidget);
 
     await tester.tap(find.text('Takeaway chicken curry'));
     await tester.pump();
-    await tester.tap(find.text('Done'));
-    await tester.pumpAndSettle();
-    expect(find.byType(AlertDialog), findsNothing);
     expect(find.text('850'), findsOneWidget);
     expect(find.text('32'), findsOneWidget);
-    expect(find.text('Takeaway chicken curry 850'), findsOneWidget);
+    expect(find.text('850 kcal · 32 g'), findsOneWidget);
   });
 
   final banitsa = Meal(

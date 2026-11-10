@@ -986,35 +986,11 @@ abstract class AppLocalizations {
   /// **'{kcal} kcal · {grams} g'**
   String mealKcalGrams(int kcal, int grams);
 
-  /// Dialog asking which version of an item the user had (size, milk, homemade or takeaway).
-  ///
-  /// In en, this message translates to:
-  /// **'Quick question'**
-  String get mealChoiceTitle;
-
-  /// Which-did-you-have dialog: label of the row of counts, e.g. 3, 5 or 8 pieces.
-  ///
-  /// In en, this message translates to:
-  /// **'How many?'**
-  String get mealChoiceHowMany;
-
-  /// Which-did-you-have dialog: label of the row of amounts, e.g. small, regular or large.
-  ///
-  /// In en, this message translates to:
-  /// **'How big a portion?'**
-  String get mealChoiceHowMuch;
-
-  /// Which-did-you-have dialog: the amount the AI went with, when it didn't name it; beside e.g. small and large.
+  /// Estimate breakdown: the chip for the amount the AI went with, when it didn't name it; beside chips such as small and large.
   ///
   /// In en, this message translates to:
   /// **'Regular'**
   String get mealChoiceRegular;
-
-  /// Which-did-you-have dialog: label of the row of kinds, e.g. with or without meat.
-  ///
-  /// In en, this message translates to:
-  /// **'Which kind?'**
-  String get mealChoiceWhichKind;
 
   /// Camera page: the device has no camera.
   ///

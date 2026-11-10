@@ -8,7 +8,10 @@ import 'package:lean_streak/services/calorie_estimate_service.dart';
 /// How the AI arrived at its number: one muted line of components, which
 /// opens into rows with weight and protein when tapped. With [onChanged],
 /// a weight can be tapped and corrected; the item is rescaled and the new
-/// list handed back, with no further AI call.
+/// list handed back, with no further AI call. Where the AI had to assume
+/// how much of an item or which kind, it starts open, with the item's
+/// other amounts and kinds as chips under it, the assumed ones ticked; a
+/// tap swaps that version in the same way. Ignored, the assumption stays.
 class EstimateBreakdown extends StatefulWidget {
   const EstimateBreakdown({
     super.key,
@@ -25,8 +28,57 @@ class EstimateBreakdown extends StatefulWidget {
   State<EstimateBreakdown> createState() => _EstimateBreakdownState();
 }
 
+bool _hasChoices(EstimateItem item) =>
+    item.amounts.isNotEmpty || item.options.isNotEmpty;
+
 class _EstimateBreakdownState extends State<EstimateBreakdown> {
-  bool _expanded = false;
+  late bool _expanded;
+
+  // The items as the AI gave them, choices and all (settled once a weight
+  // is corrected), so an amount and a kind picked combine; what's picked,
+  // by index; and the list last handed back, which isn't a new estimate.
+  late List<EstimateItem> _asked;
+  final _grams = <int, int>{};
+  final _kinds = <int, EstimateItem>{};
+  List<EstimateItem>? _sent;
+
+  @override
+  void initState() {
+    super.initState();
+    _start();
+  }
+
+  @override
+  void didUpdateWidget(EstimateBreakdown oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(widget.items, oldWidget.items) &&
+        !identical(widget.items, _sent)) {
+      _start();
+    }
+  }
+
+  void _start() {
+    _asked = widget.items;
+    _grams.clear();
+    _kinds.clear();
+    _expanded = widget.onChanged != null && _asked.any(_hasChoices);
+  }
+
+  void _send(int index, EstimateItem item) {
+    final items = [
+      for (final (i, other) in widget.items.indexed) i == index ? item : other,
+    ];
+    _sent = items;
+    widget.onChanged?.call(items);
+  }
+
+  void _answer(int index, {int? grams, EstimateItem? kind}) {
+    setState(() {
+      grams == null ? _grams.remove(index) : _grams[index] = grams;
+      kind == null ? _kinds.remove(index) : _kinds[index] = kind;
+    });
+    _send(index, answered(_asked[index], kind: kind, grams: grams));
+  }
 
   Future<void> _changeGrams(int index) async {
     final item = widget.items[index];
@@ -35,10 +87,71 @@ class _EstimateBreakdownState extends State<EstimateBreakdown> {
       builder: (_) => _GramsDialog(item: item),
     );
     if (grams == null || grams == item.grams || !mounted) return;
-    widget.onChanged?.call([
-      for (final (i, other) in widget.items.indexed)
-        i == index ? resized(other, grams) : other,
-    ]);
+    final changed = resized(item, grams);
+    setState(() {
+      _asked = [
+        for (final (i, other) in _asked.indexed) i == index ? changed : other,
+      ];
+      _grams.remove(index);
+      _kinds.remove(index);
+    });
+    _send(index, changed);
+  }
+
+  /// [index]'s other amounts and kinds, each row with the AI's first.
+  Widget _choices(int index) {
+    final l10n = context.l10n;
+    final item = _asked[index];
+    Widget row(List<Widget> chips) =>
+        Wrap(spacing: 6, runSpacing: 6, children: chips);
+    // A tap between the chips mustn't close the breakdown.
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {},
+      child: Padding(
+        padding: const EdgeInsets.only(top: 4, bottom: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (item.amounts.isNotEmpty)
+              row([
+                _Chip(
+                  item.amount ?? l10n.mealChoiceRegular,
+                  selected: _grams[index] == null,
+                  onTap: () => _answer(index, kind: _kinds[index]),
+                ),
+                for (final amount in item.amounts)
+                  _Chip(
+                    amount.label,
+                    selected: _grams[index] == amount.grams,
+                    onTap: () => _answer(
+                      index,
+                      grams: amount.grams,
+                      kind: _kinds[index],
+                    ),
+                  ),
+              ]),
+            if (item.amounts.isNotEmpty && item.options.isNotEmpty)
+              const SizedBox(height: 6),
+            if (item.options.isNotEmpty)
+              row([
+                _Chip(
+                  item.name,
+                  selected: _kinds[index] == null,
+                  onTap: () => _answer(index, grams: _grams[index]),
+                ),
+                for (final option in item.options)
+                  _Chip(
+                    option.name,
+                    selected: _kinds[index] == option,
+                    onTap: () =>
+                        _answer(index, grams: _grams[index], kind: option),
+                  ),
+              ]),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -60,7 +173,7 @@ class _EstimateBreakdownState extends State<EstimateBreakdown> {
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (final (index, item) in widget.items.indexed)
+                  for (final (index, item) in widget.items.indexed) ...[
                     Padding(
                       padding: const EdgeInsets.only(bottom: 2),
                       child: Row(
@@ -105,6 +218,9 @@ class _EstimateBreakdownState extends State<EstimateBreakdown> {
                         ],
                       ),
                     ),
+                    if (widget.onChanged != null && _hasChoices(_asked[index]))
+                      _choices(index),
+                  ],
                   if (editable)
                     Text(
                       l10n.mealTapWeight,
@@ -185,6 +301,52 @@ class _GramsDialogState extends State<_GramsDialog> {
         ),
         FilledButton(onPressed: _use, child: Text(context.l10n.mealUseWeight)),
       ],
+    );
+  }
+}
+
+/// One amount or kind on a small soft pill, tinted and ticked when picked.
+class _Chip extends StatelessWidget {
+  const _Chip(this.label, {required this.selected, required this.onTap});
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(14);
+    return Material(
+      color: selected ? AppColors.primaryContainer : AppColors.surfaceVariant,
+      borderRadius: radius,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: Text(
+                  capitalised(label),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: selected
+                        ? AppColors.onPrimaryContainer
+                        : AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              if (selected) ...[
+                const SizedBox(width: 4),
+                Icon(Icons.check_rounded, size: 14, color: AppColors.primary),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
