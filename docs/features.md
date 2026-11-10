@@ -82,7 +82,7 @@ SharedPreferences through `sharedPreferencesProvider` (`lib/providers/preference
 ## YumSum Star
 
 The paid tier (plan 06; the code says `plus`).
-- **The record:** `entitlements/{uid}`, written by the server (the billing functions, plan 07) or by the owner in the console.
+- **The record:** `entitlements/{uid}`, written by the server (the billing functions, plan 07) or by the owner in the console. The document ID is the account's user ID, the same as `users/{uid}`; that is the only link. A Play write also stores the account's `email`, which nothing reads: it is there so the console's list can be told apart without matching IDs (10 November 2026). Manual grants should carry it too.
   - A manual grant is `active` true, `source` `manual` and an optional `expiresAt`.
   - Play's records also carry `startedAt`: when YumSum Star last switched on, kept while it stays on and set afresh after a lapse (`functions/src/entitlement.ts`). AI Coach counts weeks from it; a manual grant has none and counts from the beginning.
   - `admin` true is YumSum Star for good with no daily AI limit (`aiDailyLimitProvider` is null) and no past-day change limit.

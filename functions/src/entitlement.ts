@@ -17,6 +17,8 @@ export interface Stored {
   purchaseId?: string;
   admin?: boolean;
   dev?: boolean;
+  /** The account's email, for the console's list only; nothing reads it. */
+  email?: string | null;
 }
 
 /**

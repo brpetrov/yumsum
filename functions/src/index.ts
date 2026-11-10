@@ -71,6 +71,7 @@ export const verifyPurchase = onCall({ enforceAppCheck: true }, async (request) 
   const purchaseId = purchaseIdFor(token);
   const linkRef = db.doc(`playPurchases/${purchaseId}`);
   const entitlementRef = db.doc(`entitlements/${uid}`);
+  const email = await emailOf(uid);
   const plus = await db.runTransaction(async (tx) => {
     const [link, entitlement] = await tx.getAll(linkRef, entitlementRef);
     const owner = link.get("uid") as string | undefined;
@@ -82,7 +83,7 @@ export const verifyPurchase = onCall({ enforceAppCheck: true }, async (request) 
       tx.set(linkRef, linkFor(uid, subscription));
     }
     const previous = entitlement.data() as Stored | undefined;
-    return writeEntitlement(tx, entitlementRef, purchaseId, subscription, previous);
+    return writeEntitlement(tx, entitlementRef, purchaseId, subscription, previous, email);
   });
 
   // The app's completePurchase acknowledges too, and so does the
@@ -149,6 +150,7 @@ export const playNotifications = onMessagePublished(
 
     const linkRef = db.doc(`playPurchases/${purchaseId}`);
     const entitlementRef = db.doc(`entitlements/${uid}`);
+    const email = await emailOf(uid);
     await db.runTransaction(async (tx) => {
       const [link, entitlement] = await tx.getAll(linkRef, entitlementRef);
       const previous = entitlement.data() as Stored | undefined;
@@ -159,7 +161,7 @@ export const playNotifications = onMessagePublished(
         logger.info("Older purchase, left alone", { purchaseId });
         return;
       }
-      writeEntitlement(tx, entitlementRef, purchaseId, subscription, previous);
+      writeEntitlement(tx, entitlementRef, purchaseId, subscription, previous, email);
     });
     await acknowledgeIfPending(token, subscription);
   },
@@ -219,12 +221,22 @@ function linkFor(uid: string, subscription: Subscription) {
 }
 
 /** Returns whether YumSum Star is on once the transaction commits. */
+/** The account's email, so the record can be told apart in the console. */
+async function emailOf(uid: string): Promise<string | null> {
+  try {
+    return (await getAuth().getUser(uid)).email ?? null;
+  } catch {
+    return null;
+  }
+}
+
 function writeEntitlement(
   tx: Transaction,
   ref: DocumentReference,
   purchaseId: string,
   subscription: Subscription,
   previous: Stored | undefined,
+  email: string | null,
 ): boolean {
   const now = new Date();
   const fields = entitlementFrom(subscription, previous, now);
@@ -232,7 +244,7 @@ function writeEntitlement(
 
   // Merged, so the owner's admin and dev stay; a null removes the field.
   const update = Object.fromEntries(
-    Object.entries({ ...fields, purchaseId }).map(([key, value]) => [
+    Object.entries({ ...fields, purchaseId, email }).map(([key, value]) => [
       key,
       value ?? FieldValue.delete(),
     ]),

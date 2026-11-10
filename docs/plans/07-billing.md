@@ -64,8 +64,8 @@ No write rule, so only the functions (which bypass the rules) can write it. `pla
 
 You can switch YumSum Star on for anyone by hand. Firebase console → Firestore → `entitlements` (Start collection the first time) → Add document:
 
-- **Document ID:** the person's User UID, from Authentication → Users (search by email).
-- **Fields:** `active` (boolean, true), `source` (string, `manual`), and `expiresAt` (timestamp) if it should end. Leave the rest out.
+- **Document ID:** the person's User UID, from Authentication → Users (search by email). The ID is the only link to `users/{uid}`; Firestore has no joins.
+- **Fields:** `active` (boolean, true), `source` (string, `manual`), `email` (string, their email, so the list reads by name; Play writes it on purchases), and `expiresAt` (timestamp) if it should end. Leave the rest out.
 
 It takes effect within seconds, on the phone and the website. Delete the document to take it away.
 
