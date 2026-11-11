@@ -3,4 +3,16 @@ shots/
 *.png
 !store/en-*.png
 !store/feature-graphic.png
+!store/play-*.png
+!store/recipe-backdrop.png
+!store/smart-snap-curry.png
+!store/scan-peanut-butter.png
+!store/phone-home-light-matched.png
+!store/phone-home-dark-matched.png
+!store/phone-ai-estimate.png
+!store/phone-choice.png
+!store/phone-scan.png
+!store/phone-scanner-camera.png
+!store/phone-progress-dark.png
+!store/phone-history-stats-dark.png
 store/reference/

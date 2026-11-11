@@ -16,18 +16,40 @@ Make 6 to 8 phone screenshots, 1080 × 1920 PNG, each under 8 MB, saved here as 
 
 ## The screenshots, in order
 
+*Revised 11 November 2026 after the first set: the Bulgarian closer is out (no Bulgarian capture), History is in, and Smart Snap (the plate photo) gets its own slide. Eight slides, so the AI result and its chips share one.*
+
 | # | Headline | Line under it | Raw screen | Notes |
 |---|---|---|---|---|
-| 1 | Log a meal in seconds | Type it, say it or scan it | `en-2-quick-log.png` | The hook. Crop so the quick-log bar with its chips and the sparkle button sit mid-frame. The first screenshot is the one most people see. |
-| 2 | AI counts the calories | 10 free estimates a day. No ads. | the AI estimate result, from the phone (`phone-ai-estimate.png` when supplied; else `en-2-quick-log.png` with the sparkle button pointed at) | Our strongest fact. Keep the wording exact. |
-| 3 | It asks when it's not sure | 3 or 5 pieces? With meat or without? | the "Which did you have?" dialog, from the phone (`phone-choice.png`) | Shows the AI isn't a black box. Skip if no phone shot. |
-| 4 | Your whole day on one screen | Calories, protein, carbs, fat and fibre | `en-1-home.png` | The rings and the progress bar. Paint the name "Tester" out (replace with "Sam", same font, or crop above the card). |
-| 5 | Scan a packet, pick your portion | 1, 2 or 3 servings, or the whole pack | the barcode sheet, from the phone (`phone-scan.png`) | Skip if no phone shot. |
+| 1 | Log meals in seconds | Type it, say it or scan it | `en-2-quick-log.png` | The hook. The quick-log bar with its chips and the sparkle button mid-frame, the mic and barcode buttons as a detail. The first screenshot is the one most people see. |
+| 2 | AI counts the calories | 10 free estimates a day. No ads. | `phone-ai-estimate.png` (the result) with the chips of `phone-choice.png` as the detail | Our strongest fact. Keep the wording exact. The chips show the AI isn't a black box: a second short line such as "Not sure? Tap a portion or an extra." |
+| 3 | Snap a photo, get the calories | Smart Snap · YumSum Star | `en-7-camera-chicken-curry.png` (the real camera page) with the result from `phone-ai-estimate.png` | See "The Smart Snap slide" below: a generated plate under the app's real camera chrome. |
+| 4 | Your day, at a glance | Calories, protein, carbs, fat and fibre | `en-1-home.png` | The rings and the progress bar. Full macros are YumSum Star: say so in the pill. |
+| 5 | Scan. Pick your portion | A serving or the whole pack | `phone-scanner-camera.png` (the real scanner page) with `phone-scan.png` as the detail | See "The scan slide" below: the scanner in action on a generated jar, the real portion sheet as the detail bubble. |
 | 6 | 40 high-protein recipes | Log a portion in one tap | `en-4-recipes.png` | The photos sell themselves; keep the frame large. |
-| 7 | A target that adapts to you | Adaptive formula learns from your weigh-ins · YumSum Star | `phone-progress.png` from the phone (real history) or `en-5-progress.png` | Must say YumSum Star, as it's a paid feature. |
-| 8 | In English and Bulgarian | Free to use. No ads. | `en-1-home.png` or the Bulgarian home if supplied | Optional closer. |
+| 7 | Your target adapts to you | Learns from your weigh-ins · YumSum Star | `phone-progress-dark.png` | Dark. Must say YumSum Star, as it's a paid feature. |
+| 8 | See your month at a glance | Every on-track day, in green | `phone-history-stats-dark.png` | Dark, so 7 and 8 are the dark pair. The "68% of logged days on track · 31 of 31 days logged" stats visible. Pill: "Free to use. No ads." |
 
 If a phone screen isn't supplied, drop that slide rather than fake it.
+
+### The Smart Snap slide
+
+Smart Snap is the camera button on the bar: a photo of the plate goes to the AI, which names the meal and gives its calories, protein and macros (YumSum Star only). The competitors' strongest slides are exactly this (`reference/ref-38.png`, `ref-41.png`: a plate photo, a framing bracket, a result card), so ours must match them.
+
+What's real and must be used as is: `en-7-camera-chicken-curry.png` is the app's actual camera page, captured on 11 November 2026: a full-screen preview, the close cross top left, the dark rounded card "Take a photo of your meal / From above, with the whole plate in.", the white round shutter, and "Choose a photo instead" under it (that last line is the website's only; leave it out, the phone app has no such button). The preview in that capture is a soft close-up of chicken curry: replace the preview only.
+
+What you may generate: the plate in the preview. A photorealistic top-down photo of chicken curry with rice on a plate, as a phone camera would see it held above a table (a wooden or light table edge, natural light, a fork), filling the preview edge to edge, sharp, appetising, no text, no hands, no brands. It must be chicken curry with rice, because the result card we have is for that dish.
+
+The result: the real card from `phone-ai-estimate.png`, "Chicken curry with rice · 450 g · 550 kcal · 30 g" with its chips, enlarged as the detail bubble over the lower part of the phone, as on slide 2. Nothing else typed over the screen. A thin framing bracket on the preview, like the references, is fine as a decoration; keep it outside the dark card.
+
+### The scan slide
+
+The first set showed only the portion sheet, which says nothing about scanning. Show it in action, as the references do.
+
+What's real and must be used as is: `phone-scanner-camera.png` is the app's actual barcode scanner, captured on the phone: a full-screen camera preview, the close cross top left, the white rounded box in the middle that the barcode goes in, and the dark card at the bottom "Point at the barcode / Hold it inside the box and it's read by itself." Crop the status bar. The preview in that capture shows a hand holding a branded yoghurt pot (Pilos, with a Nutri-Score label): **don't use that preview**. Keep the chrome, replace the preview.
+
+What you may generate: the product in the preview. A photorealistic phone-camera shot of a plain jar of peanut butter on a kitchen worktop or in a hand, its label unbranded (a plain label that says only "Peanut butter", no logo, no real brand, no Nutri-Score), turned so a clear EAN barcode sits inside the white box, natural light, sharp. It must be peanut butter, because the portion sheet we have is for "Creamy Peanut Butter".
+
+The result: the real portion sheet from `phone-scan.png` (1 serving · **2 servings** · 3 servings · Whole pack, "Serving: 1 serving (32 g)", 64 g, 380 kcal · 14 g protein), its product photo and brand name blurred as before, enlarged as the detail bubble over the lower part of the phone. Nothing else typed over the screen.
 
 ### The phone screens supplied (10 November 2026)
 
@@ -36,14 +58,12 @@ All taken on a Samsung S24 at about 510 × 1100 (a mirrored window, half the pho
 | File | What it shows | Use |
 |---|---|---|
 | `phone-ai-estimate.png` | "Chicken curry with rice" estimated: 550 kcal · 30 g, with the chips Regular ✓ Small Large / Homemade ✓ Takeaway | slide 2 (AI counts the calories) |
-| `phone-choice.png`, `phone-choice-crop.png` | "Avocado toast" with chips 2 slices ✓ 1 slice 3 slices / With butter ✓ With egg With bacon | slide 3 (it asks when it's not sure); the crop is a close-up of the chips |
+| `phone-choice.png` | "Avocado toast" with chips 2 slices ✓ 1 slice 3 slices / With butter ✓ With egg With bacon | slide 3 (it asks when it's not sure) |
 | `phone-scan.png` | the portion sheet after a barcode scan: 1 serving · **2 servings** · 3 servings · Whole pack, 380 kcal | slide 5 (scan a packet) |
-| `phone-scanner-camera.png` | the camera scanning a yoghurt pot | **don't use the photo as is**: it shows a brand and a hand. For slide 5 use `phone-scan.png` as the screen, and if the slide wants a scanning motif, draw a plain generic barcode graphic, not this photo |
-| `phone-rings-crop.png` | the home card's rings close up: 1015 kcal left, protein 80 g amber, carbs 89 g, fat 28 g, fibre | slide 4 close-up, or a detail on slide 1 |
-| `phone-home-dark.png` | the home screen in dark mode | a **dark mode** slide ("Easy on the eyes at night"), or slide 4 in dark |
+| `phone-scanner-camera.png` | the app's real scanner page, scanning a yoghurt pot | slide 5: keep the chrome (cross, white box, dark card), replace the preview, which shows a brand and a hand (see "The scan slide") |
 | `phone-progress-dark.png` | Weight & Progress in dark mode with real history (80 → 79 kg, trend line, target 73, Adaptive formula On, "You burn 2300 kcal a day") | slide 7 |
-| `phone-recipes-dark.png` | Recipes in dark mode | slide 6 if you prefer dark; `en-4-recipes.png` is the light one |
-| `phone-history-dark.png`, `phone-history-stats-dark.png` | History: the month calendar with on-track days, and the "68% of logged days on track, 31 of 31 days logged" stats | an optional slide: "See your month at a glance" |
+| `phone-history-stats-dark.png` | History: the month calendar with on-track days, and the "68% of logged days on track, 31 of 31 days logged" stats | slide 8 ("See your month at a glance") |
+| `en-7-camera-chicken-curry.png` | the app's real camera page (1080 × 1920, from the website, 11 November), preview showing a close-up of chicken curry | slide 3: keep the chrome, replace the preview (see "The Smart Snap slide") |
 
 Brands: blur or paint out any third-party brand name or logo that appears in a screen (the peanut butter in `phone-scan.png` shows a brand name and jar photo: soften or crop it so no brand is readable; Open Food Facts can stay).
 
@@ -53,7 +73,8 @@ Mixing themes is fine, but make it deliberate: light for the first slides, then 
 
 - **Background**: the app's cream, `#FAF2E7`, flat or with a very soft warm gradient. A faded food photo behind the phone is fine on one or two slides (as in the references), but never behind the headline.
 - **Headline**: Fredoka, bold, dark brown `#2B1F18`, two lines at most, at least 96 px tall per line at 1080 wide, so it reads in the thumbnail strip. **Line under it**: Nunito, `#76665A`, about 48 px. Both fonts are on Google Fonts; the app uses them.
-- **Accent**: orange `#C94D1A` for one word or a pill badge per slide (for example a pill reading "10 a day, free"); green `#1E9E6A` only for "on track" things. Don't introduce other colours.
+- **Accent**: orange `#C94D1A` for one word per headline (the benefit: "seconds", "free", "adapts", "glance") and for the pill under the subline, filled orange with white text, one loud claim per slide ("10 a day, free", "No ads", "Free", "YumSum Star"). Green `#1E9E6A` only for "on track" things. Don't introduce other colours.
+- **Warmth**: a faded generated food backdrop behind the phone on most slides (never behind the headline, never inside the frame), as the references do. The first set had one on the recipes slide only and read as quiet next to them.
 - **Phone frame**: a plain dark rounded frame, straight or tilted no more than 6°, taking 60 to 70% of the height, screen cropped from the raw PNG at full resolution (never upscaled). The raw screens have no status bar; leave it off.
 - **Consistency**: same background, headline position and frame size on every slide. The set should read as one strip.
 - A small YumSum icon in a corner of slide 1 only.
@@ -64,7 +85,7 @@ Mixing themes is fine, but make it deliberate: light for the first slides, then 
 - No competitor names, logos or "unlike other apps".
 - Every claim is true of the app today: 10 AI estimates a day free (typed or spoken), 30 with YumSum Star; plate photos, Adaptive formula, AI Coach and detailed macros are YumSum Star; recipes, barcode scanning, the mic and typed logging are free. Label a YumSum Star feature as such on its slide.
 - Copy in British English, sentence case, no exclamation marks, "you". Short: a headline is five words or fewer.
-- Only real screens of the app. No invented UI, no mock data drawn by hand, no stock food in the phone frame.
+- Only real screens of the app. No invented UI, no mock data drawn by hand, no stock food in the phone frame. The exceptions are the camera previews on the Smart Snap and scan slides, which are generated (a plate, a jar) under the app's real camera chrome (see above): they stand for what the camera sees, not for anything the app draws.
 - Don't show the name "Tester" or the test account's details.
 
 ## Where to be creative, and where not

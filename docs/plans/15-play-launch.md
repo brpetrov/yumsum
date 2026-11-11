@@ -33,7 +33,7 @@
 - [ ] **Grow users → Store presence → Main store listing**: app name, short and full description from plan 14 section 1.
   - [ ] App icon: `assets/android/play_store_512.png`.
   - [ ] Feature graphic: `tools/e2e/store/feature-graphic.png` (1024 × 500).
-  - [ ] Phone screenshots, in this order: `tools/e2e/store/en-1-home.png`, `en-2-quick-log.png`, `en-3-targets.png`, `en-4-recipes.png`, `en-5-progress.png`, `en-6-history.png`. For production, the poster-style set from `tools/e2e/store/BRIEF.md` (`play-*.png`) replaces these.
+  - [ ] Phone screenshots, in this order: `tools/e2e/store/play-1.png` to `play-8.png`, the poster-style set (`tools/e2e/store/PLAY.md`). The plain screens `en-1-home.png` to `en-6-history.png` are the fallback.
   - [ ] Translations → Add → Bulgarian: the Bulgarian texts from plan 14 (screenshots can stay English).
   - [ ] Save.
 - [ ] **Store settings**: category **Health & Fitness**, contact email `help.yumsum@gmail.com`, website `https://yumsum.web.app`.
