@@ -93,7 +93,7 @@ Set-up, in this order:
 What's fair to users:
 - **Free for ever:** typing meals and numbers, barcode scanning, food search, recent and usual meals, history, weight, reminders, Day off, contributing to Open Food Facts.
 - **Metered, because each use costs money:** AI estimates (typed, voice, photo). Everyone gets a **free daily allowance**, for example 10 a day, plenty for normal use.
-- **YumSum Star, for people who want more:** decided on 2 November 2026; see `06-yumsum-plus.md`. Photo logging, 30 AI estimates a day, the Adaptive formula, the AI weekly review and full macros, at £3.99 a month or £25.99 a year with a 7-day trial (priced on 4 November 2026, `11-pricing.md`).
+- **YumSum Star, for people who want more:** decided on 2 November 2026; see `06-yumsum-plus.md`. Photo logging, 30 AI estimates a day, the Adaptive formula, the AI weekly review and full macros, at £3.99 a month or £29.99 a year (£25.99 until 11 November) with a 7-day trial (priced on 4 November 2026, `11-pricing.md`).
 
 Nothing a free user relies on is ever taken away or hidden behind a paywall later. That's the difference from the apps people complain about: MyFitnessPal moved its barcode scanner behind Premium in 2022.
 
