@@ -8,6 +8,7 @@ import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/period_review.dart';
+import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/providers/period_review_provider.dart';
 import 'package:lean_streak/providers/review_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
@@ -393,6 +394,14 @@ class _PeriodReviewCard extends ConsumerWidget {
               if (summary.date.compareTo(endKey) <= 0) summary,
           ],
           l10n: l10n,
+          month: isMonth,
+          losing: ref.watch(
+            userProfileProvider.select(
+              (profile) =>
+                  profile.valueOrNull?.weightLossPace !=
+                  WeightLossPace.maintain,
+            ),
+          ),
         );
 
     return Column(

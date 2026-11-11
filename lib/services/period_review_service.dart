@@ -6,12 +6,15 @@ import 'package:lean_streak/models/period_review.dart';
 
 class PeriodReviewService {
   /// The [PeriodReview.guidance] is in [l10n]'s language, English when not
-  /// given.
+  /// given. A [month] also says when its days ran over target on average,
+  /// and for someone [losing] weight that the goal date moves later.
   PeriodReview buildReview({
     required DateTime startDate,
     required DateTime endDate,
     required List<DailySummary> summaries,
     AppLocalizations? l10n,
+    bool month = false,
+    bool losing = false,
   }) {
     final sortedSummaries = [...summaries]
       ..sort((a, b) => a.date.compareTo(b.date));
@@ -45,6 +48,17 @@ class PeriodReviewService {
     final calorieConsistencyRate = judged.isEmpty
         ? 0.0
         : greenDays / judged.length.toDouble();
+    // A day 140 kcal over is still on track, but a month of them adds up.
+    // Each day against its own target, from a week of judged days.
+    final averageOver = !month || judged.length < 7
+        ? 0
+        : (judged.fold<int>(
+                    0,
+                    (sum, summary) =>
+                        sum + summary.totalCalories - summary.targetCalories,
+                  ) /
+                  judged.length)
+              .round();
 
     final bestDay = judged.isEmpty
         ? null
@@ -80,6 +94,8 @@ class PeriodReviewService {
         calorieConsistencyRate: calorieConsistencyRate,
         daysInPeriod: daysInPeriod,
         loggedDays: loggedDays,
+        averageOver: averageOver,
+        losing: losing,
       ),
     );
   }
@@ -93,6 +109,8 @@ class PeriodReviewService {
     required double calorieConsistencyRate,
     required int daysInPeriod,
     required int loggedDays,
+    required int averageOver,
+    required bool losing,
   }) {
     final guidance = <String>[];
 
@@ -107,6 +125,14 @@ class PeriodReviewService {
       guidance.add(l10n.historyGuidanceSomeClose);
     } else {
       guidance.add(l10n.historyGuidanceMostOff);
+    }
+
+    if (averageOver > 100) {
+      guidance.add(
+        losing
+            ? l10n.historyGuidanceOverGoalDate(averageOver)
+            : l10n.historyGuidanceOver(averageOver),
+      );
     }
 
     // About 4 days in 7 for weeks, half for months, scaled to the days that

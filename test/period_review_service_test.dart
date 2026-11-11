@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/models/daily_summary.dart';
+import 'package:lean_streak/models/period_review.dart';
 import 'package:lean_streak/services/period_review_service.dart';
 
 void main() {
@@ -100,6 +101,72 @@ void main() {
         );
 
         expect(review.guidance, contains(note));
+      });
+    });
+
+    group('over-target note', () {
+      const over =
+          'You averaged 140 kcal a day over your target, so your goal '
+          'date moves a little later.';
+
+      /// [count] days from 2 November at [calories] against 1660.
+      List<DailySummary> days(int count, int calories) => [
+        for (var day = 2; day < 2 + count; day++)
+          _summary(
+            '2026-11-${day.toString().padLeft(2, '0')}',
+            calories: calories,
+            targetCalories: 1660,
+          ),
+      ];
+
+      PeriodReview review(
+        List<DailySummary> summaries, {
+        bool month = true,
+        bool losing = true,
+      }) => PeriodReviewService().buildReview(
+        startDate: DateTime(2026, 11, 1),
+        endDate: DateTime(2026, 11, 30),
+        summaries: summaries,
+        month: month,
+        losing: losing,
+      );
+
+      test('a month over by more than 100 a day says the date moves', () {
+        expect(review(days(10, 1800)).guidance, contains(over));
+      });
+
+      test('keeping weight, it leaves the goal date out', () {
+        expect(
+          review(days(10, 1800), losing: false).guidance,
+          contains('You averaged 140 kcal a day over your target.'),
+        );
+      });
+
+      test('not at 100 over, in a week, or before 7 judged days', () {
+        bool noted(PeriodReview review) =>
+            review.guidance.any((note) => note.startsWith('You averaged'));
+        expect(noted(review(days(10, 1760))), isFalse);
+        expect(noted(review(days(7, 1960), month: false)), isFalse);
+        expect(noted(review(days(6, 1960))), isFalse);
+      });
+
+      test('days off are left out, and each day has its own target', () {
+        final summaries = [
+          ...days(7, 1700),
+          _summary(
+            '2026-11-20',
+            calories: 3500,
+            targetCalories: 1660,
+            dayOff: true,
+          ),
+          // 100 over a higher target from an earlier plan; against today's
+          // 1660 it would tip the month over.
+          _summary('2026-11-21', calories: 2200, targetCalories: 2100),
+        ];
+        expect(
+          review(summaries).guidance.any((n) => n.startsWith('You averaged')),
+          isFalse,
+        );
       });
     });
   });

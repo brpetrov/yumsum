@@ -1435,6 +1435,24 @@
   "@historyGuidanceMostOff": {
     "description": "History: review note when under 40% of the logged days were on track."
   },
+  "historyGuidanceOver": "You averaged {kcal} kcal a day over your target.",
+  "@historyGuidanceOver": {
+    "description": "History: month review note when the judged days averaged over 100 kcal above target, for someone keeping their weight.",
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
+  },
+  "historyGuidanceOverGoalDate": "You averaged {kcal} kcal a day over your target, so your goal date moves a little later.",
+  "@historyGuidanceOverGoalDate": {
+    "description": "History: month review note when the judged days averaged over 100 kcal above target, for someone losing weight.",
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
+  },
   "historyGuidanceLogMore": "Some days weren't logged. Log more days for a clearer review.",
   "@historyGuidanceLogMore": {
     "description": "History: review note when too few days were logged."

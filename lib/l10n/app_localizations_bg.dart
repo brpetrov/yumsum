@@ -1132,6 +1132,16 @@ class AppLocalizationsBg extends AppLocalizations {
       'През повечето записани дни калориите са доста над или под целта.';
 
   @override
+  String historyGuidanceOver(int kcal) {
+    return 'Средно калориите ти са с $kcal ккал на ден над целта.';
+  }
+
+  @override
+  String historyGuidanceOverGoalDate(int kcal) {
+    return 'Средно калориите ти са с $kcal ккал на ден над целта, затова срокът за желаното тегло леко се удължава.';
+  }
+
+  @override
   String get historyGuidanceLogMore =>
       'За някои дни няма записи. Записвай храненията си по-редовно за по-точно обобщение.';
 

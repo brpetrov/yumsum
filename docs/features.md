@@ -239,6 +239,7 @@ The AI weekly review, YumSum Star (plan 09); users only ever see it called AI Co
   - Period reviews count its calories but leave it out of the tally, the consistency rate and best/worst day, reporting a days-off count instead.
 - **Past-day changes:** adding, editing or deleting a meal on an earlier day uses one of 10 a calendar month (`DayEditRepository.monthlyLimit`). Once they're used up, `LogMealController` fails with `EditLimitExceededException`. Admin has no limit.
 - **Period reviews** (`lib/services/period_review_service.dart`): weekly and monthly figures from the summaries, under the History calendar for finished days. They're built from the calendar's summaries (`reviewSummariesProvider`, a live range query, also behind Home's month card), so a meal change re-reads only its day.
+  - A month whose judged days (7 at least, days off left out) average more than 100 kcal over target, each day against its own, adds a note (`historyGuidanceOver`, since 11 November 2026): green allows 10% over, so a month of small extras would otherwise pass unseen. For someone losing weight it adds that the goal date moves a little later, as each weigh-in works the date out again from the current weight.
 
 ## AI
 

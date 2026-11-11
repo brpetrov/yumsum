@@ -1114,6 +1114,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Most logged days were well above or below target.';
 
   @override
+  String historyGuidanceOver(int kcal) {
+    return 'You averaged $kcal kcal a day over your target.';
+  }
+
+  @override
+  String historyGuidanceOverGoalDate(int kcal) {
+    return 'You averaged $kcal kcal a day over your target, so your goal date moves a little later.';
+  }
+
+  @override
   String get historyGuidanceLogMore =>
       'Some days weren\'t logged. Log more days for a clearer review.';
 

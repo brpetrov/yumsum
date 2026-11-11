@@ -1892,6 +1892,18 @@ abstract class AppLocalizations {
   /// **'Most logged days were well above or below target.'**
   String get historyGuidanceMostOff;
 
+  /// History: month review note when the judged days averaged over 100 kcal above target, for someone keeping their weight.
+  ///
+  /// In en, this message translates to:
+  /// **'You averaged {kcal} kcal a day over your target.'**
+  String historyGuidanceOver(int kcal);
+
+  /// History: month review note when the judged days averaged over 100 kcal above target, for someone losing weight.
+  ///
+  /// In en, this message translates to:
+  /// **'You averaged {kcal} kcal a day over your target, so your goal date moves a little later.'**
+  String historyGuidanceOverGoalDate(int kcal);
+
   /// History: review note when too few days were logged.
   ///
   /// In en, this message translates to:
