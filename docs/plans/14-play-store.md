@@ -124,7 +124,7 @@ Check: prices are left out on purpose. Plan 11 sets £3.99 a month, £25.99 a ye
 
 | Form | Answer | Why |
 |---|---|---|
-| Privacy policy URL | `https://yumsum.web.app/privacy` | Served from `tools/hosting/privacy.html`, effective 9 November 2026. |
+| Privacy policy URL | `https://yumsum.web.app/privacy` | Served from `tools/hosting/privacy.html`, effective 11 November 2026. |
 | Ads | No, the app contains no ads | No ad SDK in `pubspec.yaml` or the Android build; the policy says no advertising or ad trackers. |
 | App access | All or some functionality is restricted, so add instructions (2.1) | Everything sits behind sign-in. |
 | Content rating | Category: Utility, Productivity, Communication or other (2.2) | A tracking tool, not a game. |
