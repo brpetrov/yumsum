@@ -136,7 +136,7 @@ To cover everyone's AI, roughly **1 in 40 daily users (about 2.5%)** needs to be
 - [x] Blaze plan + billing account + prepay (done 24 October: **$5** in AI Studio, auto-reload off, so AI can never cost more than that)
 - [x] Spend-cap budget on AI Logic (done 24 October: **£3 a month** on "Gemini Developer API (AI Logic)"; the other services are unused)
 - [x] Per-user AI rate limit down to about 10 a minute (done 24 October)
-- [ ] Check the paid tier works: one AI estimate shows up as usage on <https://aistudio.google.com/billing>
+- [x] Check the paid tier works: one AI estimate shows up as usage on <https://aistudio.google.com/billing> (done: the spend cap paused the AI on 10 November 2026, so its usage is counted)
 - [x] (me) Free allowance down to 10 a day; voice notes count (protein on save doesn't; Firestore rules can't make the counter tamper-proof, see step 4). Back up to 20 a day for now on 30 October, while testing; 10 again from 11 November, with 30 for YumSum Star
 - [x] (me) Correct 429 and 402 handling and messages
 - [x] (me) Read the logged token use during the next phone test, then update the figures here (5 November, plan 11)
@@ -146,11 +146,11 @@ To cover everyone's AI, roughly **1 in 40 daily users (about 2.5%)** needs to be
 
 **AI through our own functions (see above)**
 - [x] (me) The functions, the read-only `ai_usage` rule and the app calling them (5 November 2026)
-- [ ] The functions' Gemini key, as the `GEMINI_API_KEY` secret
-- [ ] Deploy the functions, the rules and the app together
-- [ ] One estimate shows in the functions' log and in `ai_usage`
+- [x] The functions' Gemini key, as the `GEMINI_API_KEY` secret (done: the functions answer in the Play test of 10 November 2026)
+- [x] Deploy the functions, the rules and the app together (done: live and answering since 5 November 2026; Claude runs the deploys)
+- [x] One estimate shows in the functions' log and in `ai_usage` (done: plan 15 section G reads the function logs of 10 November 2026)
 - [ ] Disable the Firebase AI Logic API and untick it on the app's keys
-- [ ] Check the spend cap covers the functions' calls
+- [x] Check the spend cap covers the functions' calls (done: the £3 cap paused them on 10 November 2026; it's £10 now)
 
 **YumSum Star (before the closed test, see `06-yumsum-plus.md`)**
 - [x] Decide the free allowance and YumSum Star contents (2 November 2026: `06-yumsum-plus.md`)

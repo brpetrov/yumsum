@@ -1,6 +1,6 @@
 # Plan 6: YumSum Star
 
-*Written 2 November 2026. Status: planned, not built. You agreed the contents on 1–2 November. Each big feature has its own plan (07–10). This one holds the decisions they all share, the two small features, and the order of work.*
+*Written 2 November 2026. Status: built as of 11 November 2026: steps 1–7 are coded (the switch and paywall, weight trend, Adaptive formula, photo logging and the allowance, AI Coach, full macros, and the billing code and functions). What's left is the Google Play side of billing (subscription, Pub/Sub, notifications, licence testers), in plan 07 and plan 15, and your phone checks. You agreed the contents on 1–2 November. Each big feature has its own plan (07–10). This one holds the decisions they all share, the two small features, and the order of work.*
 
 ## The short version
 
@@ -166,7 +166,7 @@ After launch, check once a month:
 - [x] The name: **YumSum Star** (2 November)
 - [x] (Claude) Step 1: YumSum Star switch, manual grant, paywall (plan 07), with admin and debug tools (2 November)
 - [ ] (you) Grant yourself YumSum Star in the Firebase console (plan 07 explains how) and try every feature on the phone
-- [ ] (Claude) Steps 2–6, one at a time, each tried on your phone
+- [ ] (Claude) Steps 2–6, one at a time, each tried on your phone [11 November: all five are built and live; what's left is your phone check of each]
 - [ ] (you) Once Google approves your account: create the app, payments profile, subscription and trial (plan 07)
-- [ ] (Claude) Step 7: real billing; (you) deploy the functions and test a purchase as a licence tester
+- [ ] (Claude) Step 7: real billing; (you) deploy the functions and test a purchase as a licence tester [11 November: Claude's part is coded (`billing_service.dart`, `functions/src/index.ts`); the Play Console set-up, the functions deploy and the purchase test are plan 07 and 15]
 - [ ] (you) Closed test with 12 testers: a manual grant each, all on the licence-testing list, two or three try a purchase

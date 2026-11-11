@@ -1,6 +1,6 @@
 # Plan 9: AI weekly review
 
-*Written 2 November 2026; revised 4 November to look at fibre, salt, sugars and saturates as well as calories and protein. Status: built 4 November as AI Coach; the rules deploy, the privacy page deploy and a try on the phone are left. Part of YumSum Star (`06-yumsum-plus.md`, step 5 of the order of work). It depends on the YumSum Star switch and paywall (`07-billing.md`), and it reads one thing from the Adaptive formula (`08-adaptive-formula.md`).*
+*Written 2 November 2026; revised 4 November to look at fibre, salt, sugars and saturates as well as calories and protein. Status: built 4 November as AI Coach; the rules and the privacy page are deployed (11 November); a try on the phone is left. Part of YumSum Star (`06-yumsum-plus.md`, step 5 of the order of work). It depends on the YumSum Star switch and paywall (`07-billing.md`), and it reads one thing from the Adaptive formula (`08-adaptive-formula.md`).*
 
 ## The short version
 
@@ -443,10 +443,10 @@ Then check that the Play Data safety answers still match (plan 04).
 - [ ] ~~(you) Try the instruction in AI Studio on 4–5 of the test weeks~~ Skipped: tried on the phone instead. The two weeks in `test/week_facts_test.dart` can be pasted into AI Studio if wanted.
 - [x] (Claude) `WeeklyReviewService`, `parseReviewPoints` and their tests
 - [x] (Claude) Model, repository, `fetchMealsInRange`, rules, account reset
-- [ ] (you) `firebase deploy --only firestore:rules`
+- [x] (you) `firebase deploy --only firestore:rules` [11 November: run by Claude; the `weekly_reviews` and `coach_replies` rules are in main, and the fix in 4fba9e3 on 8 November depends on them being live]
 - [x] (Claude) Provider, `WeeklyNotesCard`, `WeeklyNotesLine`, `showCoachIntro`, the shared `TryButton`, `initialWeek`, widget tests
 - [x] (Claude) Privacy page paragraph, and the CLAUDE.md lines (most now in `docs/features.md`)
-- [ ] (you) `tools/build_hosting.ps1` and `firebase deploy --only hosting:app` for the privacy page
+- [x] (you) `tools/build_hosting.ps1` and `firebase deploy --only hosting:app` for the privacy page [11 November: run by Claude; the privacy page has the AI Coach paragraph and is dated 11 November 2026]
 - [ ] (you) On the phone with YumSum Star granted: page back through your own finished weeks. Read the "AI tokens" lines in the log, and check two `weekly_reviews` documents in the console against the notes
 
 ## Sources

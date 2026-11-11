@@ -157,16 +157,16 @@ Once the domain and email exist, I'll change:
 
 ## Checklist
 
-- [ ] Shortlist names; check the UK IPO, TMview, the stores and domains; pick one
-- [ ] Buy the domain
-- [ ] Set up email (Zoho Free) with hello@, support@, privacy@ and noreply@
+- [x] Shortlist names; check the UK IPO, TMview, the stores and domains; pick one (done: YumSum, 28 October 2026)
+- [ ] Buy the domain (not yet: the app uses yumsum.web.app)
+- [ ] Set up email (Zoho Free) with hello@, support@, privacy@ and noreply@ (not yet: help.yumsum@gmail.com is the contact address)
 - [ ] Add the MX, SPF, DKIM and DMARC records
 - [ ] Connect the domain to Firebase Hosting; add www and the redirect
-- [ ] Build the landing page and `/delete-account`; I can write both
+- [ ] Build the landing page and `/delete-account`; I can write both (`/delete-account` is live since 9 November 2026; no landing page yet)
 - [ ] Switch Firebase Auth emails to the domain
 - [ ] Verify the domain in Search Console; submit OAuth branding
 - [ ] I update the links, emails and name in the app
-- [ ] Create the Play Console account; recruit 12 testers; start the closed test
+- [ ] Create the Play Console account; recruit 12 testers; start the closed test (the account is verified and the app is a draft; testers and the closed test are plan 15)
 
 ## Sources
 

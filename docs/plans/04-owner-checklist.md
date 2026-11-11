@@ -5,15 +5,15 @@
 ## Now
 
 - [ ] **Put the 30 October changes live** (new quick-log bar, optional protein, launch screen, web loading page)
-  - [ ] `firebase deploy --only hosting:app,firestore:rules` (the rules now check the new `trackProtein` field), then Ctrl+F5 on the website
+  - [x] `firebase deploy --only hosting:app,firestore:rules` (done: Claude has run the deploys since 5 November 2026) (the rules now check the new `trackProtein` field), then Ctrl+F5 on the website
   - [ ] Run the app on the phone again from VS Code. Then close it fully and open it from the home screen: the launch screen should show the bowl alone on cream, and the app's splash should carry on from it
   - [x] Try the bar: photo, barcode and mic buttons; tap the box and watch them slide away for the sparkle button; type a name (it lights up), add calories (it becomes a tick)
   - [x] Plan Settings → Track protein too? → No, Save: no protein on Today, in the bar, on meals or in History
   - [x] Weight & Progress: delete a weigh-in with the bin on its card. Deleting the newest one puts your target back to the one before
 - [x] **Open Food Facts account** (30 October 2026): made on the real server with help.yumsum, in `config/off_account.json`, login checked; API usage form sent. The test server was down all day, so testing goes straight to the real one
-  - [ ] Try both flows safely first: run "YumSum (Android, contribute dry run)" and scan the two test barcodes Claude put on screen (3809990001236 is unknown, 5010251434573 is listed without calories). Nothing is sent; the AI reading still counts towards the 20 a day
+  - [ ] Try both flows safely first: run "YumSum (Android, contribute dry run)" and scan the two test barcodes Claude put on screen (3809990001236 is unknown, 5010251434573 is listed without calories). Nothing is sent; the AI reading still counts towards the 10 a day
   - [ ] Then for real with "YumSum (Android)": scan a packet Open Food Facts doesn't know, or one it has without calories, contribute it, then check its page at world.openfoodfacts.org/product/ followed by the barcode
-  - [ ] The account now lives in the `contributeProduct` function, not the app (5 November 2026). Change its password on Open Food Facts, since builds made before carry the old one; then `firebase functions:secrets:set OFF_USER_ID` and `firebase functions:secrets:set OFF_PASSWORD` (type each when asked), and `firebase deploy --only firestore:rules,functions`. Do this before the "for real" try above, and before the next upload to Play
+  - [ ] (The password change was skipped on 9 November 2026, plan 15: only the owner's old builds carried it.) The account now lives in the `contributeProduct` function, not the app (5 November 2026). Change its password on Open Food Facts, since builds made before carry the old one; then `firebase functions:secrets:set OFF_USER_ID` and `firebase functions:secrets:set OFF_PASSWORD` (type each when asked), and `firebase deploy --only firestore:rules,functions`. Do this before the "for real" try above, and before the next upload to Play
 - [ ] **Recipes** (built 31 October 2026; all 40 recipes written, 10 photos in): see `docs/plans/05-recipes.md`
   - [x] The 40 recipes (redone by Claude for easy, common, high-protein, lower-calorie meals; checked by `flutter test test/recipes_asset_test.dart`)
   - [ ] Read through them and change anything you'd cook differently, then run the check again
@@ -42,7 +42,7 @@
   - [x] Logo: the website now draws it, so it stays sharp (goes live with the deploy below)
 
 - [x] **Lock down the Firebase API keys** (most important security item)
-  The keys in the app are public. If one may call the **Generative Language API** (Gemini itself), anyone can copy it and use Gemini directly, skipping App Check and the 10-a-day limit, on your credit. The app doesn't need it: its AI goes through the **Firebase AI Logic API**.
+  The keys in the app are public. If one may call the **Generative Language API** (Gemini itself), anyone can copy it and use Gemini directly, skipping App Check and the 10-a-day limit, on your credit. The app doesn't need it: its AI goes through the **Firebase AI Logic API** (since 5 November 2026 through our Cloud Functions instead; see plan 03).
 
   Open https://console.cloud.google.com/apis/credentials?project=lean-streak-project. Under API Keys, click each key's name, scroll to **API restrictions**, and:
   - If it says **Restrict key**: open the APIs dropdown, untick **Generative Language API** if it's ticked, keep **Firebase AI Logic API** (formerly "Vertex AI in Firebase API") ticked, OK, Save.
@@ -88,8 +88,8 @@ The app sends feedback to a Formspree form (formspree.io, signed up with help.yu
 ### While Google checks your ID
 
 - [ ] **Find 12 testers.** A new personal account can only go to production after a closed test with at least 12 testers who stay opted in for 14 days in a row. Collect 12 Gmail addresses (friends, family, colleagues with Android phones) now; this is the longest wait of all.
-- [ ] **Store listing** (Claude can make these): app name, short description (80 characters), full description, the 1024×500 feature graphic, 2–8 phone screenshots; the icon is `assets/android/play_store_512.png`.
-- [ ] **Account deletion page** (Claude can make it): Play asks for a web link that explains how to delete your account and data, e.g. https://yumsum.web.app/delete-account.
+- [ ] **Store listing** (made: the texts are in plan 14 and the pictures in `tools/e2e/store/`; putting them into Play Console is plan 15, section C) (Claude can make these): app name, short description (80 characters), full description, the 1024×500 feature graphic, 2–8 phone screenshots; the icon is `assets/android/play_store_512.png`.
+- [x] **Account deletion page** (done: live since 9 November 2026, with a Bulgarian page; Claude can make it): Play asks for a web link that explains how to delete your account and data, e.g. https://yumsum.web.app/delete-account.
 - [x] **Open Food Facts account**: done 30 October 2026, see "Now" above.
 - [ ] Authentication → Settings: check email enumeration protection is on. (The app asks for 6+ character passwords, Firebase's default; leave the length unless the app changes too.)
 
@@ -98,8 +98,8 @@ The app sends feedback to a Formspree form (formspree.io, signed up with help.yu
 - [x] **Create the app**: YumSum, `com.bpetrov.yumsum`, a draft since 4 November 2026.
 - [ ] **App content** forms (Claude can draft the answers): privacy policy https://yumsum.web.app/privacy, ads (none), app access (sign-in needed, so give Google a test email account with a password), content rating, target audience (18+), data safety, health apps, account deletion link.
 - [ ] **First closed test**: Claude builds the bundle; upload it under Test and release → Testing → Closed testing, accept Play App Signing, add the 12 testers, and send them the opt-in link. Add the same 12 to Settings → License testing too, and give each a YumSum Star manual grant so they can try it (`docs/plans/07-billing.md`).
-- [ ] Add the Play signing SHA-1 and SHA-256 (Test and release → App integrity → App signing) to **YumSum Android** in Firebase → Project settings (Google sign-in and App Check need them)
-- [ ] Link the Cloud project `lean-streak-project` under App integrity → Play Integrity API in Play Console. Without this, AI fails in Play installs. (App Check's **YumSum Android** provider is Play Integrity since 6 November 2026, with the debug and upload keys' SHA-256.)
+- [x] Add the Play signing SHA-1 and SHA-256 (Test and release → App integrity → App signing) to **YumSum Android** in Firebase → Project settings (Google sign-in and App Check need them) (done 10 November 2026, plan 15)
+- [x] Link the Cloud project `lean-streak-project` under App integrity → Play Integrity API in Play Console. Without this, AI fails in Play installs. (App Check's **YumSum Android** provider is Play Integrity since 6 November 2026, with the debug and upload keys' SHA-256.) (Linked 10 November 2026, plan 15.)
 - [ ] After 14 days with 12 testers: Play Console → Dashboard → **Apply for production**.
 - [ ] Once App Check metrics show nearly all requests verified: enforce App Check for **Cloud Firestore** and **Authentication**, not just AI Logic
 

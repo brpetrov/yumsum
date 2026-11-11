@@ -70,13 +70,6 @@ String formatPace(double kgPerWeek, WeightUnit unit, AppLocalizations l10n) {
       : l10n.unitsLb(number.format(kgToLb(kgPerWeek)));
 }
 
-/// [cm] as shown in [unit]: "180 cm" or "5 ft 11 in".
-String formatHeight(double cm, HeightUnit unit, AppLocalizations l10n) =>
-    switch (unit) {
-      HeightUnit.cm => l10n.unitsCm('${cm.round()}'),
-      HeightUnit.ftin => _feet((cm / cmPerInch).round(), l10n),
-    };
-
 String _feet(int inches, AppLocalizations l10n) =>
     l10n.unitsFtIn(inches ~/ 12, inches % 12);
 

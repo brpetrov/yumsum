@@ -1,6 +1,6 @@
 # Plan 10: Full macros
 
-*Written 2 November 2026. Status: steps 1–5 built on 3 November 2026. `macrosForEveryone` stays `false` for good (your decision, 4 November: macros are a YumSum Star feature whatever they cost), and the rules need deploying with the release.*
+*Written 2 November 2026. Status: steps 1–5 built on 3 November 2026. `macrosForEveryone` stays `false` for good (your decision, 4 November: macros are a YumSum Star feature whatever they cost), and the rules are deployed (11 November).*
 
 ## The short version
 
@@ -380,14 +380,14 @@ Play's Data safety form needs no change: these are more details of the same meal
 ## Checklist
 
 - [x] (Claude) Step 1: `Nutrients`, meals, summaries, rules, edits, privacy page (3 November)
-- [ ] (you) `firebase deploy --only firestore:rules`
+- [x] (you) `firebase deploy --only firestore:rules` [11 November: run by Claude; the macro fields are in `firestore.rules`, and macros have been in use since 8 November (2968c0b)]
 - [x] (Claude) Step 2: packets and contributions (3 November)
 - [x] (Claude) Step 3: the recipe data job and parser (3 November; no calories, protein or ingredients changed)
 - [ ] (you) look over a few recipes
 - [x] (Claude) Step 4: the AI (3 November)
 - [x] `macrosForEveryone` stays `false` for good (4 November): macros are a YumSum Star feature whatever they cost, so no measuring is needed to decide it
 - [x] (Claude) Step 5: Today, meal rows, day sheet, recipe page, amount sheet (3 November). The paywall already lists Detailed Macros ("The full label: fat, carbs, sugars, fibre, salt."), so its line was left as you tuned it
-- [ ] (you) Phone checklist, then publish the privacy page with the release
+- [ ] (you) Phone checklist, then publish the privacy page with the release [11 November: the privacy page is already live and lists the macros; the phone checklist is what's left]
 
 ## Sources
 

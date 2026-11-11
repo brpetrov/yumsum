@@ -36,13 +36,11 @@ void main() {
     expect(formatWeightChange(lbToKg(-16), WeightUnit.st, en), '-1 st 2 lb');
   });
 
-  test('paces and heights', () {
+  test('paces', () {
     expect(formatPace(0.5, WeightUnit.kg, en), '0.5 kg');
     expect(formatPace(0.25, WeightUnit.kg, en), '0.25 kg');
     expect(formatPace(0.5, WeightUnit.lb, en), '1.1 lb');
     expect(formatPace(0.75, WeightUnit.st, en), '1.65 lb');
-    expect(formatHeight(180, HeightUnit.cm, en), '180 cm');
-    expect(formatHeight(180, HeightUnit.ftin, en), '5 ft 11 in');
   });
 
   test('in Bulgarian: decimal commas, кг and см, imperial symbols kept', () {
@@ -52,8 +50,6 @@ void main() {
     expect(formatWeightChange(-0.8, WeightUnit.kg, bg), '-0,8 кг');
     expect(formatPace(0.25, WeightUnit.kg, bg), '0,25 кг');
     expect(formatPace(0.75, WeightUnit.st, bg), '1,65 lb');
-    expect(formatHeight(180, HeightUnit.cm, bg), '180 см');
-    expect(formatHeight(180, HeightUnit.ftin, bg), '5 ft 11 in');
     expect(weightRange(30, 300, WeightUnit.kg, bg), '30–300 кг');
     expect(heightRange(100, 250, HeightUnit.cm, bg), '100–250 см');
   });
