@@ -41,4 +41,22 @@ void main() {
   test('pretending to be free leaves macros out', () async {
     expect(await asksForMacros(shown: false, real: owner), isFalse);
   });
+
+  test('10 AI estimates a day free, 30 with YumSum Star, none for the '
+      'owner', () {
+    int? limit({required bool plus, bool admin = false}) {
+      final container = ProviderContainer(
+        overrides: [
+          plusProvider.overrideWithValue(plus),
+          adminProvider.overrideWithValue(admin),
+        ],
+      );
+      addTearDown(container.dispose);
+      return container.read(aiDailyLimitProvider);
+    }
+
+    expect(limit(plus: false), 10);
+    expect(limit(plus: true), 30);
+    expect(limit(plus: true, admin: true), isNull);
+  });
 }

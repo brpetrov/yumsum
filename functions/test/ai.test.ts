@@ -173,19 +173,34 @@ describe("the daily allowance", () => {
     assert.equal(usage()?.count, 3);
   });
 
-  test("20 a day, then refused without asking Gemini", async () => {
-    const { call, usage, asked } = setUp(undefined, { count: 19 });
+  test("10 a day free, then refused without asking Gemini", async () => {
+    const { call, usage, asked } = setUp(undefined, { count: 9 });
     await call(meal);
     await refused(call(meal), "resource-exhausted");
-    assert.equal(usage()?.count, 20);
+    assert.equal(usage()?.count, 10);
     assert.equal(asked.length, 1);
   });
 
+  test("30 a day with YumSum Star", async () => {
+    const { call, usage, asked } = setUp(star, { count: 29 });
+    await call(meal);
+    await refused(call(meal), "resource-exhausted");
+    assert.equal(usage()?.count, 30);
+    assert.equal(asked.length, 1);
+  });
+
+  test("a YumSum Star that has ended gets the free 10", async () => {
+    const ended = { ...star, expiresAt: new Date("2026-11-01T00:00:00Z") };
+    const { call, asked } = setUp(ended, { count: 10 });
+    await refused(call(meal), "resource-exhausted");
+    assert.equal(asked.length, 0);
+  });
+
   test("calls made at the same time are all counted", async () => {
-    const { call, usage, asked } = setUp(undefined, { count: 15 });
+    const { call, usage, asked } = setUp(undefined, { count: 5 });
     const results = await Promise.allSettled(Array.from({ length: 8 }, () => call(meal)));
     assert.equal(results.filter((r) => r.status === "fulfilled").length, 5);
-    assert.equal(usage()?.count, 20);
+    assert.equal(usage()?.count, 10);
     assert.equal(asked.length, 5);
   });
 
@@ -260,10 +275,10 @@ describe("YumSum Star", () => {
 
 describe("the fill-in and AI Coach", () => {
   test("don't use the allowance, even once it's used up", async () => {
-    const { call, usage } = setUp(star, { count: 20 });
+    const { call, usage } = setUp(star, { count: 30 });
     await call(nutrients);
     await call(coach);
-    assert.deepEqual(usage(), { count: 20, nutrients: 1, coach: 1 });
+    assert.deepEqual(usage(), { count: 30, nutrients: 1, coach: 1 });
   });
 
   test("AI Coach is capped at 10 a day", async () => {

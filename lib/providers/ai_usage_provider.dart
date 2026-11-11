@@ -34,10 +34,13 @@ final aiMacrosProvider = Provider.autoDispose<bool>((ref) {
   return ref.watch(plusProvider) && (real?.isPlusAt(DateTime.now()) ?? false);
 });
 
-/// How many AI estimates the user gets a day; null for the owner's admin
-/// account, which has no limit.
+/// How many AI estimates the user gets a day, more with YumSum Star; null
+/// for the owner's admin account, which has no limit.
 final aiDailyLimitProvider = Provider.autoDispose<int?>((ref) {
-  return ref.watch(adminProvider) ? null : AiUsageRepository.dailyLimit;
+  if (ref.watch(adminProvider)) return null;
+  return ref.watch(plusProvider)
+      ? AiUsageRepository.starDailyLimit
+      : AiUsageRepository.dailyLimit;
 });
 
 /// Streams today's AI estimate usage count for the current user.

@@ -10,8 +10,10 @@ class AiUsageRepository {
   AiUsageRepository(this._db);
   final FirebaseFirestore _db;
 
-  /// The same as the server's `limits.estimate` in `functions/src/ai.ts`.
-  static const int dailyLimit = 20;
+  /// The same as the server's `limits.estimate` in `functions/src/ai.ts`:
+  /// [dailyLimit] free, [starDailyLimit] with YumSum Star.
+  static const int dailyLimit = 10;
+  static const int starDailyLimit = 30;
 
   DocumentReference<Map<String, dynamic>> _doc(String uid, String date) =>
       _db.collection('users').doc(uid).collection('ai_usage').doc(date);

@@ -32,7 +32,7 @@ So nobody researches it again. Each line says where it came from.
 
 **The free tier**
 - 10 AI estimates a day, typed or by voice.
-- The code still allows 20 for everyone while testing (`AiUsageRepository.dailyLimit`). Plan 06's 10 free and 30 with YumSum Star isn't built yet.
+- Plan 06's 10 a day free and 30 with YumSum Star is built since 11 November 2026, on the server and in the app (20 for everyone while testing before).
 
 **Competitors, rough figures from plan 06** (2 November)
 - MacroFactor about £60–70 a year

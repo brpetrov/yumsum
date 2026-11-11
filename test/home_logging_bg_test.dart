@@ -311,7 +311,7 @@ void main() {
       tester,
       entitlement: null,
       lastWeighIn: DateTime.now(),
-      aiUsed: 15,
+      aiUsed: 5,
     );
     expect(find.byTooltip('Снимай'), findsOneWidget);
     expect(find.byTooltip('Говори'), findsOneWidget);

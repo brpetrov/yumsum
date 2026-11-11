@@ -104,8 +104,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   // row: about half a 360 px phone.
   static const _chipNameWidth = 200.0;
 
-  String get _limitMessage =>
-      context.l10n.quickLogLimit(AiUsageRepository.dailyLimit);
+  String get _limitMessage => context.l10n.quickLogLimit(
+    ref.read(aiDailyLimitProvider) ?? AiUsageRepository.dailyLimit,
+  );
 
   final _name = TextEditingController();
   final _kcal = TextEditingController();

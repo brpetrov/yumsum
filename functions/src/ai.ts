@@ -53,13 +53,14 @@ const options = {
 export type Use = "estimate" | "nutrients" | "coach";
 
 /**
- * Each use's field in the day's document and its limit. `count` is the daily
- * allowance the app shows (`AiUsageRepository.dailyLimit`). The save-time
+ * Each use's field in the day's document and its limit, with YumSum Star's
+ * where it's higher. `count` is the daily allowance the app shows
+ * (`AiUsageRepository.dailyLimit` and `starDailyLimit`). The save-time
  * fill-in and AI Coach don't use it, as before; their caps are only there so
  * they can't be scripted. The owner's admin account has no limit.
  */
-export const limits: Record<Use, { field: string; perDay: number }> = {
-  estimate: { field: "count", perDay: 20 },
+export const limits: Record<Use, { field: string; perDay: number; starPerDay?: number }> = {
+  estimate: { field: "count", perDay: 10, starPerDay: 30 },
   nutrients: { field: "nutrients", perDay: 50 },
   coach: { field: "coach", perDay: 10 },
 };
@@ -250,16 +251,18 @@ export async function reserve(
 ): Promise<void> {
   const usageRef = db.doc(`users/${uid}/ai_usage/${dateKey}`);
   const entitlementRef = db.doc(`entitlements/${uid}`);
-  const { field, perDay } = limits[ask.use];
+  const { field, perDay, starPerDay } = limits[ask.use];
   await db.runTransaction(async (tx) => {
     const [usage, record] = await tx.getAll(usageRef, entitlementRef);
     const entitlement = record.data() as Stored | undefined;
-    if (ask.star && !isPlusAt(entitlement, now)) {
+    const plus = isPlusAt(entitlement, now);
+    if (ask.star && !plus) {
       throw new HttpsError("permission-denied", "That needs YumSum Star.");
     }
     const stored: unknown = usage.get(field);
     const used = typeof stored === "number" ? stored : 0;
-    if (entitlement?.admin !== true && used >= perDay) {
+    const limit = plus ? starPerDay ?? perDay : perDay;
+    if (entitlement?.admin !== true && used >= limit) {
       throw new HttpsError("resource-exhausted", "Today's limit is used up.");
     }
     tx.set(usageRef, { [field]: used + 1 }, { merge: true });
