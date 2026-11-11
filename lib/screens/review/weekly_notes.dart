@@ -53,7 +53,7 @@ class WeeklyNotesCard extends ConsumerWidget {
         ),
         child: Row(
           children: [
-            const IconBubble(Icons.auto_awesome_rounded, size: 36),
+            const IconBubble(Icons.insights_rounded, size: 36),
             const SizedBox(width: 12),
             Expanded(
               child: Column(

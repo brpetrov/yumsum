@@ -132,7 +132,7 @@ class AppDrawer extends ConsumerWidget {
     ),
     (
       route: AppRoutes.coach,
-      icon: Icons.auto_awesome_outlined,
+      icon: Icons.insights_outlined,
       label: l10n.menuCoach,
       star: true,
     ),
