@@ -4,119 +4,128 @@
 
 ## 1. Store listing
 
+*Copy revised 11 November 2026. Counts include spaces and LF line breaks within the descriptions, excluding the surrounding code fences.*
+
 ### English (United Kingdom)
 
 **App name** (30 max): `YumSum: Calorie Tracker` (23)
 
-**Short description** (80 max): `Log meals fast by typing, voice, photo or barcode. AI estimates calories.` (73)
+**Short description** (80 max, 67 characters): `Track calories and protein with AI. Log meals in seconds, your way.`
 
-**Full description** (4000 max, 2169 characters):
+**Full description** (4000 max, 2900 characters):
 
-```
-YumSum is the quick way to track calories and protein. Say or type what you ate and it's logged in seconds. Not sure of the numbers? AI estimates them for you, and asks when it has to guess.
+```text
+Less time logging. More time for you.
 
-LOG A MEAL YOUR WAY
-- Type it, or tap the mic and say it.
-- Scan a packet's barcode and pick your portion.
-- Snap your plate or a nutrition label (plate photos are a YumSum Star feature).
-- Pick from your recent meals, or log a recipe portion.
-- Add the calories and protein yourself whenever you like.
+YumSum makes calorie and protein tracking easy to fit into your day. Type or say what you ate, check the AI estimate and save your meal in seconds. See where you stand today and how your progress adds up over time.
 
-AI ESTIMATES
-Not sure what's in your meal? Ask for an estimate. YumSum gives calories, protein and a breakdown by item, which you can correct. When it has to guess how much or which kind, it asks you. There is a daily allowance of AI estimates, and you can always enter numbers yourself. Estimates are only estimates and can be wrong.
+10 free AI estimates a day. No ads. The everyday essentials are free to use.
 
-YOUR PLAN
-- A daily calorie target worked out from your details and your goal.
-- A protein target and a clear view of your day on the home screen.
-- Weight in kg, lb or stones, with a trend line that smooths out the daily ups and downs.
-- Take a day off when you need one.
+Log meals your way
+- Type a meal or say it into the mic. AI estimates the calories and protein.
+- Scan a barcode and choose a serving, a few servings or the whole pack.
+- Log a recent meal again without entering everything twice.
+- Choose a recipe and add your portion in a tap.
+- Enter your own numbers whenever you like.
+- Prefer a photo? Smart Snap estimates your meal from a picture with YumSum Star.
 
-HISTORY AND PROGRESS
-- A calendar of your weeks and months, with each day's meals.
-- Edit, copy or delete any meal, and add meals to past days.
-- Weight and progress charts.
+Estimates you can check
+See a breakdown of your meal, adjust the portion and correct the details before saving. When more information is needed, YumSum can ask about the size, ingredients or extras. You stay in control, and manual logging is always available.
 
-RECIPES
-A library of recipes with photos. Log a portion in one tap.
+Your day and your progress, at a glance
+Get calorie and protein targets based on your details and your goal. See what you've eaten and what's left for today, in light or dark mode.
 
-REMINDERS AND SHORTCUTS
-Optional reminders for meals and weigh-ins, an app-icon shortcut and a home-screen widget for quick logging.
+Look back through your calendar, revisit meals and see your on-track days in green. Edit entries or add a meal you forgot. Follow your weight trend in kg, lb or stones, with a smoother view of the daily ups and downs. Need a break? Mark a day off.
 
-YUMSUM STAR (OPTIONAL SUBSCRIPTION)
-YumSum is free to use. YumSum Star adds:
-- Smart Snap: log a meal from a photo.
-- Triple the AI estimates each day.
-- Adaptive formula: your calorie target adjusts to how your weight really changes.
-- AI Coach: a short weekly review of your finished weeks.
-- Detailed macros: fat, carbohydrate, fibre, salt and more.
-Pay monthly or yearly through Google Play, and cancel any time in Google Play. A free trial is offered where you are eligible.
+Ideas for your next meal
+Browse high-protein recipes with photos, ingredients and clear instructions. Choose your portion and log it straight from the recipe.
 
-YOUR DATA
-No ads. No selling your data. Delete your account and data any time in the app.
+Optional meal and weigh-in reminders, a home-screen widget and an app-icon shortcut make logging easier to remember and quicker to reach.
 
-IMPORTANT
-YumSum is for adults aged 18 and over. It gives general estimates, not medical advice. Talk to a doctor or dietitian before changing your diet.
+Go further with YumSum Star
+The optional subscription adds:
+- Smart Snap: photograph your meal for an AI estimate of calories, protein and more.
+- 30 AI estimates a day, three times the free allowance.
+- Adaptive formula: a calorie target that learns from your meal logs and weigh-ins, then adjusts as your weight changes.
+- AI Coach: a personal review of the past week's meals, with practical tips on what's going well and what to try next.
+- Detailed macros: see carbs, fat and fibre, plus sugars, salt and more.
+
+Choose a monthly or yearly subscription through Google Play. It renews automatically unless cancelled, and you can cancel in Google Play at any time. A free trial is available to eligible accounts.
+
+Your data, your choice
+No ads. We don't sell your data. Delete your account and its meal and weight records in the app whenever you choose.
 
 Available in English and Bulgarian.
+
+Important
+For adults aged 18 and over. AI estimates can be inaccurate. YumSum is not a medical device and does not diagnose, treat, cure or prevent any medical condition. Consult a doctor or dietitian before changing your diet, and a healthcare professional for medical advice.
 ```
 
 ### Bulgarian (bg)
 
 **Име** (30 max): `YumSum: Калории и протеин` (25)
 
-**Кратко описание** (80 max): `Записвай храната бързо с текст, глас, снимка или баркод. AI оценява калориите.` (78)
+**Кратко описание** (80 max, 69 characters): `Следи калории и протеин с AI. Записвай храната си лесно и за секунди.`
 
-**Пълно описание** (4000 max, 2326 characters):
+**Пълно описание** (4000 max, 3359 characters):
 
+```text
+По-малко смятане. Повече време за теб.
+
+С YumSum следенето на калории и протеин лесно се вписва в деня ти. Напиши или кажи какво хапна, провери изчислените от изкуствения интелект (AI) стойности и запази храненето за секунди. Виж колко ти остава до дневната цел и как напредваш с времето.
+
+10 безплатни изчисления с AI на ден. Без реклами. Основните функции са безплатни.
+
+Записвай, както ти е удобно
+- Напиши какво хапна или го кажи на глас. AI изчислява приблизително калориите и протеина.
+- Сканирай баркода и избери една порция, няколко или цялата опаковка.
+- Добави отново скорошно хранене, без да въвеждаш всичко отначало.
+- Избери рецепта и запиши порцията си с едно докосване.
+- Въведи стойностите ръчно, когато предпочиташ.
+- По-лесно ти е със снимка? С YumSum Star можеш да снимаш храната, за да получиш приблизителните ѝ хранителни стойности.
+
+Виж какво стои зад числата
+Разгледай стойностите за отделните храни, промени порцията и коригирай подробностите, преди да запазиш. Ако е нужно уточнение, YumSum може да попита за количеството, съставките или добавките. Ти решаваш какво да запишеш, а ръчното въвеждане винаги е на разположение.
+
+Денят и напредъкът ти с един поглед
+Получаваш дневни цели за калории и протеин според данните и целта си. Виж какво хапна и колко ти остава за деня. Избери светъл или тъмен режим според вкуса си.
+
+Разгледай календара, върни се към предишни хранения и виж в зелено дните, в които си в рамките на целта. Поправи запис или добави пропуснато хранене. Следи теглото си с графика, която изглажда ежедневните колебания и показва общата тенденция. Имаш нужда от почивка? Отбележи си почивен ден.
+
+Идеи за следващото хранене
+Открий рецепти, богати на протеин, със снимки, продукти и ясни стъпки за приготвяне. Избери порцията си и я запиши направо от рецептата.
+
+Включи напомняния за хранене и претегляне, ако са ти полезни. Уиджетът на началния екран и прекият път от иконата на приложението улесняват бързото записване.
+
+Още възможности с YumSum Star
+Абонаментът е по избор и включва:
+- Запис със снимка: снимай храната, за да получиш приблизителни стойности за калориите, протеина и други хранителни вещества.
+- 30 изчисления с AI на ден, три пъти повече от безплатния лимит.
+- Адаптивна формула: използва записите за храненето и теглото ти, за да коригира калорийната цел според напредъка ти.
+- AI треньор: анализ на храненето ти през изминалата седмица и практични съвети, съобразени с теб. Виж какво ти помага и какво да опиташ занапред.
+- Подробни макроси: следи въглехидрати, мазнини и фибри, както и захари, сол и други хранителни стойности.
+
+Избери месечен или годишен абонамент през Google Play. Той се подновява автоматично, докато не го прекратиш. Можеш да го прекратиш по всяко време в Google Play. Ако отговаряш на условията, можеш да ползваш безплатен пробен период.
+
+Твоите данни, твоят избор
+Без реклами. Не продаваме данните ти. Можеш да изтриеш профила си и записите за хранене и тегло директно от приложението.
+
+Приложението е на български и английски.
+
+Важно
+За хора на 18 и повече години. Изчисленията с AI са приблизителни и може да са неточни. YumSum не е медицинско изделие и не е предназначено за диагностика, лечение, излекуване или предотвратяване на заболявания. Консултирай се с лекар или диетолог, преди да промениш храненето си. За медицински съвет се обърни към медицински специалист.
 ```
-YumSum е бърз тракер за калории и протеин. Кажи или напиши какво хапна и е записано за секунди.
 
-ЗАПИШИ ХРАНА ПО ТВОЙ НАЧИН
-- Напиши я или натисни микрофона и я кажи.
-- Сканирай баркода на опаковка и избери порцията си.
-- Снимай чинията или етикета с хранителната информация (снимката на чинията е функция на YumSum Star).
-- Избери от последните си храни или запиши порция от рецепта.
-- Въведи калориите и протеина ръчно, когато поискаш.
+The Bulgarian copy is adapted for natural reading, using informal singular address without gendered forms. It keeps the app's feature names („Запис със снимка“, „AI треньор“, „Адаптивна формула“, „Подробни макроси“, YumSum Star). AI is explained on first use in the full description; everyday wording replaces literal translations such as „налучка“ and „линия на тенденцията“.
 
-ОЦЕНКИ С AI
-Не знаеш какво има в ястието? Поискай оценка. YumSum дава калории, протеин и разбивка по продукти, които можеш да поправиш. Когато трябва да налучка колко или какъв вид, те пита. Има дневен лимит на оценките с AI, а числата винаги можеш да въведеш ръчно. Оценките са само приблизителни и може да грешат.
-
-ТВОЯТ ПЛАН
-- Дневна цел за калории, изчислена от данните и целта ти.
-- Цел за протеин и ясен поглед върху деня ти на началния екран.
-- Тегло в кг, фунтове или стоуни, с линия на тенденцията, която заглажда дневните колебания.
-- Вземи почивен ден, когато ти трябва.
-
-ИСТОРИЯ И НАПРЕДЪК
-- Календар на седмиците и месеците ти с храните за всеки ден.
-- Редактирай, копирай или изтрий всяка храна и добавяй храни към минали дни.
-- Графики на теглото и напредъка.
-
-РЕЦЕПТИ
-Библиотека с рецепти със снимки. Запиши порция с едно докосване.
-
-НАПОМНЯНИЯ И ПРЕКИ ПЪТИЩА
-По избор напомняния за храна и претегляне, пряк път от иконата на приложението и приспособление за началния екран за бързо записване.
-
-YUMSUM STAR (ПО ИЗБОР, АБОНАМЕНТ)
-YumSum се ползва безплатно. YumSum Star добавя:
-- Запис със снимка: запиши храна от снимка.
-- Три пъти повече оценки с AI на ден.
-- Адаптивна формула: калорийната ти цел се нагажда към това как наистина се променя теглото ти.
-- AI треньор: кратък седмичен преглед на приключилите ти седмици.
-- Подробни макроси: мазнини, въглехидрати, фибри, сол и други.
-Плащаш месечно или годишно през Google Play и можеш да отмениш по всяко време в Google Play. Предлага се безплатен пробен период, ако имаш право на него.
-
-ТВОИТЕ ДАННИ
-Без реклами. Не продаваме данните ти. Можеш да изтриеш профила и данните си по всяко време в приложението.
-
-ВАЖНО
-YumSum е за пълнолетни, на 18 и повече години. Дава общи приблизителни оценки, а не медицински съвети. Поговори с лекар или диетолог, преди да променяш храненето си.
-
-Приложението е на английски и български.
-```
-
-The Bulgarian text uses the app's own names („Запис със снимка“, „AI треньор“, YumSum Star) and no forms that show gender (11 November 2026).
+Review notes:
+- The opening now leads with easier everyday logging and the concrete free allowance. The short description focuses on calorie/protein tracking and speed.
+- Verified 10 free estimates and 30 with Star against `functions/src/ai.ts` and `lib/repositories/ai_usage_repository.dart`. Barcode scanning and manual entry do not consume that allowance.
+- Smart Snap, Adaptive formula, AI Coach and detailed macros are clearly in the optional paid tier. AI Coach describes the past week's meals, not an on-demand chat.
+- Added light/dark mode, recipe instructions and practical benefits without promising weight-loss results or perfect AI accuracy. The recipe count is deliberately omitted.
+- Removed the generic nutrition-label photo claim. That exists in the missing-product contribution flow, rather than as an alternative to Smart Snap's meal camera.
+- Account deletion names the account's meal and weight records, avoiding a promise that every third-party record is erased immediately. Subscription renewal and cancellation are explicit.
+- Completed the disclaimer with the non-medical-device wording in [Google Play's health policy](https://support.google.com/googleplay/android-developer/answer/16679511?hl=en). Lengths were checked against [Google Play's listing limits](https://support.google.com/googleplay/android-developer/answer/9859152?hl=en). The short descriptions follow the [preview asset guidance](https://support.google.com/googleplay/android-developer/answer/9866151?hl=en-GB).
 
 Check: prices are left out on purpose. Plan 11 sets £3.99 a month, £29.99 a year and 7 days free, but Play shows its own prices on the listing.
 
