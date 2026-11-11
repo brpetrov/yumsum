@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
+import 'package:lean_streak/core/config/crash_reports.dart';
 import 'package:lean_streak/l10n/app_localizations.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/plus_provider.dart';
@@ -86,8 +87,8 @@ class PlusPurchaseController extends Notifier<PlusPurchase> {
       await ref
           .read(billingServiceProvider)
           .buy(plan, account: sha256.convert(utf8.encode(uid)).toString());
-    } catch (error) {
-      debugPrint('Could not start the purchase: $error');
+    } catch (error, stack) {
+      reportError(error, stack, 'Start a purchase');
       _say(PurchaseMessage.playUnreachable);
     }
   }
@@ -99,9 +100,9 @@ class PlusPurchaseController extends Notifier<PlusPurchase> {
     _restoring = quiet;
     try {
       await ref.read(billingServiceProvider).restore();
-    } catch (error) {
+    } catch (error, stack) {
       _restoring = null;
-      debugPrint('Could not restore purchases: $error');
+      reportError(error, stack, 'Restore purchases');
       if (!quiet) _say(PurchaseMessage.playUnreachable);
     }
   }
@@ -119,10 +120,14 @@ class PlusPurchaseController extends Notifier<PlusPurchase> {
         case PurchaseStatus.pending:
           _say(PurchaseMessage.paymentPending);
         case PurchaseStatus.error:
-          debugPrint('Purchase failed: ${purchase.error}');
           if (alreadyOwned(purchase)) {
             await restore();
           } else {
+            reportError(
+              purchase.error ?? 'No error from Play',
+              null,
+              'Purchase',
+            );
             _say(PurchaseMessage.playUnreachable);
           }
         case PurchaseStatus.canceled:
@@ -142,11 +147,12 @@ class PlusPurchaseController extends Notifier<PlusPurchase> {
     if (!quiet) state = const PlusPurchase(checking: true);
     try {
       await ref.read(billingRepositoryProvider).verify(token);
-    } catch (error) {
-      debugPrint('Could not check the purchase: $error');
-      if (quiet) return;
+    } catch (error, stack) {
       final linked =
           error is FirebaseFunctionsException && error.code == 'already-exists';
+      // Paid, but not confirmed: the one to look into first.
+      if (!linked) reportError(error, stack, 'Purchase check');
+      if (quiet) return;
       _say(
         linked
             ? PurchaseMessage.onAnotherAccount

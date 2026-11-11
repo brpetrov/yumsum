@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:lean_streak/app/launch_actions.dart';
 import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/config/app_check.dart';
+import 'package:lean_streak/core/config/crash_reports.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
@@ -389,7 +390,8 @@ class _DayOffButton extends ConsumerWidget {
           await ref
               .read(dailySummaryServiceProvider)
               .setDayOff(uid, date, !isOff);
-        } catch (_) {
+        } catch (error, stack) {
+          reportError(error, stack, 'Day off');
           if (!context.mounted) return;
           ScaffoldMessenger.of(
             context,

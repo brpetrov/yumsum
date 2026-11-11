@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:lean_streak/core/config/crash_reports.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
@@ -103,7 +104,8 @@ class _FeedbackDialogState extends ConsumerState<_FeedbackDialog> {
       await prefs.setString(_sentDayKey, _today);
       await prefs.setInt(_sentCountKey, _dailyLimit);
       if (mounted) setState(() => _sending = false);
-    } catch (_) {
+    } catch (error, stack) {
+      reportError(error, stack, 'Feedback');
       if (mounted) {
         setState(() {
           _sending = false;

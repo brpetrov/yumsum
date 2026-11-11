@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 import 'package:lean_streak/core/config/app_check.dart';
+import 'package:lean_streak/core/config/crash_reports.dart';
 
 import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/nutrients.dart';
@@ -661,6 +662,7 @@ class CalorieEstimateService {
       );
     } catch (error, st) {
       debugPrint('CalorieEstimateService error: $error\n$st');
+      reportError(error, st, 'AI estimate');
       throw aiCallError(error, _l10n.mealAiErrorEstimate, _l10n);
     }
   }
@@ -681,6 +683,7 @@ class CalorieEstimateService {
       rethrow;
     } catch (error, st) {
       debugPrint('CalorieEstimateService voice error: $error\n$st');
+      reportError(error, st, 'AI voice estimate');
       throw aiCallError(error, _l10n.mealAiErrorVoice, _l10n);
     }
   }
@@ -700,6 +703,7 @@ class CalorieEstimateService {
       rethrow;
     } catch (error, st) {
       debugPrint('CalorieEstimateService photo error: $error\n$st');
+      reportError(error, st, 'AI photo estimate');
       throw aiCallError(error, _l10n.mealAiErrorPhoto, _l10n);
     }
   }
@@ -726,6 +730,7 @@ class CalorieEstimateService {
       rethrow;
     } catch (error, st) {
       debugPrint('CalorieEstimateService label error: $error\n$st');
+      reportError(error, st, 'AI label reading');
       throw aiCallError(error, _l10n.contributeErrorRead, _l10n);
     }
   }

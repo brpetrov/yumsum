@@ -83,13 +83,16 @@ void main() async {
       }
     }
     // On the web it starts later, off the start-up path (ensureAppCheck).
+    // On phones before the other Firebase products are used; a failure is
+    // reported once crash reports are set up, below.
+    (Object, StackTrace)? appCheckFailure;
     if (!kIsWeb) {
       try {
         await activateAppCheck();
-      } catch (error) {
+      } catch (error, stack) {
         // Without a token the AI call fails with a clear message; the rest
         // of the app does not depend on App Check.
-        debugPrint('App Check setup failed: $error');
+        appCheckFailure = (error, stack);
       }
     }
     if (!kIsWeb) {
@@ -105,10 +108,15 @@ void main() async {
         return true;
       };
       await setUpCrashReports();
+      if (appCheckFailure case (final error, final stack)) {
+        reportError(error, stack, 'App Check set-up');
+      }
     }
   } catch (error, stackTrace) {
     debugPrint('LeanStreak startup failed: $error');
     debugPrint(stackTrace.toString());
+    // Once Firebase is up (reportFault checks).
+    reportFault(error, stackTrace, 'Start-up');
     AppColors.isDark =
         WidgetsBinding.instance.platformDispatcher.platformBrightness ==
         Brightness.dark;

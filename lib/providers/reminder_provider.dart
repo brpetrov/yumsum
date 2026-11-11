@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:lean_streak/core/config/crash_reports.dart';
 import 'package:lean_streak/helpers/adaptive_formula.dart';
 import 'package:lean_streak/helpers/weight_reminder.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
@@ -123,7 +124,9 @@ class ReminderSettingsNotifier extends Notifier<ReminderSettings> {
       final current = profile.adaptiveFrom;
       if (current != null && current.compareTo(from) >= 0) return;
       await profiles.createProfile(profile.copyWith(adaptiveFrom: from));
-    } catch (_) {}
+    } catch (error, stack) {
+      reportError(error, stack, 'Pause the Adaptive formula for creatine');
+    }
   }
 
   Future<void> setCreatineTime(TimeOfDay time) async {

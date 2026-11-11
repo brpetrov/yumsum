@@ -1,10 +1,11 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:lean_streak/core/config/app_check.dart';
+import 'package:lean_streak/core/config/crash_reports.dart';
 
 import 'package:lean_streak/providers/language_provider.dart';
 
@@ -16,6 +17,14 @@ class EmailNotVerifiedException implements Exception {
 }
 
 Future<void>? _googleReady;
+
+/// Google sign-in's errors from Firebase that are the user's or the
+/// network's.
+const _googleUsersCodes = {
+  'network-request-failed',
+  'too-many-requests',
+  'user-disabled',
+};
 
 /// The phone's Google sign-in, set up on first use: the plugin may only be
 /// initialised once, and signing in again or confirming a deletion uses it
@@ -79,6 +88,13 @@ class AuthController extends AsyncNotifier<AuthStatus> {
       state = const AsyncData(AuthStatus.idle);
       return false;
     }
+    // Firebase's sign-in errors are usually the user's (expectedError), but
+    // here nearly all are the app's set-up, such as no Google client for
+    // the key a build is signed with (the Play build, 10 November 2026).
+    if (next.error case final FirebaseAuthException error
+        when expectedError(error) && !_googleUsersCodes.contains(error.code)) {
+      reportFault(error, next.stackTrace, 'Google sign-in');
+    }
     state = next;
     return !next.hasError;
   }
@@ -104,8 +120,8 @@ class AuthController extends AsyncNotifier<AuthStatus> {
     if (user == null) return;
     try {
       await ref.read(verificationEmailProvider)();
-    } catch (error) {
-      debugPrint("Sending Firebase's confirmation email instead: $error");
+    } catch (error, stack) {
+      reportError(error, stack, 'Our confirmation email');
       await user.sendEmailVerification();
     }
   }
@@ -168,8 +184,8 @@ final passwordResetEmailProvider = Provider<Future<void> Function(String)>(
 Future<void> sendResetEmail(Ref ref, String email) async {
   try {
     await ref.read(passwordResetEmailProvider)(email);
-  } catch (error) {
-    debugPrint("Sending Firebase's password reset email instead: $error");
+  } catch (error, stack) {
+    reportError(error, stack, 'Our password reset email');
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (error) {

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
 
+import 'package:lean_streak/core/config/crash_reports.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/screens/dashboard/helpers/meal_photo.dart';
@@ -185,7 +186,12 @@ class _MealCameraPageState extends State<MealCameraPage>
         );
       }
       setState(() {});
-    } on CameraException catch (error) {
+    } on CameraException catch (error, stack) {
+      // No camera or no permission is the phone's; anything else, ours.
+      if (error.code != 'cameraNotFound' &&
+          !error.code.startsWith('CameraAccess')) {
+        reportError(error, stack, 'Camera start');
+      }
       // Found again next time, in case the camera changed.
       _webCamera = null;
       final failed = _camera;
@@ -335,9 +341,10 @@ class _MealCameraPageState extends State<MealCameraPage>
         return;
       }
       _leave((barcode: null, photos: List.of(_photos)));
-    } on CameraException {
+    } on CameraException catch (error, stack) {
       // Closed meanwhile: nothing to go back to.
       if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) return;
+      reportError(error, stack, 'Taking a photo');
       _done = false;
       ScaffoldMessenger.of(
         context,

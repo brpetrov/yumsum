@@ -1,5 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +13,10 @@ import 'package:lean_streak/services/calorie_estimate_service.dart';
 // Crash reports go to Firebase Crashlytics from the Android and iOS apps;
 // there is none on the web. Uncaught errors are fatal reports (main.dart);
 // the errors a screen shows as a message are non-fatal ones, so a tester's
-// "it said it couldn't save" can be found. Nothing the user logged is sent.
+// "it said it couldn't save" can be found, and so are failures the app
+// gets past quietly (our own emails, a saved coach note). Each carries the
+// account's ID, which a user's feedback carries too. Nothing the user
+// logged is sent.
 
 /// Turns reports off in debug builds, so the owner's runs don't mix in, and
 /// tags them with the signed-in account's ID (a random code).
@@ -25,10 +29,22 @@ Future<void> setUpCrashReports() async {
   );
 }
 
-/// Reports [error], which the user was shown as a message, as non-fatal.
+/// Reports [error], which the user was shown as a message or which was
+/// handled quietly, as non-fatal, unless it's the user's or the network's
+/// ([expectedError]).
 void reportError(Object error, StackTrace? stack, String reason) {
   debugPrint('$reason: $error');
-  if (kIsWeb || expectedError(error)) return;
+  if (!_canReport || expectedError(error)) return;
+  reportFault(error, stack, reason);
+}
+
+/// None on the web, and none before Firebase is up (or in tests).
+bool get _canReport => !kIsWeb && Firebase.apps.isNotEmpty;
+
+/// Reports [error] as non-fatal whatever it is: for a path where an error
+/// that's usually the user's is the app's (Google sign-in).
+void reportFault(Object error, StackTrace? stack, String reason) {
+  if (!_canReport) return;
   FirebaseCrashlytics.instance.recordError(
     error,
     stack,
@@ -37,12 +53,43 @@ void reportError(Object error, StackTrace? stack, String reason) {
   );
 }
 
+/// Firebase sign-in errors that are the user's or the network's: a wrong,
+/// unknown or taken address or password, too many tries, a disabled
+/// account, a sign-in too old for a change, a used link, a closed popup.
+/// Any other (an internal error, a sign-in method not allowed, the app not
+/// authorised) is the app's set-up and is reported.
+const _usersAuthCodes = {
+  'invalid-credential',
+  'invalid-login-credentials',
+  'wrong-password',
+  'user-not-found',
+  'invalid-email',
+  'missing-email',
+  'missing-password',
+  'email-already-in-use',
+  'weak-password',
+  'user-disabled',
+  'too-many-requests',
+  'requires-recent-login',
+  'user-mismatch',
+  'user-token-expired',
+  'network-request-failed',
+  'expired-action-code',
+  'invalid-action-code',
+  'credential-already-in-use',
+  'account-exists-with-different-credential',
+  'popup-closed-by-user',
+  'cancelled-popup-request',
+  'popup-blocked',
+};
+
 /// Errors that are the user's or the network's, not the app's: a wrong
-/// password, a used-up allowance or month of changes, the AI's own
-/// messages, no connection, or the server refusing a listener after
-/// signing out.
+/// password, backing out of Google, a used-up allowance or month of
+/// changes, the AI's own messages, no connection, or the server refusing a
+/// listener after signing out.
 bool expectedError(Object error) => switch (error) {
-  FirebaseAuthException() ||
+  FirebaseAuthException(:final code) => _usersAuthCodes.contains(code),
+  _ when backedOutOfGoogle(error) => true,
   EmailNotVerifiedException() ||
   AccountActionException() ||
   EditLimitExceededException() ||

@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:lean_streak/core/config/crash_reports.dart';
 import 'package:lean_streak/helpers/week_facts.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/models/weekly_review.dart';
@@ -155,9 +155,9 @@ final weeklyReviewProvider = FutureProvider.autoDispose
               createdAt: DateTime.now(),
             ),
           );
-        } catch (error) {
+        } catch (error, stack) {
           // The notes are written and worth showing; the next look asks again.
-          debugPrint('Could not save the weekly review: $error');
+          reportError(error, stack, 'Save the weekly review');
         }
         return points;
       }();

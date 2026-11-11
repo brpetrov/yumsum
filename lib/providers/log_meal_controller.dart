@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:lean_streak/core/config/crash_reports.dart';
 
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/nutrients.dart';
@@ -118,8 +119,9 @@ class LogMealController extends AsyncNotifier<void> {
       return await ref
           .read(calorieEstimateServiceProvider)
           .estimateNutrients(name, calories.round());
-    } catch (_) {
+    } catch (error, stack) {
       // Protein and macros are optional; never block saving the meal.
+      reportError(error, stack, 'AI nutrients');
       return (protein: null, macros: null);
     }
   }

@@ -445,7 +445,8 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
         ),
       );
       _audioSub = audio.listen(_chunks.add);
-    } catch (_) {
+    } catch (error, stack) {
+      reportError(error, stack, 'Voice recording');
       if (!mounted) return;
       setState(() {
         _listening = false;

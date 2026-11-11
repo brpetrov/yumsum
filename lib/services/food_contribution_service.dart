@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:lean_streak/core/config/app_check.dart';
+import 'package:lean_streak/core/config/crash_reports.dart';
 
 import 'package:lean_streak/core/constants/app_info.dart';
 import 'package:lean_streak/l10n/l10n.dart';
@@ -131,8 +132,8 @@ class FoodContributionService {
                 {'field': field, 'jpeg': base64Encode(bytes)},
             ],
           });
-    } on Exception catch (error) {
-      debugPrint('Could not contribute: $error');
+    } on Exception catch (error, stack) {
+      reportError(error, stack, 'Contribute to Open Food Facts');
       throw FoodContributionException(switch (error) {
         FirebaseFunctionsException(code: 'resource-exhausted') =>
           _l10n.contributeErrorLimit,

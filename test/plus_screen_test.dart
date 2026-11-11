@@ -120,7 +120,8 @@ void main() {
         active: true,
         source: EntitlementSource.play,
         inTrial: true,
-        expiresAt: DateTime(2026, 11, 11),
+        // Always ahead: a fixed 11 November 2026 ran out on that day.
+        expiresAt: DateTime(DateTime.now().year + 1, 11, 11),
       ),
     );
     await tester.pumpAndSettle();
