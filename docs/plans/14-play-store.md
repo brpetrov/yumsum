@@ -118,7 +118,7 @@ YumSum е за пълнолетни, на 18 и повече години. Да�
 
 Check: the Bulgarian text uses "Smart Snap", "AI Coach" and "YumSum Star" as the app does; compare with `lib/l10n/app_bg.arb` if you want the listing to match the app's exact Bulgarian names (the app calls Smart Snap „Запис със снимка“ in places).
 
-Check: prices are left out on purpose. Plan 11 sets £3.99 a month, £25.99 a year and 7 days free, but Play shows its own prices on the listing.
+Check: prices are left out on purpose. Plan 11 sets £3.99 a month, £29.99 a year and 7 days free, but Play shows its own prices on the listing.
 
 ## 2. App content forms
 

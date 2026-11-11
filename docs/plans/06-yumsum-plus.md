@@ -4,7 +4,7 @@
 
 ## The short version
 
-1. **YumSum Star** is the paid tier: **£3.99 a month or £25.99 a year** (priced 4 November, `11-pricing.md`), with a **7-day free trial** of everything.
+1. **YumSum Star** is the paid tier: **£3.99 a month or £29.99 a year** (priced 4 November, the year raised from £25.99 on 11 November, `11-pricing.md`), with a **7-day free trial** of everything.
 2. It pays for what costs money each time, or does thinking for you over weeks:
    - photo logging
    - more AI estimates
@@ -53,7 +53,7 @@ Billing, the paywall and who counts as a subscriber are in `07-billing.md`.
 
 ## Price and trial
 
-- **£3.99 a month or £25.99 a year**, decided on 4 November 2026 from the research in `11-pricing.md` (£2.99 and £17.99 before that).
+- **£3.99 a month or £29.99 a year**, decided on 4 November 2026 from the research in `11-pricing.md`, the year raised from £25.99 on 11 November (£2.99 and £17.99 before that).
   - The year is 6.5 months' worth, 46% off.
   - Both are about a quarter of what the big apps charge: MyFitnessPal £15.99 a month or £64.99 a year, MacroFactor £10.99 or £62.99, Cronometer £9.99 or £59.99; Yazio's year is £35.90.
 - **What you keep after Play's 15% fee and 20% VAT:**

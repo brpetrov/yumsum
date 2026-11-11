@@ -1,6 +1,6 @@
 # Plan 11: The price of YumSum Star
 
-*Written 4 November 2026. Status: decided the same day, **£3.99 a month, £25.99 a year, 7 days free**, from the research below; plans 03, 05, 06, 07 and 09 now carry it. The AI's real token use was measured on 5 November (B2) and came out under what was assumed. Still yours: the Play Console steps in plan 07.*
+*Written 4 November 2026. Status: decided the same day, **£3.99 a month, £25.99 a year, 7 days free**, from the research below, and the year raised to **£29.99** by the owner on 11 November; plans 03, 05, 06, 07 and 09 now carry it. The AI's real token use was measured on 5 November (B2) and came out under what was assumed. Still yours: the Play Console steps in plan 07.*
 
 ## The short version
 
@@ -536,7 +536,7 @@ They must be in a form that can be kept, such as email or text; a passing in-app
 
 ## The decision (4 November 2026)
 
-**£3.99 a month, £25.99 a year, 7 days free.** Bulgaria gets the same figures in euros: let Play convert, then round to €3.99 and €25.99.
+**£3.99 a month, £29.99 a year, 7 days free** (the year was £25.99 until 11 November). Bulgaria and the other euro countries get the same figures in euros: €3.99 and €29.99.
 
 **Your answers to the questions**
 - **Q1, the aim:** not the cheap one. Feature for feature, YumSum Star is in Yazio and Lifesum's league and ahead in places: typed, voice and photo AI in one bar, AI Coach, the Adaptive Formula, no ads, and a real free tier. It's behind on the food database, integrations, iPhone and trust. So a middle price, not a bargain one.
@@ -558,7 +558,7 @@ They must be in a form that can be kept, such as email or text; a passing in-app
 - **Not £2.99:** cheaper apps convert worse as a group, "too cheap" reads as low quality for an AI feature, and a rise later from £2.99 needs subscribers' consent. £3.99 is still a quarter of MyFitnessPal, MacroFactor and Cronometer.
 - **Not £5.99:** the right regular price for the features, but the app has no name or reviews yet, and the launch offer it would need is more paywall work than it's worth now. If the app earns a name, raise the base plan for new subscribers and keep existing ones on £3.99 (Play's legacy price cohorts). Note that £3.99 to £5.99 is a 50.1% rise, a hair over Play's opt-out limit, so moving existing subscribers would need their consent.
 - **Not £17.99 a year:** 6 months' worth, and it left £1.06 a month, under the worst-case cost.
-- **Not £29.99 a year:** only 37% off, and 68% of subscriptions are yearly, so the year is where the discount has to be convincing. £25.99 is 46% off.
+- **Not £29.99 a year:** only 37% off, and 68% of subscriptions are yearly, so the year is where the discount has to be convincing. £25.99 is 46% off. On 11 November the owner chose £29.99 anyway: still £2.50 a month and cheaper than every competitor's year above, and about £2.80 more to us for each yearly subscriber.
 - **7 days free:** trials of 5–9 days turn paid 37% of the time; 3-day trials 25%, with half cancelled on the first day. Longer trials convert a little more but delay the first payment.
 - **Nothing else for now:** no top-ups, no introductory price, no lifetime. Thin evidence and extra code.
 
@@ -572,7 +572,7 @@ They must be in a form that can be kept, such as email or text; a passing in-app
 - [x] (agents) A1–A5, B1, B3–B7, C1–C4, D1, D2, E1, E2 (4 November)
 - [x] (you) Q1–Q4 (4 November)
 - [x] (you) B2: the tokens measured on the phone (5 November); "Against the costs" above uses them
-- [x] (Claude) The price: £3.99 a month, £25.99 a year, 7 days free (4 November)
+- [x] (Claude) The price: £3.99 a month, £25.99 a year, 7 days free (4 November); the year £29.99 from 11 November
 - [x] (Claude) Plans 03, 05, 06, 07 and 09 updated to it (4 November). The terms page names no price, so it's unchanged
 - [ ] (you) Set the prices on the base plans in Play Console (plan 07)
 

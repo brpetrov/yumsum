@@ -101,7 +101,7 @@ Nothing a free user relies on is ever taken away or hidden behind a paywall late
 
 | Option | What it earns | Verdict |
 |---|---|---|
-| **YumSum Star subscription** at **£3.99 a month or £25.99 a year** (plan 11; £2.99 and £17.99 when this was written) | You keep 85% after Play's fee, and Google handles VAT. So £3.99 a month is about **£2.83** to you, enough to pay for about 40 daily users' AI at 3 calls a day. | **Recommended.** Competitors charge £7.49–£15.99 a month; an honest YumSum Star at a quarter of that stands out. |
+| **YumSum Star subscription** at **£3.99 a month or £29.99 a year** (plan 11; the year was £25.99 until 11 November, £2.99 and £17.99 when this was written) | You keep 85% after Play's fee, and Google handles VAT. So £3.99 a month is about **£2.83** to you, enough to pay for about 40 daily users' AI at 3 calls a day. | **Recommended.** Competitors charge £7.49–£15.99 a month; an honest YumSum Star at a quarter of that stands out. |
 | **Rewarded ad, opt-in** ("watch a short ad for 5 more AI estimates today") | About 0.4–0.8p per view, enough for 4–9 AI calls | **Optional extra** for free users who run out. Never forced. |
 | **Banner ads** | About $0.04–$0.15 per daily user a month | **Not recommended.** It barely covers AI, ads are the top complaint in calorie-app reviews, Play forbids ads where people usually tap (next to the log bar), and it needs a consent pop-up and extra Data safety entries. |
 | **Interstitial (full-screen) ads** | More money | **No.** It interrupts logging, which is exactly what people hate. |
