@@ -1,7 +1,7 @@
 name: lean_streak
 description: "LeanStreak - A low-friction habit and calorie consistency tracker"
 publish_to: 'none'
-version: 0.1.0+3
+version: 0.1.0+2
 
 environment:
   sdk: ^3.11.4
