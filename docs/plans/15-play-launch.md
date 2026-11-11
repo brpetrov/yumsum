@@ -25,6 +25,7 @@
 - [x] **Testers** tab → Create email list "Me" → add your phone's Gmail → Save → tick it. Copy the **join on the web** link (https://play.google.com/apps/internaltest/4701065037597490716).
 - [x] **Signing keys into Firebase** (added by Claude 10 November 2026; SHA-1 36:F8:32:6E…, SHA-256 68:27:1B:D7…): Protected with Play → Play Store protection → App signing → copy the **App signing key** SHA-1 and SHA-256. Firebase console → Project settings → Your apps → **YumSum Android** → Add fingerprint → paste each. (Without them, Google sign-in fails in Play installs.)
 - [x] **Play Integrity** (linked to project 296684319013, App Check already registered, 10 November 2026): Protected with Play → Play Integrity API → **Link a Cloud project** → `lean-streak-project`. Then Firebase → App Check → Apps → YumSum Android → Play Integrity → add the same **App signing** SHA-256. (Without this, AI fails in Play installs.)
+- [ ] **Store listing first** (since 11 November 2026): do C's Main store listing and Store settings before trying it, so the icon, feature graphic and posters show in Play when you install.
 - [ ] **Try it**: on your phone open the join link → Become a tester → Download it on Google Play. Uninstall the VS Code build first if Play says it can't install (different signatures). Then: sign in with Google and with email, log a meal with an AI estimate, scan a barcode, use the mic, open every menu page. Anything odd → tell Claude.
 - [ ] **Crash reports**: on that install, Settings → Debug tools (your owner account) → **Send a test crash report**, close the app fully, open it again; within a few minutes it shows in Firebase → Crashlytics → Non-fatals.
 
@@ -55,7 +56,7 @@
 - [ ] **Countries**: Closed testing → Countries/regions → add the United Kingdom, Bulgaria and wherever your testers are.
 - [ ] **Testers** tab → Create email list "Testers" → paste every Gmail (comma-separated) → Save → tick it → copy the join link.
 - [ ] **Licence testers too**: Play Console → Settings → License testing → add the same Gmails (so they never pay real money if they try YumSum Star).
-- [ ] When Google approves the release, send the message below. As each tester joins, give them a YumSum Star manual grant in Firestore (`entitlements/{their uid}`, see plan 07) so they can try everything; their uid shows in Debug tools for you, or ask Claude to look it up by email.
+- [ ] When Google approves the release, send the message below. As each tester joins, give them a YumSum Star manual grant in Firestore (`entitlements/{their uid}`, see plan 07) so they can try everything: `active` true, `source` `manual` and `expiresAt` a timestamp 3 weeks ahead, so it ends by itself after the test (never `admin` or `dev`). Their uid shows in Debug tools for you, or ask Claude to look it up by email and write the grant.
 
 Message for testers:
 
