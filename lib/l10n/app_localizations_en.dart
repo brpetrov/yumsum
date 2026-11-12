@@ -405,7 +405,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickLogProteinHint => 'protein (g)';
 
   @override
-  String get quickLogProteinUnit => 'g protein';
+  String get quickLogProteinUnit => 'g';
 
   @override
   String get quickLogSearchFoods => 'Search foods';
@@ -420,9 +420,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quickLogTime => 'Time eaten';
-
-  @override
-  String get quickLogTimeNow => 'Now';
 
   @override
   String get mealTime => 'Time';

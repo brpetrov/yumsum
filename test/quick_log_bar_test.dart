@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -543,7 +544,7 @@ void main() {
     await tester.enterText(proteinBox, '21g');
     await tester.pump();
     expect(boxes(tester), ['', '450', '21']);
-    expect(find.text('g protein'), findsOneWidget);
+    expect(find.text('g'), findsOneWidget);
   });
 
   testWidgets('the keyboard sliding in or out rebuilds the bar once', (
@@ -1710,15 +1711,18 @@ void main() {
 
   final clock = find.byTooltip('Time eaten');
 
-  /// What the clock reads.
-  String clockLabel(WidgetTester tester) => tester
-      .widget<Text>(
-        find.descendant(
-          of: find.byKey(const ValueKey('quick-log-time')),
-          matching: find.byType(Text),
-        ),
-      )
-      .data!;
+  /// The time the clock reads, null while it shows Now (the clock icon).
+  String? clockLabel(WidgetTester tester) {
+    final time = find.descendant(
+      of: find.byKey(const ValueKey('quick-log-time')),
+      matching: find.byType(Text),
+    );
+    if (time.evaluate().isEmpty) {
+      expect(find.byIcon(Icons.schedule_rounded), findsOneWidget);
+      return null;
+    }
+    return tester.widget<Text>(time).data;
+  }
 
   /// Opens the bar with the keyboard up, then the time picker over it,
   /// which takes the focus so the keyboard goes.
@@ -1738,17 +1742,22 @@ void main() {
     addTearDown(tester.view.resetViewInsets);
     await tester.tap(nameBox);
     await tester.pump();
-    // In the same frame as the boxes, on its own line under them.
+    // In the same frame as the boxes, at the end of their row.
     expect(kcalBox, findsOneWidget);
     expect(clock, findsOneWidget);
-    expect(clockLabel(tester), 'Now');
+    expect(clockLabel(tester), isNull);
+    expect(tester.getCenter(clock).dy, tester.getCenter(kcalBox).dy);
+    // Once the buttons have swapped, under the one beside the name box,
+    // with the boxes ending where the name box does.
+    await tester.pumpAndSettle();
     expect(
-      tester.getTopLeft(clock).dy,
-      greaterThan(tester.getBottomLeft(kcalBox).dy),
+      tester.getCenter(clock).dx,
+      tester.getCenter(find.byTooltip('Estimate')).dx,
     );
+    expect(tester.getTopRight(proteinBox).dx, tester.getTopRight(nameBox).dx);
 
     tester.view.resetViewInsets();
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(kcalBox, findsNothing);
     expect(clock, findsNothing);
   });
@@ -1778,7 +1787,7 @@ void main() {
     tester.view.viewInsets = const FakeViewPadding(bottom: 800);
     await tester.tap(nameBox);
     await tester.pump();
-    expect(clockLabel(tester), 'Now');
+    expect(clockLabel(tester), isNull);
   });
 
   testWidgets('a meal saved without a picked time is saved at Now', (
@@ -1810,7 +1819,7 @@ void main() {
     await tester.tap(find.byTooltip('Clear'));
     await tester.pump();
     expect(boxes(tester), ['', '', '']);
-    expect(clockLabel(tester), 'Now');
+    expect(clockLabel(tester), isNull);
   });
 
   testWidgets('the bar stays as it was while the picker is up, and a picked '
@@ -1854,8 +1863,18 @@ void main() {
     );
   });
 
-  testWidgets('in Bulgarian on a 360dp phone the clock has its own line and '
-      'the number boxes keep their width', (tester) async {
+  testWidgets('in Bulgarian on a 360dp phone the clock fits beside the '
+      'number boxes, and a three-digit protein with its unit in its box', (
+    tester,
+  ) async {
+    // The app's own font, so the widths are the real ones. Loaded last in
+    // this file, as it changes every later test's text widths.
+    final nunito = FontLoader('Nunito');
+    for (final file in ['Nunito-Regular', 'Nunito-SemiBold', 'Nunito-Bold']) {
+      final bytes = File('assets/fonts/$file.ttf').readAsBytesSync();
+      nunito.addFont(Future.value(ByteData.sublistView(bytes)));
+    }
+    await nunito.load();
     tester.view.physicalSize = const Size(360, 640);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -1876,9 +1895,22 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byTooltip('Кога хапна'), findsOneWidget);
-    expect(clockLabel(tester), 'Сега');
-    // The bar's 18 px sides and the 12 px gap, halved.
-    expect(tester.getSize(proteinBox).width, (360 - 36 - 12) / 2);
+    expect(clockLabel(tester), isNull);
+    // The bar's 18 px sides, the 12 px gap, and the clock and its gap.
+    expect(tester.getSize(proteinBox).width, (360 - 36 - 12 - 10 - 44) / 2);
+
+    await tester.enterText(proteinBox, '120');
+    await tester.pumpAndSettle();
+    expect(find.text('г'), findsOneWidget);
+    final input = tester
+        .state<EditableTextState>(
+          find.descendant(of: proteinBox, matching: find.byType(EditableText)),
+        )
+        .renderEditable;
+    expect(
+      input.getMaxIntrinsicWidth(double.infinity),
+      lessThanOrEqualTo(input.size.width),
+    );
     expect(tester.takeException(), isNull);
   });
 }

@@ -740,10 +740,10 @@ abstract class AppLocalizations {
   /// **'protein (g)'**
   String get quickLogProteinHint;
 
-  /// Quick-log bar: after the number in the protein box.
+  /// Quick-log bar: after the number in the protein box, whose hint already says protein. Kept to the unit: beside the clock the box is narrow on a phone.
   ///
   /// In en, this message translates to:
-  /// **'g protein'**
+  /// **'g'**
   String get quickLogProteinUnit;
 
   /// Quick-log bar: chip that searches packaged foods for what's typed.
@@ -769,12 +769,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Time eaten'**
   String get quickLogTime;
-
-  /// Quick-log bar: the clock button's label while the meal is logged at the current time.
-  ///
-  /// In en, this message translates to:
-  /// **'Now'**
-  String get quickLogTimeNow;
 
   /// Meal form (log and edit): label of the time the meal was eaten.
   ///

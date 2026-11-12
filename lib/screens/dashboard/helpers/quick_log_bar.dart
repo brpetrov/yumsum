@@ -62,7 +62,7 @@ typedef _Entry = ({String? name, int? kcal, int? protein});
 
 /// The log composer pinned to the bottom of Today, under the thumb: a name
 /// box, with calorie and protein boxes under it once the bar is in use, and
-/// under them a small clock for when the meal was eaten (Now by default).
+/// beside them a round clock for when the meal was eaten (Now by default).
 /// Beside the idle box sit the other ways in, one round button each: a
 /// photo of the plate for the AI, a packet's barcode (phones only) and the
 /// mic, which writes the words into the box as they're said, in the app's
@@ -1063,15 +1063,11 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                                     ),
                                   ),
                                 ],
+                                // Under the button above and as round, so the
+                                // boxes end where the name box does.
+                                const SizedBox(width: 10),
+                                _buildClock(focused ? keyboardUp : null),
                               ],
-                            ),
-                            // The clock comes with the number boxes, on a
-                            // line of its own: beside them it would leave
-                            // the protein box too narrow for its hint.
-                            const SizedBox(height: 8),
-                            Align(
-                              alignment: AlignmentDirectional.centerStart,
-                              child: _buildClock(focused ? keyboardUp : null),
                             ),
                           ],
                         ],
@@ -1147,15 +1143,16 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     );
   }
 
-  /// A small clock with when the meal was eaten: Now, or the time picked.
-  /// [keyboardUp] is the panel as shown, held while the picker is up.
+  /// A round clock for when the meal was eaten: the icon for Now, or the
+  /// time picked. [keyboardUp] is the panel as shown, held while the picker
+  /// is up.
   Widget _buildClock(bool? keyboardUp) {
     final time = _time;
     // Above it, clear of the phone's navigation bar, as for the buttons.
     return Tooltip(
       message: context.l10n.quickLogTime,
       preferBelow: false,
-      child: TextButton.icon(
+      child: TextButton(
         key: const ValueKey('quick-log-time'),
         onPressed: _working || _listening ? null : () => _pickTime(keyboardUp),
         style: TextButton.styleFrom(
@@ -1164,17 +1161,21 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
               : AppColors.textPrimary,
           backgroundColor: AppColors.surfaceVariant,
           disabledBackgroundColor: AppColors.surfaceVariant,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          visualDensity: VisualDensity.compact,
+          shape: const CircleBorder(),
+          fixedSize: const Size.square(44),
+          minimumSize: const Size.square(44),
+          padding: EdgeInsets.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-        icon: const Icon(Icons.schedule_rounded, size: 18),
-        label: Text(
-          time == null
-              ? context.l10n.quickLogTimeNow
-              : context.l10n.time(DateTime(2000, 1, 1, time.hour, time.minute)),
-          style: const TextStyle(fontSize: 14),
-        ),
+        child: time == null
+            ? const Icon(Icons.schedule_rounded, size: 22)
+            : Text(
+                context.l10n.time(DateTime(2000, 1, 1, time.hour, time.minute)),
+                style: const TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
       ),
     );
   }

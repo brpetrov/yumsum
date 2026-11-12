@@ -414,7 +414,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get quickLogProteinHint => 'протеин (г)';
 
   @override
-  String get quickLogProteinUnit => 'г протеин';
+  String get quickLogProteinUnit => 'г';
 
   @override
   String get quickLogSearchFoods => 'Търси храни';
@@ -429,9 +429,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get quickLogTime => 'Кога хапна';
-
-  @override
-  String get quickLogTimeNow => 'Сега';
 
   @override
   String get mealTime => 'Час';

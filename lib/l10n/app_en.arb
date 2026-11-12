@@ -515,9 +515,9 @@
   "@quickLogProteinHint": {
     "description": "Quick-log bar: hint in the protein box, half the bar's width."
   },
-  "quickLogProteinUnit": "g protein",
+  "quickLogProteinUnit": "g",
   "@quickLogProteinUnit": {
-    "description": "Quick-log bar: after the number in the protein box."
+    "description": "Quick-log bar: after the number in the protein box, whose hint already says protein. Kept to the unit: beside the clock the box is narrow on a phone."
   },
   "quickLogSearchFoods": "Search foods",
   "@quickLogSearchFoods": {
@@ -539,10 +539,6 @@
   "quickLogTime": "Time eaten",
   "@quickLogTime": {
     "description": "Quick-log bar: tooltip of the small clock button that sets when the meal was eaten."
-  },
-  "quickLogTimeNow": "Now",
-  "@quickLogTimeNow": {
-    "description": "Quick-log bar: the clock button's label while the meal is logged at the current time."
   },
   "mealTime": "Time",
   "@mealTime": {
