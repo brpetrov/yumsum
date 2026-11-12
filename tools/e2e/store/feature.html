@@ -1,42 +1,67 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
+<title>YumSum Play feature graphic</title>
 <style>
 @font-face { font-family: Fredoka; src: url("../../../assets/fonts/Fredoka-SemiBold.ttf"); font-weight: 600; }
 @font-face { font-family: Nunito; src: url("../../../assets/fonts/Nunito-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: Nunito; src: url("../../../assets/fonts/Nunito-Bold.ttf"); font-weight: 700; }
 * { box-sizing: border-box; }
 html, body { margin: 0; width: 1024px; height: 500px; overflow: hidden; }
 body { background: #FAF2E7; color: #2B1F18; font-family: Nunito, sans-serif; font-weight: 600; position: relative; }
-.wash { position: absolute; left: 500px; top: 60px; width: 700px; height: 700px; border-radius: 50%; background: radial-gradient(ellipse, #F6D6BD 0%, #FAF2E700 65%); }
-.food { position: absolute; left: 550px; right: 0; top: 160px; bottom: 0; background: linear-gradient(#FAF2E7, #FAF2E700 50%), url('recipe-backdrop.png') center bottom / 560px auto; opacity: .76; filter: blur(2px); mask-image: linear-gradient(to right, transparent, black 30%); }
-.copy { position: absolute; left: 60px; top: 54px; }
-.brand { display: flex; align-items: center; gap: 16px; font: 600 52px Fredoka; }
-.brand img { width: 72px; height: 72px; border-radius: 20px; }
-h1 { margin: 31px 0 19px; font: 600 55px/1.08 Fredoka; letter-spacing: -.7px; }
+.copy { position: absolute; left: 54px; top: 22px; z-index: 5; }
+.brand { display: flex; align-items: center; gap: 12px; font: 600 40px/1 Fredoka; letter-spacing: -.7px; }
+.brand img { width: 54px; height: 54px; border-radius: 15px; box-shadow: 0 6px 13px #9D451214; }
+.category { margin: 8px 0 0; font-size: 18px; color: #6F5F53; }
+h1 { margin: 12px 0 10px; font: 600 54px/1 Fredoka; letter-spacing: -1.1px; }
 h1 em { color: #C94D1A; font-style: normal; }
-p { margin: 0; font-size: 25px; line-height: 1.5; color: #76665A; }
-.fact { display: inline-block; margin-top: 24px; padding: 12px 20px; border-radius: 99px; background: #C94D1A; color: white; font-size: 22px; }
-.phone { position: absolute; right: 58px; top: 38px; width: 300px; height: 485px; padding: 7px; border-radius: 36px; background: #2B211B; box-shadow: 0 22px 40px #4F2D1926; transform: rotate(3deg); }
-.screen { border-radius: 29px; overflow: hidden; width: 100%; height: 100%; }
-canvas { display: block; width: 100%; height: 100%; object-fit: cover; object-position: bottom; }
+.ways { margin: 0; font-size: 21px; line-height: 1.4; color: #6F5F53; letter-spacing: -.25px; }
+.fact { display: inline-flex; align-items: center; margin-top: 14px; padding: 11px 19px 12px; border-radius: 99px; background: #C94D1A; color: #FFF; font-size: 20px; font-weight: 700; line-height: 1.2; box-shadow: 0 9px 20px #C94D1A22, inset 0 1px 0 #FFFFFF26; }
+.phone { position: absolute; right: 52px; top: 28px; width: 230px; padding: 5.5px; border-radius: 32px; background: linear-gradient(132deg, #9A8270 0%, #473930 13%, #241C17 42%, #6A5342 74%, #34261F 100%); box-shadow: 0 23px 34px #6B422526, 0 7px 11px #3A251B1C, inset 0 0 0 1px #B4A08C; transform: rotate(3deg); z-index: 2; }
+.phone::before { content: ""; position: absolute; right: -2px; top: 99px; width: 2px; height: 35px; border-radius: 0 2px 2px 0; background: #65503F; }
+.phone::after { content: ""; position: absolute; left: -2px; top: 76px; width: 2px; height: 48px; border-radius: 2px 0 0 2px; background: #65503F; }
+.screen { border-radius: 27px; overflow: hidden; width: 100%; aspect-ratio: 430 / 850; background: #FBF0E4; box-shadow: 0 0 0 1px #17100C; }
+.screen canvas { display: block; width: 100%; height: 100%; }
+.meal { position: absolute; left: -73px; bottom: -73px; width: 220px; height: 220px; object-fit: contain; filter: drop-shadow(0 11px 13px #7853332E); z-index: 1; }
+.estimate { position: absolute; left: 510px; top: 285px; width: 366px; padding: 10px; border: 1px solid #E6CEBA; border-radius: 25px; background: #FFFBF5; box-shadow: 0 15px 30px #5C331C26, 0 2px 3px #5C331C0D; transform: rotate(-3deg); z-index: 4; }
+.estimate canvas { display: block; width: 100%; height: auto; border-radius: 16px; }
 </style></head>
 <body>
-  <div class="wash"></div>
-  <div class="food"></div>
   <div class="copy">
     <div class="brand"><img src="../../../assets/android/play_store_512.png" alt="YumSum icon"><span>YumSum</span></div>
+    <p class="category">Calories &amp; protein, made simple</p>
     <h1>Log meals<br>in <em>seconds</em></h1>
-    <p>Type it, say it, snap it or scan it.</p>
-    <p class="fact">10 free estimates a day. No ads.</p>
+    <p class="ways">Type it. Say it. Snap it. Scan it.</p>
+    <div class="fact">10 free AI estimates a day. No ads.</div>
   </div>
-  <div class="phone"><div class="screen"><canvas id="capture"></canvas></div></div>
+  <div class="phone"><div class="screen"><canvas id="home" aria-label="YumSum home screen, including the full header and meal logging bar"></canvas></div></div>
+  <img class="meal" src="feature-food.png" alt="Chicken curry with rice">
+  <div class="estimate"><canvas id="estimate" aria-label="Real AI estimate: chicken curry with rice, 450 g, 550 kcal and 30 g protein, with portion options"></canvas></div>
   <script>
     window.ready = (async () => {
       await document.fonts.ready;
       await Promise.all([...document.images].map(img => img.decode()));
-      const img = new Image(); img.src = 'en-2-quick-log.png'; await img.decode();
-      const canvas = document.getElementById('capture');
-      canvas.width = 1080; canvas.height = 1759;
-      canvas.getContext('2d').drawImage(img, 0, 160, 1080, 1759, 0, 0, 1080, 1759);
+      const capture = async (id, file, crop) => {
+        const img = new Image(); img.src = window.featureSources?.[file] || file; await img.decode();
+        const [x, y, width, height] = crop;
+        if (x + width > img.width || y + height > img.height) throw Error('Capture crop out of bounds');
+        const canvas = document.getElementById(id);
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, x, y, width, height, 0, 0, width, height);
+        return ctx;
+      };
+      // Full app height, excluding only the phone's status bar. This matches
+      // slide 1's real capture and leaves the camera, scanner and mic visible.
+      const ctx = await capture('home', 'phone-home-light-matched.png', [0, 30, 430, 850]);
+      // The brief permits this name swap only; all numbers and chips stay real.
+      // The exporter supplies data URLs so a local canvas is safe to sample.
+      let background = [251, 240, 228];
+      if (window.featureSources) background = ctx.getImageData(76, 23, 1, 1).data;
+      ctx.fillStyle = 'rgb(' + background[0] + ',' + background[1] + ',' + background[2] + ')';
+      ctx.fillRect(80, 19, 57, 31);
+      ctx.fillStyle = '#2B1F18'; ctx.font = '600 26px Fredoka';
+      ctx.fillText('Sam', 82, 46);
+      await capture('estimate', 'phone-ai-estimate.png', [32, 748, 460, 140]);
     })();
   </script>
 </body></html>

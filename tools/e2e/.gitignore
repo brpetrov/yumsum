@@ -3,6 +3,7 @@ shots/
 *.png
 !store/en-*.png
 !store/feature-graphic.png
+!store/feature-food.png
 !store/play-*.png
 !store/recipe-backdrop.png
 !store/smart-snap-curry.png

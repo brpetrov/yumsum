@@ -25,7 +25,7 @@ Revised 11 November 2026. Eight posters, in the revised brief's order. Each `pla
 - Slide 7 says "Smart formula adapts to you" with "Learns as you weigh in" underneath. Its actual Adaptive formula screen and YumSum Star pill are retained.
 - The former language closer is replaced by History. Its real calendar is enlarged; the original "68% of logged days on track" and "31 of 31 days logged" remain visible. The unrelated Coach row is covered by the calendar detail rather than promoted as free.
 - Every claim pill is filled `#C94D1A` with white text. Claims, in order: "No ads", "10 a day, free", "YumSum Star", "YumSum Star", "Free", "Free", "YumSum Star", "Free to use. No ads."
-- Slides 1, 2, 4, 5 and 6 use the generated food backdrop outside the phone only, faded into the cream below the headline. Phone tilts alternate -3° / +3°, with soft shadows. The feature graphic now uses the same orange claim pill and food treatment.
+- Slides 1, 2, 4, 5 and 6 use the generated food backdrop outside the phone only, faded into the cream below the headline. Phone tilts alternate -3° / +3°, with soft shadows. The feature graphic uses the matching orange claim pill and cream palette, with its own food composition described below.
 
 Nothing from the requested eight-slide revision was skipped. The standalone choice slide was merged into slide 2. No requested work remains unfinished. The two exact seven-word headlines for Smart Snap and History take precedence over the general five-word guideline. Slide 2's headline is exactly five words and highlights "free".
 
@@ -34,6 +34,17 @@ The original scanner preview, with the branded yoghurt pot and hand, is excluded
 Mirrored window controls, phone status bars and Android navigation bars are cropped out. Full-height home headers use the permitted "Sam" name replacement in the same Fredoka font, with no change to dates, meals or numeric values. The choice detail excludes the tooltip. Original capture files are unchanged. Enlarged details preserve their original words, chips and numbers. Lower-resolution phone captures are enlarged with browser interpolation under the brief's explicit enhancement allowance. The generated plate and jar inside the camera previews are the brief's specific exceptions to the real-screen rule.
 
 The first six posters use light screens, the camera previews or the deliberate light/dark split; the final two are dark. The layout uses local Fredoka SemiBold and Nunito, `#FAF2E7` cream, and one orange benefit word per headline. Full-height capture layouts use taller phone proportions on slides 1, 3, 4 and 5. Frame heights range from 1220 to 1290 px, within 60 to 70% of poster height. Tilts alternate -3° / +3°, except slide 4's upright comparison. The orange words are "seconds", "free", "photo", "glance", "portion", "protein", "adapts" and "month".
+
+## Feature graphic
+
+Revised 11 November 2026 at the user's request. `feature-graphic.png` remains 1024 × 500 RGB. Its complete phone fits inside the banner, with a slim warm graphite frame, a subtle metallic edge, small side buttons, a 3° tilt and soft shadows. The frame preserves the capture's aspect ratio.
+
+- Full home capture: `phone-home-light-matched.png`, crop `[0, 30, 430, 850]`, including the header and complete camera/scanner/microphone logging bar. Only the status bar is excluded. The permitted name replacement is Sam, matching slide 1.
+- Main copy: "Calories & protein, made simple", "Log meals in seconds", "Type it. Say it. Snap it. Scan it." and "10 free AI estimates a day. No ads." Fredoka and Nunito remain the only fonts; the claim is white on `#C94D1A` with a restrained shadow.
+- `feature-food.png` is a transparent photographic cutout of the existing chicken curry with rice, outside the phone. It is 220 px across in the bottom-left corner, with 73 px cropped beyond both the left and bottom edges and a soft shadow. No text or graphic overlaps it, and the orange claim pill clears it by at least 24 px.
+- The enlarged AI result is the real crop `[32, 748, 460, 140]` from `phone-ai-estimate.png`. Its 450 g, 550 kcal, 30 g and all portion chips are retained. The card sits above the logging bar, which remains visible.
+- The background is flat `#FAF2E7`. The earlier Smart Snap label and decorative background rings are removed. The plate stays more than 300 px from both the phone and the AI result card.
+- No invented UI, app code changes or changes to the eight posters are part of this feature-graphic revision.
 
 ## Rebuild
 
@@ -45,11 +56,17 @@ node tools/e2e/store/render-play.js
 
 Pass slide numbers to render only selected posters, for example `node tools/e2e/store/render-play.js 1 2`. A full run also rebuilds the contact strip and feature graphic. `feature.html` remains the standalone feature-graphic source.
 
+To rebuild only the feature graphic from any working directory, run `node tools/e2e/feature_shot.js` from the repository root (or use the script's absolute path). Both render paths use the same exporter, wait for the fonts and image captures, and check the complete phone bounds, capture proportions, plate crop, 24 px claim clearance, separation from the phone/card, exact cream background and 1024 × 500 RGB output.
+
 The renderer checks crop bounds, brand-font loading, headline word counts (with explicit exceptions for the two requested exact headlines), text overflow, the original camera-feed match and the 8 MB limit. The exported PNG dimensions and colour type were checked separately. The finished posters were also visually reviewed at full size and as a contact strip. No app code or app behaviour was changed.
 
 ## Generated image provenance
 
-All three generated assets use the built-in imagegen tool. No API/CLI image-generation fallback was used. All UI is from the supplied captures, composed with HTML/CSS and canvas. Ingredient labels and the estimate caption are outside the phone.
+All four generated assets use the built-in imagegen tool. No API/CLI image-generation fallback was used. All UI is from the supplied captures, composed with HTML/CSS and canvas. Ingredient labels and the estimate caption are outside the phone.
+
+`feature-food.png` is a 1254 × 1254 RGBA photograph cutout, edited from `smart-snap-curry.png` with built-in imagegen. Only the feature graphic uses it. The source table and fork are removed; the full plate, curry and rice are preserved as a food photograph outside the phone. Final image-edit prompt:
+
+> Use case: background-extraction / photorealistic-natural. Asset type: an appetising food photograph cutout for a YumSum Play Store feature graphic. Image 1 is the edit target. Isolate ONLY the complete ivory plate of chicken curry with rice from the supplied photograph, with a genuinely transparent background. Remove the wooden table and the fork completely. Keep the actual dish, chicken pieces in orange curry sauce on the left, white basmati rice on the right and natural small coriander leaves; keep it unmistakably chicken curry with rice. Preserve photographic realism and real textures, with a subtle improvement to natural appetising contrast and crisp food detail, no artificial shine or oversaturation. Reframe as a square image with the whole circular plate centred, a little transparent margin on every side. Straight-down food photograph with soft daylight. Clean plate silhouette, no tabletop, no cast rectangular shadow, no extra props, no text, no typography, no labels, no brands, no camera UI, no phone, no hands. This food will be positioned outside the real app phone and paired with its real AI estimate.
 
 `scan-peanut-butter.png`, used only as the scanner preview on slide 5. The current revision shows more of the kitchen, the entire jar in the source photograph, and a textured ivory label with terracotta bands, serif lettering and a small decorative peanut illustration. It remains unbranded. The renderer no longer adds a 1.2× crop or an upward offset; the barcode still fits within the real scan box.
 
@@ -61,7 +78,7 @@ Initial generation prompt for the base photograph, superseded by the edit above:
 
 > Use case: photorealistic-natural. Asset type: camera preview photograph underneath a real mobile barcode scanner's captured chrome. One sharp photorealistic portrait phone photograph, 1080 x 2160. A single plain glass jar of creamy peanut butter with a simple unbranded pale beige lid stands on a warm light kitchen worktop in natural window light. Straight-on phone camera from slightly above the jar. Jar is large and fills about 75 percent of image width, from 20 to 80 percent down the portrait. Turned so a large, clear, realistic EAN-13 barcode on a flat plain ivory paper label faces the camera squarely. Barcode centred horizontally at 56 percent down the image, approximately 52 percent of image width and 12 percent of image height, with generous blank quiet zones. The label's ONLY words are exactly 'Peanut butter', small and plainly printed ABOVE the barcode. Only the barcode's 13 small digits below it; absolutely no other writing. Realistic thin and thick black barcode bars and clear number row, no warped bars. Peanut butter visible through glass below and above the label. Warm cream and peach kitchen background, softly out of focus, but jar and barcode are sharp. Realistic everyday product photography, appetising peanut butter. No hand, no person, no brand, no logos, no Nutri-Score, no nutrition badge, no awards, no scanner UI, no cross, no framing box, no graphics. The existing app scanner chrome will be composited separately; generate ONLY the product photo.
 
-`recipe-backdrop.png`, reused outside the phone on slides 1, 2, 4, 5 and 6 and the feature graphic. Original generation prompt:
+`recipe-backdrop.png`, reused outside the phone on slides 1, 2, 4, 5 and 6. Original generation prompt:
 
 > Use case: photorealistic-natural. Asset type: a soft food backdrop to be placed OUTSIDE a real app phone frame on a 1080 x 1920 Google Play screenshot poster. Create one vertical 1080 x 1920 image. Warm cream (#FAF2E7) and peach palette, quiet natural morning light, matte cream tabletop with extremely subtle linen texture. At the very bottom left edge, a partly cropped shallow ivory bowl of Greek yoghurt with strawberries and a few oats. At the very bottom right edge, a partly cropped ivory plate with scrambled eggs on toast. Both foods are softly out of focus, warm, natural and appetising. The centre 70 percent is completely empty cream tabletop, reserved for a phone. The entire top 40 percent is plain uninterrupted cream #FAF2E7, reserved for a headline, no food or shadows there. Gentle editorial food photography, low contrast, tasteful premium nutrition app campaign. No text, no letters, no UI, no phone, no logos, no packaging, no hands, no people, no bright accent colours. This is only the backdrop, never invent an app screen.
 

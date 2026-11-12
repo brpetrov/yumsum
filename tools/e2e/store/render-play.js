@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { pathToFileURL } = require('url');
 const { chromium } = require('playwright');
+const { renderFeatureGraphic } = require('../feature_shot');
 
 const dir = __dirname;
 const root = path.resolve(dir, '../../..');
@@ -369,11 +370,7 @@ async function main() {
       await page.evaluate(() => Promise.all([...document.images].map(img=>img.decode())));
       await page.screenshot({path:path.join(dir,'play-contact.png')});
       console.log('play-contact.png: 2250 x 500');
-      await page.setViewportSize({width:1024,height:500});
-      await page.goto(url('feature.html'));
-      await page.evaluate(() => window.ready);
-      await page.screenshot({path:path.join(dir,'feature-graphic.png')});
-      console.log('feature-graphic.png: 1024 x 500');
+      await renderFeatureGraphic(page);
     }
     fs.unlinkSync(path.join(dir, '.play-render.html'));
   } finally {
