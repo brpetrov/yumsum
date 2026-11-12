@@ -234,6 +234,7 @@ class _FakeSpeech extends Fake implements SpeechToText {
   final bool works;
   int starts = 0;
   SpeechResultListener? _onResult;
+  SpeechSoundLevelChange? onSoundLevel;
   SpeechListenOptions? options;
   bool stopped = false;
   bool cancelled = false;
@@ -271,6 +272,7 @@ class _FakeSpeech extends Fake implements SpeechToText {
     SpeechListenOptions? listenOptions,
   }) async {
     _onResult = onResult;
+    onSoundLevel = onSoundLevelChange;
     options = listenOptions;
   }
 
@@ -1371,7 +1373,22 @@ void main() {
     await tester.pump();
     expect(find.text(listening), findsOneWidget);
     expect(speech.options!.localeId, 'en-GB');
-    expect(speech.options!.pauseFor, const Duration(seconds: 3));
+    expect(speech.options!.pauseFor, const Duration(milliseconds: 2500));
+    // The mic bubble, swelling with the voice; the box wraps a long meal.
+    final bubble = find.byKey(const ValueKey('quick-log-listening'));
+    expect(bubble, findsOneWidget);
+    speech.onSoundLevel!(8);
+    await tester.pumpAndSettle();
+    final halo = tester.widget<Transform>(
+      find.descendant(of: bubble, matching: find.byType(Transform)).first,
+    );
+    expect(halo.transform.getMaxScaleOnAxis(), closeTo(1.2 + 0.8 * 0.7, 1e-6));
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const ValueKey('quick-log-name')))
+          .maxLines,
+      3,
+    );
 
     speech.say('two eggs');
     await tester.pump();
@@ -1381,6 +1398,7 @@ void main() {
     speech.say('two eggs on toast', last: true);
     await tester.pumpAndSettle();
     expect(find.text(listening), findsNothing);
+    expect(bubble, findsNothing);
     expect(estimateService.described, 'two eggs on toast');
     expect(boxes(tester).take(2), ['two eggs on toast', '520']);
     expect(estimateService.heard, isNull);

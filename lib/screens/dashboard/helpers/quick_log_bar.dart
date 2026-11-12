@@ -91,8 +91,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   static const _silenceAfterSpeech = Duration(milliseconds: 2500);
   static const _speechDbfs = -30.0;
   static const _silenceDbfs = -45.0;
-  // The recogniser stops after this long without new words.
-  static const _speechPause = Duration(seconds: 3);
+  // The recogniser stops after this long without new words (3 s felt like
+  // a wait, 12 November); Android's own silence cut can come sooner.
+  static const _speechPause = Duration(milliseconds: 2500);
   // Errors that mean nothing was said, rather than that it can't listen.
   static const _nothingSaid = {
     'error_no_match',
@@ -131,6 +132,9 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   AppLifecycleListener? _resumeListener;
 
   bool _listening = false;
+  // How loud the speaker is, 0 to 1, for the listening bubble; a notifier
+  // so the many updates a second repaint the bubble and nothing else.
+  final _level = ValueNotifier<double>(0);
   // The recogniser while it, rather than the recorder, is listening.
   SpeechToText? _speech;
   bool _working = false;
@@ -262,6 +266,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     for (final box in [_name, _kcal, _protein]) {
       box.dispose();
     }
+    _level.dispose();
     super.dispose();
   }
 
@@ -430,6 +435,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     _chunks.clear();
     _heardSpeech = false;
     _quietSince = null;
+    _level.value = 0;
     _fill('', null, null);
     setState(() {
       _listening = true;
@@ -486,6 +492,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       if (await speech.initialize()) {
         if (!mounted) return true;
         _fill('', null, null);
+        _level.value = 0;
         setState(() {
           _listening = true;
           _speech = speech;
@@ -494,6 +501,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
         });
         await speech.listen(
           onResult: _onWords,
+          onSoundLevelChange: _onSoundLevel,
           listenOptions: SpeechListenOptions(
             localeId: _speechLocale,
             listenFor: _maxRecording,
@@ -534,6 +542,16 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       );
     });
     if (result.finalResult) _finishSpeech();
+  }
+
+  /// The recogniser's sound level, for the bubble: Android reports RMS dB
+  /// from about -2 (silence) to 10, Apple dBFS, where speech sits between
+  /// -50 and -10; browsers report none, so there the bubble stays still.
+  void _onSoundLevel(double level) {
+    _level.value = switch (defaultTargetPlatform) {
+      TargetPlatform.android => level / 10,
+      _ => (level + 50) / 40,
+    }.clamp(0, 1);
   }
 
   /// The recogniser stopped by itself, after a pause or at the time cap.
@@ -577,8 +595,10 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     await _estimate();
   }
 
-  /// Ends the recording by itself after a pause, once something was said.
+  /// Ends the recording by itself after a pause, once something was said,
+  /// and moves the bubble meanwhile.
   void _onLevel(Amplitude level) {
+    _level.value = ((level.current + 50) / 40).clamp(0, 1);
     if (level.current >= _speechDbfs) _heardSpeech = true;
     if (level.current > _silenceDbfs) {
       _quietSince = null;
@@ -922,6 +942,11 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                                   focusNode: _focusNode,
                                   autofocus: _isDesktop,
                                   readOnly: _working || _listening,
+                                  // Wraps, so a whole spoken meal stays in
+                                  // view as it's said; Enter still submits.
+                                  keyboardType: TextInputType.text,
+                                  maxLines: 3,
+                                  minLines: 1,
                                   textCapitalization:
                                       TextCapitalization.sentences,
                                   textInputAction: TextInputAction.done,
@@ -1349,7 +1374,8 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     );
   }
 
-  /// Listening, working or what went wrong, and an AI result's breakdown.
+  /// Listening (the mic bubble, pulsing with the voice, over the line),
+  /// working or what went wrong, and an AI result's breakdown.
   Widget _buildStatus(bool showProtein) {
     final (String? message, Color color) = _listening
         ? (context.l10n.quickLogListening, AppColors.textSecondary)
@@ -1360,10 +1386,36 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     return Padding(
       padding: const EdgeInsets.only(left: 6, top: 4),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: _listening
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.start,
         children: [
+          if (_listening) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: _ListeningBubble(
+                key: const ValueKey('quick-log-listening'),
+                level: _level,
+                onTap: _toggleListening,
+                child: _glossy(
+                  enabled: true,
+                  shape: const CircleBorder(),
+                  child: SizedBox.square(
+                    dimension: 56,
+                    child: Icon(
+                      Icons.mic_rounded,
+                      size: 28,
+                      color: AppColors.onPrimary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
           if (message != null)
             Row(
+              mainAxisSize: _listening ? MainAxisSize.min : MainAxisSize.max,
               children: [
                 if (_working && !_listening) ...[
                   SizedBox.square(
@@ -1390,6 +1442,57 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
               showProtein: showProtein,
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// The mic while the bar listens: a soft halo behind [child] that grows
+/// with [level] (0 to 1), so it's plain the phone is hearing the speaker,
+/// like the phone's own voice dialog. A tap stops listening, as the stop
+/// button does.
+class _ListeningBubble extends StatelessWidget {
+  const _ListeningBubble({
+    super.key,
+    required this.level,
+    required this.onTap,
+    required this.child,
+  });
+
+  final ValueListenable<double> level;
+  final VoidCallback onTap;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: ValueListenableBuilder<double>(
+        valueListenable: level,
+        builder: (_, level, child) => TweenAnimationBuilder<double>(
+          // Eased between readings, so the halo swells rather than jumps.
+          tween: Tween(end: level),
+          duration: const Duration(milliseconds: 150),
+          builder: (_, level, child) => Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              Transform.scale(
+                scale: 1.2 + level * 0.7,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.primary.withValues(alpha: 0.18),
+                  ),
+                  child: const SizedBox.square(dimension: 56),
+                ),
+              ),
+              child!,
+            ],
+          ),
+          child: child,
+        ),
+        child: child,
       ),
     );
   }
