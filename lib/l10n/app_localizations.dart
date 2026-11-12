@@ -611,7 +611,7 @@ abstract class AppLocalizations {
   /// Adaptive formula dialog: third promise, its line.
   ///
   /// In en, this message translates to:
-  /// **'Your calorie needs can change as you lose weight. Your target adjusts to help you keep making progress.'**
+  /// **'Your calorie needs change as your weight does. Your target adjusts to help you keep making progress.'**
   String get adaptiveIntroChangeBody;
 
   /// Adaptive formula dialog: fourth promise, bold.
@@ -1571,13 +1571,13 @@ abstract class AppLocalizations {
   /// Macro guide dialog: what calories are.
   ///
   /// In en, this message translates to:
-  /// **'The energy in food. Eat less than you burn and you lose weight.'**
+  /// **'The energy in food. Eat less than you burn to lose weight, more to gain it.'**
   String get macroGuideCaloriesWhy;
 
   /// Macro guide dialog: how the calorie target is set, after Target:.
   ///
   /// In en, this message translates to:
-  /// **'What you burn in a day, from your age, height, weight and activity, with a little taken off if you\'re losing weight.'**
+  /// **'What you burn in a day, from your age, height, weight and activity, with a little taken off to lose weight or added to gain it.'**
   String get macroGuideCaloriesTarget;
 
   /// Macro guide dialog: group heading over protein and fibre, shown in capitals.
@@ -1607,7 +1607,7 @@ abstract class AppLocalizations {
   /// Macro guide dialog: what protein does.
   ///
   /// In en, this message translates to:
-  /// **'Keeps you full and protects your muscle while you lose fat.'**
+  /// **'Keeps you full and looks after your muscle.'**
   String get macroGuideProteinWhy;
 
   /// Macro guide dialog: protein's target, after Target:.
@@ -1892,7 +1892,7 @@ abstract class AppLocalizations {
   /// **'Most logged days were well above or below target.'**
   String get historyGuidanceMostOff;
 
-  /// History: month review note when the judged days averaged over 100 kcal above target, for someone keeping their weight.
+  /// History: month review note when the judged days averaged over 100 kcal above target, for someone keeping or gaining weight.
   ///
   /// In en, this message translates to:
   /// **'You averaged {kcal} kcal a day over your target.'**
@@ -1903,6 +1903,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You averaged {kcal} kcal a day over your target, so your goal date moves a little later.'**
   String historyGuidanceOverGoalDate(int kcal);
+
+  /// History: month review note when the judged days averaged over 100 kcal below target, for someone gaining weight.
+  ///
+  /// In en, this message translates to:
+  /// **'You averaged {kcal} kcal a day under your target, so your goal date moves a little later.'**
+  String historyGuidanceUnderGoalDate(int kcal);
 
   /// History: review note when too few days were logged.
   ///
@@ -3146,6 +3152,18 @@ abstract class AppLocalizations {
   /// **'Keeps your calories around maintenance instead of creating a deficit.'**
   String get planPaceMaintainHint;
 
+  /// Pace card: title; {amount} is 0.25 kg in the user's unit, e.g. "0.25 kg" or "0.55 lb".
+  ///
+  /// In en, this message translates to:
+  /// **'Gain - {amount}/week'**
+  String planPaceGain(String amount);
+
+  /// Pace card: text under Gain.
+  ///
+  /// In en, this message translates to:
+  /// **'A small calorie surplus for steady weight gain.'**
+  String get planPaceGainHint;
+
   /// Page shown when the profile doesn't load after sign-in: heading.
   ///
   /// In en, this message translates to:
@@ -3872,6 +3890,12 @@ abstract class AppLocalizations {
   /// **'Must be less than your current weight'**
   String get commonTargetBelowCurrent;
 
+  /// Onboarding and Plan Settings: the target weight is not above the current one, when gaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Must be more than your current weight'**
+  String get commonTargetAboveCurrent;
+
   /// Onboarding and Plan Settings: gender button.
   ///
   /// In en, this message translates to:
@@ -3947,7 +3971,7 @@ abstract class AppLocalizations {
   /// Onboarding: the line under What's your goal?
   ///
   /// In en, this message translates to:
-  /// **'A calorie is the energy in food. Eat a little less than your body burns and you lose weight, steadily and safely.'**
+  /// **'A calorie is the energy in food. Eat a little less than your body burns to lose weight, or a little more to gain it.'**
   String get onboardingGoalBody;
 
   /// Onboarding: goal toggle option.
@@ -3961,6 +3985,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keep my weight'**
   String get onboardingKeepWeight;
+
+  /// Onboarding: goal option.
+  ///
+  /// In en, this message translates to:
+  /// **'Gain weight'**
+  String get onboardingGainWeight;
 
   /// Onboarding: the quiet line under the goal choices.
   ///
@@ -4100,6 +4130,12 @@ abstract class AppLocalizations {
   /// **'A moderate deficit from estimated maintenance.'**
   String get planPreviewSafeNote;
 
+  /// Plan card: under Sustainable pace, when gaining.
+  ///
+  /// In en, this message translates to:
+  /// **'A small surplus over estimated maintenance.'**
+  String get planPreviewGainNote;
+
   /// Plan card: under Faster pace.
   ///
   /// In en, this message translates to:
@@ -4135,6 +4171,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Weekly loss'**
   String get planPreviewWeeklyLoss;
+
+  /// Plan card: small label over the weekly gain; a third of the card wide.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly gain'**
+  String get planPreviewWeeklyGain;
 
   /// Plan card: small label over the date the target weight is reached; a third of the card wide.
   ///
@@ -4343,13 +4385,13 @@ abstract class AppLocalizations {
   /// Plan Settings: under TRACK PROTEIN TOO?
   ///
   /// In en, this message translates to:
-  /// **'Protein helps keep muscle while you lose weight. Off hides it everywhere.'**
+  /// **'Protein helps you keep and build muscle. Off hides it everywhere.'**
   String get planProteinNote;
 
   /// Plan Settings: section label, in capitals.
   ///
   /// In en, this message translates to:
-  /// **'HOW FAST DO YOU WANT TO LOSE WEIGHT?'**
+  /// **'YOUR PACE'**
   String get planSectionPace;
 
   /// Plan Settings: under the pace section label.
@@ -4477,6 +4519,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'To lose {amount} a week.'**
   String adaptiveTargetLose(String amount);
+
+  /// Weight & Progress: under Your target, when gaining. {amount} is formatted in the user's unit, "0.25 kg".
+  ///
+  /// In en, this message translates to:
+  /// **'To gain {amount} a week.'**
+  String adaptiveTargetGain(String amount);
 
   /// The Adaptive formula's line on Home, Weight & Progress and Plan Settings when the last weigh-in is 10 days old.
   ///

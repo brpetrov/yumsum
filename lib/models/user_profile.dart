@@ -75,12 +75,15 @@ enum TrainingFrequency {
 const currentActivityScaleVersion = 3;
 const currentPlanCalculationVersion = 2;
 
-/// How quickly the user wants to lose weight — determines target date & deficit.
+/// The user's goal and how quickly: losing at one of three paces, keeping
+/// their weight, or gaining (one pace, 0.25 kg a week, since 12 November
+/// 2026). Determines the target date and the deficit or surplus.
 enum WeightLossPace {
   slow('slow'),
   moderate('moderate'),
   fast('fast'),
-  maintain('maintain');
+  maintain('maintain'),
+  gain('gain');
 
   const WeightLossPace(this.value);
   final String value;

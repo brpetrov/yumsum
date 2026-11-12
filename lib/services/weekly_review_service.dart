@@ -8,7 +8,7 @@ import 'package:lean_streak/services/calorie_estimate_service.dart';
 /// of each new review's `basis`. Saved weeks keep their original notes. The
 /// instruction (plan 09) is `weeklyReviewInstruction` in
 /// `functions/src/prompts.ts`, on the server with its response schema.
-const weeklyReviewPromptVersion = 11;
+const weeklyReviewPromptVersion = 12;
 
 /// The AI's answer had no note worth showing.
 class WeeklyReviewException implements Exception {

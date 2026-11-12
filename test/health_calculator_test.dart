@@ -233,6 +233,90 @@ void main() {
         now,
       );
     });
+
+    group('gain', () {
+      final now = DateTime(2026, 4, 21);
+      HealthPlanCalculation gain({
+        double currentWeightKg = 55,
+        double? targetWeightKg = 60,
+        double adaptiveKcal = 0,
+      }) => HealthCalculator.calculatePlan(
+        currentWeightKg: currentWeightKg,
+        targetWeightKg: targetWeightKg,
+        heightCm: 165,
+        age: 27,
+        gender: Gender.female,
+        activityLevel: ActivityLevel.sedentary,
+        trainingFrequency: TrainingFrequency.none,
+        weightLossPace: WeightLossPace.gain,
+        adaptiveKcal: adaptiveKcal,
+        now: now,
+      );
+
+      test('adds 275 to maintenance and counts the kg to gain', () {
+        final plan = gain();
+
+        expect(plan.isGaining, isTrue);
+        expect(plan.isMaintaining, isFalse);
+        expect(plan.tdee, closeTo(1606.5625, 0.001));
+        expect(plan.dailyCalorieTarget, closeTo(1881.5625, 0.001));
+        expect(plan.planCalorieTarget, plan.dailyCalorieTarget);
+        expect(plan.calorieTargetClamped, isFalse);
+        expect(plan.goalPaceKgPerWeek, 0.25);
+        expect(plan.goalPaceLevel, GoalPaceLevel.safe);
+        expect(plan.targetWeightKg, 60);
+        // 5 kg at 0.25 a week: 20 weeks.
+        expect(plan.targetDate, DateTime(2026, 9, 8));
+      });
+
+      test('never under the minimum, even with a large Adaptive cut', () {
+        // 1606.6 burn − 800 + 275 would be 1081.6, under the 1200 minimum.
+        expect(gain(adaptiveKcal: -800).dailyCalorieTarget, 1200);
+      });
+
+      test('already at or over the target, the goal date is today', () {
+        expect(gain(targetWeightKg: 55).targetDate, now);
+        expect(gain(currentWeightKg: 62).targetDate, now);
+        expect(gain(targetWeightKg: null).targetDate, now);
+      });
+
+      test('the Adaptive formula moves the burn and keeps the goal date', () {
+        final plain = gain();
+        for (final kcal in [-80.0, 120.0]) {
+          final adjusted = gain(adaptiveKcal: kcal);
+          expect(
+            adjusted.dailyCalorieTarget,
+            closeTo(plain.dailyCalorieTarget + kcal, 1e-9),
+          );
+          expect(adjusted.planCalorieTarget, plain.dailyCalorieTarget);
+          expect(adjusted.tdee, plain.tdee);
+          expect(adjusted.goalPaceKgPerWeek, 0.25);
+          expect(adjusted.calorieTargetClamped, isFalse);
+          expect(adjusted.targetDate, plain.targetDate);
+        }
+      });
+
+      test('the date from the pace counts up', () {
+        expect(
+          HealthCalculator.targetDateFromWeightLossPace(
+            70,
+            75,
+            WeightLossPace.gain,
+            now: now,
+          ),
+          DateTime(2026, 9, 8),
+        );
+        expect(
+          HealthCalculator.targetDateFromWeightLossPace(
+            75,
+            70,
+            WeightLossPace.gain,
+            now: now,
+          ),
+          now,
+        );
+      });
+    });
   });
 
   group("the Adaptive formula's adjustment", () {

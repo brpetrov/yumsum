@@ -395,11 +395,10 @@ class _PeriodReviewCard extends ConsumerWidget {
           ],
           l10n: l10n,
           month: isMonth,
-          losing: ref.watch(
+          goal: ref.watch(
             userProfileProvider.select(
               (profile) =>
-                  profile.valueOrNull?.weightLossPace !=
-                  WeightLossPace.maintain,
+                  profile.valueOrNull?.weightLossPace ?? WeightLossPace.slow,
             ),
           ),
         );

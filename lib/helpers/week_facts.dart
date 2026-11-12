@@ -43,6 +43,7 @@ const _weekdays = [
 
 final _number = NumberFormat('#,##0');
 final _tenths = NumberFormat('#,##0.#');
+final _hundredths = NumberFormat('#,##0.##');
 final _dateKey = DateFormat('yyyy-MM-dd');
 
 String _n(num value) => _number.format(value);
@@ -146,6 +147,15 @@ WeekFacts buildWeekFacts({
     'Logged ${logged.length} of 7 days.',
     'Daily calorie target: ${_n(target)} kcal. Minimum: ${_n(minimum)} kcal '
         'a day.',
+    switch (profile.weightLossPace) {
+      WeightLossPace.maintain => 'Goal: keep weight steady.',
+      WeightLossPace.gain =>
+        'Goal: gain weight, ${_hundredths.format(profile.goalPaceKgPerWeek)} '
+            'kg a week.',
+      _ =>
+        'Goal: lose weight, ${_hundredths.format(profile.goalPaceKgPerWeek)} '
+            'kg a week.',
+    },
     'Already on the card: ${_days(card.greenDays)} on track, '
         '${card.yellowDays} close, ${card.redDays} off track'
         '${card.daysOff > 0 ? '; ${_days(card.daysOff)} off' : ''}; average '

@@ -9,7 +9,8 @@ import 'package:lean_streak/widgets/clickable.dart';
 import 'package:lean_streak/widgets/icon_bubble.dart';
 
 // The form pieces onboarding and Plan Settings share: section labels, the
-// gender buttons and the cards for pace, daily movement and training.
+// gender buttons and the cards for the goal, pace, daily movement and
+// training.
 
 class SectionLabel extends StatelessWidget {
   const SectionLabel(this.text, {super.key});
@@ -202,6 +203,9 @@ class PaceCard extends StatelessWidget {
       formatPace(0.75, weightUnit, l10n),
     ),
     WeightLossPace.maintain => l10n.planPaceMaintain,
+    WeightLossPace.gain => l10n.planPaceGain(
+      formatPace(0.25, weightUnit, l10n),
+    ),
   };
 
   static String _description(AppLocalizations l10n, WeightLossPace pace) =>
@@ -210,6 +214,7 @@ class PaceCard extends StatelessWidget {
         WeightLossPace.moderate => l10n.planPaceModerateHint,
         WeightLossPace.fast => l10n.planPaceFastHint,
         WeightLossPace.maintain => l10n.planPaceMaintainHint,
+        WeightLossPace.gain => l10n.planPaceGainHint,
       };
 
   static IconData _icon(WeightLossPace pace) => switch (pace) {
@@ -217,6 +222,7 @@ class PaceCard extends StatelessWidget {
     WeightLossPace.moderate => Icons.trending_down_rounded,
     WeightLossPace.fast => Icons.bolt_rounded,
     WeightLossPace.maintain => Icons.horizontal_rule_rounded,
+    WeightLossPace.gain => Icons.trending_up_rounded,
   };
 
   @override
@@ -231,17 +237,60 @@ class PaceCard extends StatelessWidget {
   }
 }
 
+/// Onboarding's goal: lose ([WeightLossPace.moderate] until Plan Settings
+/// changes the pace), keep ([WeightLossPace.maintain]) or gain
+/// ([WeightLossPace.gain]).
+class GoalCard extends StatelessWidget {
+  const GoalCard({
+    super.key,
+    required this.goal,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final WeightLossPace goal;
+  final bool selected;
+  final VoidCallback onTap;
+
+  static String _title(AppLocalizations l10n, WeightLossPace goal) =>
+      switch (goal) {
+        WeightLossPace.slow ||
+        WeightLossPace.moderate ||
+        WeightLossPace.fast => l10n.onboardingLoseWeight,
+        WeightLossPace.maintain => l10n.onboardingKeepWeight,
+        WeightLossPace.gain => l10n.onboardingGainWeight,
+      };
+
+  static IconData _icon(WeightLossPace goal) => switch (goal) {
+    WeightLossPace.slow ||
+    WeightLossPace.moderate ||
+    WeightLossPace.fast => Icons.trending_down_rounded,
+    WeightLossPace.maintain => Icons.horizontal_rule_rounded,
+    WeightLossPace.gain => Icons.trending_up_rounded,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return _SelectionCard(
+      title: _title(context.l10n, goal),
+      icon: _icon(goal),
+      selected: selected,
+      onTap: onTap,
+    );
+  }
+}
+
 class _SelectionCard extends StatelessWidget {
   const _SelectionCard({
     required this.title,
-    required this.description,
+    this.description,
     required this.icon,
     required this.selected,
     required this.onTap,
   });
 
   final String title;
-  final String description;
+  final String? description;
   final IconData icon;
   final bool selected;
   final VoidCallback onTap;
@@ -295,14 +344,16 @@ class _SelectionCard extends StatelessWidget {
                           : AppColors.textPrimary,
                     ),
                   ),
-                  SizedBox(height: 2),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
+                  if (description case final description?) ...[
+                    SizedBox(height: 2),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),

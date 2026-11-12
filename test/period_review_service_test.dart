@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/period_review.dart';
+import 'package:lean_streak/models/user_profile.dart';
 import 'package:lean_streak/services/period_review_service.dart';
 
 void main() {
@@ -122,14 +123,18 @@ void main() {
       PeriodReview review(
         List<DailySummary> summaries, {
         bool month = true,
-        bool losing = true,
+        WeightLossPace goal = WeightLossPace.moderate,
       }) => PeriodReviewService().buildReview(
         startDate: DateTime(2026, 11, 1),
         endDate: DateTime(2026, 11, 30),
         summaries: summaries,
         month: month,
-        losing: losing,
+        goal: goal,
       );
+
+      const under =
+          'You averaged 140 kcal a day under your target, so your goal '
+          'date moves a little later.';
 
       test('a month over by more than 100 a day says the date moves', () {
         expect(review(days(10, 1800)).guidance, contains(over));
@@ -137,9 +142,36 @@ void main() {
 
       test('keeping weight, it leaves the goal date out', () {
         expect(
-          review(days(10, 1800), losing: false).guidance,
+          review(days(10, 1800), goal: WeightLossPace.maintain).guidance,
           contains('You averaged 140 kcal a day over your target.'),
         );
+      });
+
+      test('gaining, over target has no date, under moves it later', () {
+        const gain = WeightLossPace.gain;
+        expect(
+          review(days(10, 1800), goal: gain).guidance,
+          contains('You averaged 140 kcal a day over your target.'),
+        );
+        expect(review(days(10, 1520), goal: gain).guidance, contains(under));
+      });
+
+      test('under target is left alone when losing or keeping', () {
+        for (final goal in [WeightLossPace.moderate, WeightLossPace.maintain]) {
+          expect(
+            review(days(10, 1520), goal: goal).guidance,
+            isNot(contains(under)),
+          );
+        }
+      });
+
+      test('gaining, not at 100 under, in a week, or before 7 days', () {
+        const gain = WeightLossPace.gain;
+        bool noted(PeriodReview review) =>
+            review.guidance.any((note) => note.startsWith('You averaged'));
+        expect(noted(review(days(10, 1560), goal: gain)), isFalse);
+        expect(noted(review(days(7, 1500), month: false, goal: gain)), isFalse);
+        expect(noted(review(days(6, 1500), goal: gain)), isFalse);
       });
 
       test('not at 100 over, in a week, or before 7 judged days', () {

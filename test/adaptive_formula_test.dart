@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lean_streak/helpers/adaptive_formula.dart';
 import 'package:lean_streak/helpers/health_calculator.dart';
@@ -535,6 +537,55 @@ void main() {
         ).adjustment,
         30,
       );
+    });
+  });
+
+  group('gaining', () {
+    // Your plan's man gaining 0.25 kg a week towards 86 kg: 2495 + 275.
+    final profile = planProfile(pace: WeightLossPace.gain, targetKg: 86);
+    SimRun gain(double burnOffset) =>
+        simulate(Scenario(profile: profile, weeks: 8, burnOffset: burnOffset));
+
+    test('it measures either way: steps down when gaining faster, up when '
+        'slower', () {
+      expect(
+        AdaptiveFormula.planOf(profile).dailyCalorieTarget,
+        closeTo(2770, 1),
+      );
+      final faster = gain(-227);
+      expect(faster.mondays.map((m) => m.note), [
+        _firstSign,
+        ...List.filled(5, _lowered),
+        _steady,
+      ]);
+      expect(faster.mondays.map((m) => m.adjustment), [
+        0,
+        -70,
+        -110,
+        -150,
+        -190,
+        -230,
+        -230,
+      ]);
+      expect(gain(218).mondays.map((m) => m.adjustment), [
+        30,
+        70,
+        110,
+        140,
+        180,
+        220,
+        220,
+      ]);
+    });
+
+    test('the fast pace\'s floor is far under, so the 15% limit bounds it', () {
+      expect(AdaptiveFormula.lowestAdjustment(profile), -1150);
+      final run = gain(-600);
+      expect(run.mondays.map((m) => m.adjustment).reduce(math.min), -420);
+      for (final m in run.mondays) {
+        final plan = m.target - m.adjustment;
+        expect(m.adjustment, greaterThanOrEqualTo(-0.15 * plan));
+      }
     });
   });
 

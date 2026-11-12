@@ -38,6 +38,7 @@ class HealthPlanPreviewCard extends StatelessWidget {
   String _paceMessage(AppLocalizations l10n) {
     if (preview.isMaintaining) return l10n.planPreviewMaintenanceNote;
     if (preview.calorieTargetClamped) return l10n.planPreviewFloorNote;
+    if (preview.isGaining) return l10n.planPreviewGainNote;
     return switch (preview.goalPaceLevel) {
       GoalPaceLevel.safe => l10n.planPreviewSafeNote,
       GoalPaceLevel.caution => l10n.planPreviewCautionNote,
@@ -67,7 +68,9 @@ class HealthPlanPreviewCard extends StatelessWidget {
         value: l10n.commonKcal(preview.dailyCalorieTarget.round()),
       ),
       _PlanMetric(
-        label: l10n.planPreviewWeeklyLoss,
+        label: preview.isGaining
+            ? l10n.planPreviewWeeklyGain
+            : l10n.planPreviewWeeklyLoss,
         value: _weeklyLossLabel(l10n),
       ),
       _PlanMetric(label: l10n.planPreviewGoalBy, value: _goalDateLabel(l10n)),
@@ -166,6 +169,9 @@ class _CalculationInfoDialog extends StatelessWidget {
         .toDouble();
   }
 
+  double get _dailySurplus =>
+      preview.dailyCalorieTarget - preview.tdee - preview.adaptiveKcal;
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -181,6 +187,8 @@ class _CalculationInfoDialog extends StatelessWidget {
         ? preview.calorieTargetClamped
               ? l10n.planInfoAtMinimum(target)
               : '$burn = $perDay'
+        : preview.isGaining
+        ? '$burn + ${_dailySurplus.round()} = $perDay'
         : '$burn - ${_dailyDeficit.round()} = $perDay';
     String times(double multiplier) => l10n.decimal(multiplier, 2);
 

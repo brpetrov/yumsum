@@ -111,15 +111,23 @@ class AdaptiveSection extends ConsumerWidget {
           color: AppColors.primary,
           sentence: l10n.adaptiveTargetFact,
           kcal: profile.dailyCalorieTarget.round(),
-          note: profile.weightLossPace == WeightLossPace.maintain
-              ? l10n.adaptiveTargetKeep
-              : l10n.adaptiveTargetLose(
-                  formatPace(
-                    profile.goalPaceKgPerWeek,
-                    ref.watch(weightUnitProvider),
-                    l10n,
-                  ),
-                ),
+          note: switch (profile.weightLossPace) {
+            WeightLossPace.maintain => l10n.adaptiveTargetKeep,
+            WeightLossPace.gain => l10n.adaptiveTargetGain(
+              formatPace(
+                profile.goalPaceKgPerWeek,
+                ref.watch(weightUnitProvider),
+                l10n,
+              ),
+            ),
+            _ => l10n.adaptiveTargetLose(
+              formatPace(
+                profile.goalPaceKgPerWeek,
+                ref.watch(weightUnitProvider),
+                l10n,
+              ),
+            ),
+          },
         ),
         if (progress != null) ...[
           if (adaptivePausedLine(progress, l10n) case final paused?) ...[

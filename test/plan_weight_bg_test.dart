@@ -227,7 +227,10 @@ void main() {
       expect(find.text('Каква е целта ти?'), findsOneWidget);
       expect(find.text('Отслабване'), findsOneWidget);
       expect(find.text('Поддържане'), findsOneWidget);
-      expect(find.textContaining('Калориите измерват енергията'), findsOneWidget);
+      expect(
+        find.textContaining('Калориите измерват енергията'),
+        findsOneWidget,
+      );
       fits(tester);
       await next(tester);
 
@@ -273,6 +276,58 @@ void main() {
       expect(find.text('Обща активност'), findsOneWidget);
       expect(find.textContaining('ккал/ден'), findsWidgets);
       expect(find.text('Разбрах'), findsOneWidget);
+      fits(tester);
+    });
+
+    testWidgets('gaining: the three goals, the target over, the plan', (
+      tester,
+    ) async {
+      await pump(tester);
+      await type(tester, 'Име', 'Мария');
+      await next(tester);
+      await tester.tap(find.text('Жена'));
+      await tester.pump();
+      await next(tester);
+      await type(tester, 'Възраст', '34');
+      await next(tester);
+      await type(tester, 'Ръст', '168');
+      await next(tester);
+      await type(tester, 'Сегашно тегло', '58');
+      await next(tester);
+
+      expect(find.text('Каква е целта ти?'), findsOneWidget);
+      expect(find.text('Отслабване'), findsOneWidget);
+      expect(find.text('Поддържане'), findsOneWidget);
+      expect(find.text('Качване на тегло'), findsOneWidget);
+      expect(find.textContaining('„Настройки на плана“'), findsOneWidget);
+      fits(tester);
+      await tester.tap(find.text('Качване на тегло'));
+      await tester.pumpAndSettle();
+      fits(tester);
+      await next(tester);
+
+      await type(tester, 'Желано тегло', '55');
+      expect(find.text('Трябва да е над сегашното ти тегло'), findsOneWidget);
+      fits(tester);
+      await type(tester, 'Желано тегло', '62');
+      await next(tester);
+      await next(tester);
+      await next(tester);
+      await next(tester);
+
+      expect(find.text('Планът ти е готов!'), findsOneWidget);
+      expect(find.text('Темпо'), findsOneWidget);
+      expect(find.text('0,25 кг/седм.'), findsOneWidget);
+      expect(find.text('Устойчиво темпо'), findsOneWidget);
+      expect(
+        find.text('Малък излишък спрямо калориите за поддържане на теглото.'),
+        findsOneWidget,
+      );
+      fits(tester);
+
+      await tester.tap(find.byTooltip('Как се изчислява'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining(' + 275 = '), findsOneWidget);
       fits(tester);
     });
 
@@ -353,10 +408,7 @@ void main() {
       expect(find.text('27,6', skipOffstage: false), findsOneWidget);
       expect(find.text('Наднормено тегло', skipOffstage: false), findsOne);
       expect(find.text('18,5', skipOffstage: false), findsOneWidget);
-      expect(
-        find.text('КОЛКО БЪРЗО ИСКАШ ДА ОТСЛАБНЕШ?', skipOffstage: false),
-        findsOneWidget,
-      );
+      expect(find.text('ТВОЕТО ТЕМПО', skipOffstage: false), findsOneWidget);
       expect(
         find.text('Бързо – 0,75 кг седмично', skipOffstage: false),
         findsOneWidget,

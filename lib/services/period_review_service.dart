@@ -3,18 +3,20 @@ import 'package:flutter/widgets.dart';
 import 'package:lean_streak/l10n/app_localizations.dart';
 import 'package:lean_streak/models/daily_summary.dart';
 import 'package:lean_streak/models/period_review.dart';
+import 'package:lean_streak/models/user_profile.dart';
 
 class PeriodReviewService {
   /// The [PeriodReview.guidance] is in [l10n]'s language, English when not
   /// given. A [month] also says when its days ran over target on average,
-  /// and for someone [losing] weight that the goal date moves later.
+  /// and for someone losing weight that the goal date moves later; for
+  /// someone gaining, it says when they ran under, which moves the date.
   PeriodReview buildReview({
     required DateTime startDate,
     required DateTime endDate,
     required List<DailySummary> summaries,
     AppLocalizations? l10n,
     bool month = false,
-    bool losing = false,
+    WeightLossPace goal = WeightLossPace.maintain,
   }) {
     final sortedSummaries = [...summaries]
       ..sort((a, b) => a.date.compareTo(b.date));
@@ -95,7 +97,7 @@ class PeriodReviewService {
         daysInPeriod: daysInPeriod,
         loggedDays: loggedDays,
         averageOver: averageOver,
-        losing: losing,
+        goal: goal,
       ),
     );
   }
@@ -110,7 +112,7 @@ class PeriodReviewService {
     required int daysInPeriod,
     required int loggedDays,
     required int averageOver,
-    required bool losing,
+    required WeightLossPace goal,
   }) {
     final guidance = <String>[];
 
@@ -127,7 +129,11 @@ class PeriodReviewService {
       guidance.add(l10n.historyGuidanceMostOff);
     }
 
-    if (averageOver > 100) {
+    if (goal == WeightLossPace.gain && averageOver < -100) {
+      guidance.add(l10n.historyGuidanceUnderGoalDate(-averageOver));
+    } else if (averageOver > 100) {
+      final losing =
+          goal != WeightLossPace.maintain && goal != WeightLossPace.gain;
       guidance.add(
         losing
             ? l10n.historyGuidanceOverGoalDate(averageOver)

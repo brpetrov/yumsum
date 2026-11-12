@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/core/theme/app_theme.dart';
 import 'package:lean_streak/models/entitlement.dart';
 import 'package:lean_streak/models/units.dart';
@@ -211,6 +212,47 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Log my weight'), findsOneWidget);
     expect(find.text('Become a Star'), findsNothing);
+  });
+
+  testWidgets('the target says to gain, to keep or to lose', (tester) async {
+    await pumpScreen(
+      tester,
+      profile: planProfile(pace: WeightLossPace.gain, targetKg: 85),
+      entitlement: _plus,
+    );
+    expect(find.text('To gain 0.25 kg a week.'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    await pumpScreen(
+      tester,
+      profile: planProfile(pace: WeightLossPace.maintain, targetKg: 79.8),
+      entitlement: _plus,
+    );
+    expect(find.text('To keep your weight steady.'), findsOneWidget);
+  });
+
+  testWidgets('the change is green going up for a gain goal, down for a loss', (
+    tester,
+  ) async {
+    Color? changeColour(String text) =>
+        tester.widget<Text>(find.text(text)).style?.color;
+
+    final up = [_entry('2026-10-01', 70.0), _entry('2026-10-08', 70.8)];
+    final down = [_entry('2026-10-01', 86.0), _entry('2026-10-08', 85.2)];
+    final gain = planProfile(pace: WeightLossPace.gain, targetKg: 85);
+
+    await tester.pumpWidget(const SizedBox());
+    await pumpScreen(tester, profile: gain, entries: up);
+    expect(changeColour('+0.8 kg'), AppColors.veryGood);
+    await tester.pumpWidget(const SizedBox());
+    await pumpScreen(tester, profile: gain, entries: down);
+    expect(changeColour('-0.8 kg'), AppColors.bad);
+
+    await tester.pumpWidget(const SizedBox());
+    await pumpScreen(tester, profile: planProfile(), entries: down);
+    expect(changeColour('-0.8 kg'), AppColors.veryGood);
+    await tester.pumpWidget(const SizedBox());
+    await pumpScreen(tester, profile: planProfile(), entries: up);
+    expect(changeColour('+0.8 kg'), AppColors.bad);
   });
 
   testWidgets('a new member\'s burn is a first estimate', (tester) async {

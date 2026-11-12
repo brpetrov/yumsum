@@ -318,7 +318,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get adaptiveIntroChangeBody =>
-      'Нуждата ти от калории се променя, докато сваляш килограми. Целта ти се настройва, за да продължиш да напредваш.';
+      'Нуждата ти от калории се променя заедно с теглото ти. Целта ти се настройва, за да продължиш да напредваш.';
 
   @override
   String get adaptiveIntroWeighTitle => 'Всяко претегляне е важно';
@@ -926,11 +926,11 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get macroGuideCaloriesWhy =>
-      'Калориите измерват енергията в храната. Отслабваш, когато приемаш по-малко калории, отколкото изгаряш.';
+      'Калориите измерват енергията в храната. Отслабваш, когато приемаш по-малко калории, отколкото изгаряш, и качваш, когато приемаш повече.';
 
   @override
   String get macroGuideCaloriesTarget =>
-      'Изчисляваме дневния ти разход според възрастта, ръста, теглото и активността ти. За отслабване задаваме малко по-ниска цел.';
+      'Изчисляваме дневния ти разход според възрастта, ръста, теглото и активността ти. За отслабване задаваме малко по-ниска цел, а за качване – малко по-висока.';
 
   @override
   String get macroGuideAimFor => 'Стреми се към';
@@ -946,8 +946,7 @@ class AppLocalizationsBg extends AppLocalizations {
       'Не надвишавай посочените количества. Редовното превишаване вреди на зъбите и сърцето и повишава кръвното налягане.';
 
   @override
-  String get macroGuideProteinWhy =>
-      'Засища и пази мускулите, докато изгаряш мазнини.';
+  String get macroGuideProteinWhy => 'Засища и пази мускулите.';
 
   @override
   String get macroGuideProteinTarget =>
@@ -1139,6 +1138,11 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String historyGuidanceOverGoalDate(int kcal) {
     return 'Средно калориите ти са с $kcal ккал на ден над целта, затова срокът за желаното тегло леко се удължава.';
+  }
+
+  @override
+  String historyGuidanceUnderGoalDate(int kcal) {
+    return 'Средно калориите ти са с $kcal ккал на ден под целта, затова срокът за желаното тегло леко се удължава.';
   }
 
   @override
@@ -1937,6 +1941,15 @@ class AppLocalizationsBg extends AppLocalizations {
       'Приемаш приблизително толкова калории, колкото изгаряш, без дефицит.';
 
   @override
+  String planPaceGain(String amount) {
+    return 'Качване – $amount седмично';
+  }
+
+  @override
+  String get planPaceGainHint =>
+      'Малък калориен излишък за постепенно качване на тегло.';
+
+  @override
   String get profileErrorLoadTitle => 'Не успяхме да заредим профила ти';
 
   @override
@@ -2344,6 +2357,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get commonTargetBelowCurrent => 'Трябва да е под сегашното ти тегло';
 
   @override
+  String get commonTargetAboveCurrent => 'Трябва да е над сегашното ти тегло';
+
+  @override
   String get commonMale => 'Мъж';
 
   @override
@@ -2381,13 +2397,16 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get onboardingGoalBody =>
-      'Калориите измерват енергията в храната. Когато приемаш малко по-малко, отколкото изгаряш, отслабваш постепенно и безопасно.';
+      'Калориите измерват енергията в храната. Яж малко по-малко, отколкото изгаряш, за да отслабнеш, или малко повече, за да качиш тегло.';
 
   @override
   String get onboardingLoseWeight => 'Отслабване';
 
   @override
   String get onboardingKeepWeight => 'Поддържане';
+
+  @override
+  String get onboardingGainWeight => 'Качване на тегло';
 
   @override
   String get onboardingGoalNote =>
@@ -2464,6 +2483,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'Умерен дефицит спрямо калориите за поддържане на теглото.';
 
   @override
+  String get planPreviewGainNote =>
+      'Малък излишък спрямо калориите за поддържане на теглото.';
+
+  @override
   String get planPreviewCautionNote =>
       'Изисква постоянство и по-строги ограничения в храненето.';
 
@@ -2484,6 +2507,9 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get planPreviewWeeklyLoss => 'Темпо';
+
+  @override
+  String get planPreviewWeeklyGain => 'Темпо';
 
   @override
   String get planPreviewGoalBy => 'Очаквана дата';
@@ -2598,10 +2624,10 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get planProteinNote =>
-      'Протеинът помага да запазиш мускулите, докато отслабваш. Ако избереш „Не“, данните за протеин няма да се показват в приложението.';
+      'Протеинът помага да запазиш и изградиш мускули. Ако избереш „Не“, данните за протеин няма да се показват в приложението.';
 
   @override
-  String get planSectionPace => 'КОЛКО БЪРЗО ИСКАШ ДА ОТСЛАБНЕШ?';
+  String get planSectionPace => 'ТВОЕТО ТЕМПО';
 
   @override
   String get planPaceNote =>
@@ -2676,6 +2702,11 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String adaptiveTargetLose(String amount) {
     return 'За да сваляш по $amount седмично.';
+  }
+
+  @override
+  String adaptiveTargetGain(String amount) {
+    return 'За да качваш по $amount седмично.';
   }
 
   @override

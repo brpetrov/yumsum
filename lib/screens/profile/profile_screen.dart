@@ -49,6 +49,13 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
   WeightLossPace _weightLossPace = WeightLossPace.moderate;
   bool _trackProtein = true;
 
+  bool get _gaining => _weightLossPace == WeightLossPace.gain;
+
+  /// A target the goal can't reach: not under the current weight when
+  /// losing, not over it when gaining.
+  bool _wrongSide(double target, double current) =>
+      _gaining ? target <= current : target >= current;
+
   double? get _currentBmi {
     final currentWeight = _currentWeight.value;
     final height = _height.value;
@@ -90,7 +97,7 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
     final isMaintaining = _weightLossPace == WeightLossPace.maintain;
     final targetWeight = isMaintaining ? null : _targetWeight.value;
     if (!isMaintaining &&
-        (targetWeight == null || targetWeight >= currentWeight)) {
+        (targetWeight == null || _wrongSide(targetWeight, currentWeight))) {
       return null;
     }
 
@@ -133,7 +140,17 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
   }
 
   Future<void> _submit(UserProfile profile) async {
-    if (!_formKey.currentState!.validate()) return;
+    final invalid = _formKey.currentState!.validateGranularly();
+    if (invalid.isNotEmpty) {
+      // The error may be far above Save (a goal switched between losing and
+      // gaining leaves the target on the wrong side), so bring it into view.
+      Scrollable.ensureVisible(
+        invalid.first.context,
+        duration: const Duration(milliseconds: 300),
+        alignment: 0.2,
+      );
+      return;
+    }
     if (_gender == null) {
       _showSnack(context.l10n.planSelectGender);
       return;
@@ -359,8 +376,10 @@ class _PlanSettingsScreenState extends ConsumerState<PlanSettingsScreen> {
                             if (error != null) return error;
                             final current = _currentWeight.value;
                             if (current != null &&
-                                _targetWeight.value! >= current) {
-                              return l10n.commonTargetBelowCurrent;
+                                _wrongSide(_targetWeight.value!, current)) {
+                              return _gaining
+                                  ? l10n.commonTargetAboveCurrent
+                                  : l10n.commonTargetBelowCurrent;
                             }
                             return null;
                           },

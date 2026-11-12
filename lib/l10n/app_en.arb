@@ -399,7 +399,7 @@
   "@adaptiveIntroChangeTitle": {
     "description": "Adaptive formula dialog: third promise, bold."
   },
-  "adaptiveIntroChangeBody": "Your calorie needs can change as you lose weight. Your target adjusts to help you keep making progress.",
+  "adaptiveIntroChangeBody": "Your calorie needs change as your weight does. Your target adjusts to help you keep making progress.",
   "@adaptiveIntroChangeBody": {
     "description": "Adaptive formula dialog: third promise, its line."
   },
@@ -1155,11 +1155,11 @@
   "@macroGuideCalories": {
     "description": "Macro guide dialog: the calories heading."
   },
-  "macroGuideCaloriesWhy": "The energy in food. Eat less than you burn and you lose weight.",
+  "macroGuideCaloriesWhy": "The energy in food. Eat less than you burn to lose weight, more to gain it.",
   "@macroGuideCaloriesWhy": {
     "description": "Macro guide dialog: what calories are."
   },
-  "macroGuideCaloriesTarget": "What you burn in a day, from your age, height, weight and activity, with a little taken off if you're losing weight.",
+  "macroGuideCaloriesTarget": "What you burn in a day, from your age, height, weight and activity, with a little taken off to lose weight or added to gain it.",
   "@macroGuideCaloriesTarget": {
     "description": "Macro guide dialog: how the calorie target is set, after Target:."
   },
@@ -1179,7 +1179,7 @@
   "@macroGuideKeepUnderNote": {
     "description": "Macro guide dialog: under the Keep under heading."
   },
-  "macroGuideProteinWhy": "Keeps you full and protects your muscle while you lose fat.",
+  "macroGuideProteinWhy": "Keeps you full and looks after your muscle.",
   "@macroGuideProteinWhy": {
     "description": "Macro guide dialog: what protein does."
   },
@@ -1437,7 +1437,7 @@
   },
   "historyGuidanceOver": "You averaged {kcal} kcal a day over your target.",
   "@historyGuidanceOver": {
-    "description": "History: month review note when the judged days averaged over 100 kcal above target, for someone keeping their weight.",
+    "description": "History: month review note when the judged days averaged over 100 kcal above target, for someone keeping or gaining weight.",
     "placeholders": {
       "kcal": {
         "type": "int"
@@ -1447,6 +1447,15 @@
   "historyGuidanceOverGoalDate": "You averaged {kcal} kcal a day over your target, so your goal date moves a little later.",
   "@historyGuidanceOverGoalDate": {
     "description": "History: month review note when the judged days averaged over 100 kcal above target, for someone losing weight.",
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
+  },
+  "historyGuidanceUnderGoalDate": "You averaged {kcal} kcal a day under your target, so your goal date moves a little later.",
+  "@historyGuidanceUnderGoalDate": {
+    "description": "History: month review note when the judged days averaged over 100 kcal below target, for someone gaining weight.",
     "placeholders": {
       "kcal": {
         "type": "int"
@@ -2515,6 +2524,19 @@
   "@planPaceMaintainHint": {
     "description": "Pace card: text under Maintain weight."
   },
+  "planPaceGain": "Gain - {amount}/week",
+  "@planPaceGain": {
+    "description": "Pace card: title; {amount} is 0.25 kg in the user's unit, e.g. \"0.25 kg\" or \"0.55 lb\".",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "planPaceGainHint": "A small calorie surplus for steady weight gain.",
+  "@planPaceGainHint": {
+    "description": "Pace card: text under Gain."
+  },
   "profileErrorLoadTitle": "Could not load your profile",
   "@profileErrorLoadTitle": {
     "description": "Page shown when the profile doesn't load after sign-in: heading."
@@ -3058,6 +3080,10 @@
   "@commonTargetBelowCurrent": {
     "description": "Onboarding and Plan Settings: the target weight is not below the current one."
   },
+  "commonTargetAboveCurrent": "Must be more than your current weight",
+  "@commonTargetAboveCurrent": {
+    "description": "Onboarding and Plan Settings: the target weight is not above the current one, when gaining."
+  },
   "commonMale": "Male",
   "@commonMale": {
     "description": "Onboarding and Plan Settings: gender button."
@@ -3106,7 +3132,7 @@
   "@onboardingGoalTitle": {
     "description": "Onboarding card heading."
   },
-  "onboardingGoalBody": "A calorie is the energy in food. Eat a little less than your body burns and you lose weight, steadily and safely.",
+  "onboardingGoalBody": "A calorie is the energy in food. Eat a little less than your body burns to lose weight, or a little more to gain it.",
   "@onboardingGoalBody": {
     "description": "Onboarding: the line under What's your goal?"
   },
@@ -3117,6 +3143,10 @@
   "onboardingKeepWeight": "Keep my weight",
   "@onboardingKeepWeight": {
     "description": "Onboarding: goal toggle option."
+  },
+  "onboardingGainWeight": "Gain weight",
+  "@onboardingGainWeight": {
+    "description": "Onboarding: goal option."
   },
   "onboardingGoalNote": "You can change this any time in Plan Settings.",
   "@onboardingGoalNote": {
@@ -3210,6 +3240,10 @@
   "@planPreviewSafeNote": {
     "description": "Plan card: under Sustainable pace."
   },
+  "planPreviewGainNote": "A small surplus over estimated maintenance.",
+  "@planPreviewGainNote": {
+    "description": "Plan card: under Sustainable pace, when gaining."
+  },
   "planPreviewCautionNote": "This needs consistency and may feel restrictive.",
   "@planPreviewCautionNote": {
     "description": "Plan card: under Faster pace."
@@ -3238,6 +3272,10 @@
   "planPreviewWeeklyLoss": "Weekly loss",
   "@planPreviewWeeklyLoss": {
     "description": "Plan card: small label over the weekly loss; a third of the card wide."
+  },
+  "planPreviewWeeklyGain": "Weekly gain",
+  "@planPreviewWeeklyGain": {
+    "description": "Plan card: small label over the weekly gain; a third of the card wide."
   },
   "planPreviewGoalBy": "Goal by",
   "@planPreviewGoalBy": {
@@ -3385,11 +3423,11 @@
   "@planSectionProtein": {
     "description": "Plan Settings: section label, in capitals."
   },
-  "planProteinNote": "Protein helps keep muscle while you lose weight. Off hides it everywhere.",
+  "planProteinNote": "Protein helps you keep and build muscle. Off hides it everywhere.",
   "@planProteinNote": {
     "description": "Plan Settings: under TRACK PROTEIN TOO?"
   },
-  "planSectionPace": "HOW FAST DO YOU WANT TO LOSE WEIGHT?",
+  "planSectionPace": "YOUR PACE",
   "@planSectionPace": {
     "description": "Plan Settings: section label, in capitals."
   },
@@ -3486,6 +3524,15 @@
   "adaptiveTargetLose": "To lose {amount} a week.",
   "@adaptiveTargetLose": {
     "description": "Weight & Progress: under Your target. {amount} is formatted in the user's unit, \"0.5 kg\".",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "adaptiveTargetGain": "To gain {amount} a week.",
+  "@adaptiveTargetGain": {
+    "description": "Weight & Progress: under Your target, when gaining. {amount} is formatted in the user's unit, \"0.25 kg\".",
     "placeholders": {
       "amount": {
         "type": "String"

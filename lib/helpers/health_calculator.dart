@@ -109,22 +109,27 @@ class HealthCalculator {
       WeightLossPace.moderate => 0.50,
       WeightLossPace.fast => 0.75,
       WeightLossPace.maintain => 0.0,
+      WeightLossPace.gain => 0.25,
     };
   }
 
+  /// The day the kg to lose (or, [gaining], to gain) are done at
+  /// [paceKgPerWeek]; today when there are none.
   static DateTime targetDateFromPaceKgPerWeek(
     double currentWeightKg,
     double targetWeightKg,
     double paceKgPerWeek, {
+    bool gaining = false,
     DateTime? now,
   }) {
     final anchor = now ?? DateTime.now();
-    final totalKgToLose = (currentWeightKg - targetWeightKg).clamp(
-      0,
-      double.infinity,
-    );
-    if (paceKgPerWeek <= 0 || totalKgToLose <= 0) return anchor;
-    final daysNeeded = ((totalKgToLose / paceKgPerWeek) * 7).ceil();
+    final totalKgToGo =
+        (gaining
+                ? targetWeightKg - currentWeightKg
+                : currentWeightKg - targetWeightKg)
+            .clamp(0, double.infinity);
+    if (paceKgPerWeek <= 0 || totalKgToGo <= 0) return anchor;
+    final daysNeeded = ((totalKgToGo / paceKgPerWeek) * 7).ceil();
     return DateTime(anchor.year, anchor.month, anchor.day + daysNeeded);
   }
 
@@ -139,6 +144,7 @@ class HealthCalculator {
       currentWeightKg,
       targetWeightKg,
       goalPaceFromWeightLossPace(pace),
+      gaining: pace == WeightLossPace.gain,
       now: now,
     );
   }
@@ -187,6 +193,9 @@ class HealthCalculator {
   /// burn (docs/plans/08-adaptive-formula.md, step 9). It goes in before the
   /// minimum, so away from it the target moves by the same amount and the
   /// goal date stays; at the minimum the pace drops and the date moves later.
+  /// A gain is the burn plus the surplus for its pace, by the same 1100 kcal
+  /// a day per kg a week as a cut, never under the minimum Keep my weight
+  /// has (only a small person with a large Adaptive cut could reach it).
   static HealthPlanCalculation calculatePlan({
     required double currentWeightKg,
     required double? targetWeightKg,
@@ -208,10 +217,12 @@ class HealthCalculator {
     final calcTdee = tdee(calcBmr, activityLevel, trainingFrequency);
     final burn = calcTdee + adaptiveKcal;
     final isMaintaining = weightLossPace == WeightLossPace.maintain;
+    final isGaining = weightLossPace == WeightLossPace.gain;
     final resolvedTargetWeight = isMaintaining
         ? currentWeightKg
         : (targetWeightKg ?? currentWeightKg);
     final requestedPace = goalPaceFromWeightLossPace(weightLossPace);
+    double gainTarget(double maintenance) => maintenance + requestedPace * 1100;
     // A cut never takes maintenance below the minimum (or below the plain
     // maintenance, when that is already under it).
     final maintainFloor = math.min(calorieFloor(gender), calcTdee);
@@ -220,6 +231,8 @@ class HealthCalculator {
             calories: math.max(maintenanceCalories(burn), maintainFloor),
             clamped: burn < maintainFloor,
           )
+        : isGaining
+        ? (calories: math.max(gainTarget(burn), maintainFloor), clamped: false)
         : dailyCalorieTargetFromPace(
             tdee: burn,
             paceKgPerWeek: requestedPace,
@@ -227,6 +240,8 @@ class HealthCalculator {
           );
     final effectivePace = isMaintaining
         ? 0.0
+        : isGaining
+        ? requestedPace
         : effectivePaceKgPerWeek(
             tdee: burn,
             dailyCalorieTarget: calorieResult.calories,
@@ -237,6 +252,7 @@ class HealthCalculator {
             currentWeightKg,
             resolvedTargetWeight,
             effectivePace,
+            gaining: isGaining,
             now: anchor,
           );
     final paceLevel = isMaintaining
@@ -248,6 +264,8 @@ class HealthCalculator {
         ? calorieResult.calories
         : isMaintaining
         ? calcTdee
+        : isGaining
+        ? gainTarget(calcTdee)
         : dailyCalorieTargetFromPace(
             tdee: calcTdee,
             paceKgPerWeek: requestedPace,
@@ -270,6 +288,7 @@ class HealthCalculator {
       targetWeightKg: resolvedTargetWeight,
       targetDate: calcTargetDate,
       isMaintaining: isMaintaining,
+      isGaining: isGaining,
     );
   }
 }
@@ -291,6 +310,7 @@ class HealthPlanCalculation {
     required this.targetWeightKg,
     required this.targetDate,
     required this.isMaintaining,
+    required this.isGaining,
   });
 
   final double bmi;
@@ -314,4 +334,8 @@ class HealthPlanCalculation {
   final double targetWeightKg;
   final DateTime targetDate;
   final bool isMaintaining;
+
+  /// The gain goal: [goalPaceKgPerWeek] is then a gain and [targetDate]
+  /// when the kg to gain are on.
+  final bool isGaining;
 }

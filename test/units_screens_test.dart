@@ -61,6 +61,7 @@ class _FakeOnboardingController extends OnboardingController {
 
 class _FakeProfileController extends ProfileController {
   final saved = <_Body>[];
+  final paces = <WeightLossPace>[];
 
   @override
   Future<bool> saveProfile({
@@ -85,6 +86,7 @@ class _FakeProfileController extends ProfileController {
       weightUnit: weightUnit,
       heightUnit: heightUnit,
     ));
+    paces.add(weightLossPace);
     return true;
   }
 }
@@ -394,6 +396,55 @@ void main() {
       await _type(tester, 'Current weight', '2');
       await save(tester);
       expect(find.text('4 st 11 lb–47 st 3 lb'), findsOneWidget);
+      expect(controller.saved, isEmpty);
+    });
+
+    testWidgets('switching to Gain needs a target over the current weight', (
+      tester,
+    ) async {
+      // 79.8 kg, aiming for 73.
+      await pump(tester, planProfile());
+      expect(find.text('Updated plan'), findsOneWidget);
+      final gain = find.text('Gain - 0.25 kg/week');
+      await tester.ensureVisible(gain);
+      await tester.tap(gain);
+      await tester.pumpAndSettle();
+      expect(find.text('Updated plan'), findsNothing);
+
+      await save(tester);
+      final error = find.text('Must be more than your current weight');
+      expect(error, findsOneWidget);
+      // Brought into view, though the target is far above Save.
+      expect(error.hitTestable(), findsOneWidget);
+      expect(controller.saved, isEmpty);
+
+      await _type(tester, 'Target weight', '85');
+      expect(find.text('Weekly gain'), findsOneWidget);
+      expect(
+        find.text('A small surplus over estimated maintenance.'),
+        findsOneWidget,
+      );
+      await save(tester);
+      expect(controller.saved.single.targetWeightKg, 85);
+      expect(controller.paces.single, WeightLossPace.gain);
+    });
+
+    testWidgets('back from Gain to a loss, the target must be under again', (
+      tester,
+    ) async {
+      await pump(tester, planProfile(pace: WeightLossPace.gain, targetKg: 85));
+      expect(_box(tester, 'Target weight').controller!.text, '85');
+      expect(find.text('Weekly gain'), findsOneWidget);
+      final slow = find.text('Slow - 0.25 kg/week');
+      await tester.ensureVisible(slow);
+      await tester.tap(slow);
+      await tester.pumpAndSettle();
+
+      await save(tester);
+      expect(
+        find.text('Must be less than your current weight'),
+        findsOneWidget,
+      );
       expect(controller.saved, isEmpty);
     });
   });

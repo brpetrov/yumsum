@@ -485,7 +485,9 @@ const coachIntro =
   "can improve, each tied to a fact and specific: getting closer to the " +
   "daily target, more protein, more fibre, less salt, sugars or " +
   "saturates, or a pattern such as weekends running higher or a usual big " +
-  "day. Add a note on something that went well when the facts show it; if " +
+  "day. The facts give the user's goal: for someone gaining weight, days " +
+  "under the target are what to improve, and a bigger day is no problem " +
+  "in itself. Add a note on something that went well when the facts show it; if " +
   "the week went well all round, say so rather than inventing a change. " +
   "If the facts say a nutrient has been off for weeks running, make that " +
   "the first note and say how many weeks. If the facts compare the week " +

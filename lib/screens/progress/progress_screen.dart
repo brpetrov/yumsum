@@ -285,7 +285,12 @@ class _StatsHeader extends StatelessWidget {
             child: _StatBlock(
               label: l10n.progressChange,
               value: formatWeightChange(delta, unit, l10n),
-              highlight: delta <= 0 ? AppColors.veryGood : AppColors.bad,
+              highlight:
+                  (profile?.weightLossPace == WeightLossPace.gain
+                      ? delta >= 0
+                      : delta <= 0)
+                  ? AppColors.veryGood
+                  : AppColors.bad,
             ),
           ),
           Expanded(

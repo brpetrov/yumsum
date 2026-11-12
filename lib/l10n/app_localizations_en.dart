@@ -313,7 +313,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adaptiveIntroChangeBody =>
-      'Your calorie needs can change as you lose weight. Your target adjusts to help you keep making progress.';
+      'Your calorie needs change as your weight does. Your target adjusts to help you keep making progress.';
 
   @override
   String get adaptiveIntroWeighTitle => 'Make every weigh-in count';
@@ -911,11 +911,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get macroGuideCaloriesWhy =>
-      'The energy in food. Eat less than you burn and you lose weight.';
+      'The energy in food. Eat less than you burn to lose weight, more to gain it.';
 
   @override
   String get macroGuideCaloriesTarget =>
-      'What you burn in a day, from your age, height, weight and activity, with a little taken off if you\'re losing weight.';
+      'What you burn in a day, from your age, height, weight and activity, with a little taken off to lose weight or added to gain it.';
 
   @override
   String get macroGuideAimFor => 'Aim for';
@@ -932,7 +932,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get macroGuideProteinWhy =>
-      'Keeps you full and protects your muscle while you lose fat.';
+      'Keeps you full and looks after your muscle.';
 
   @override
   String get macroGuideProteinTarget =>
@@ -1121,6 +1121,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String historyGuidanceOverGoalDate(int kcal) {
     return 'You averaged $kcal kcal a day over your target, so your goal date moves a little later.';
+  }
+
+  @override
+  String historyGuidanceUnderGoalDate(int kcal) {
+    return 'You averaged $kcal kcal a day under your target, so your goal date moves a little later.';
   }
 
   @override
@@ -1907,6 +1912,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'Keeps your calories around maintenance instead of creating a deficit.';
 
   @override
+  String planPaceGain(String amount) {
+    return 'Gain - $amount/week';
+  }
+
+  @override
+  String get planPaceGainHint =>
+      'A small calorie surplus for steady weight gain.';
+
+  @override
   String get profileErrorLoadTitle => 'Could not load your profile';
 
   @override
@@ -2312,6 +2326,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Must be less than your current weight';
 
   @override
+  String get commonTargetAboveCurrent =>
+      'Must be more than your current weight';
+
+  @override
   String get commonMale => 'Male';
 
   @override
@@ -2349,13 +2367,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingGoalBody =>
-      'A calorie is the energy in food. Eat a little less than your body burns and you lose weight, steadily and safely.';
+      'A calorie is the energy in food. Eat a little less than your body burns to lose weight, or a little more to gain it.';
 
   @override
   String get onboardingLoseWeight => 'Lose weight';
 
   @override
   String get onboardingKeepWeight => 'Keep my weight';
+
+  @override
+  String get onboardingGainWeight => 'Gain weight';
 
   @override
   String get onboardingGoalNote =>
@@ -2432,6 +2453,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'A moderate deficit from estimated maintenance.';
 
   @override
+  String get planPreviewGainNote =>
+      'A small surplus over estimated maintenance.';
+
+  @override
   String get planPreviewCautionNote =>
       'This needs consistency and may feel restrictive.';
 
@@ -2452,6 +2477,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get planPreviewWeeklyLoss => 'Weekly loss';
+
+  @override
+  String get planPreviewWeeklyGain => 'Weekly gain';
 
   @override
   String get planPreviewGoalBy => 'Goal by';
@@ -2566,10 +2594,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get planProteinNote =>
-      'Protein helps keep muscle while you lose weight. Off hides it everywhere.';
+      'Protein helps you keep and build muscle. Off hides it everywhere.';
 
   @override
-  String get planSectionPace => 'HOW FAST DO YOU WANT TO LOSE WEIGHT?';
+  String get planSectionPace => 'YOUR PACE';
 
   @override
   String get planPaceNote =>
@@ -2643,6 +2671,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String adaptiveTargetLose(String amount) {
     return 'To lose $amount a week.';
+  }
+
+  @override
+  String adaptiveTargetGain(String amount) {
+    return 'To gain $amount a week.';
   }
 
   @override

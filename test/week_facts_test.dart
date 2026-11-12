@@ -440,6 +440,7 @@ void main() {
           '20%.',
       'Logged 7 of 7 days.',
       'Daily calorie target: 1,900 kcal. Minimum: 1,200 kcal a day.',
+      'Goal: lose weight, 0.75 kg a week.',
       'Already on the card: 5 days on track, 0 close, 2 off track; average '
           '2,085 kcal.',
       'Day by day: Monday 1,846 kcal (on track, 54 under); Tuesday 1,921 '
@@ -475,6 +476,18 @@ void main() {
       'Weigh-ins this week: 3.',
       _library,
     ]);
+  });
+
+  test('the goal line says lose, keep or gain with the pace', () {
+    String goal(WeightLossPace pace, double targetKg) => _facts(
+      profile: planProfile(pace: pace, targetKg: targetKg),
+    ).lines.firstWhere((line) => line.startsWith('Goal:'));
+    expect(
+      goal(WeightLossPace.moderate, 73),
+      'Goal: lose weight, 0.5 kg a week.',
+    );
+    expect(goal(WeightLossPace.maintain, 79.8), 'Goal: keep weight steady.');
+    expect(goal(WeightLossPace.gain, 85), 'Goal: gain weight, 0.25 kg a week.');
   });
 
   test('the country comes first; the stored country and usual food never '
@@ -662,6 +675,7 @@ void main() {
           '20%.',
       'Logged 6 of 7 days.',
       'Daily calorie target: 1,900 kcal. Minimum: 1,200 kcal a day.',
+      'Goal: lose weight, 0.75 kg a week.',
       'Already on the card: 4 days on track, 1 close, 0 off track; 1 day '
           'off; average 2,068 kcal.',
       'Day by day: Monday 1,880 kcal (on track, 20 under); Tuesday 1,950 '

@@ -216,6 +216,45 @@ void main() {
     expect(onboarding.submitted.single.targetWeightKg, isNull);
   });
 
+  testWidgets('gaining: three goals, a target over the current weight, and '
+      'the plan in gain', (tester) async {
+    await pump(tester);
+    await answerAboutYou(tester);
+    expect(find.text('Lose weight'), findsOneWidget);
+    expect(find.text('Keep my weight'), findsOneWidget);
+    expect(find.text('Gain weight'), findsOneWidget);
+    await tester.tap(find.text('Gain weight'));
+    await tester.pump();
+    await next(tester);
+
+    expect(find.text('What weight are you aiming for?'), findsOneWidget);
+    await type(tester, '75');
+    expect(find.text('Must be more than your current weight'), findsOneWidget);
+    expect(nextEnabled(tester), isFalse);
+    await type(tester, '80');
+    expect(nextEnabled(tester), isFalse);
+    await type(tester, '85');
+    expect(nextEnabled(tester), isTrue);
+    await next(tester);
+    await next(tester);
+    await next(tester);
+    await next(tester);
+
+    expect(find.text('Your plan is ready!'), findsOneWidget);
+    expect(find.text('Weekly gain'), findsOneWidget);
+    expect(find.text('0.25 kg/wk'), findsOneWidget);
+    expect(find.text('Sustainable pace'), findsOneWidget);
+    expect(
+      find.text('A small surplus over estimated maintenance.'),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Start'));
+    await tester.pumpAndSettle();
+
+    expect(onboarding.submitted.single.weightLossPace, WeightLossPace.gain);
+    expect(onboarding.submitted.single.targetWeightKg, 85);
+  });
+
   testWidgets('a target at or over the current weight can\'t go on', (
     tester,
   ) async {

@@ -36,11 +36,11 @@ enum _Step {
   plan,
 }
 
-/// First run: one question per card, then the plan. The pace is moderate
-/// until Plan Settings changes it; the country is stored from the phone's
-/// region, as `countryProvider`'s fallback. Height and weight are typed in
-/// kg and cm until a card's units toggle changes them, and the units are
-/// stored too.
+/// First run: one question per card, then the plan. Losing is at the
+/// moderate pace until Plan Settings changes it, and gaining at its one
+/// pace; the country is stored from the phone's region, as
+/// `countryProvider`'s fallback. Height and weight are typed in kg and cm
+/// until a card's units toggle changes them, and the units are stored too.
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -83,6 +83,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   bool get _maintaining => _weightLossPace == WeightLossPace.maintain;
+  bool get _gaining => _weightLossPace == WeightLossPace.gain;
+
+  /// A target the goal can't reach: not under the current weight when
+  /// losing, not over it when gaining.
+  bool _wrongSide(double target, double current) =>
+      _gaining ? target <= current : target >= current;
 
   List<_Step> get _steps => [
     for (final step in _Step.values)
@@ -120,8 +126,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final error = _weightError(_targetWeight);
     if (error != null) return error;
     final current = _currentWeight.value;
-    if (current != null && _targetWeight.value! >= current) {
-      return context.l10n.commonTargetBelowCurrent;
+    if (current != null && _wrongSide(_targetWeight.value!, current)) {
+      return _gaining
+          ? context.l10n.commonTargetAboveCurrent
+          : context.l10n.commonTargetBelowCurrent;
     }
     return null;
   }
@@ -153,7 +161,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
     final targetWeight = _maintaining ? null : _targetWeight.value;
     if (!_maintaining &&
-        (targetWeight == null || targetWeight >= currentWeight)) {
+        (targetWeight == null || _wrongSide(targetWeight, currentWeight))) {
       return null;
     }
     return HealthCalculator.calculatePlan(
@@ -360,14 +368,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          PillToggle<WeightLossPace>(
-            options: [
-              (WeightLossPace.moderate, _l10n.onboardingLoseWeight),
-              (WeightLossPace.maintain, _l10n.onboardingKeepWeight),
-            ],
-            selected: _weightLossPace,
-            onChanged: (pace) => setState(() => _weightLossPace = pace),
-          ),
+          for (final (i, goal) in const [
+            WeightLossPace.moderate,
+            WeightLossPace.maintain,
+            WeightLossPace.gain,
+          ].indexed) ...[
+            if (i > 0) const SizedBox(height: 10),
+            GoalCard(
+              goal: goal,
+              selected: _weightLossPace == goal,
+              onTap: () => setState(() => _weightLossPace = goal),
+            ),
+          ],
           const SizedBox(height: 12),
           Text(
             _l10n.onboardingGoalNote,

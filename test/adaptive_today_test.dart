@@ -270,7 +270,7 @@ void main() {
           .dy;
       expect(top('Calories'), lessThan(top('Protein')));
       expect(
-        find.textContaining('a little taken off if you\'re losing weight'),
+        find.textContaining('a little taken off to lose weight'),
         findsOneWidget,
       );
       expect(find.textContaining('UK'), findsNothing);
