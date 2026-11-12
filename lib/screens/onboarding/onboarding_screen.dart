@@ -357,13 +357,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     _Step.goal => (
       _l10n.onboardingGoalTitle,
       _l10n.onboardingGoalBody,
-      PillToggle<WeightLossPace>(
-        options: [
-          (WeightLossPace.moderate, _l10n.onboardingLoseWeight),
-          (WeightLossPace.maintain, _l10n.onboardingKeepWeight),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          PillToggle<WeightLossPace>(
+            options: [
+              (WeightLossPace.moderate, _l10n.onboardingLoseWeight),
+              (WeightLossPace.maintain, _l10n.onboardingKeepWeight),
+            ],
+            selected: _weightLossPace,
+            onChanged: (pace) => setState(() => _weightLossPace = pace),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            _l10n.onboardingGoalNote,
+            style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+          ),
         ],
-        selected: _weightLossPace,
-        onChanged: (pace) => setState(() => _weightLossPace = pace),
       ),
     ),
     _Step.target => (

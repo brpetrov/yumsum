@@ -2390,6 +2390,10 @@ class AppLocalizationsBg extends AppLocalizations {
   String get onboardingKeepWeight => 'Поддържане';
 
   @override
+  String get onboardingGoalNote =>
+      'Можеш да промениш това по всяко време в „Настройки на плана“.';
+
+  @override
   String get onboardingTargetTitle => 'Към какво тегло се стремиш?';
 
   @override

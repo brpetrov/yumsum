@@ -2358,6 +2358,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingKeepWeight => 'Keep my weight';
 
   @override
+  String get onboardingGoalNote =>
+      'You can change this any time in Plan Settings.';
+
+  @override
   String get onboardingTargetTitle => 'What weight are you aiming for?';
 
   @override

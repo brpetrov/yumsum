@@ -197,6 +197,10 @@ void main() {
   testWidgets('keeping weight skips the target weight', (tester) async {
     await pump(tester);
     await answerAboutYou(tester);
+    expect(
+      find.text('You can change this any time in Plan Settings.'),
+      findsOneWidget,
+    );
     await tester.tap(find.text('Keep my weight'));
     await tester.pump();
     await next(tester);

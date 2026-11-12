@@ -3118,6 +3118,10 @@
   "@onboardingKeepWeight": {
     "description": "Onboarding: goal toggle option."
   },
+  "onboardingGoalNote": "You can change this any time in Plan Settings.",
+  "@onboardingGoalNote": {
+    "description": "Onboarding: the quiet line under the goal choices."
+  },
   "onboardingTargetTitle": "What weight are you aiming for?",
   "@onboardingTargetTitle": {
     "description": "Onboarding card heading."

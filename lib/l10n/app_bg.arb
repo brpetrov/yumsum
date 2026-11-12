@@ -644,6 +644,7 @@
   "onboardingGoalBody": "Калориите измерват енергията в храната. Когато приемаш малко по-малко, отколкото изгаряш, отслабваш постепенно и безопасно.",
   "onboardingLoseWeight": "Отслабване",
   "onboardingKeepWeight": "Поддържане",
+  "onboardingGoalNote": "Можеш да промениш това по всяко време в „Настройки на плана“.",
   "onboardingTargetTitle": "Към какво тегло се стремиш?",
   "onboardingActivityTitle": "Колко се движиш през деня?",
   "onboardingActivityBody": "Без да броим тренировките.",

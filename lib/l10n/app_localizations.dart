@@ -3962,6 +3962,12 @@ abstract class AppLocalizations {
   /// **'Keep my weight'**
   String get onboardingKeepWeight;
 
+  /// Onboarding: the quiet line under the goal choices.
+  ///
+  /// In en, this message translates to:
+  /// **'You can change this any time in Plan Settings.'**
+  String get onboardingGoalNote;
+
   /// Onboarding card heading.
   ///
   /// In en, this message translates to:
