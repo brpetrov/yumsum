@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/providers/reminder_provider.dart';
+import 'package:lean_streak/widgets/time_wheels.dart';
 
 /// The reminders, Settings' Notifications section: each a switch with its
 /// time, the evening meal reminder, the weigh-in (weekly, or every day) and
@@ -44,14 +45,8 @@ class NotificationSettings extends ConsumerWidget {
       ).showSnackBar(SnackBar(content: Text(l10n.notificationsDenied)));
     }
 
-    Future<TimeOfDay?> pickTime(TimeOfDay initial) => showTimePicker(
-      context: context,
-      initialTime: initial,
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-        child: child!,
-      ),
-    );
+    Future<TimeOfDay?> pickTime(TimeOfDay initial, String title) =>
+        showTimeWheels(context, initial: initial, title: title);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,7 +101,10 @@ class NotificationSettings extends ConsumerWidget {
               ),
               TextButton.icon(
                 onPressed: () async {
-                  final picked = await pickTime(settings.weeklyTime);
+                  final picked = await pickTime(
+                    settings.weeklyTime,
+                    l10n.notificationsWeight,
+                  );
                   if (picked != null) {
                     await notifier.setWeeklySchedule(
                       day: settings.weeklyDay,
@@ -131,7 +129,10 @@ class NotificationSettings extends ConsumerWidget {
         if (settings.creatine)
           TextButton.icon(
             onPressed: () async {
-              final picked = await pickTime(settings.creatineTime);
+              final picked = await pickTime(
+                settings.creatineTime,
+                l10n.notificationsCreatine,
+              );
               if (picked != null) {
                 await notifier.setCreatineTime(picked);
               }

@@ -39,6 +39,7 @@ import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/services/food_lookup_service.dart';
 import 'package:lean_streak/widgets/estimate_breakdown.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
+import 'package:lean_streak/widgets/time_wheels.dart';
 
 /// Whether a typed name offers "Search foods" (Open Food Facts' search).
 /// Hidden for now; the barcode scan still looks packets up there.
@@ -385,13 +386,10 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   /// fold an empty bar under it.
   Future<void> _pickTime(bool? keyboardUp) async {
     setState(() => _heldKeyboardUp = keyboardUp);
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: _time ?? TimeOfDay.now(),
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-        child: child!,
-      ),
+    final picked = await showTimeWheels(
+      context,
+      initial: _time ?? TimeOfDay.now(),
+      title: context.l10n.quickLogTime,
     );
     if (!mounted) return;
     setState(() {

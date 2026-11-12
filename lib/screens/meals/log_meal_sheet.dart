@@ -15,6 +15,7 @@ import 'package:lean_streak/providers/past_day_edit_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 import 'package:lean_streak/widgets/estimate_breakdown.dart';
+import 'package:lean_streak/widgets/time_wheels.dart';
 
 /// Opens the meal form: edits [existingMeal], or adds a meal on [date]
 /// (yyyy-MM-dd, today by default). Resolves to true when the meal was saved.
@@ -154,13 +155,10 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
   }
 
   Future<void> _pickTime() async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: _shownTime,
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-        child: child!,
-      ),
+    final picked = await showTimeWheels(
+      context,
+      initial: _shownTime,
+      title: context.l10n.mealTime,
     );
     if (picked != null && mounted) setState(() => _time = picked);
   }

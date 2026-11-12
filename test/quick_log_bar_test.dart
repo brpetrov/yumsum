@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1832,7 +1833,7 @@ void main() {
 
     // The empty bar doesn't fold under the picker as the keyboard goes.
     await openPicker(tester);
-    expect(find.byType(TimePickerDialog), findsOneWidget);
+    expect(find.byType(CupertinoDatePicker), findsOneWidget);
     expect(kcalBox, findsOneWidget);
     expect(find.byTooltip('Estimate'), findsOneWidget);
     await pickTime(tester, 12, 30);
