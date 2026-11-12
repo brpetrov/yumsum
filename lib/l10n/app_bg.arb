@@ -53,6 +53,7 @@
   "homeSlotAfternoon": "Следобед",
   "homeSlotEvening": "Вечер",
   "homeSlotItems": "{count, plural, one{1 запис} other{{count} записа}}",
+  "homeSlotTotal": "{kcal} ккал · {protein} г",
   "homeMealsLogged": "{count, plural, one{1 записано} other{{count} записани}}",
   "homeNothingLogged": "Още няма записани хранения. Опиши храната или натисни микрофона долу.",
   "homeHistory": "История",

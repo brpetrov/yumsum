@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lean_streak/core/config/crash_reports.dart';
@@ -20,9 +21,11 @@ class LogMealController extends AsyncNotifier<void> {
 
   /// Saves a new meal, or [existingMeal] with new values. New meals go on
   /// [date] (yyyy-MM-dd), today by default. An edit given no [macros] keeps
-  /// the meal's own ([macrosAfterEdit]). Changing a past day uses one of
-  /// the month's past-day changes; the state errors with
-  /// [EditLimitExceededException] once they are used up.
+  /// the meal's own ([macrosAfterEdit]). A [time] puts the meal at that time
+  /// on its own day; without one an edit keeps its time and a new meal gets
+  /// the current time. Changing a past day uses one of the month's past-day
+  /// changes; the state errors with [EditLimitExceededException] once they
+  /// are used up.
   Future<void> submit({
     Meal? existingMeal,
     String? date,
@@ -30,6 +33,7 @@ class LogMealController extends AsyncNotifier<void> {
     required double calories,
     double? proteinGrams,
     Nutrients? macros,
+    TimeOfDay? time,
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
@@ -65,7 +69,10 @@ class LogMealController extends AsyncNotifier<void> {
       final meal = Meal(
         id: existingMeal?.id ?? docRef!.id,
         date: mealDate,
-        timestamp: existingMeal?.timestamp ?? _timestampFor(mealDate, now),
+        timestamp: time != null
+            ? _timestampFor(mealDate, time)
+            : existingMeal?.timestamp ??
+                  _timestampFor(mealDate, TimeOfDay.fromDateTime(now)),
         name: mealName,
         calories: calories,
         proteinGrams: protein,
@@ -104,11 +111,11 @@ class LogMealController extends AsyncNotifier<void> {
         .increment(uid, currentEditMonthKey());
   }
 
-  /// A meal added to a past day keeps the current time of day, so it sorts
-  /// sensibly among that day's meals.
-  DateTime _timestampFor(String date, DateTime now) {
+  /// [time] on [date]: the date always comes from the meal's day, so a meal
+  /// added to a past day sorts sensibly among that day's meals.
+  DateTime _timestampFor(String date, TimeOfDay time) {
     final day = DateTime.parse(date);
-    return DateTime(day.year, day.month, day.day, now.hour, now.minute);
+    return DateTime(day.year, day.month, day.day, time.hour, time.minute);
   }
 
   Future<({int? protein, Nutrients? macros})> _estimateNutrients(

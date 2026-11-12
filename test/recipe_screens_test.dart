@@ -43,6 +43,7 @@ class _FakeLogMealController extends LogMealController {
     required double calories,
     double? proteinGrams,
     Nutrients? macros,
+    TimeOfDay? time,
   }) async {
     // Let build() finish first, or it would wipe the error below.
     await future;

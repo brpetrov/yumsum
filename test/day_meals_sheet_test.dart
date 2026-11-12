@@ -115,13 +115,14 @@ void main() {
       WidgetTester tester, {
       int changesUsed = 0,
       bool plus = false,
+      List<Meal>? meals,
     }) {
       return tester.pumpWidget(
         ProviderScope(
           overrides: [
             plusProvider.overrideWithValue(plus),
             mealsForDateProvider.overrideWith(
-              (ref, date) => Stream.value([meal]),
+              (ref, date) => Stream.value(meals ?? [meal]),
             ),
             dailySummaryForDateProvider.overrideWith(
               (ref, date) => Stream.value(summary),
@@ -155,6 +156,34 @@ void main() {
         find.widgetWithText(ElevatedButton, 'Add meal'),
       );
       expect(addMeal.onPressed, isNotNull);
+    });
+
+    testWidgets('the day\'s meals are in slots, every one open', (
+      tester,
+    ) async {
+      Meal at(String name, int hour) => Meal(
+        id: name,
+        date: '2020-03-10',
+        timestamp: DateTime(2020, 3, 10, hour),
+        name: name,
+        calories: 200,
+        createdAt: DateTime(2020, 3, 10, hour),
+        updatedAt: DateTime(2020, 3, 10, hour),
+      );
+      await pumpSheet(
+        tester,
+        meals: [at('Toast', 8), at('Salad', 13), meal, at('Yoghurt', 21)],
+      );
+      await tester.pump();
+
+      expect(find.text('Morning'), findsOneWidget);
+      expect(find.text('Afternoon'), findsOneWidget);
+      expect(find.text('Evening'), findsOneWidget);
+      expect(find.textContaining('item'), findsNothing);
+      for (final name in ['Toast', 'Salad', 'Musaka', 'Yoghurt']) {
+        expect(find.text(name), findsOneWidget);
+      }
+      expect(find.text('840 kcal · 31 g'), findsOneWidget);
     });
 
     testWidgets('adding is switched off once the month is used up', (

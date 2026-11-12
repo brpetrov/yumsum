@@ -61,7 +61,8 @@ final speechProvider = StateProvider<SpeechToText?>((ref) => SpeechToText());
 typedef _Entry = ({String? name, int? kcal, int? protein});
 
 /// The log composer pinned to the bottom of Today, under the thumb: a name
-/// box, with calorie and protein boxes under it once the bar is in use.
+/// box, with calorie and protein boxes under it once the bar is in use, and
+/// under them a small clock for when the meal was eaten (Now by default).
 /// Beside the idle box sit the other ways in, one round button each: a
 /// photo of the plate for the AI, a packet's barcode (phones only) and the
 /// mic, which writes the words into the box as they're said, in the app's
@@ -118,7 +119,8 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   /// a box had focus, until it lifts; null otherwise. iOS Safari lets go of
   /// the box, and hides the keyboard, as soon as a finger touches outside
   /// it, which folded the chips before their tap could end; the panel stays
-  /// as it was until the finger lifts.
+  /// as it was until the finger lifts. Held the same way while the time
+  /// picker is up ([_pickTime]).
   bool? _heldKeyboardUp;
   final _kcalFocus = FocusNode();
   final _proteinFocus = FocusNode();
@@ -153,6 +155,10 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   // came with, and scaled to the calories saved.
   Nutrients? _macros;
   int? _macrosKcal;
+
+  // When the meal was eaten, once picked; Now (the time it is saved) until
+  // then. Only the time: the meal always goes on today.
+  TimeOfDay? _time;
 
   _Entry get _entry {
     final name = _name.text.trim();
@@ -333,6 +339,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     setState(() {
       _aiItems = const [];
       _error = null;
+      _time = null;
     });
   }
 
@@ -356,6 +363,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
           calories: entry.kcal!.toDouble(),
           proteinGrams: entry.protein?.toDouble(),
           macros: _macrosFor(entry.kcal!),
+          time: _time,
         );
     if (!mounted) return;
 
@@ -365,6 +373,27 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       return;
     }
     _reset();
+  }
+
+  /// Asks when the meal was eaten. The panel is held as it was while the
+  /// picker is up ([keyboardUp] as for a finger on it, when a box had
+  /// focus): the box lets go of the keyboard for the dialog, which would
+  /// fold an empty bar under it.
+  Future<void> _pickTime(bool? keyboardUp) async {
+    setState(() => _heldKeyboardUp = keyboardUp);
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _time ?? TimeOfDay.now(),
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
+      ),
+    );
+    if (!mounted) return;
+    setState(() {
+      _heldKeyboardUp = null;
+      _time = picked ?? _time;
+    });
   }
 
   Future<void> _estimate() async {
@@ -781,11 +810,12 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   @override
   Widget build(BuildContext context) {
     final entry = _entry;
-    final hasText = [
-      _name,
-      _kcal,
-      _protein,
-    ].any((box) => box.text.trim().isNotEmpty);
+    // A picked time is part of the meal being entered, as text is: the bar
+    // stays open with it and the X clears it, so it never folds and opens
+    // again as the keyboard comes back after the picker.
+    final hasEntry =
+        _time != null ||
+        [_name, _kcal, _protein].any((box) => box.text.trim().isNotEmpty);
     final focused =
         _heldKeyboardUp != null ||
         _focusNode.hasFocus ||
@@ -801,11 +831,11 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     // Listening opens the bar from the first moment, so the number boxes
     // don't appear under the words mid-sentence and jolt it.
     final open =
-        hasText || (focused && (keyboardUp || _isDesktop)) || _listening;
-    // The other ways in make room once the bar is in use: text, or the
+        hasEntry || (focused && (keyboardUp || _isDesktop)) || _listening;
+    // The other ways in make room once the bar is in use: an entry, or the
     // keyboard up to type it. Not for desktop's standing focus, which
     // would hide them for good.
-    final typing = hasText || (focused && keyboardUp);
+    final typing = hasEntry || (focused && keyboardUp);
     final showStatus =
         _listening || _working || _error != null || _aiItems.isNotEmpty;
     // Watched whether or not the box is focused, so the chips are ready the
@@ -969,7 +999,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                                     // wrong voice or AI result is one tap from
                                     // gone.
                                     suffixIcon:
-                                        hasText && !_working && !_listening
+                                        hasEntry && !_working && !_listening
                                         ? IconButton(
                                             tooltip: context.l10n.quickLogClear,
                                             onPressed: _reset,
@@ -1014,6 +1044,14 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
                                   ),
                                 ],
                               ],
+                            ),
+                            // The clock comes with the number boxes, on a
+                            // line of its own: beside them it would leave
+                            // the protein box too narrow for its hint.
+                            const SizedBox(height: 8),
+                            Align(
+                              alignment: AlignmentDirectional.centerStart,
+                              child: _buildClock(focused ? keyboardUp : null),
                             ),
                           ],
                         ],
@@ -1085,6 +1123,38 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
       decoration: _boxDecoration(
         hint: hint,
         suffixText: box.text.isEmpty ? null : unit,
+      ),
+    );
+  }
+
+  /// A small clock with when the meal was eaten: Now, or the time picked.
+  /// [keyboardUp] is the panel as shown, held while the picker is up.
+  Widget _buildClock(bool? keyboardUp) {
+    final time = _time;
+    // Above it, clear of the phone's navigation bar, as for the buttons.
+    return Tooltip(
+      message: context.l10n.quickLogTime,
+      preferBelow: false,
+      child: TextButton.icon(
+        key: const ValueKey('quick-log-time'),
+        onPressed: _working || _listening ? null : () => _pickTime(keyboardUp),
+        style: TextButton.styleFrom(
+          foregroundColor: time == null
+              ? AppColors.textSecondary
+              : AppColors.textPrimary,
+          backgroundColor: AppColors.surfaceVariant,
+          disabledBackgroundColor: AppColors.surfaceVariant,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          visualDensity: VisualDensity.compact,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        icon: const Icon(Icons.schedule_rounded, size: 18),
+        label: Text(
+          time == null
+              ? context.l10n.quickLogTimeNow
+              : context.l10n.time(DateTime(2000, 1, 1, time.hour, time.minute)),
+          style: const TextStyle(fontSize: 14),
+        ),
       ),
     );
   }

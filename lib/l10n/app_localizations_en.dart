@@ -189,6 +189,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String homeSlotTotal(int kcal, int protein) {
+    return '$kcal kcal · $protein g';
+  }
+
+  @override
   String homeMealsLogged(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

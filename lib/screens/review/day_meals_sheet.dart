@@ -18,6 +18,7 @@ import 'package:lean_streak/widgets/bowl_note.dart';
 import 'package:lean_streak/widgets/day_status.dart';
 import 'package:lean_streak/widgets/macro_totals.dart';
 import 'package:lean_streak/widgets/meal_row.dart';
+import 'package:lean_streak/widgets/meal_slots.dart';
 
 /// Opens one day's meals so they can be added to, edited or deleted.
 Future<void> showDayMealsSheet(BuildContext context, DateTime date) {
@@ -209,13 +210,11 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
               )
             else
               Flexible(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: meals.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1),
-                  itemBuilder: (context, index) {
-                    final meal = meals[index];
-                    return MealRow(
+                child: SingleChildScrollView(
+                  child: MealSlots(
+                    meals: meals,
+                    showProtein: showProtein,
+                    mealRow: (meal) => MealRow(
                       meal: meal,
                       showProtein: showProtein,
                       showMacros: showMacros,
@@ -231,8 +230,8 @@ class _DayMealsSheetState extends ConsumerState<DayMealsSheet> {
                         logMealAgain(context, meal);
                         Navigator.of(context).pop();
                       },
-                    );
-                  },
+                    ),
+                  ),
                 ),
               ),
             if (_error != null) ...[

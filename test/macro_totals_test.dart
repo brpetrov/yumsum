@@ -28,6 +28,7 @@ class _SavingController extends LogMealController {
     required double calories,
     double? proteinGrams,
     Nutrients? macros,
+    TimeOfDay? time,
   }) async => saved.add((date, name, calories, macros));
 }
 

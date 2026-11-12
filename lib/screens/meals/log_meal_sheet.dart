@@ -74,7 +74,15 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
   Nutrients? _macros;
   int? _macrosKcal;
 
+  // The time eaten, once picked; until then an edit keeps the meal's own
+  // and a new meal gets the time it is saved. The day is always the meal's.
+  TimeOfDay? _time;
+
   bool get _isEditing => widget.existingMeal != null;
+
+  TimeOfDay get _shownTime =>
+      _time ??
+      TimeOfDay.fromDateTime(widget.existingMeal?.timestamp ?? DateTime.now());
 
   String get _date =>
       widget.existingMeal?.date ??
@@ -145,6 +153,18 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
     setState(() => _estimateItems = items);
   }
 
+  Future<void> _pickTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _shownTime,
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
+      ),
+    );
+    if (picked != null && mounted) setState(() => _time = picked);
+  }
+
   Future<void> _submit() async {
     final calories = parseDecimal(_caloriesController.text);
     if (calories == null || calories <= 0) {
@@ -167,6 +187,7 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
             ),
             _ => null,
           },
+          time: _time,
         );
 
     if (!mounted) return;
@@ -300,6 +321,24 @@ class _LogMealSheetState extends ConsumerState<_LogMealSheet> {
                 showProtein: showProtein,
                 onChanged: _itemsChanged,
               ),
+            const SizedBox(height: 12),
+            InkWell(
+              key: const ValueKey('meal-time'),
+              onTap: saving ? null : _pickTime,
+              borderRadius: BorderRadius.circular(AppTheme.inputRadius),
+              child: InputDecorator(
+                decoration: InputDecoration(
+                  labelText: l10n.mealTime,
+                  suffixIcon: const Icon(Icons.schedule_rounded),
+                ),
+                child: Text(
+                  l10n.time(
+                    DateTime(2000, 1, 1, _shownTime.hour, _shownTime.minute),
+                  ),
+                  style: TextStyle(fontSize: 16, color: AppColors.textPrimary),
+                ),
+              ),
+            ),
             if (_error != null) ...[
               const SizedBox(height: 8),
               Text(

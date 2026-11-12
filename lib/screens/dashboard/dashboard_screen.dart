@@ -46,6 +46,7 @@ import 'package:lean_streak/widgets/icon_bubble.dart';
 import 'package:lean_streak/widgets/macro_guide.dart';
 import 'package:lean_streak/widgets/macro_rings.dart';
 import 'package:lean_streak/widgets/meal_row.dart';
+import 'package:lean_streak/widgets/meal_slots.dart';
 import 'package:lean_streak/widgets/plus_mark.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
 
@@ -595,7 +596,7 @@ class _ProgressBar extends StatelessWidget {
   }
 }
 
-/// Today's meals as plain rows in one card.
+/// Today's meals in one card, in slots by the time they were eaten.
 class _MealsCard extends StatelessWidget {
   const _MealsCard({
     required this.meals,
@@ -645,17 +646,19 @@ class _MealsCard extends StatelessWidget {
               child: BowlNote(context.l10n.homeNothingLogged),
             )
           else
-            for (var index = 0; index < meals.length; index++) ...[
-              if (index > 0) const Divider(height: 1, endIndent: 14),
-              MealRow(
-                meal: meals[index],
+            MealSlots(
+              meals: meals,
+              showProtein: showProtein,
+              now: DateTime.now(),
+              mealRow: (meal) => MealRow(
+                meal: meal,
                 showProtein: showProtein,
                 showMacros: showMacros,
-                onEdit: () => onEditMeal(meals[index]),
-                onDelete: () => onDeleteMeal(meals[index]),
-                onLogAgain: () => logMealAgain(context, meals[index]),
+                onEdit: () => onEditMeal(meal),
+                onDelete: () => onDeleteMeal(meal),
+                onLogAgain: () => logMealAgain(context, meal),
               ),
-            ],
+            ),
         ],
       ),
     );

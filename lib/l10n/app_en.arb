@@ -243,6 +243,18 @@
       }
     }
   },
+  "homeSlotTotal": "{kcal} kcal · {protein} g",
+  "@homeSlotTotal": {
+    "description": "Home, Today's meals: a group's calories and protein, short so a big one fits a 360dp phone.",
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      },
+      "protein": {
+        "type": "int"
+      }
+    }
+  },
   "homeMealsLogged": "{count, plural, other{{count} logged}}",
   "@homeMealsLogged": {
     "description": "Home: pill beside Today's meals with how many meals are logged today.",

@@ -36,6 +36,7 @@ class _FakeLogMealController extends LogMealController {
     required double calories,
     double? proteinGrams,
     Nutrients? macros,
+    TimeOfDay? time,
   }) async {
     await future;
     saved.add(name);

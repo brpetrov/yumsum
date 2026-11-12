@@ -9,6 +9,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:lean_streak/app/launch_actions.dart';
+import 'package:lean_streak/core/theme/app_theme.dart';
+import 'package:lean_streak/l10n/l10n.dart';
 import 'package:lean_streak/models/meal.dart';
 import 'package:lean_streak/models/nutrients.dart';
 import 'package:lean_streak/models/recipe.dart';
@@ -38,10 +40,12 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 import 'recipe_fixtures.dart';
+import 'time_picker_fixtures.dart';
 
 class _FakeLogMealController extends LogMealController {
   final saved = <({String? name, double calories, double? protein})>[];
   final savedMacros = <Nutrients?>[];
+  final savedTimes = <TimeOfDay?>[];
 
   @override
   Future<void> submit({
@@ -51,9 +55,11 @@ class _FakeLogMealController extends LogMealController {
     required double calories,
     double? proteinGrams,
     Nutrients? macros,
+    TimeOfDay? time,
   }) async {
     saved.add((name: name, calories: calories, protein: proteinGrams));
     savedMacros.add(macros);
+    savedTimes.add(time);
   }
 }
 
@@ -1692,5 +1698,179 @@ void main() {
     expect(controller.saved, [
       (name: 'Chicken wrap', calories: 450.0, protein: 35.0),
     ]);
+  });
+
+  final clock = find.byTooltip('Time eaten');
+
+  /// What the clock reads.
+  String clockLabel(WidgetTester tester) => tester
+      .widget<Text>(
+        find.descendant(
+          of: find.byKey(const ValueKey('quick-log-time')),
+          matching: find.byType(Text),
+        ),
+      )
+      .data!;
+
+  /// Opens the bar with the keyboard up, then the time picker over it,
+  /// which takes the focus so the keyboard goes.
+  Future<void> openPicker(WidgetTester tester) async {
+    await tester.tap(clock);
+    tester.view.resetViewInsets();
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('the clock shows Now, coming with the number boxes', (
+    tester,
+  ) async {
+    await pumpCard(tester);
+    expect(clock, findsNothing);
+
+    tester.view.viewInsets = const FakeViewPadding(bottom: 800);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.tap(nameBox);
+    await tester.pump();
+    // In the same frame as the boxes, on its own line under them.
+    expect(kcalBox, findsOneWidget);
+    expect(clock, findsOneWidget);
+    expect(clockLabel(tester), 'Now');
+    expect(
+      tester.getTopLeft(clock).dy,
+      greaterThan(tester.getBottomLeft(kcalBox).dy),
+    );
+
+    tester.view.resetViewInsets();
+    await tester.pump();
+    expect(kcalBox, findsNothing);
+    expect(clock, findsNothing);
+  });
+
+  testWidgets('a picked time is the one the meal is saved at; the next is '
+      'Now again', (tester) async {
+    await pumpCard(tester);
+    tester.view.viewInsets = const FakeViewPadding(bottom: 800);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.tap(nameBox);
+    await tester.pump();
+    await tester.enterText(nameBox, 'porridge');
+    await tester.enterText(kcalBox, '350');
+    await tester.pump();
+
+    await openPicker(tester);
+    await pickTime(tester, 8, 5);
+    expect(clockLabel(tester), '08:05');
+
+    await tester.tap(find.byTooltip('Save'));
+    await tester.pump();
+    expect(controller.saved, [
+      (name: 'Porridge', calories: 350.0, protein: null),
+    ]);
+    expect(controller.savedTimes, [const TimeOfDay(hour: 8, minute: 5)]);
+
+    tester.view.viewInsets = const FakeViewPadding(bottom: 800);
+    await tester.tap(nameBox);
+    await tester.pump();
+    expect(clockLabel(tester), 'Now');
+  });
+
+  testWidgets('a meal saved without a picked time is saved at Now', (
+    tester,
+  ) async {
+    await pumpCard(tester);
+    await tester.enterText(nameBox, 'porridge');
+    await tester.pump();
+    await tester.enterText(kcalBox, '350');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Save'));
+    await tester.pump();
+    expect(controller.savedTimes, [null]);
+  });
+
+  testWidgets('Clear takes the time back to Now', (tester) async {
+    await pumpCard(tester);
+    tester.view.viewInsets = const FakeViewPadding(bottom: 800);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.tap(nameBox);
+    await tester.pump();
+    await tester.enterText(nameBox, 'porridge');
+    await tester.pump();
+    await openPicker(tester);
+    await pickTime(tester, 8, 0);
+    expect(clockLabel(tester), '08:00');
+
+    tester.view.viewInsets = const FakeViewPadding(bottom: 800);
+    await tester.tap(find.byTooltip('Clear'));
+    await tester.pump();
+    expect(boxes(tester), ['', '', '']);
+    expect(clockLabel(tester), 'Now');
+  });
+
+  testWidgets('the bar stays as it was while the picker is up, and a picked '
+      'time keeps it open until cleared', (tester) async {
+    await pumpCard(tester);
+    tester.view.viewInsets = const FakeViewPadding(bottom: 800);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.tap(nameBox);
+    await tester.pump();
+
+    // The empty bar doesn't fold under the picker as the keyboard goes.
+    await openPicker(tester);
+    expect(find.byType(TimePickerDialog), findsOneWidget);
+    expect(kcalBox, findsOneWidget);
+    expect(find.byTooltip('Estimate'), findsOneWidget);
+    await pickTime(tester, 12, 30);
+
+    // Let go of the box: still open with the time, and the X clears it.
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+    expect(clockLabel(tester), '12:30');
+    expect(kcalBox, findsOneWidget);
+    await tester.tap(find.byTooltip('Clear'));
+    await tester.pumpAndSettle();
+    expect(kcalBox, findsNothing);
+    expect(find.byTooltip('Speak'), findsOneWidget);
+  });
+
+  testWidgets('the clock is greyed while the mic listens', (tester) async {
+    await pumpCard(tester, speech: _FakeSpeech());
+    await tester.tap(find.byTooltip('Speak'));
+    await tester.pump();
+    expect(find.text(listening), findsOneWidget);
+    expect(
+      tester
+          .widget<ButtonStyleButton>(
+            find.byKey(const ValueKey('quick-log-time')),
+          )
+          .onPressed,
+      isNull,
+    );
+  });
+
+  testWidgets('in Bulgarian on a 360dp phone the clock has its own line and '
+      'the number boxes keep their width', (tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await pumpCard(tester);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          theme: AppTheme.light,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('bg'),
+          home: const Scaffold(body: QuickLogBar()),
+        ),
+      ),
+    );
+    await tester.enterText(nameBox, 'мусака');
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Кога хапна'), findsOneWidget);
+    expect(clockLabel(tester), 'Сега');
+    // The bar's 18 px sides and the 12 px gap, halved.
+    expect(tester.getSize(proteinBox).width, (360 - 36 - 12) / 2);
+    expect(tester.takeException(), isNull);
   });
 }

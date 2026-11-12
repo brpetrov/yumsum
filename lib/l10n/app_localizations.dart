@@ -416,6 +416,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{1 item} other{{count} items}}'**
   String homeSlotItems(int count);
 
+  /// Home, Today's meals: a group's calories and protein, short so a big one fits a 360dp phone.
+  ///
+  /// In en, this message translates to:
+  /// **'{kcal} kcal · {protein} g'**
+  String homeSlotTotal(int kcal, int protein);
+
   /// Home: pill beside Today's meals with how many meals are logged today.
   ///
   /// In en, this message translates to:

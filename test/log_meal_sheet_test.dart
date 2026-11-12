@@ -10,12 +10,15 @@ import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/meals/log_meal_sheet.dart';
 import 'package:lean_streak/services/calorie_estimate_service.dart';
 
+import 'time_picker_fixtures.dart';
+
 typedef _Saved = ({
   String? date,
   String? name,
   double calories,
   Meal? edited,
   Nutrients? macros,
+  TimeOfDay? time,
 });
 
 /// The breakdown the next estimate comes with; none by default.
@@ -42,6 +45,7 @@ class _FakeLogMealController extends LogMealController {
     required double calories,
     double? proteinGrams,
     Nutrients? macros,
+    TimeOfDay? time,
   }) async {
     // What the real controller keeps for an edit given no macros.
     saved.add((
@@ -54,6 +58,7 @@ class _FakeLogMealController extends LogMealController {
           (existingMeal == null
               ? null
               : macrosAfterEdit(existingMeal, name?.trim(), calories)),
+      time: time,
     ));
   }
 }
@@ -107,6 +112,25 @@ void main() {
     expect(controller.saved.single.date, '2026-10-10');
     expect(controller.saved.single.name, 'Musaka');
     expect(controller.saved.single.calories, 640);
+    // No time picked: the controller gives it the current time.
+    expect(controller.saved.single.time, isNull);
+  });
+
+  testWidgets('a meal added to a past day is saved on that day at the time '
+      'picked', (tester) async {
+    await openSheet(tester, date: '2026-10-10');
+    await tester.enterText(find.widgetWithText(TextField, 'Meal'), 'Musaka');
+    await tester.enterText(find.widgetWithText(TextField, 'Calories'), '640');
+
+    await tester.tap(find.byKey(const ValueKey('meal-time')));
+    await tester.pumpAndSettle();
+    await pickTime(tester, 21, 15);
+    expect(find.text('21:15'), findsOneWidget);
+
+    await tester.tap(find.text('Save meal'));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(controller.saved.single.date, '2026-10-10');
+    expect(controller.saved.single.time, const TimeOfDay(hour: 21, minute: 15));
   });
 
   testWidgets('editing pre-fills the meal and saves it in place', (
@@ -134,6 +158,46 @@ void main() {
 
     expect(controller.saved.single.edited, same(meal));
     expect(controller.saved.single.date, '2026-10-12');
+    // The time wasn't touched, so the meal keeps its own.
+    expect(controller.saved.single.time, isNull);
+  });
+
+  testWidgets('an edit shows the meal\'s time and saves a picked one', (
+    tester,
+  ) async {
+    final meal = Meal(
+      id: 'm1',
+      date: '2026-10-12',
+      timestamp: DateTime(2026, 10, 12, 13, 5),
+      name: 'Porridge',
+      calories: 350,
+      createdAt: DateTime(2026, 10, 12, 13, 5),
+      updatedAt: DateTime(2026, 10, 12, 13, 5),
+    );
+    await openSheet(tester, existingMeal: meal);
+    final time = find.byKey(const ValueKey('meal-time'));
+    expect(
+      find.descendant(of: time, matching: find.text('Time')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: time, matching: find.text('13:05')),
+      findsOneWidget,
+    );
+
+    await tester.tap(time);
+    await tester.pumpAndSettle();
+    await pickTime(tester, 8, 30);
+    expect(
+      find.descendant(of: time, matching: find.text('08:30')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('Save changes'));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(controller.saved.single.edited, same(meal));
+    expect(controller.saved.single.date, '2026-10-12');
+    expect(controller.saved.single.time, const TimeOfDay(hour: 8, minute: 30));
   });
 
   testWidgets('saves the estimate\'s macros, scaled to edited calories', (
