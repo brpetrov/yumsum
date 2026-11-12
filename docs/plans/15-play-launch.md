@@ -75,6 +75,8 @@ Message for testers:
 
 **11 November 2026:** crash reports now also catch failed AI calls, Google sign-in set-up faults, purchase failures and the errors the app used to swallow (docs/features.md, Crash reporting); a fresh 0.1.0+2 bundle is needed to carry them, built when you ask. After installing it from Play, do the crash report check in B, then try Continue with Google: if it fails, Firebase → Crashlytics → Non-fatals shows it as "Google sign-in" within a few minutes, with the exact error. The help pages no longer link to the app or name you, and are dated 11 November 2026.
 
+**12 November 2026:** 0.1.0+2 rebuilt at 17:12 with everything up to today (meal groups and times, the mic fixes, onboarding's new pictures, the time wheels); the 11 November +3 bundle was never uploaded and is gone. Next: upload it to Internal testing (release notes: `Meal times and groups, voice fixes, a new onboarding.`), then C's store listing, then B's Try it and crash report check.
+
 Where the internal test got to: the release is live, you're a tester, the signing keys are in Firebase, Play Integrity is linked. Open:
 
 - [ ] **Google sign-in failed in the Play build.** Play's signing SHA-1 (36:F8:32:6E…) went into Firebase at about 12:45 on 10 November; a try before that fails, and Google can take a few minutes after. Try again; if it still fails, note the exact message for Claude. Next check: Google Cloud console → APIs & Services → Credentials → an Android OAuth client with package `com.bpetrov.yumsum` and that SHA-1 (Firebase makes it when the fingerprint is added).
