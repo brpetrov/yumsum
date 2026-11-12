@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The notification icon is referenced only by name from Dart, so stop
-     release resource shrinking from removing it. -->
+<!-- Looked up only by name, so stop release resource shrinking from
+     removing them: the notification icon (from Dart), and the web client ID
+     from google-services.json, which google_sign_in needs on Android; without
+     it Continue with Google failed in every Play install (12 November 2026). -->
 <resources xmlns:tools="http://schemas.android.com/tools"
-    tools:keep="@drawable/ic_notification" />
+    tools:keep="@drawable/ic_notification,@string/default_web_client_id" />
