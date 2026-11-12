@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,7 +9,26 @@ import 'package:lean_streak/screens/auth/auth_screen.dart';
 
 class _FakeAuthController extends AuthController {
   final resets = <String>[];
+  final resends = <(String, String)>[];
   int googleSignIns = 0;
+
+  /// What sending the link again fails with, if anything.
+  Object? resendError;
+
+  /// Every email sign-in finds the email not yet verified.
+  @override
+  Future<bool> signIn(String email, String password) async {
+    state = AsyncError(const EmailNotVerifiedException(), StackTrace.empty);
+    return false;
+  }
+
+  @override
+  Future<void> resendVerification(String email, String password) async {
+    resends.add((email, password));
+    state = resendError == null
+        ? const AsyncData(AuthStatus.verificationSent)
+        : AsyncError(resendError!, StackTrace.empty);
+  }
 
   @override
   Future<bool> signInWithGoogle() async {
@@ -153,5 +173,67 @@ void main() {
     await tester.tap(find.text('Sign up'));
     await tester.pumpAndSettle();
     expect(find.text('Forgot password?'), findsNothing);
+  });
+
+  group('signing in before verifying the email', () {
+    /// The sign-in page after signing in with an email not yet verified.
+    Future<void> pumpUnverified(
+      WidgetTester tester,
+      _FakeAuthController controller,
+    ) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            authControllerProvider.overrideWith(() => controller),
+            languageCodeProvider.overrideWithValue('en'),
+          ],
+          child: MaterialApp(theme: AppTheme.light, home: const AuthScreen()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField).at(0), 'me@x.com');
+      await tester.enterText(find.byType(TextFormField).at(1), 'secret1');
+      await tester.ensureVisible(find.byType(ElevatedButton));
+      await tester.tap(find.byType(ElevatedButton));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Verify your email first. Check your inbox for the link.'),
+        findsOneWidget,
+      );
+      await tester.ensureVisible(find.text('Send the link again'));
+    }
+
+    testWidgets('can send the link again, and says it went', (tester) async {
+      final controller = _FakeAuthController();
+      await pumpUnverified(tester, controller);
+
+      await tester.tap(find.text('Send the link again'));
+      await tester.pumpAndSettle();
+
+      expect(controller.resends, [('me@x.com', 'secret1')]);
+      expect(find.text('Verification email sent'), findsOneWidget);
+      expect(
+        find.text(
+          'We sent a link to me@x.com. Open it to verify your account, then '
+          'sign in. Not in your inbox? Check your junk or spam folder.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Send the link again'), findsNothing);
+    });
+
+    testWidgets('a wrong password says so, as signing in does', (tester) async {
+      final controller = _FakeAuthController()
+        ..resendError = FirebaseAuthException(code: 'invalid-credential');
+      await pumpUnverified(tester, controller);
+
+      await tester.tap(find.text('Send the link again'));
+      await tester.pumpAndSettle();
+
+      expect(controller.resends, hasLength(1));
+      expect(find.text('Incorrect email or password.'), findsOneWidget);
+      expect(find.text('Verification email sent'), findsNothing);
+      expect(find.text('Send the link again'), findsNothing);
+    });
   });
 }

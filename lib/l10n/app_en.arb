@@ -2342,11 +2342,11 @@
   },
   "authVerificationSentTitle": "Verification email sent",
   "@authVerificationSentTitle": {
-    "description": "Sign-in page: banner title after signing up."
+    "description": "Sign-in page: banner title after signing up or sending the link again."
   },
-  "authVerificationSentBody": "We sent a link to {email}. Open it to verify your account, then sign in.",
+  "authVerificationSentBody": "We sent a link to {email}. Open it to verify your account, then sign in. Not in your inbox? Check your junk or spam folder.",
   "@authVerificationSentBody": {
-    "description": "Sign-in page: banner text after signing up.",
+    "description": "Sign-in page: banner text after signing up or sending the link again.",
     "placeholders": {
       "email": {
         "type": "String"
@@ -2385,6 +2385,10 @@
   "authErrorVerifyEmail": "Verify your email first. Check your inbox for the link.",
   "@authErrorVerifyEmail": {
     "description": "Sign-in page: signing in before confirming the email."
+  },
+  "authResendVerification": "Send the link again",
+  "@authResendVerification": {
+    "description": "Sign-in page: under the verify-your-email error; signs in with the form's email and password, emails the confirmation link again and signs out."
   },
   "authErrorGoogle": "Google sign-in didn't work. Try again.",
   "@authErrorGoogle": {

@@ -113,6 +113,26 @@ class AuthController extends AsyncNotifier<AuthStatus> {
     });
   }
 
+  /// Sends the confirmation link again, for an account whose sign-in failed
+  /// with [EmailNotVerifiedException]: signs in to send it, then signs out.
+  /// An account verified since just stays signed in.
+  Future<void> resendVerification(String email, String password) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+      if (credential.user?.emailVerified ?? false) return AuthStatus.idle;
+      try {
+        await _sendVerification(credential.user);
+      } finally {
+        await FirebaseAuth.instance.signOut();
+      }
+      return AuthStatus.verificationSent;
+    });
+  }
+
   /// Our own confirmation email ([verificationEmailProvider]), or
   /// Firebase's plain one when ours can't be sent, so a new account always
   /// gets a link.

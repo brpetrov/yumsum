@@ -1782,7 +1782,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String authVerificationSentBody(String email) {
-    return 'We sent a link to $email. Open it to verify your account, then sign in.';
+    return 'We sent a link to $email. Open it to verify your account, then sign in. Not in your inbox? Check your junk or spam folder.';
   }
 
   @override
@@ -1809,6 +1809,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get authErrorVerifyEmail =>
       'Verify your email first. Check your inbox for the link.';
+
+  @override
+  String get authResendVerification => 'Send the link again';
 
   @override
   String get authErrorGoogle => 'Google sign-in didn\'t work. Try again.';

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:lean_streak/models/recipe.dart';
+import 'package:lean_streak/providers/account_controller.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/debug_provider.dart';
 import 'package:lean_streak/providers/language_provider.dart';
@@ -205,7 +206,13 @@ String? _redirect(Ref ref, GoRouterState state) {
     return location == AppRoutes.splash ? null : AppRoutes.splash;
   }
 
-  final isAuthenticated = authValue.valueOrNull != null;
+  // A password account counts as signed in only once its email is verified,
+  // as in signIn. Sign-up is signed in while it sends the link, which
+  // showed onboarding for a moment (12 November 2026). Google sign-in has
+  // no such check, so Google accounts aren't held here either.
+  final user = authValue.valueOrNull;
+  final isAuthenticated =
+      user != null && (user.emailVerified || !hasPasswordLogin(user));
 
   // 2. Not signed in — send to auth.
   if (!isAuthenticated) {

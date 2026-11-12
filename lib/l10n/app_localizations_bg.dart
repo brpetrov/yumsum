@@ -1809,7 +1809,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String authVerificationSentBody(String email) {
-    return 'Изпратихме линк на $email. Отвори го, за да потвърдиш профила си, и после влез.';
+    return 'Изпратихме линк на $email. Отвори го, за да потвърдиш профила си, и после влез. Не го виждаш? Провери и папката за спам.';
   }
 
   @override
@@ -1836,6 +1836,9 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get authErrorVerifyEmail =>
       'Първо потвърди имейла си. Линкът е във входящата ти поща.';
+
+  @override
+  String get authResendVerification => 'Изпрати линка отново';
 
   @override
   String get authErrorGoogle => 'Входът с Google не успя. Опитай отново.';

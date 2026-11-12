@@ -53,6 +53,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     }
   }
 
+  Future<void> _resendVerification() async {
+    if (!_formKey.currentState!.validate()) return;
+    await ref
+        .read(authControllerProvider.notifier)
+        .resendVerification(_emailController.text, _passwordController.text);
+  }
+
   Future<void> _signInWithGoogle() =>
       ref.read(authControllerProvider.notifier).signInWithGoogle();
 
@@ -284,6 +291,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           ],
                         ),
                       ),
+                      // The confirmation email may not have come (or be in
+                      // junk), so it can be sent again.
+                      if (authState.error is EmailNotVerifiedException)
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: isLoading ? null : _resendVerification,
+                            child: Text(l10n.authResendVerification),
+                          ),
+                        ),
                       SizedBox(height: 16),
                     ],
 

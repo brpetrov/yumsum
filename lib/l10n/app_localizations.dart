@@ -2918,16 +2918,16 @@ abstract class AppLocalizations {
   /// **'Continue with Google'**
   String get authContinueWithGoogle;
 
-  /// Sign-in page: banner title after signing up.
+  /// Sign-in page: banner title after signing up or sending the link again.
   ///
   /// In en, this message translates to:
   /// **'Verification email sent'**
   String get authVerificationSentTitle;
 
-  /// Sign-in page: banner text after signing up.
+  /// Sign-in page: banner text after signing up or sending the link again.
   ///
   /// In en, this message translates to:
-  /// **'We sent a link to {email}. Open it to verify your account, then sign in.'**
+  /// **'We sent a link to {email}. Open it to verify your account, then sign in. Not in your inbox? Check your junk or spam folder.'**
   String authVerificationSentBody(String email);
 
   /// Forgot password dialog: title.
@@ -2971,6 +2971,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Verify your email first. Check your inbox for the link.'**
   String get authErrorVerifyEmail;
+
+  /// Sign-in page: under the verify-your-email error; signs in with the form's email and password, emails the confirmation link again and signs out.
+  ///
+  /// In en, this message translates to:
+  /// **'Send the link again'**
+  String get authResendVerification;
 
   /// Sign-in page: Google sign-in failed.
   ///
