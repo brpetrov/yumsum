@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -220,6 +222,27 @@ void main() {
     expect(tester.widget<TextButton>(back).onPressed, isNull);
     // The phone's back gesture waits too.
     expect(tester.widget<PopScope>(find.byType(PopScope)).canPop, isFalse);
+    // Two cogs turning, one each way.
+    final cogs = find.byIcon(Icons.settings_rounded);
+    expect(cogs, findsNWidgets(2));
+    double angle(int i) {
+      final turn = tester
+          .widget<Transform>(
+            find
+                .ancestor(of: cogs.at(i), matching: find.byType(Transform))
+                .first,
+          )
+          .transform;
+      return math.atan2(turn.entry(1, 0), turn.entry(0, 0));
+    }
+
+    // The signed change since [from], whichever way round it wrapped.
+    double turned(int i, double from) =>
+        (angle(i) - from + 3 * math.pi) % (2 * math.pi) - math.pi;
+    final (first, second) = (angle(0), angle(1));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(turned(0, first), greaterThan(0));
+    expect(turned(1, second), lessThan(0));
 
     await tester.pump(const Duration(seconds: 7));
     await tester.pump(const Duration(milliseconds: 500)); // the fade

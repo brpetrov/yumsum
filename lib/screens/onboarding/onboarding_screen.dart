@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,7 +15,6 @@ import 'package:lean_streak/providers/country_provider.dart';
 import 'package:lean_streak/providers/debug_provider.dart';
 import 'package:lean_streak/providers/onboarding_controller.dart';
 import 'package:lean_streak/widgets/app_card.dart';
-import 'package:lean_streak/widgets/app_logo_mark.dart';
 import 'package:lean_streak/widgets/health_plan_preview_card.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
 import 'package:lean_streak/widgets/measure_field.dart';
@@ -658,6 +659,50 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 }
 
+/// Two meshed cogs at work while the plan is put together: one [turns]
+/// times, the other as many the other way, their teeth interleaving.
+class _Cogs extends StatelessWidget {
+  const _Cogs({required this.turns});
+
+  final double turns;
+
+  static const _size = 52.0;
+  // Measured from the icon: its six teeth reach 0.43 of its size from the
+  // centre and their roots 0.31. This far apart, up and to the right, with
+  // the second a third of a tooth on, the teeth interleave without
+  // touching all the way round.
+  static const _apart = 0.81 * _size;
+  static const _slant = -35 * math.pi / 180;
+  static const _offset = 20 / 360;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget cog(Offset centre, double turns, Color color) => Positioned(
+      left: centre.dx - _size / 2,
+      top: centre.dy - _size / 2,
+      child: Transform.rotate(
+        angle: turns * 2 * math.pi,
+        child: Icon(Icons.settings_rounded, size: _size, color: color),
+      ),
+    );
+    const first = Offset(_size / 2 + 2, 80 - _size / 2 - 2);
+    return SizedBox(
+      width: 92,
+      height: 80,
+      child: Stack(
+        children: [
+          cog(first, turns, AppColors.primary),
+          cog(
+            first + Offset.fromDirection(_slant, _apart),
+            _offset - turns,
+            AppColors.veryGood,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Between the last question and the plan: sixteen seconds of the plan being
 /// put together, a bar filling with what it's working on, and three cards in
 /// turn: a fact for the goal (the WHO's on obesity, or for someone
@@ -732,7 +777,8 @@ class _PlanBuildingState extends State<_PlanBuilding>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 16),
-            const Center(child: AppLogoMark(size: 80)),
+            // A turn every two seconds.
+            Center(child: _Cogs(turns: t * _duration.inSeconds / 2)),
             const SizedBox(height: 24),
             Text(
               l10n.onboardingBuildingTitle,
