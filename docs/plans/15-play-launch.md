@@ -31,12 +31,12 @@
 
 ## C. Store listing and forms (about 1 hour; plan 14 has every answer)
 
-- [ ] **Grow users → Store presence → Main store listing**: app name, short and full description from plan 14 section 1.
-  - [ ] App icon: `assets/android/play_store_512.png`.
-  - [ ] Feature graphic: `tools/e2e/store/feature-graphic.png` (1024 × 500).
-  - [ ] Phone screenshots, in this order: `tools/e2e/store/play-1.png` to `play-8.png`, the poster-style set (`tools/e2e/store/PLAY.md`). The plain screens `en-1-home.png` to `en-6-history.png` are the fallback.
+- [x] **Grow users → Store presence → Main store listing**: app name, short and full description from plan 14 section 1.
+  - [x] App icon: `assets/android/play_store_512.png`.
+  - [x] Feature graphic: `tools/e2e/store/feature-graphic.png` (1024 × 500).
+  - [x] Phone screenshots, in this order: `tools/e2e/store/play-1.png` to `play-8.png`, the poster-style set (`tools/e2e/store/PLAY.md`). The plain screens `en-1-home.png` to `en-6-history.png` are the fallback.
   - [ ] Translations → Add → Bulgarian: the Bulgarian texts from plan 14 (screenshots can stay English).
-  - [ ] Save.
+  - [x] Save.
 - [ ] **Store settings**: category **Health & Fitness**, contact email `help.yumsum@gmail.com`, website `https://yumsum.web.app`.
 - [ ] **Policy and programs → App content**, each form from plan 14 section 2:
   - [ ] Privacy policy: `https://yumsum.web.app/privacy`
@@ -75,7 +75,7 @@ Message for testers:
 
 **11 November 2026:** crash reports now also catch failed AI calls, Google sign-in set-up faults, purchase failures and the errors the app used to swallow (docs/features.md, Crash reporting); a fresh 0.1.0+2 bundle is needed to carry them, built when you ask. After installing it from Play, do the crash report check in B, then try Continue with Google: if it fails, Firebase → Crashlytics → Non-fatals shows it as "Google sign-in" within a few minutes, with the exact error. The help pages no longer link to the app or name you, and are dated 11 November 2026.
 
-**12 November 2026:** 0.1.0+2 rebuilt at 17:12 with everything up to today (meal groups and times, the mic fixes, onboarding's new pictures, the time wheels); the 11 November +3 bundle was never uploaded and is gone. Next: upload it to Internal testing (release notes: `Meal times and groups, voice fixes, a new onboarding.`), then C's store listing, then B's Try it and crash report check.
+**12 November 2026:** 0.1.0+2 rebuilt at 17:12 with everything up to today (meal groups and times, the mic fixes, onboarding's new pictures, the time wheels); the 11 November +3 bundle was never uploaded and is gone. Uploaded to Internal testing the same evening (version code 2, live to internal testers) and the main store listing filled in. Until the App content forms are done and the app is reviewed, Play shows testers the temporary name `com.bpetrov.yumsum (unreviewed)`. Next: B's Try it and crash report check, then C's Store settings and App content forms.
 
 Where the internal test got to: the release is live, you're a tester, the signing keys are in Firebase, Play Integrity is linked. Open:
 
