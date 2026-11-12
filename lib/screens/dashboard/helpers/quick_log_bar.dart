@@ -95,6 +95,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   // The recogniser stops after this long without new words (3 s felt like
   // a wait, 12 November); Android's own silence cut can come sooner.
   static const _speechPause = Duration(milliseconds: 2500);
+  static const _webFinalWait = Duration(milliseconds: 300);
   // Errors that mean nothing was said, rather than that it can't listen.
   static const _nothingSaid = {
     'error_no_match',
@@ -137,6 +138,8 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   // How loud the speaker is, 0 to 1, for the listening bubble; a notifier
   // so the many updates a second repaint the bubble and nothing else.
   final _level = ValueNotifier<double>(0);
+  // Settles the bubble after a word on the web.
+  Timer? _pulseTimer;
   // The recogniser while it, rather than the recorder, is listening.
   SpeechToText? _speech;
   bool _working = false;
@@ -260,6 +263,7 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     _resumeListener?.dispose();
     _stopTimer?.cancel();
     _afterFailure?.cancel();
+    _pulseTimer?.cancel();
     _levelSub?.cancel();
     _audioSub?.cancel();
     _speech?.cancel();
@@ -514,11 +518,18 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
   /// when it can't start, and then it isn't tried again this session.
   Future<bool> _startSpeech(SpeechToText speech) async {
     try {
-      // Set each time: initialize() takes its listeners only once.
-      speech
-        ..errorListener = _onSpeechError
-        ..statusListener = _onSpeechStatus;
-      if (await speech.initialize()) {
+      // A browser's recogniser never marks its words final, so the plugin
+      // does, this long after stopping (only the first initialize() sets
+      // it): its 2 s default came on top of the pause.
+      if (await speech.initialize(
+        finalTimeout: kIsWeb ? _webFinalWait : SpeechToText.defaultFinalTimeout,
+      )) {
+        // Set each time, and after initialize(): its first call replaces
+        // them with its own (none), which left the first try of a session
+        // deaf to the recogniser stopping or failing (12 November).
+        speech
+          ..errorListener = _onSpeechError
+          ..statusListener = _onSpeechStatus;
         if (!mounted) return true;
         _fill('', null, null);
         _level.value = 0;
@@ -570,6 +581,15 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
         selection: TextSelection.collapsed(offset: words.length),
       );
     });
+    // Browsers report no sound level: there each new word swells the
+    // bubble for a moment instead.
+    if (kIsWeb && !result.finalResult) {
+      _level.value = 0.8;
+      _pulseTimer?.cancel();
+      _pulseTimer = Timer(const Duration(milliseconds: 250), () {
+        if (mounted) _level.value = 0.15;
+      });
+    }
     if (result.finalResult) _finishSpeech();
   }
 

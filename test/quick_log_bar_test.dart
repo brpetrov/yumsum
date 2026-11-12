@@ -251,6 +251,11 @@ class _FakeSpeech extends Fake implements SpeechToText {
   @override
   SpeechStatusListener? statusListener;
 
+  bool _initWorked = false;
+
+  /// As the plugin's: until a call works, each takes its own arguments as
+  /// the listeners, replacing any set before it; after that, calls change
+  /// nothing.
   @override
   Future<bool> initialize({
     SpeechErrorListener? onError,
@@ -260,7 +265,10 @@ class _FakeSpeech extends Fake implements SpeechToText {
     List<SpeechConfigOption>? options,
   }) async {
     starts++;
-    return works;
+    if (_initWorked) return true;
+    errorListener = onError;
+    statusListener = onStatus;
+    return _initWorked = works;
   }
 
   @override
