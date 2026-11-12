@@ -428,7 +428,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get quickLogStop => 'Спри';
 
   @override
-  String get quickLogTime => 'Кога хапна';
+  String get quickLogTime => 'Час на хранене';
 
   @override
   String get mealTime => 'Час';

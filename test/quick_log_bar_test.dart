@@ -1895,7 +1895,7 @@ void main() {
     await tester.enterText(nameBox, 'мусака');
     await tester.pumpAndSettle();
 
-    expect(find.byTooltip('Кога хапна'), findsOneWidget);
+    expect(find.byTooltip('Час на хранене'), findsOneWidget);
     expect(clockLabel(tester), isNull);
     // The bar's 18 px sides, the 12 px gap, and the clock and its gap.
     expect(tester.getSize(proteinBox).width, (360 - 36 - 12 - 10 - 44) / 2);
