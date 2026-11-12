@@ -477,8 +477,15 @@ class _RingPainter extends CustomPainter {
               .createShader(rect)
       ..style = PaintingStyle.stroke
       ..strokeWidth = _stroke;
-    // A full gold ring is one unbroken band, like a real ring.
-    if (gold && value >= 1) {
+    // A full ring is one unbroken band, like a real ring: a gold one keeps
+    // its shading, any other is its colour all round, so at or over the
+    // target no ends or lighter start read as a gap (12 November 2026).
+    if (value >= 1) {
+      if (!gold) {
+        arc
+          ..shader = null
+          ..color = color;
+      }
       canvas.drawArc(rect, 0, 2 * math.pi, false, arc);
       return;
     }

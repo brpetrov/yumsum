@@ -190,6 +190,20 @@ void main() {
     );
   });
 
+  testWidgets('a ring over its target is one full band in its colour', (
+    tester,
+  ) async {
+    await pump(tester, [_withCarbs(185)]);
+    expect(
+      find
+          .ancestor(of: find.text('185 g'), matching: find.byType(CustomPaint))
+          .first,
+      paints
+        ..arc()
+        ..arc(startAngle: 0, sweepAngle: 2 * math.pi, color: AppColors.bad),
+    );
+  });
+
   testWidgets('more protein than the target is gold, never a warning', (
     tester,
   ) async {
