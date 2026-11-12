@@ -1365,13 +1365,15 @@ void main() {
     expect(boxes(tester), ['Lunch', '400', '']);
   });
 
-  testWidgets('the mic writes the words as they are said and estimates them '
-      'once the speaker stops', (tester) async {
+  testWidgets('the mic writes the words as they are said, and once the '
+      'speaker stops they wait for the sparkle or the X', (tester) async {
     final speech = _FakeSpeech();
     await pumpCard(tester, speech: speech);
     await tester.tap(find.byTooltip('Speak'));
     await tester.pump();
     expect(find.text(listening), findsOneWidget);
+    // The bar opens as the mic starts, so nothing appears mid-sentence.
+    expect(kcalBox, findsOneWidget);
     expect(speech.options!.localeId, 'en-GB');
     expect(speech.options!.pauseFor, const Duration(milliseconds: 2500));
     // The mic bubble, swelling with the voice; the box wraps a long meal.
@@ -1399,9 +1401,30 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(listening), findsNothing);
     expect(bubble, findsNothing);
+    // Nothing sent: the words sit in the box to be checked first.
+    expect(estimateService.estimateCalls, 0);
+    expect(boxes(tester), ['two eggs on toast', '', '']);
+    expect(find.byTooltip('Clear'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Estimate'));
+    await tester.pumpAndSettle();
     expect(estimateService.described, 'two eggs on toast');
     expect(boxes(tester).take(2), ['two eggs on toast', '520']);
     expect(estimateService.heard, isNull);
+  });
+
+  testWidgets('misheard words are one tap from gone', (tester) async {
+    final speech = _FakeSpeech();
+    await pumpCard(tester, speech: speech);
+    await tester.tap(find.byTooltip('Speak'));
+    await tester.pump();
+    speech.say('two legs on toast', last: true);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Clear'));
+    await tester.pumpAndSettle();
+    expect(boxes(tester).first, '');
+    expect(estimateService.estimateCalls, 0);
   });
 
   testWidgets('in Bulgarian the recogniser listens for Bulgarian', (
@@ -1414,7 +1437,7 @@ void main() {
     expect(speech.options!.localeId, 'bg-BG');
   });
 
-  testWidgets('stop estimates the words heard so far', (tester) async {
+  testWidgets('stop keeps the words heard so far', (tester) async {
     final speech = _FakeSpeech();
     await pumpCard(tester, speech: speech);
     await tester.tap(find.byTooltip('Speak'));
@@ -1425,7 +1448,9 @@ void main() {
     await tester.tap(find.byTooltip('Stop'));
     await tester.pumpAndSettle();
     expect(speech.stopped, isTrue);
-    expect(estimateService.described, 'a banana');
+    expect(boxes(tester).first, 'a banana');
+    expect(estimateService.estimateCalls, 0);
+    expect(find.byTooltip('Estimate'), findsOneWidget);
   });
 
   testWidgets('silence from the recogniser is not sent to the AI', (

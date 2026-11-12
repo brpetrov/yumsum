@@ -51,7 +51,7 @@ final audioRecorderProvider = Provider<AudioRecorder>((ref) {
   return recorder;
 });
 
-/// The phone's or browser's speech recogniser behind the mic, which shows
+/// The phone's or browser's speech recogniser behind the mic, which writes
 /// the words as they're said and stops by itself after a pause; overridable
 /// in tests. Null once it has failed this session (none there, no such
 /// language, as on iPhones in Bulgarian, or no permission), so the mic
@@ -65,8 +65,8 @@ typedef _Entry = ({String? name, int? kcal, int? protein});
 /// Beside the idle box sit the other ways in, one round button each: a
 /// photo of the plate for the AI, a packet's barcode (phones only) and the
 /// mic, which writes the words into the box as they're said, in the app's
-/// language, and estimates them as if typed; where the device can't, it
-/// records a short note that the AI listens to itself. Once the bar is in
+/// language, to be estimated as if typed once they've been checked; where
+/// the device can't, it records a short note that the AI listens to itself. Once the bar is in
 /// use (text, or the keyboard up for it) they slide away for one round
 /// button, so the box has the room: a sparkle to estimate a named meal, a
 /// tick to save one with calories. While the box is focused, meals are
@@ -578,21 +578,20 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
 
   Future<void> _stopSpeech() async {
     await _speech?.stop();
-    await _finishSpeech();
+    _finishSpeech();
   }
 
-  /// Ends listening and estimates what was said, as if typed.
-  Future<void> _finishSpeech() async {
+  /// Ends listening. The words stay in the box, with the sparkle to
+  /// estimate them and the X to clear them: a look first, as a word may
+  /// have been misheard or misspoken (12 November; before, they went to
+  /// the AI by themselves).
+  void _finishSpeech() {
     if (!mounted || _speech == null) return;
     setState(() {
       _speech = null;
       _listening = false;
+      if (_name.text.trim().isEmpty) _error = context.l10n.quickLogMisTap;
     });
-    if (_name.text.trim().isEmpty) {
-      setState(() => _error = context.l10n.quickLogMisTap);
-      return;
-    }
-    await _estimate();
   }
 
   /// Ends the recording by itself after a pause, once something was said,
@@ -799,7 +798,10 @@ class _QuickLogBarState extends ConsumerState<QuickLogBar>
     // body, where the bar lives.
     final keyboardUp =
         _heldKeyboardUp ?? View.of(context).viewInsets.bottom > 0;
-    final open = hasText || (focused && (keyboardUp || _isDesktop));
+    // Listening opens the bar from the first moment, so the number boxes
+    // don't appear under the words mid-sentence and jolt it.
+    final open =
+        hasText || (focused && (keyboardUp || _isDesktop)) || _listening;
     // The other ways in make room once the bar is in use: text, or the
     // keyboard up to type it. Not for desktop's standing focus, which
     // would hide them for good.
