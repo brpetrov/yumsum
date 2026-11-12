@@ -55,6 +55,38 @@ flutter build web `
   --no-wasm-dry-run `
   -o $webkitBuild
 
+# Each build's code gets a name of its own, main.<hash>.dart.js, so no
+# browser can keep running an old copy out of its cache: on 12 November an
+# iPhone's Brave still ran a 9 November copy after two reloads. build.json
+# names the current file, so a tab left open can tell a newer copy is up
+# and reload (web/flutter_bootstrap.js).
+function Set-MainName($dir) {
+  $hash = (Get-FileHash (Join-Path $dir 'main.dart.js') -Algorithm SHA256).Hash.Substring(0, 12).ToLower()
+  $main = "main.$hash.dart.js"
+  # flutter build leaves earlier builds' files in its folder.
+  Get-ChildItem -LiteralPath $dir -File |
+    Where-Object { $_.Name -match '^main\.[0-9a-f]{12}\.dart\.js$' } |
+    Remove-Item
+  Rename-Item -LiteralPath (Join-Path $dir 'main.dart.js') -NewName $main
+  $references = @{
+    'flutter_bootstrap.js' = '"mainJsPath":"main.dart.js"'
+    'index.html'           = 'href="main.dart.js"'
+  }
+  foreach ($file in $references.Keys) {
+    $path = Join-Path $dir $file
+    $text = [IO.File]::ReadAllText($path)
+    $old = $references[$file]
+    if (-not $text.Contains($old)) {
+      throw "$path no longer names main.dart.js as $old; update tools/build_hosting.ps1."
+    }
+    [IO.File]::WriteAllText($path, $text.Replace($old, $old.Replace('main.dart.js', $main)))
+  }
+  [IO.File]::WriteAllText((Join-Path $dir 'build.json'), "{`"main`":`"$main`"}")
+}
+
+Set-MainName $fastBuild
+Set-MainName $webkitBuild
+
 Reset-Directory $hostingBuild
 
 Copy-Item -Path $fastBuild -Destination (Join-Path $hostingBuild 'app') -Recurse

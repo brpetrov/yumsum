@@ -137,6 +137,37 @@ keepFlutterTextInputsFocused();
 {{flutter_js}}
 {{flutter_build_config}}
 
+// A tab left open keeps running the code it first loaded, for weeks on a
+// phone. Each time it comes back into view it asks for build.json, which
+// tools/build_hosting.ps1 writes with the current code file's name, and
+// reloads once if the site has a newer copy.
+function reloadWhenUpdated() {
+  const loaded = _flutter.buildConfig?.builds?.[0]?.mainJsPath;
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState !== 'visible') {
+      return;
+    }
+    try {
+      const response = await fetch('build.json', { cache: 'no-store' });
+      if (!response.ok) {
+        return;
+      }
+      const { main } = await response.json();
+      // Once per newer copy, so a reload that still brings back the old
+      // one can't repeat.
+      if (!main || main === loaded || sessionStorage.getItem('reloadedFor') === main) {
+        return;
+      }
+      sessionStorage.setItem('reloadedFor', main);
+      location.reload();
+    } catch (_) {
+      // Offline, or a local run, which has no build.json: carry on.
+    }
+  });
+}
+
+reloadWhenUpdated();
+
 _flutter.loader.load({
   config: {
     canvasKitBaseUrl: 'canvaskit/',
