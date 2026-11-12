@@ -236,6 +236,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Your plan is ready!'), findsOneWidget);
     expect(find.text('Building your plan'), findsNothing);
+    // The mascot with its plan, rather than the logo.
+    expect(
+      find.image(const AssetImage('assets/plan_ready.webp')),
+      findsOneWidget,
+    );
 
     expect(tester.widget<PopScope>(find.byType(PopScope)).canPop, isTrue);
 

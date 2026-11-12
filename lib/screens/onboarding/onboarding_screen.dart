@@ -461,8 +461,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // The celebration illustration goes here once it's drawn.
-          const Center(child: AppLogoMark(size: 96)),
+          // The mascot with its plan (assets/plan_ready.webp, 720 px for
+          // the web), as wide as AI Coach's.
+          Center(
+            child: Image.asset(
+              'assets/plan_ready.webp',
+              width: 156,
+              filterQuality: FilterQuality.medium,
+            ),
+          ),
           const SizedBox(height: 20),
           if (_preview case final preview?)
             Shine(
