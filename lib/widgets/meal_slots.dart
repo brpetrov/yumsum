@@ -85,9 +85,7 @@ class _MealSlotsState extends State<MealSlots> {
     for (final MapEntry(key: slot, value: meals) in slots.entries) {
       final open = _open[slot] ?? slot.index >= openFrom;
       final totals = mealTotals(meals);
-      if (children.isNotEmpty) {
-        children.add(const Divider(height: 1, endIndent: 14));
-      }
+      children.add(const SizedBox(height: 6));
       children.add(
         _SlotHeader(
           key: ValueKey(slot),
@@ -126,7 +124,7 @@ class _MealSlotsState extends State<MealSlots> {
 }
 
 /// A slot's name, its count while folded, its totals and a chevron, all one
-/// tap target.
+/// tap target on a tinted band, so it reads apart from the meals under it.
 class _SlotHeader extends StatelessWidget {
   const _SlotHeader({
     super.key,
@@ -147,64 +145,68 @@ class _SlotHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       expanded: open,
-      child: InkWell(
-        onTap: onTap,
+      child: Material(
+        color: AppColors.surfaceVariant,
         borderRadius: BorderRadius.circular(14),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 48),
-          child: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: AppTheme.display.copyWith(
-                        fontSize: 16,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    if (!open)
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48),
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 8, 0, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        count,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textSecondary,
+                        name,
+                        style: AppTheme.display.copyWith(
+                          fontSize: 16,
+                          color: AppColors.textPrimary,
                         ),
                       ),
-                  ],
+                      if (!open)
+                        Text(
+                          count,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              // A big slot's totals shrink a little on a narrow phone, rather
-              // than break the name or wrap.
-              Expanded(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    totals,
-                    style: AppTheme.display.copyWith(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
+                const SizedBox(width: 8),
+                // A big slot's totals shrink a little on a narrow phone, rather
+                // than break the name or wrap.
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      totals,
+                      style: AppTheme.display.copyWith(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              // As wide as a row's menu, so the chevrons line up with the ⋮s.
-              SizedBox(
-                width: 48,
-                child: Icon(
-                  open
-                      ? Icons.expand_more_rounded
-                      : Icons.chevron_right_rounded,
-                  color: AppColors.textSecondary,
+                // As wide as a row's menu, so the chevrons line up with the ⋮s.
+                SizedBox(
+                  width: 48,
+                  child: Icon(
+                    open
+                        ? Icons.expand_more_rounded
+                        : Icons.chevron_right_rounded,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
