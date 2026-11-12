@@ -651,7 +651,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 }
 
-/// Between the last question and the plan: ten seconds of the plan being
+/// Between the last question and the plan: sixteen seconds of the plan being
 /// put together, a bar filling with what it's working on, and three cards in
 /// turn: a fact for the goal (the WHO's on obesity, or for someone
 /// [gaining] one on muscle), one on calories for everyone, and a line to
@@ -671,7 +671,7 @@ class _PlanBuilding extends StatefulWidget {
 class _PlanBuildingState extends State<_PlanBuilding>
     with SingleTickerProviderStateMixin {
   // Long enough to read each of the three cards.
-  static const _duration = Duration(seconds: 10);
+  static const _duration = Duration(seconds: 16);
 
   late final _controller = AnimationController(vsync: this, duration: _duration)
     ..addStatusListener((status) {

@@ -221,12 +221,12 @@ void main() {
     // The phone's back gesture waits too.
     expect(tester.widget<PopScope>(find.byType(PopScope)).canPop, isFalse);
 
-    await tester.pump(const Duration(seconds: 4));
+    await tester.pump(const Duration(seconds: 7));
     await tester.pump(const Duration(milliseconds: 500)); // the fade
     expect(find.textContaining('7,700 kcal'), findsOneWidget);
     expect(find.text('World Health Organization, 2022'), findsNothing);
 
-    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(const Duration(seconds: 4));
     expect(
       find.textContaining('Today you start a journey with YumSum'),
       findsOneWidget,
