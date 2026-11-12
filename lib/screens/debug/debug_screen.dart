@@ -9,10 +9,28 @@ import 'package:lean_streak/app/router.dart';
 import 'package:lean_streak/core/constants/app_colors.dart';
 import 'package:lean_streak/providers/auth_provider.dart';
 import 'package:lean_streak/providers/debug_provider.dart';
+import 'package:lean_streak/providers/language_provider.dart';
 import 'package:lean_streak/providers/preferences_provider.dart';
 import 'package:lean_streak/screens/dashboard/helpers/plus_prompt_card.dart';
 import 'package:lean_streak/widgets/app_frame.dart';
 import 'package:lean_streak/widgets/responsive_page.dart';
+
+/// "Go through onboarding again": from the language question, as a new
+/// device in Bulgaria sees it, then onboarding in the language chosen.
+/// However it's left, the preview ends once back here and this device's
+/// own language is put back.
+Future<void> previewOnboarding(BuildContext context, WidgetRef ref) async {
+  final language = ref.read(languageControllerProvider);
+  ref.read(onboardingPreviewProvider.notifier).state = true;
+  await context.push(AppRoutes.language);
+  if (!context.mounted) return;
+  ref.read(onboardingPreviewProvider.notifier).state = false;
+  if (ref.read(languageControllerProvider) != language) {
+    await ref
+        .read(languageControllerProvider.notifier)
+        .setLanguage(language ?? 'en');
+  }
+}
 
 /// Shortcuts for trying the app, in debug builds only (the menu and the
 /// route exist only there). Nothing here reaches Firestore.
@@ -103,16 +121,14 @@ class DebugScreen extends ConsumerWidget {
                 const SizedBox(height: 24),
                 const _Label('ONBOARDING'),
                 Text(
-                  'The questions a new account answers before Home. Nothing '
-                  'you enter is saved.',
+                  'The questions a new account answers before Home, from '
+                  'the language question a device in Bulgaria gets. Nothing '
+                  'you enter is saved, and your language is put back after.',
                   style: muted,
                 ),
                 const SizedBox(height: 8),
                 OutlinedButton.icon(
-                  onPressed: () {
-                    ref.read(onboardingPreviewProvider.notifier).state = true;
-                    context.push(AppRoutes.onboarding);
-                  },
+                  onPressed: () => previewOnboarding(context, ref),
                   icon: const Icon(Icons.play_arrow_rounded),
                   label: const Text('Go through onboarding again'),
                 ),

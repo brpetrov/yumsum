@@ -234,8 +234,10 @@ String? _redirect(Ref ref, GoRouterState state) {
     return location == AppRoutes.onboarding ? null : AppRoutes.onboarding;
   }
 
-  // Debug tools' preview of onboarding, for a finished account.
-  if (location == AppRoutes.onboarding && ref.read(onboardingPreviewProvider)) {
+  // Debug tools' preview of onboarding, for a finished account, from its
+  // language question.
+  if ((location == AppRoutes.onboarding || location == AppRoutes.language) &&
+      ref.read(onboardingPreviewProvider)) {
     return null;
   }
 

@@ -19,6 +19,7 @@ import 'package:lean_streak/providers/reminder_provider.dart';
 import 'package:lean_streak/providers/user_profile_provider.dart';
 import 'package:lean_streak/screens/account/account_settings_screen.dart';
 import 'package:lean_streak/screens/auth/auth_screen.dart';
+import 'package:lean_streak/screens/debug/debug_screen.dart';
 import 'package:lean_streak/screens/language/language_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -152,6 +153,59 @@ void main() {
       expect(find.byType(AuthScreen), findsOneWidget);
       expect(appLocale(tester), const Locale('en'));
     });
+  });
+
+  testWidgets('Debug tools\' onboarding preview asks the language first, '
+      'goes on in it, and puts the device\'s own back after', (tester) async {
+    Locale? onboardingIn;
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (_, _) => Scaffold(
+            body: Consumer(
+              builder: (context, ref, _) => TextButton(
+                onPressed: () => previewOnboarding(context, ref),
+                child: const Text('Preview'),
+              ),
+            ),
+          ),
+        ),
+        GoRoute(
+          path: AppRoutes.language,
+          builder: (_, _) => const LanguageScreen(),
+        ),
+        // Onboarding itself, whose preview is tested on its own.
+        GoRoute(
+          path: AppRoutes.onboarding,
+          builder: (context, _) {
+            onboardingIn = Localizations.localeOf(context);
+            return Scaffold(
+              body: TextButton(
+                onPressed: () => context.pop(),
+                child: const Text('Leave'),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+    await pumpApp(tester, router: router, profile: planProfile(), stored: 'en');
+
+    await tester.tap(find.text('Preview'));
+    await tester.pumpAndSettle();
+    expect(find.byType(LanguageScreen), findsOneWidget);
+
+    await tester.tap(find.text('Български'));
+    await tester.pumpAndSettle();
+    expect(find.text('Leave'), findsOneWidget);
+    expect(onboardingIn, const Locale('bg'));
+
+    await tester.tap(find.text('Leave'));
+    await tester.pumpAndSettle();
+    expect(find.text('Preview'), findsOneWidget);
+    expect(prefs.getString('language'), 'en');
+    expect(appLocale(tester), const Locale('en'));
   });
 
   testWidgets('Settings switches the language at once', (tester) async {
