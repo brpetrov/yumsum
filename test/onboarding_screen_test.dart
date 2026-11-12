@@ -194,6 +194,48 @@ void main() {
     ]);
   });
 
+  testWidgets('the plan is built for a few seconds, with a fact and a line '
+      'to start on, then shown', (tester) async {
+    await pump(tester);
+    await answerAboutYou(tester);
+    await tester.tap(find.text('Keep my weight'));
+    await tester.pump();
+    await next(tester);
+    await next(tester);
+    await next(tester);
+    expect(find.text('Track protein too?'), findsOneWidget);
+    expect(
+      find.textContaining('keep muscle while you lose weight'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('Next'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text('Building your plan'), findsOneWidget);
+    expect(find.text('Working out what you burn…'), findsOneWidget);
+    expect(find.textContaining('1 in 8 people worldwide'), findsOneWidget);
+    expect(find.text('World Health Organization, 2022'), findsOneWidget);
+    final back = find.byWidgetPredicate((widget) => widget is TextButton);
+    expect(tester.widget<TextButton>(back).onPressed, isNull);
+
+    await tester.pump(const Duration(seconds: 4));
+    expect(
+      find.textContaining('Today you start a journey with YumSum'),
+      findsOneWidget,
+    );
+    expect(find.text('Your plan is ready!'), findsNothing);
+
+    await tester.pumpAndSettle();
+    expect(find.text('Your plan is ready!'), findsOneWidget);
+    expect(find.text('Building your plan'), findsNothing);
+
+    // Back from the plan goes to the last question, not through it again.
+    await tester.tap(find.text('Back'));
+    await tester.pumpAndSettle();
+    expect(find.text('Track protein too?'), findsOneWidget);
+  });
+
   testWidgets('keeping weight skips the target weight', (tester) async {
     await pump(tester);
     await answerAboutYou(tester);

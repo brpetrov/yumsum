@@ -12,6 +12,7 @@ import 'package:lean_streak/providers/auth_controller.dart';
 import 'package:lean_streak/providers/country_provider.dart';
 import 'package:lean_streak/providers/debug_provider.dart';
 import 'package:lean_streak/providers/onboarding_controller.dart';
+import 'package:lean_streak/widgets/app_card.dart';
 import 'package:lean_streak/widgets/app_logo_mark.dart';
 import 'package:lean_streak/widgets/health_plan_preview_card.dart';
 import 'package:lean_streak/widgets/legal_links.dart';
@@ -63,6 +64,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   WeightLossPace _weightLossPace = WeightLossPace.moderate;
   bool _trackProtein = true;
   int _index = 0;
+  // The few seconds between the last question and the plan (_PlanBuilding).
+  bool _building = false;
 
   @override
   void initState() {
@@ -186,7 +189,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       return;
     }
     FocusScope.of(context).unfocus();
+    if (steps[_index + 1] == _Step.plan) {
+      setState(() => _building = true);
+      return;
+    }
     setState(() => _index++);
+  }
+
+  void _built() {
+    if (!mounted) return;
+    setState(() {
+      _building = false;
+      _index++;
+    });
   }
 
   void _back() {
@@ -518,7 +533,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: TextButton.icon(
-                      onPressed: isLoading || isSigningOut ? null : _back,
+                      onPressed: isLoading || isSigningOut || _building
+                          ? null
+                          : _back,
                       icon: const Icon(Icons.arrow_back_rounded),
                       label: Text(
                         _index > 0 || inPreview
@@ -547,57 +564,71 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           child: child,
                         ),
                       ),
-                      child: SingleChildScrollView(
-                        key: ValueKey(step),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              heading,
-                              style: AppTheme.display.copyWith(
-                                fontSize: 26,
-                                color: AppColors.textPrimary,
+                      child: _building
+                          ? SingleChildScrollView(
+                              key: const ValueKey('building'),
+                              child: _PlanBuilding(onDone: _built),
+                            )
+                          : SingleChildScrollView(
+                              key: ValueKey(step),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Text(
+                                    heading,
+                                    style: AppTheme.display.copyWith(
+                                      fontSize: 26,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  if (helper != null) ...[
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      helper,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        height: 1.4,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                  const SizedBox(height: 24),
+                                  answer,
+                                ],
                               ),
                             ),
-                            if (helper != null) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                helper,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  height: 1.4,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ],
-                            const SizedBox(height: 24),
-                            answer,
-                          ],
-                        ),
-                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  SizedBox(
-                    height: 54,
-                    child: ElevatedButton(
-                      onPressed: isLoading || !_answered(step) ? null : _next,
-                      child: isLoading
-                          ? SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.5,
-                                color: AppColors.onPrimary,
+                  // Kept in place while the plan is built, so nothing jumps.
+                  Visibility(
+                    visible: !_building,
+                    maintainSize: true,
+                    maintainAnimation: true,
+                    maintainState: true,
+                    child: SizedBox(
+                      height: 54,
+                      child: ElevatedButton(
+                        onPressed: isLoading || !_answered(step) ? null : _next,
+                        child: isLoading
+                            ? SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: AppColors.onPrimary,
+                                ),
+                              )
+                            : Text(
+                                last
+                                    ? l10n.onboardingStart
+                                    : l10n.onboardingNext,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            )
-                          : Text(
-                              last ? l10n.onboardingStart : l10n.onboardingNext,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                      ),
                     ),
                   ),
                 ],
@@ -606,6 +637,148 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Between the last question and the plan: a few seconds of the plan being
+/// put together, a bar filling with what it's working on, then a fact and a
+/// line to start on, so the plan arrives as the result of the answers (12
+/// November 2026). The plan itself is worked out at once; this is only the
+/// moment. [onDone] when the bar is full.
+class _PlanBuilding extends StatefulWidget {
+  const _PlanBuilding({required this.onDone});
+
+  final VoidCallback onDone;
+
+  @override
+  State<_PlanBuilding> createState() => _PlanBuildingState();
+}
+
+class _PlanBuildingState extends State<_PlanBuilding>
+    with SingleTickerProviderStateMixin {
+  // Long enough to read the fact, then the line after it.
+  static const _duration = Duration(milliseconds: 7000);
+  static const _factShare = 0.55;
+
+  late final _controller = AnimationController(vsync: this, duration: _duration)
+    ..addStatusListener((status) {
+      if (status == AnimationStatus.completed) widget.onDone();
+    })
+    ..forward();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final status = [
+      l10n.onboardingBuildingBurn,
+      l10n.onboardingBuildingTarget,
+      l10n.onboardingBuildingPlan,
+    ];
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final t = _controller.value;
+        final progress = Curves.easeInOut.transform(t);
+        final line = (t * status.length).floor().clamp(0, status.length - 1);
+        final fact = t < _factShare;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 16),
+            const Center(child: AppLogoMark(size: 80)),
+            const SizedBox(height: 24),
+            Text(
+              l10n.onboardingBuildingTitle,
+              textAlign: TextAlign.center,
+              style: AppTheme.display.copyWith(
+                fontSize: 26,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 6),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: Text(
+                status[line],
+                key: ValueKey(line),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15, color: AppColors.textSecondary),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 10,
+                color: AppColors.veryGood,
+                backgroundColor: AppColors.surfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.onboardingBuildingPercent((progress * 100).round()),
+              textAlign: TextAlign.center,
+              style: AppTheme.display.copyWith(
+                fontSize: 18,
+                color: AppColors.veryGood,
+              ),
+            ),
+            const SizedBox(height: 28),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 400),
+              child: AppCard(
+                key: ValueKey(fact),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      fact ? Icons.public_rounded : Icons.flag_rounded,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            fact
+                                ? l10n.onboardingBuildingFact
+                                : l10n.onboardingBuildingStart,
+                            style: TextStyle(
+                              fontSize: 16,
+                              height: 1.4,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          if (fact) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              l10n.onboardingBuildingFactSource,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

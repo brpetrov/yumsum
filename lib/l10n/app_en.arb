@@ -1179,7 +1179,7 @@
   "@macroGuideKeepUnderNote": {
     "description": "Macro guide dialog: under the Keep under heading."
   },
-  "macroGuideProteinWhy": "Keeps you full and looks after your muscle.",
+  "macroGuideProteinWhy": "Keeps you full, keeps your muscle while you lose weight and helps build it while you gain.",
   "@macroGuideProteinWhy": {
     "description": "Macro guide dialog: what protein does."
   },
@@ -3176,9 +3176,46 @@
   "@onboardingProteinTitle": {
     "description": "Onboarding card heading, over a Yes/No toggle."
   },
-  "onboardingProteinBody": "Protein keeps you full and looks after your muscle. YumSum works it out for each meal you log.",
+  "onboardingProteinBody": "Protein keeps you full and helps you keep muscle while you lose weight, or build it while you gain. YumSum works it out for each meal you log.",
   "@onboardingProteinBody": {
     "description": "Onboarding: the line under Track protein too?"
+  },
+  "onboardingBuildingTitle": "Building your plan",
+  "@onboardingBuildingTitle": {
+    "description": "Onboarding: heading of the few seconds between the last question and the plan, while a bar fills."
+  },
+  "onboardingBuildingBurn": "Working out what you burn…",
+  "@onboardingBuildingBurn": {
+    "description": "Onboarding, building the plan: the first of three status lines under the heading."
+  },
+  "onboardingBuildingTarget": "Setting your daily target…",
+  "@onboardingBuildingTarget": {
+    "description": "Onboarding, building the plan: the second status line."
+  },
+  "onboardingBuildingPlan": "Putting your plan together…",
+  "@onboardingBuildingPlan": {
+    "description": "Onboarding, building the plan: the third status line."
+  },
+  "onboardingBuildingPercent": "{percent}%",
+  "@onboardingBuildingPercent": {
+    "description": "Onboarding, building the plan: how far the bar is, e.g. 64%.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingBuildingFact": "1 in 8 people worldwide live with obesity, and many everyday foods hold more calories than they seem.",
+  "@onboardingBuildingFact": {
+    "description": "Onboarding, building the plan: the fact shown first, from the WHO (2022 data, published 2024)."
+  },
+  "onboardingBuildingFactSource": "World Health Organization, 2022",
+  "@onboardingBuildingFactSource": {
+    "description": "Onboarding, building the plan: the small source line under the fact."
+  },
+  "onboardingBuildingStart": "Today you start a journey with YumSum: learning what's on your plate, and getting better one meal at a time.",
+  "@onboardingBuildingStart": {
+    "description": "Onboarding, building the plan: the encouraging line shown after the fact."
   },
   "onboardingPlanTitle": "Your plan is ready!",
   "@onboardingPlanTitle": {
@@ -3423,7 +3460,7 @@
   "@planSectionProtein": {
     "description": "Plan Settings: section label, in capitals."
   },
-  "planProteinNote": "Protein helps you keep and build muscle. Off hides it everywhere.",
+  "planProteinNote": "Protein helps you keep muscle while losing weight and build it while gaining. Off hides it everywhere.",
   "@planProteinNote": {
     "description": "Plan Settings: under TRACK PROTEIN TOO?"
   },

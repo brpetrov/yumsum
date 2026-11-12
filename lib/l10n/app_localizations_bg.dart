@@ -946,7 +946,8 @@ class AppLocalizationsBg extends AppLocalizations {
       'Не надвишавай посочените количества. Редовното превишаване вреди на зъбите и сърцето и повишава кръвното налягане.';
 
   @override
-  String get macroGuideProteinWhy => 'Засища и пази мускулите.';
+  String get macroGuideProteinWhy =>
+      'Засища, пази мускулите, докато отслабваш, и помага да ги изградиш, докато качваш.';
 
   @override
   String get macroGuideProteinTarget =>
@@ -2432,7 +2433,36 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get onboardingProteinBody =>
-      'Протеинът те засища и пази мускулите ти. YumSum го изчислява за всяко хранене, което запишеш.';
+      'Протеинът те засища и помага да запазиш мускулите, докато отслабваш, или да ги изградиш, докато качваш. YumSum го изчислява за всяко хранене, което запишеш.';
+
+  @override
+  String get onboardingBuildingTitle => 'Подготвяме плана ти';
+
+  @override
+  String get onboardingBuildingBurn => 'Изчисляваме колко изгаряш…';
+
+  @override
+  String get onboardingBuildingTarget => 'Задаваме дневната ти цел…';
+
+  @override
+  String get onboardingBuildingPlan => 'Подреждаме плана ти…';
+
+  @override
+  String onboardingBuildingPercent(int percent) {
+    return '$percent %';
+  }
+
+  @override
+  String get onboardingBuildingFact =>
+      '1 от всеки 8 души по света живее със затлъстяване, а много ежедневни храни съдържат повече калории, отколкото изглежда.';
+
+  @override
+  String get onboardingBuildingFactSource =>
+      'Световна здравна организация, 2022 г.';
+
+  @override
+  String get onboardingBuildingStart =>
+      'Днес започваш пътя си с YumSum: да опознаеш какво има в чинията ти и да се подобряваш с всяко хранене.';
 
   @override
   String get onboardingPlanTitle => 'Планът ти е готов!';
@@ -2624,7 +2654,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get planProteinNote =>
-      'Протеинът помага да запазиш и изградиш мускули. Ако избереш „Не“, данните за протеин няма да се показват в приложението.';
+      'Протеинът помага да запазиш мускулите, докато отслабваш, и да ги изградиш, докато качваш. Ако избереш „Не“, данните за протеин няма да се показват в приложението.';
 
   @override
   String get planSectionPace => 'ТВОЕТО ТЕМПО';

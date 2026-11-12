@@ -1607,7 +1607,7 @@ abstract class AppLocalizations {
   /// Macro guide dialog: what protein does.
   ///
   /// In en, this message translates to:
-  /// **'Keeps you full and looks after your muscle.'**
+  /// **'Keeps you full, keeps your muscle while you lose weight and helps build it while you gain.'**
   String get macroGuideProteinWhy;
 
   /// Macro guide dialog: protein's target, after Target:.
@@ -4037,8 +4037,56 @@ abstract class AppLocalizations {
   /// Onboarding: the line under Track protein too?
   ///
   /// In en, this message translates to:
-  /// **'Protein keeps you full and looks after your muscle. YumSum works it out for each meal you log.'**
+  /// **'Protein keeps you full and helps you keep muscle while you lose weight, or build it while you gain. YumSum works it out for each meal you log.'**
   String get onboardingProteinBody;
+
+  /// Onboarding: heading of the few seconds between the last question and the plan, while a bar fills.
+  ///
+  /// In en, this message translates to:
+  /// **'Building your plan'**
+  String get onboardingBuildingTitle;
+
+  /// Onboarding, building the plan: the first of three status lines under the heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Working out what you burn…'**
+  String get onboardingBuildingBurn;
+
+  /// Onboarding, building the plan: the second status line.
+  ///
+  /// In en, this message translates to:
+  /// **'Setting your daily target…'**
+  String get onboardingBuildingTarget;
+
+  /// Onboarding, building the plan: the third status line.
+  ///
+  /// In en, this message translates to:
+  /// **'Putting your plan together…'**
+  String get onboardingBuildingPlan;
+
+  /// Onboarding, building the plan: how far the bar is, e.g. 64%.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}%'**
+  String onboardingBuildingPercent(int percent);
+
+  /// Onboarding, building the plan: the fact shown first, from the WHO (2022 data, published 2024).
+  ///
+  /// In en, this message translates to:
+  /// **'1 in 8 people worldwide live with obesity, and many everyday foods hold more calories than they seem.'**
+  String get onboardingBuildingFact;
+
+  /// Onboarding, building the plan: the small source line under the fact.
+  ///
+  /// In en, this message translates to:
+  /// **'World Health Organization, 2022'**
+  String get onboardingBuildingFactSource;
+
+  /// Onboarding, building the plan: the encouraging line shown after the fact.
+  ///
+  /// In en, this message translates to:
+  /// **'Today you start a journey with YumSum: learning what\'s on your plate, and getting better one meal at a time.'**
+  String get onboardingBuildingStart;
 
   /// Onboarding: the last card's heading. One of the two places allowed an exclamation mark.
   ///
@@ -4385,7 +4433,7 @@ abstract class AppLocalizations {
   /// Plan Settings: under TRACK PROTEIN TOO?
   ///
   /// In en, this message translates to:
-  /// **'Protein helps you keep and build muscle. Off hides it everywhere.'**
+  /// **'Protein helps you keep muscle while losing weight and build it while gaining. Off hides it everywhere.'**
   String get planProteinNote;
 
   /// Plan Settings: section label, in capitals.

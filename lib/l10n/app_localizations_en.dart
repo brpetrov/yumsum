@@ -932,7 +932,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get macroGuideProteinWhy =>
-      'Keeps you full and looks after your muscle.';
+      'Keeps you full, keeps your muscle while you lose weight and helps build it while you gain.';
 
   @override
   String get macroGuideProteinTarget =>
@@ -2402,7 +2402,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingProteinBody =>
-      'Protein keeps you full and looks after your muscle. YumSum works it out for each meal you log.';
+      'Protein keeps you full and helps you keep muscle while you lose weight, or build it while you gain. YumSum works it out for each meal you log.';
+
+  @override
+  String get onboardingBuildingTitle => 'Building your plan';
+
+  @override
+  String get onboardingBuildingBurn => 'Working out what you burn…';
+
+  @override
+  String get onboardingBuildingTarget => 'Setting your daily target…';
+
+  @override
+  String get onboardingBuildingPlan => 'Putting your plan together…';
+
+  @override
+  String onboardingBuildingPercent(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get onboardingBuildingFact =>
+      '1 in 8 people worldwide live with obesity, and many everyday foods hold more calories than they seem.';
+
+  @override
+  String get onboardingBuildingFactSource => 'World Health Organization, 2022';
+
+  @override
+  String get onboardingBuildingStart =>
+      'Today you start a journey with YumSum: learning what\'s on your plate, and getting better one meal at a time.';
 
   @override
   String get onboardingPlanTitle => 'Your plan is ready!';
@@ -2594,7 +2622,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get planProteinNote =>
-      'Protein helps you keep and build muscle. Off hides it everywhere.';
+      'Protein helps you keep muscle while losing weight and build it while gaining. Off hides it everywhere.';
 
   @override
   String get planSectionPace => 'YOUR PACE';
