@@ -222,6 +222,27 @@
   "@homeMealsTitle": {
     "description": "Home: heading of the card listing today's meals."
   },
+  "homeSlotMorning": "Morning",
+  "@homeSlotMorning": {
+    "description": "Home, Today's meals: the group of meals logged before 12:00."
+  },
+  "homeSlotAfternoon": "Afternoon",
+  "@homeSlotAfternoon": {
+    "description": "Home, Today's meals: the group of meals logged from 12:00 to 16:59."
+  },
+  "homeSlotEvening": "Evening",
+  "@homeSlotEvening": {
+    "description": "Home, Today's meals: the group of meals logged from 17:00."
+  },
+  "homeSlotItems": "{count, plural, one{1 item} other{{count} items}}",
+  "@homeSlotItems": {
+    "description": "Home, Today's meals: how many meals a folded group holds, beside its name.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "homeMealsLogged": "{count, plural, other{{count} logged}}",
   "@homeMealsLogged": {
     "description": "Home: pill beside Today's meals with how many meals are logged today.",
@@ -502,6 +523,18 @@
   "quickLogStop": "Stop",
   "@quickLogStop": {
     "description": "Quick-log bar: tooltip of the button that stops the recording."
+  },
+  "quickLogTime": "Time eaten",
+  "@quickLogTime": {
+    "description": "Quick-log bar: tooltip of the small clock button that sets when the meal was eaten."
+  },
+  "quickLogTimeNow": "Now",
+  "@quickLogTimeNow": {
+    "description": "Quick-log bar: the clock button's label while the meal is logged at the current time."
+  },
+  "mealTime": "Time",
+  "@mealTime": {
+    "description": "Meal form (log and edit): label of the time the meal was eaten."
   },
   "quickLogPhoto": "Take a photo",
   "@quickLogPhoto": {
@@ -3212,6 +3245,14 @@
   "onboardingBuildingFactSource": "World Health Organization, 2022",
   "@onboardingBuildingFactSource": {
     "description": "Onboarding, building the plan: the small source line under the fact."
+  },
+  "onboardingBuildingGainFact": "A small surplus is enough to build muscle. Eating far more mostly adds fat.",
+  "@onboardingBuildingGainFact": {
+    "description": "Onboarding, building the plan: the first fact for someone gaining weight, in place of the WHO one."
+  },
+  "onboardingBuildingCalorieFact": "A kilo of body fat holds about 7,700 kcal, so small changes each day add up over the weeks.",
+  "@onboardingBuildingCalorieFact": {
+    "description": "Onboarding, building the plan: the second fact, for every goal."
   },
   "onboardingBuildingStart": "Today you start a journey with YumSum: learning what's on your plate, and getting better one meal at a time.",
   "@onboardingBuildingStart": {

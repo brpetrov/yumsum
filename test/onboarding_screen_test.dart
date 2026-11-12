@@ -218,8 +218,15 @@ void main() {
     expect(find.text('World Health Organization, 2022'), findsOneWidget);
     final back = find.byWidgetPredicate((widget) => widget is TextButton);
     expect(tester.widget<TextButton>(back).onPressed, isNull);
+    // The phone's back gesture waits too.
+    expect(tester.widget<PopScope>(find.byType(PopScope)).canPop, isFalse);
 
     await tester.pump(const Duration(seconds: 4));
+    await tester.pump(const Duration(milliseconds: 500)); // the fade
+    expect(find.textContaining('7,700 kcal'), findsOneWidget);
+    expect(find.text('World Health Organization, 2022'), findsNothing);
+
+    await tester.pump(const Duration(seconds: 3));
     expect(
       find.textContaining('Today you start a journey with YumSum'),
       findsOneWidget,
@@ -230,10 +237,34 @@ void main() {
     expect(find.text('Your plan is ready!'), findsOneWidget);
     expect(find.text('Building your plan'), findsNothing);
 
+    expect(tester.widget<PopScope>(find.byType(PopScope)).canPop, isTrue);
+
     // Back from the plan goes to the last question, not through it again.
     await tester.tap(find.text('Back'));
     await tester.pumpAndSettle();
     expect(find.text('Track protein too?'), findsOneWidget);
+  });
+
+  testWidgets('someone gaining gets a fact on muscle first', (tester) async {
+    await pump(tester);
+    await answerAboutYou(tester);
+    await tester.tap(find.text('Gain weight'));
+    await tester.pump();
+    await next(tester);
+    await type(tester, '85');
+    await next(tester);
+    await next(tester);
+    await next(tester);
+    await tester.tap(find.text('Next'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(
+      find.textContaining('A small surplus is enough to build muscle'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('1 in 8 people'), findsNothing);
+    await tester.pumpAndSettle();
   });
 
   testWidgets('keeping weight skips the target weight', (tester) async {

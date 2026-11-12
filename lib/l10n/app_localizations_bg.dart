@@ -171,6 +171,26 @@ class AppLocalizationsBg extends AppLocalizations {
   String get homeMealsTitle => 'Днешни хранения';
 
   @override
+  String get homeSlotMorning => 'Сутрин';
+
+  @override
+  String get homeSlotAfternoon => 'Следобед';
+
+  @override
+  String get homeSlotEvening => 'Вечер';
+
+  @override
+  String homeSlotItems(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count записа',
+      one: '1 запис',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String homeMealsLogged(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -401,6 +421,15 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get quickLogStop => 'Спри';
+
+  @override
+  String get quickLogTime => 'Кога хапна';
+
+  @override
+  String get quickLogTimeNow => 'Сега';
+
+  @override
+  String get mealTime => 'Час';
 
   @override
   String get quickLogPhoto => 'Снимай';
@@ -2459,6 +2488,14 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get onboardingBuildingFactSource =>
       'Световна здравна организация, 2022 г.';
+
+  @override
+  String get onboardingBuildingGainFact =>
+      'Малкият излишък стига, за да изградиш мускули. Ако ядеш много повече, се трупат предимно мазнини.';
+
+  @override
+  String get onboardingBuildingCalorieFact =>
+      'Един килограм телесни мазнини съдържа около 7700 ккал, затова малките промени всеки ден се натрупват през седмиците.';
 
   @override
   String get onboardingBuildingStart =>

@@ -169,6 +169,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeMealsTitle => 'Today\'s meals';
 
   @override
+  String get homeSlotMorning => 'Morning';
+
+  @override
+  String get homeSlotAfternoon => 'Afternoon';
+
+  @override
+  String get homeSlotEvening => 'Evening';
+
+  @override
+  String homeSlotItems(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String homeMealsLogged(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -392,6 +412,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quickLogStop => 'Stop';
+
+  @override
+  String get quickLogTime => 'Time eaten';
+
+  @override
+  String get quickLogTimeNow => 'Now';
+
+  @override
+  String get mealTime => 'Time';
 
   @override
   String get quickLogPhoto => 'Take a photo';
@@ -2427,6 +2456,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingBuildingFactSource => 'World Health Organization, 2022';
+
+  @override
+  String get onboardingBuildingGainFact =>
+      'A small surplus is enough to build muscle. Eating far more mostly adds fat.';
+
+  @override
+  String get onboardingBuildingCalorieFact =>
+      'A kilo of body fat holds about 7,700 kcal, so small changes each day add up over the weeks.';
 
   @override
   String get onboardingBuildingStart =>

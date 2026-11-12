@@ -392,6 +392,30 @@ abstract class AppLocalizations {
   /// **'Today\'s meals'**
   String get homeMealsTitle;
 
+  /// Home, Today's meals: the group of meals logged before 12:00.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get homeSlotMorning;
+
+  /// Home, Today's meals: the group of meals logged from 12:00 to 16:59.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon'**
+  String get homeSlotAfternoon;
+
+  /// Home, Today's meals: the group of meals logged from 17:00.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get homeSlotEvening;
+
+  /// Home, Today's meals: how many meals a folded group holds, beside its name.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 item} other{{count} items}}'**
+  String homeSlotItems(int count);
+
   /// Home: pill beside Today's meals with how many meals are logged today.
   ///
   /// In en, this message translates to:
@@ -733,6 +757,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stop'**
   String get quickLogStop;
+
+  /// Quick-log bar: tooltip of the small clock button that sets when the meal was eaten.
+  ///
+  /// In en, this message translates to:
+  /// **'Time eaten'**
+  String get quickLogTime;
+
+  /// Quick-log bar: the clock button's label while the meal is logged at the current time.
+  ///
+  /// In en, this message translates to:
+  /// **'Now'**
+  String get quickLogTimeNow;
+
+  /// Meal form (log and edit): label of the time the meal was eaten.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get mealTime;
 
   /// Quick-log bar: tooltip of the camera button (Smart Snap).
   ///
@@ -4081,6 +4123,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'World Health Organization, 2022'**
   String get onboardingBuildingFactSource;
+
+  /// Onboarding, building the plan: the first fact for someone gaining weight, in place of the WHO one.
+  ///
+  /// In en, this message translates to:
+  /// **'A small surplus is enough to build muscle. Eating far more mostly adds fat.'**
+  String get onboardingBuildingGainFact;
+
+  /// Onboarding, building the plan: the second fact, for every goal.
+  ///
+  /// In en, this message translates to:
+  /// **'A kilo of body fat holds about 7,700 kcal, so small changes each day add up over the weeks.'**
+  String get onboardingBuildingCalorieFact;
 
   /// Onboarding, building the plan: the encouraging line shown after the fact.
   ///

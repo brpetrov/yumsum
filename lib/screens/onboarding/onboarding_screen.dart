@@ -509,129 +509,139 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final l10n = context.l10n;
     final (heading, helper, answer) = _card(step);
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 560),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (_index + 1) / steps.length,
-                      minHeight: 6,
-                      color: AppColors.primary,
-                      backgroundColor: AppColors.surfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton.icon(
-                      onPressed: isLoading || isSigningOut || _building
-                          ? null
-                          : _back,
-                      icon: const Icon(Icons.arrow_back_rounded),
-                      label: Text(
-                        _index > 0 || inPreview
-                            ? l10n.onboardingBack
-                            : isSigningOut
-                            ? l10n.commonSigningOut
-                            : l10n.profileBackToSignIn,
+    // While the plan is built, the phone's back gesture waits too.
+    return PopScope(
+      canPop: !_building,
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 560),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (_index + 1) / steps.length,
+                        minHeight: 6,
+                        color: AppColors.primary,
+                        backgroundColor: AppColors.surfaceVariant,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Expanded(
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 250),
-                      layoutBuilder: (current, previous) => Stack(
-                        alignment: Alignment.topCenter,
-                        children: [...previous, ?current],
-                      ),
-                      transitionBuilder: (child, animation) => FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(
-                          position: Tween(
-                            begin: const Offset(0.08, 0),
-                            end: Offset.zero,
-                          ).animate(animation),
-                          child: child,
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: isLoading || isSigningOut || _building
+                            ? null
+                            : _back,
+                        icon: const Icon(Icons.arrow_back_rounded),
+                        label: Text(
+                          _index > 0 || inPreview
+                              ? l10n.onboardingBack
+                              : isSigningOut
+                              ? l10n.commonSigningOut
+                              : l10n.profileBackToSignIn,
                         ),
                       ),
-                      child: _building
-                          ? SingleChildScrollView(
-                              key: const ValueKey('building'),
-                              child: _PlanBuilding(onDone: _built),
-                            )
-                          : SingleChildScrollView(
-                              key: ValueKey(step),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Text(
-                                    heading,
-                                    style: AppTheme.display.copyWith(
-                                      fontSize: 26,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                  if (helper != null) ...[
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      helper,
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        height: 1.4,
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    ),
-                                  ],
-                                  const SizedBox(height: 24),
-                                  answer,
-                                ],
-                              ),
-                            ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  // Kept in place while the plan is built, so nothing jumps.
-                  Visibility(
-                    visible: !_building,
-                    maintainSize: true,
-                    maintainAnimation: true,
-                    maintainState: true,
-                    child: SizedBox(
-                      height: 54,
-                      child: ElevatedButton(
-                        onPressed: isLoading || !_answered(step) ? null : _next,
-                        child: isLoading
-                            ? SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  color: AppColors.onPrimary,
+                    const SizedBox(height: 12),
+                    Expanded(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        layoutBuilder: (current, previous) => Stack(
+                          alignment: Alignment.topCenter,
+                          children: [...previous, ?current],
+                        ),
+                        transitionBuilder: (child, animation) => FadeTransition(
+                          opacity: animation,
+                          child: SlideTransition(
+                            position: Tween(
+                              begin: const Offset(0.08, 0),
+                              end: Offset.zero,
+                            ).animate(animation),
+                            child: child,
+                          ),
+                        ),
+                        child: _building
+                            ? SingleChildScrollView(
+                                key: const ValueKey('building'),
+                                child: _PlanBuilding(
+                                  gaining: _gaining,
+                                  onDone: _built,
                                 ),
                               )
-                            : Text(
-                                last
-                                    ? l10n.onboardingStart
-                                    : l10n.onboardingNext,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                            : SingleChildScrollView(
+                                key: ValueKey(step),
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Text(
+                                      heading,
+                                      style: AppTheme.display.copyWith(
+                                        fontSize: 26,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    if (helper != null) ...[
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        helper,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          height: 1.4,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                    const SizedBox(height: 24),
+                                    answer,
+                                  ],
                                 ),
                               ),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    // Kept in place while the plan is built, so nothing jumps.
+                    Visibility(
+                      visible: !_building,
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: SizedBox(
+                        height: 54,
+                        child: ElevatedButton(
+                          onPressed: isLoading || !_answered(step)
+                              ? null
+                              : _next,
+                          child: isLoading
+                              ? SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: AppColors.onPrimary,
+                                  ),
+                                )
+                              : Text(
+                                  last
+                                      ? l10n.onboardingStart
+                                      : l10n.onboardingNext,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -641,14 +651,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 }
 
-/// Between the last question and the plan: a few seconds of the plan being
-/// put together, a bar filling with what it's working on, then a fact and a
-/// line to start on, so the plan arrives as the result of the answers (12
-/// November 2026). The plan itself is worked out at once; this is only the
-/// moment. [onDone] when the bar is full.
+/// Between the last question and the plan: ten seconds of the plan being
+/// put together, a bar filling with what it's working on, and three cards in
+/// turn: a fact for the goal (the WHO's on obesity, or for someone
+/// [gaining] one on muscle), one on calories for everyone, and a line to
+/// start on, so the plan arrives as the result of the answers (12 November
+/// 2026). The plan itself is worked out at once; this is only the moment.
+/// [onDone] when the bar is full.
 class _PlanBuilding extends StatefulWidget {
-  const _PlanBuilding({required this.onDone});
+  const _PlanBuilding({required this.gaining, required this.onDone});
 
+  final bool gaining;
   final VoidCallback onDone;
 
   @override
@@ -657,9 +670,8 @@ class _PlanBuilding extends StatefulWidget {
 
 class _PlanBuildingState extends State<_PlanBuilding>
     with SingleTickerProviderStateMixin {
-  // Long enough to read the fact, then the line after it.
-  static const _duration = Duration(milliseconds: 7000);
-  static const _factShare = 0.55;
+  // Long enough to read each of the three cards.
+  static const _duration = Duration(seconds: 10);
 
   late final _controller = AnimationController(vsync: this, duration: _duration)
     ..addStatusListener((status) {
@@ -681,13 +693,34 @@ class _PlanBuildingState extends State<_PlanBuilding>
       l10n.onboardingBuildingTarget,
       l10n.onboardingBuildingPlan,
     ];
+    // (icon, text, source)
+    final cards = [
+      widget.gaining
+          ? (
+              Icons.fitness_center_rounded,
+              l10n.onboardingBuildingGainFact,
+              null,
+            )
+          : (
+              Icons.public_rounded,
+              l10n.onboardingBuildingFact,
+              l10n.onboardingBuildingFactSource,
+            ),
+      (
+        Icons.local_fire_department_rounded,
+        l10n.onboardingBuildingCalorieFact,
+        null,
+      ),
+      (Icons.flag_rounded, l10n.onboardingBuildingStart, null),
+    ];
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
         final t = _controller.value;
         final progress = Curves.easeInOut.transform(t);
         final line = (t * status.length).floor().clamp(0, status.length - 1);
-        final fact = t < _factShare;
+        final card = (t * cards.length).floor().clamp(0, cards.length - 1);
+        final (icon, text, source) = cards[card];
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -735,23 +768,18 @@ class _PlanBuildingState extends State<_PlanBuilding>
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 400),
               child: AppCard(
-                key: ValueKey(fact),
+                key: ValueKey(card),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      fact ? Icons.public_rounded : Icons.flag_rounded,
-                      color: AppColors.primary,
-                    ),
+                    Icon(icon, color: AppColors.primary),
                     const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            fact
-                                ? l10n.onboardingBuildingFact
-                                : l10n.onboardingBuildingStart,
+                            text,
                             style: TextStyle(
                               fontSize: 16,
                               height: 1.4,
@@ -759,10 +787,10 @@ class _PlanBuildingState extends State<_PlanBuilding>
                               color: AppColors.textPrimary,
                             ),
                           ),
-                          if (fact) ...[
+                          if (source != null) ...[
                             const SizedBox(height: 8),
                             Text(
-                              l10n.onboardingBuildingFactSource,
+                              source,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
