@@ -10,8 +10,11 @@ import { type Language, languageOf } from "./prompts";
 /**
  * help.yumsum's Gmail app password, in Secret Manager. Firebase's own
  * confirmation email can't be restyled and comes from
- * lean-streak-project.firebaseapp.com, so the app's sign-up sends ours
- * instead, through Gmail.
+ * lean-streak-project.firebaseapp.com, so the app's sign-up sent ours
+ * instead, through Gmail, from 7 to 13 November 2026. The app no longer
+ * calls these: Outlook held ours for an hour and junked it, as a new free
+ * Gmail address sending HTML looks like phishing. They stay for when
+ * there's a domain of our own with an email service behind it.
  */
 const gmailAppPassword = defineSecret("GMAIL_APP_PASSWORD");
 const sender = "help.yumsum@gmail.com";

@@ -102,7 +102,7 @@ What the site should hold:
 
 ## Step 5: sign-in emails from your domain
 
-Verification and password-reset emails currently come from Firebase's address.
+Verification and password-reset emails currently come from Firebase's address (named YumSum, replying to help.yumsum@gmail.com, since 13 November 2026; our styled ones through Gmail were junked by Outlook, so they wait for this step and an email service such as Resend or Brevo).
 
 1. Firebase console → **Authentication → Templates** → edit a template → **Customize domain**.
 2. Enter `yourname…` and add the TXT and CNAME records it shows. Merge the SPF part into your one SPF record.

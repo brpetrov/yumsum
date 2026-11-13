@@ -1,10 +1,8 @@
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import 'package:lean_streak/core/config/app_check.dart';
 import 'package:lean_streak/core/config/crash_reports.dart';
 
 import 'package:lean_streak/providers/language_provider.dart';
@@ -133,17 +131,15 @@ class AuthController extends AsyncNotifier<AuthStatus> {
     });
   }
 
-  /// Our own confirmation email ([verificationEmailProvider]), or
-  /// Firebase's plain one when ours can't be sent, so a new account always
-  /// gets a link.
+  /// Firebase's confirmation email, in the app's language. Ours, styled and
+  /// sent through help.yumsum's Gmail (functions/src/email.ts), is not used:
+  /// Outlook held it for an hour and junked it (12 November 2026), as a new
+  /// free Gmail address sending HTML looks like phishing, where Firebase's
+  /// servers are trusted.
   Future<void> _sendVerification(User? user) async {
     if (user == null) return;
-    try {
-      await ref.read(verificationEmailProvider)();
-    } catch (error, stack) {
-      reportError(error, stack, 'Our confirmation email');
-      await user.sendEmailVerification();
-    }
+    await _inAppLanguage(ref);
+    await user.sendEmailVerification();
   }
 
   /// Emails a link to choose a new password: ours, else Firebase's. An
@@ -170,47 +166,20 @@ class AuthController extends AsyncNotifier<AuthStatus> {
   }
 }
 
-/// Sends the signed-in user our confirmation email (sendVerificationEmail,
-/// functions/src/email.ts): styled as YumSum and from help.yumsum, where
-/// Firebase's own is plain text from lean-streak-project.firebaseapp.com.
-/// It's written in the app's language.
-final verificationEmailProvider = Provider<Future<void> Function()>(
-  (ref) => () async {
-    await ensureAppCheck();
-    await FirebaseFunctions.instanceFor(region: 'europe-west10')
-        .httpsCallable('sendVerificationEmail')
-        .call<Object?>({'language': ref.read(languageCodeProvider)});
-  },
-);
+/// Firebase's emails, and the pages their links open, come in the app's
+/// language.
+Future<void> _inAppLanguage(Ref ref) =>
+    FirebaseAuth.instance.setLanguageCode(ref.read(languageCodeProvider));
 
-/// Sends [email] our password reset email (sendPasswordResetEmail,
-/// functions/src/email.ts), styled as YumSum and from help.yumsum in the
-/// app's language, where Firebase's own is plain text from
-/// lean-streak-project.firebaseapp.com.
-final passwordResetEmailProvider = Provider<Future<void> Function(String)>(
-  (ref) => (email) async {
-    await ensureAppCheck();
-    await FirebaseFunctions.instanceFor(
-      region: 'europe-west10',
-    ).httpsCallable('sendPasswordResetEmail').call<Object?>({
-      'email': email,
-      'language': ref.read(languageCodeProvider),
-    });
-  },
-);
-
-/// Our password reset email to [email], or Firebase's when ours fails, so a
-/// link always goes. Firebase's says nothing of an unknown address either.
+/// Firebase's password reset email to [email], in the app's language (not
+/// ours: see `_sendVerification`). It says nothing of an unknown address,
+/// so the form can't be used to probe emails.
 Future<void> sendResetEmail(Ref ref, String email) async {
+  await _inAppLanguage(ref);
   try {
-    await ref.read(passwordResetEmailProvider)(email);
-  } catch (error, stack) {
-    reportError(error, stack, 'Our password reset email');
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-    } on FirebaseAuthException catch (error) {
-      if (error.code != 'user-not-found') rethrow;
-    }
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+  } on FirebaseAuthException catch (error) {
+    if (error.code != 'user-not-found') rethrow;
   }
 }
 
