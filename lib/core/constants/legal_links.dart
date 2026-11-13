@@ -5,7 +5,7 @@ abstract final class LegalLinks {
   static Uri terms(String language) => _page('terms', language);
 
   static Uri _page(String name, String language) =>
-      Uri.parse('https://yumsum.web.app/$name${language == 'bg' ? '-bg' : ''}');
+      Uri.parse('https://yumsum.app/$name${language == 'bg' ? '-bg' : ''}');
 
   /// Where the food data comes from; its licence asks for the credit.
   static final openFoodFacts = Uri.parse('https://world.openfoodfacts.org');

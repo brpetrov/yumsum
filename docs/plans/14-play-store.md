@@ -133,7 +133,7 @@ Check: prices are left out on purpose. Plan 11 sets £3.99 a month, £29.99 a ye
 
 | Form | Answer | Why |
 |---|---|---|
-| Privacy policy URL | `https://yumsum.web.app/privacy` | Served from `tools/hosting/privacy.html`, effective 11 November 2026. |
+| Privacy policy URL | `https://yumsum.app/privacy` | Served from `tools/hosting/privacy.html`, effective 11 November 2026. |
 | Ads | No, the app contains no ads | No ad SDK in `pubspec.yaml` or the Android build; the policy says no advertising or ad trackers. |
 | App access | All or some functionality is restricted, so add instructions (2.1) | Everything sits behind sign-in. |
 | Content rating | Category: Utility, Productivity, Communication or other (2.2) | A tracking tool, not a game. |
@@ -214,7 +214,7 @@ Who receives data (from `functions/src`, `lib/services` and the privacy policy):
 
 ## 3. Account deletion
 
-Web link for Play: `https://yumsum.web.app/delete-account` (live since 9 November 2026, with `/delete-account-bg`): the steps in the app, deleting by email without it, and what is and isn't deleted.
+Web link for Play: `https://yumsum.app/delete-account` (live since 9 November 2026, with `/delete-account-bg`): the steps in the app, deleting by email without it, and what is and isn't deleted.
 
 - In the app (Settings > Delete account, confirmed with the password or Google) it deletes the profile, every meal, daily summary, weigh-in, day off and AI Coach note, the YumSum Star record and its Play purchase links, then the daily-count records and the sign-in account itself (`deleteAccountData` in `account_repository.dart`, `deleteAccount` in `functions/src/account.ts`).
 - It does not cancel a Google Play subscription (cancel it in Play), a feedback email already sent stays in the developer's mailbox until asked to delete it, and photos contributed to Open Food Facts stay published there.

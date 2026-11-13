@@ -89,17 +89,14 @@ void main() {
   test('each page has an English and a Bulgarian address', () {
     expect(
       LegalLinks.privacyPolicy('en').toString(),
-      'https://yumsum.web.app/privacy',
+      'https://yumsum.app/privacy',
     );
-    expect(LegalLinks.terms('en').toString(), 'https://yumsum.web.app/terms');
+    expect(LegalLinks.terms('en').toString(), 'https://yumsum.app/terms');
     expect(
       LegalLinks.privacyPolicy('bg').toString(),
-      'https://yumsum.web.app/privacy-bg',
+      'https://yumsum.app/privacy-bg',
     );
-    expect(
-      LegalLinks.terms('bg').toString(),
-      'https://yumsum.web.app/terms-bg',
-    );
+    expect(LegalLinks.terms('bg').toString(), 'https://yumsum.app/terms-bg');
   });
 
   testWidgets('the sign-in footer opens the pages in English', (tester) async {
@@ -108,10 +105,7 @@ void main() {
     await tester.tapOnText(find.textRange.ofSubstring('Terms of Use'));
     await tester.tapOnText(find.textRange.ofSubstring('Privacy Policy'));
 
-    expect(opened, [
-      'https://yumsum.web.app/terms',
-      'https://yumsum.web.app/privacy',
-    ]);
+    expect(opened, ['https://yumsum.app/terms', 'https://yumsum.app/privacy']);
   });
 
   testWidgets('the sign-in footer opens the pages in Bulgarian', (
@@ -125,8 +119,8 @@ void main() {
     );
 
     expect(opened, [
-      'https://yumsum.web.app/terms-bg',
-      'https://yumsum.web.app/privacy-bg',
+      'https://yumsum.app/terms-bg',
+      'https://yumsum.app/privacy-bg',
     ]);
   });
 
@@ -140,8 +134,8 @@ void main() {
     }
 
     expect(opened, [
-      'https://yumsum.web.app/privacy-bg',
-      'https://yumsum.web.app/terms-bg',
+      'https://yumsum.app/privacy-bg',
+      'https://yumsum.app/terms-bg',
     ]);
   });
 
@@ -154,8 +148,8 @@ void main() {
     }
 
     expect(opened, [
-      'https://yumsum.web.app/terms-bg',
-      'https://yumsum.web.app/privacy-bg',
+      'https://yumsum.app/terms-bg',
+      'https://yumsum.app/privacy-bg',
     ]);
   });
 }

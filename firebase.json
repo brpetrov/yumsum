@@ -67,12 +67,12 @@
       "redirects": [
         {
           "regex": "^/$",
-          "destination": "https://yumsum.web.app/",
+          "destination": "https://yumsum.app/",
           "type": 301
         },
         {
           "regex": "^/(.*)$",
-          "destination": "https://yumsum.web.app/:1",
+          "destination": "https://yumsum.app/:1",
           "type": 301
         }
       ]

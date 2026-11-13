@@ -12,7 +12,7 @@ describe("verificationEmail", () => {
     const escaped = link.replace(/&/g, "&amp;");
     assert.equal(email.html.split(`href="${escaped}"`).length - 1, 2);
     assert.ok(email.html.includes(">Confirm my email</a>"));
-    assert.ok(email.html.includes("https://yumsum.web.app/app/icons/Icon-192.png"));
+    assert.ok(email.html.includes("https://yumsum.app/app/icons/Icon-192.png"));
     assert.ok(email.text.includes(link));
   });
 

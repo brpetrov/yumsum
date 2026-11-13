@@ -37,9 +37,9 @@
   - [x] Phone screenshots, in this order: `tools/e2e/store/play-1.png` to `play-8.png`, the poster-style set (`tools/e2e/store/PLAY.md`). The plain screens `en-1-home.png` to `en-6-history.png` are the fallback.
   - [ ] Translations → Add → Bulgarian: the Bulgarian texts from plan 14 (screenshots can stay English).
   - [x] Save.
-- [ ] **Store settings**: category **Health & Fitness**, contact email `help.yumsum@gmail.com`, website `https://yumsum.web.app`.
+- [ ] **Store settings**: category **Health & Fitness**, contact email `help.yumsum@gmail.com`, website `https://yumsum.app`.
 - [ ] **Policy and programs → App content**, each form from plan 14 section 2:
-  - [ ] Privacy policy: `https://yumsum.web.app/privacy`
+  - [ ] Privacy policy: `https://yumsum.app/privacy`
   - [ ] Ads: no
   - [ ] App access: restricted → add the instructions from plan 14 section 2.1, with the test account's email and password in the credential boxes. That account has a YumSum Star manual grant (Claude wrote it on 10 November 2026). The browser tests reset its meals, never its profile, so it stays ready.
   - [ ] Content rating: the questionnaire in 2.2
@@ -47,7 +47,7 @@
   - [ ] News app: no; Government app: no; Financial features: none
   - [ ] Health apps: nutrition and weight management, not medical
   - [ ] Data safety: the table in 2.3. Go through the "Check:" lines as you fill it in
-  - [ ] **Account deletion**: `https://yumsum.web.app/delete-account`
+  - [ ] **Account deletion**: `https://yumsum.app/delete-account`
 - [ ] **Trader status** (Play Console home): can wait until February 2027, but must be done before YumSum Star is sold.
 
 ## D. Closed test with your testers

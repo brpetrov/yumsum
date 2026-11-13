@@ -20,7 +20,7 @@ const gmailAppPassword = defineSecret("GMAIL_APP_PASSWORD");
 const sender = "help.yumsum@gmail.com";
 
 /** The logo at the top of the email, from the website. */
-const logoUrl = "https://yumsum.web.app/app/icons/Icon-192.png";
+const logoUrl = "https://yumsum.app/app/icons/Icon-192.png";
 
 /**
  * Confirmation and password reset emails a day per account, together: room

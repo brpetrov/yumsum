@@ -2,7 +2,7 @@
 // tree: buttons and fields found by their names, as a person reads them.
 const pw = require("playwright");
 
-const BASE = process.env.BASE || "https://yumsum.web.app/";
+const BASE = process.env.BASE || "https://yumsum.app/";
 
 /** Opens the site in [engine] ("chromium", "firefox", "webkit") with [device]. */
 async function open(engine, device) {

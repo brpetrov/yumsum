@@ -89,14 +89,14 @@ The app sends feedback to a Formspree form (formspree.io, signed up with help.yu
 
 - [ ] **Find 12 testers.** A new personal account can only go to production after a closed test with at least 12 testers who stay opted in for 14 days in a row. Collect 12 Gmail addresses (friends, family, colleagues with Android phones) now; this is the longest wait of all.
 - [ ] **Store listing** (made: the texts are in plan 14 and the pictures in `tools/e2e/store/`; putting them into Play Console is plan 15, section C) (Claude can make these): app name, short description (80 characters), full description, the 1024×500 feature graphic, 2–8 phone screenshots; the icon is `assets/android/play_store_512.png`.
-- [x] **Account deletion page** (done: live since 9 November 2026, with a Bulgarian page; Claude can make it): Play asks for a web link that explains how to delete your account and data, e.g. https://yumsum.web.app/delete-account.
+- [x] **Account deletion page** (done: live since 9 November 2026, with a Bulgarian page; Claude can make it): Play asks for a web link that explains how to delete your account and data, e.g. https://yumsum.app/delete-account.
 - [x] **Open Food Facts account**: done 30 October 2026, see "Now" above.
 - [ ] Authentication → Settings: check email enumeration protection is on. (The app asks for 6+ character passwords, Firebase's default; leave the length unless the app changes too.)
 
 ### Once Google has approved you
 
 - [x] **Create the app**: YumSum, `com.bpetrov.yumsum`, a draft since 4 November 2026.
-- [ ] **App content** forms (Claude can draft the answers): privacy policy https://yumsum.web.app/privacy, ads (none), app access (sign-in needed, so give Google a test email account with a password), content rating, target audience (18+), data safety, health apps, account deletion link.
+- [ ] **App content** forms (Claude can draft the answers): privacy policy https://yumsum.app/privacy, ads (none), app access (sign-in needed, so give Google a test email account with a password), content rating, target audience (18+), data safety, health apps, account deletion link.
 - [ ] **First closed test**: Claude builds the bundle; upload it under Test and release → Testing → Closed testing, accept Play App Signing, add the 12 testers, and send them the opt-in link. Add the same 12 to Settings → License testing too, and give each a YumSum Star manual grant so they can try it (`docs/plans/07-billing.md`).
 - [x] Add the Play signing SHA-1 and SHA-256 (Test and release → App integrity → App signing) to **YumSum Android** in Firebase → Project settings (Google sign-in and App Check need them) (done 10 November 2026, plan 15)
 - [x] Link the Cloud project `lean-streak-project` under App integrity → Play Integrity API in Play Console. Without this, AI fails in Play installs. (App Check's **YumSum Android** provider is Play Integrity since 6 November 2026, with the debug and upload keys' SHA-256.) (Linked 10 November 2026, plan 15.)
@@ -105,7 +105,7 @@ The app sends feedback to a Formspree form (formspree.io, signed up with help.yu
 
 ## Later
 
-- [ ] **Our own page for account email links** (asked 9 November 2026, parked): the reset and confirmation emails' links open Firebase's plain grey page at lean-streak-project.firebaseapp.com/__/auth/action. Claude can build a YumSum page at yumsum.web.app/account (plain HTML, English and Bulgarian: choose a new password, email confirmed, link expired, a button back to YumSum), test it with the test account, then point Firebase at it (Authentication → Templates → Customize action URL). A few hours, website only. Switching the setting back restores Firebase's page.
+- [ ] **Our own page for account email links** (asked 9 November 2026, parked): the reset and confirmation emails' links open Firebase's plain grey page at lean-streak-project.firebaseapp.com/__/auth/action. Claude can build a YumSum page at yumsum.app/account (plain HTML, English and Bulgarian: choose a new password, email confirmed, link expired, a button back to YumSum), test it with the test account, then point Firebase at it (Authentication → Templates → Customize action URL). A few hours, website only. Switching the setting back restores Firebase's page.
 
 ## Known and accepted for now
 
