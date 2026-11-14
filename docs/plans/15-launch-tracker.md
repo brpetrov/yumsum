@@ -12,6 +12,22 @@
 
 **Now:** 1.1, Verify and Apply the email domain in Firebase. Then section 2's forms.
 
+## 0. Done before this list
+
+- [x] The app itself: logging by typing, voice, photo and barcode, with AI estimates; plan, weight and progress; History; recipes (40, with photos); reminders and the home-screen widget; English and Bulgarian
+- [x] YumSum Star: photo logging, macros, the Adaptive formula and AI Coach, with the buying code built (4 Nov; Google's side is section 5)
+- [x] The name YumSum and the app ID `com.bpetrov.yumsum` (28 Oct)
+- [x] help.yumsum@gmail.com, with feedback from the app arriving there (29 Oct)
+- [x] Firebase on the paid plan with a spend cap on the AI; the app's keys locked down (24–29 Oct)
+- [x] The AI behind our own Cloud Functions, which count the daily allowance (5 Nov)
+- [x] Open Food Facts account (30 Oct)
+- [x] Privacy policy, terms and the delete-account page, in both languages (9–11 Nov)
+- [x] Crash reports reaching Firebase (9–11 Nov)
+- [x] Play developer account, identity verified (30 Oct); the app created as a draft (4 Nov)
+- [x] The upload signing key, backed up (29 Oct)
+- [x] Store texts in both languages, the feature graphic and eight pictures (plan 14, 9–12 Nov)
+- [x] Browser tests of the website as the test account (9 Nov)
+
 ## 1. Email
 
 ### 1.1 Sign-in emails from yumsum.app (before the test)
@@ -116,6 +132,8 @@ Billing can be set up while the 14 days run. The clicks are in plan 07, "Steps f
 
 Nothing here is agreed. Each one is talked through before any code.
 
+- [ ] Water count: log the water you drink through the day (your idea, 14 Nov)
+- [ ] Steps: show the day's steps (your idea, 14 Nov). Reading the phone's step count means a new permission and one more Play form
 - [ ] Adaptive formula: show the pace you're really on beside the one you chose (talked about on 13 Nov). Other ideas from that talk: let a cut go past the fast pace's floor, cap a big gap instead of ignoring it, show the measured burn
 - [ ] `docs/adaptive-formula-explained.md`: correct its "Your own numbers" section, then commit it
 - [ ] A YumSum page for the email links (new password, email confirmed) at yumsum.app/account, instead of Firebase's grey one
