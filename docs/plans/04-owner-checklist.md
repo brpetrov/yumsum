@@ -2,6 +2,8 @@
 
 *Started 29 October 2026. Things only you can do (consoles, accounts, the phone), plus the next jobs Claude can pick up. Tick each one off as it's done; add a note under it if something went wrong.*
 
+**Since 14 November 2026 the live list is plan 15, the launch tracker (`15-launch-tracker.md`), which took over what was still open here. This file is kept for the background.**
+
 ## Now
 
 - [ ] **Put the 30 October changes live** (new quick-log bar, optional protein, launch screen, web loading page)

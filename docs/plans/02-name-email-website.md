@@ -157,6 +157,8 @@ Once the domain and email exist, I'll change:
 
 ## Checklist
 
+**Since 14 November 2026 the open items here are tracked in plan 15, the launch tracker (`15-launch-tracker.md`), section 1 for email. Tick them there.**
+
 - [x] Shortlist names; check the UK IPO, TMview, the stores and domains; pick one (done: YumSum, 28 October 2026)
 - [x] Buy the domain (done: yumsum.app at Cloudflare, 13 November 2026)
 - [ ] Set up email (Zoho Free) with hello@, support@, privacy@ and noreply@ (not yet: help.yumsum@gmail.com is the contact address)

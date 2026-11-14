@@ -2,6 +2,13 @@
 
 Guidance for Claude Code in this repository. The rules and the map are here; how each feature works in detail is in `docs/features.md` (read the section for what you're changing), and why things are the way they are is in `docs/plans/`. Trust the code over any notes, and update `docs/features.md` when you change a feature.
 
+## How we work
+
+- **One list:** `docs/plans/15-launch-tracker.md` is the only to-do list. Work it top to bottom, tick a task with its date once it's done and checked, and keep its "Now" line current.
+- **The queue:** anything the owner mentions on the side goes into the tracker's Queue with its date, and the current task carries on. It's sorted into a section when we next plan.
+- **Talk first:** agree the approach before coding anything beyond a small fix, and never add a new service unasked.
+- **Builds, version bumps and pushes only when asked.** Commit locally as work is finished.
+
 ## Commands
 
 ```bash
@@ -28,6 +35,7 @@ Run the deploys a change needs yourself, straight after it: rules, then the webs
 - **Home** in the app is `DashboardScreen`, called Today in the code.
 - **YumSum Star**, the paid tier, is `plus` in the code (`plusProvider`, `PlusScreen`, `/plus`).
 - The Android application ID and iOS bundle ID are `com.bpetrov.yumsum`.
+- The website is `yumsum.app`, the owner's domain since 13 November 2026 (DNS at Cloudflare; records for Firebase are DNS only, never proxied). `yumsum.web.app` still serves it and keeps the recipe photos.
 
 ## Architecture
 
@@ -51,6 +59,7 @@ Run the deploys a change needs yourself, straight after it: rules, then the webs
   - Macros are YumSum Star only for good, whatever they cost; the AI functions refuse them otherwise.
 - **The Adaptive formula changes targets only on Mondays,** never on a weigh-in.
 - **Recipe photos are served from the website,** so deploy hosting before an app release that lists new recipes, and run `test/recipes_asset_test.dart` after adding any.
+- **New web domain:** add it to Firebase Auth's authorised domains and to the reCAPTCHA key's allowed domains, or sign-in and App Check fail there.
 - **Secrets:** never print or commit them. The Open Food Facts account is held only by the functions, as the secrets `OFF_USER_ID` and `OFF_PASSWORD`, the Gemini key as `GEMINI_API_KEY` and help.yumsum's Gmail app password as `GMAIL_APP_PASSWORD`, never in the app; the release signing details are in the gitignored `android/key.properties`.
 
 ## Copy
@@ -91,7 +100,11 @@ The app is in English and Bulgarian (`docs/translation.md` has the how-to and wh
 | Billing | `lib/services/billing_service.dart`, `lib/providers/plus_purchase_controller.dart`, `lib/repositories/billing_repository.dart`, `functions/` | 07 |
 | Reminders, widget, shortcuts | `lib/services/notification_service.dart`, `lib/app/launch_actions.dart` | |
 | Language, texts, dates and numbers | `lib/l10n/`, `lib/providers/language_provider.dart`, `lib/screens/language/` | |
+| Sign-in and account emails | `lib/providers/auth_controller.dart`, `lib/screens/auth/auth_screen.dart`, `functions/src/email.ts` | 02 |
+| Meal groups on Home and in History | `lib/widgets/meal_slots.dart` | |
+| Crash reports, App Check | `lib/core/config/crash_reports.dart`, `app_check.dart` | |
 | Legal pages, website | `tools/hosting/`, `tools/build_hosting.ps1` | 02 |
+| Browser tests, Play store pictures | `tools/e2e/`, `tools/e2e/store/` | 14 |
 
 `docs/plans/` holds the owner's plans with their set-up steps and checklists:
 - 01 contributing
@@ -108,4 +121,4 @@ The app is in English and Bulgarian (`docs/translation.md` has the how-to and wh
 - 12 estimate choices: the amount and the kind
 - 13 servings on the scan sheet
 - 14 Play store listing and forms
-- 15 from draft to closed test in Play Console
+- 15 the launch tracker: the one to-do list from here to the public launch, with the queue
